@@ -2,7 +2,15 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-First, run the development server:
+We're using [pnpm](https://pnpm.io/) as the package manager for this application. **Please** download if the following commands don't work:
+
+Install packages:
+
+```bash
+pnpm install
+```
+
+Run the development server:
 
 ```bash
 pnpm dev
