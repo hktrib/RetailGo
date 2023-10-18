@@ -1,0 +1,11 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "./db/queries/user.sql"
+    schema: "./db/migration"
+    gen:
+      go:
+        package: "db"
+        out: "./db/sqlc"
+        output_querier_file_name: "./db/sqlc/querier.go"
+        emit_json_tags:   
