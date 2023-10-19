@@ -16,7 +16,6 @@ To lessen the install burden, we'll work with postgres on a docker container via
 1. Ensure that you have docker desktop installed. If not download it here https://www.docker.com/products/docker-desktop/
 2. (Ignore Steps 2&3 if you want to use another GUI viewer)Download TablePlus at https://tableplus.com/
 
-![Alt text](image.png)
 
 4. Once your project has been cloned navigate to the **server/Makefile** file.
 
@@ -31,4 +30,5 @@ To lessen the install burden, we'll work with postgres on a docker container via
     - ```console foo@bar:RetailGo/server$ make sqlc``` generates our sqlc database interfacing code (based on the queries in our queries in the various .sql files in the **queries** folder) and places them inside the **db/sqlc** folder.
     - ```console foo@bar:RetailGo/server$ make sqlc_delete``` deletes the **db/sqlc** folder.
 6. run **make postgres** **make createdb** **make migrateup** and Configure TablePlus to connect to the retail_go database via PORT# 5432 (Password: secret)
+![Alt text](image.png)
 7. Run ```console foo@bar:RetailGo/server$ go run main.go``` 
