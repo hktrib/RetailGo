@@ -33,6 +33,9 @@ To lessen the install burden, we'll work with postgres on a docker container via
 ![Alt text](image.png)
 7. Run ```console foo@bar:RetailGo/server$ go run main.go``` 
 
+##### Working With DBML
+Check the docs linked below to get familiar
+Install the "DBML Live Preview" extension
 
 ##### Docs
 Go-Chi -> https://go-chi.io/
