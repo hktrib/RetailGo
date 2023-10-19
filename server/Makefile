@@ -23,4 +23,4 @@ sqlc:
 sqlc_delete:
 	rm -rf ./db/sqlc
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc sqlc_delete
+.PHONY: postgres createdb dropdb dbschema migrateup migratedown sqlc sqlc_delete
