@@ -14,7 +14,7 @@ Contributors: Colby Frey, Apramay Singh
 To lessen the install burden, we'll work with postgres on a docker container via PORT# 5432
 
 1. Ensure that you have docker desktop installed. If not download it here https://www.docker.com/products/docker-desktop/
-2. (Ignore Steps 2&3 if you want to use another GUI viewer)Download TablePlus at https://tableplus.com/
+2. (Ignore Steps 2 if you want to use another GUI viewer)Download TablePlus at https://tableplus.com/
 
 
 4. Once your project has been cloned navigate to the **server/Makefile** file.
