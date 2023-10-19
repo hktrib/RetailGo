@@ -21,13 +21,13 @@ To lessen the install burden, we'll work with postgres on a docker container via
 
 
 5. Most of the commands are pretty self-explanatory. 
-    - ```console foo@bar:RetailGo/server$ make postgres``` spins up a docker container
-    - ```console foo@bar:RetailGo/server$ make createdb``` creates a database -> retail_go
-    - ```console foo@bar:RetailGo/server$ make drodb``` deletes a database -> retail_go
-    - ```console foo@bar:RetailGo/server$ make dbschema``` creates the schema.sql file fromt the db.dbml file
-    - ```console foo@bar:RetailGo/server$ make migrateup``` migrates the latest schema over to the database. 
-    - ```console foo@bar:RetailGo/server$ make migratedown``` migrates us back to our previous schema 
-    - ```console foo@bar:RetailGo/server$ make sqlc``` generates our sqlc database interfacing code (based on the queries in our queries in the various .sql files in the **queries** folder) and places them inside the **db/sqlc** folder.
+    - ```foo@bar:RetailGo/server$ make postgres``` spins up a docker container
+    - ```foo@bar:RetailGo/server$ make createdb``` creates a database -> retail_go
+    - ```foo@bar:RetailGo/server$ make drodb``` deletes a database -> retail_go
+    - ```foo@bar:RetailGo/server$ make dbschema``` creates the schema.sql file fromt the db.dbml file
+    - ```foo@bar:RetailGo/server$ make migrateup``` migrates the latest schema over to the database. 
+    - ```foo@bar:RetailGo/server$ make migratedown``` migrates us back to our previous schema 
+    - ```foo@bar:RetailGo/server$ make sqlc``` generates our sqlc database interfacing code (based on the queries in our queries in the various .sql files in the **queries** folder) and places them inside the **db/sqlc** folder.
     - ```console foo@bar:RetailGo/server$ make sqlc_delete``` deletes the **db/sqlc** folder.
 6. run **make postgres** **make createdb** **make migrateup** and Configure TablePlus to connect to the retail_go database via PORT# 5432 (Password: secret)
 ![Alt text](image.png)
