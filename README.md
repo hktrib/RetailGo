@@ -32,3 +32,9 @@ To lessen the install burden, we'll work with postgres on a docker container via
 6. run **make postgres** **make createdb** **make migrateup** and Configure TablePlus to connect to the retail_go database via PORT# 5432 (Password: secret)
 ![Alt text](image.png)
 7. Run ```console foo@bar:RetailGo/server$ go run main.go``` 
+
+
+##### Docs
+Go-Chi -> https://go-chi.io/
+DBMl -> https://dbml.dbdiagram.io/docs/
+Sqlc -> https://docs.sqlc.dev/en/stable/tutorials/getting-started-postgresql.html
