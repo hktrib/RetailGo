@@ -22,6 +22,12 @@ export default function Header() {
             Sign in
           </Link>
           <Link
+            href="/inventory"
+            className="bg-sky-500 text-white font-semibold p-2 rounded-md text-sm"
+          >
+            Inventory <span aria-hidden="true">&rarr;</span>
+          </Link>
+          <Link
             href="/sign-up"
             className="bg-amber-500 text-white font-semibold p-2 rounded-md text-sm"
           >

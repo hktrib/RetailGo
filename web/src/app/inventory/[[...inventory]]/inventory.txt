@@ -1,0 +1,33 @@
+// This class represents an inventory system that tracks items by their number, description, type, status, expiration date, and category.
+
+public class InventorySystem {
+    // Fields
+    private int itemNumber;
+    private string description;
+    private string itemType;
+    private string status;
+    private DateTime expiration;
+    private string category;
+
+    // Constructor
+    public InventorySystem(int itemNumber, string description, string itemType, string status, DateTime expiration, string category) {
+        this.itemNumber = itemNumber;
+        this.description = description;
+        this.itemType = itemType;
+        this.status = status;
+        this.expiration = expiration;
+        this.category = category;
+    }
+
+    // Methods
+    // ...
+}
+
+Fields: 
+Item code
+description
+item type
+status
+expiration
+quantity avaible
+allocated
