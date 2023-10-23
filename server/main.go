@@ -1,14 +1,14 @@
 package main
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	db "github.com/hktrib/RetailGo/db/sqlc"
+	"github.com/hktrib/RetailGo/ent"
 	"github.com/hktrib/RetailGo/routes"
 	"github.com/hktrib/RetailGo/util"
 
@@ -35,14 +35,18 @@ func main() {
 		log.Fatal(err)
 	}
 
-	conn, err := sql.Open(config.DBDriver, config.DBSource)
+	client, err := ent.Open(config.DBDriver, config.DBSource)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed opening connection to postgres: %v", err)
+	}
+	defer client.Close()
+
+	if err := client.Schema.Create(context.Background()); err != nil {
+		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
-	store := db.NewStore(conn)
 	routes := routes.RouteHandler{
-		Store:  &store,
+		Client: client,
 		Config: &config,
 	}
 
