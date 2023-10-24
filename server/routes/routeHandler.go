@@ -2,22 +2,17 @@ package routes
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-<<<<<<< HEAD
 	"log"
 	"net/http"
 	"strconv"
 
-	"github.com/hktrib/RetailGo/ent"
-	"github.com/hktrib/RetailGo/ent/item"
-=======
 	"github.com/go-chi/chi/v5"
 	"github.com/hktrib/RetailGo/ent"
+	"github.com/hktrib/RetailGo/ent/item"
 	store2 "github.com/hktrib/RetailGo/ent/store"
->>>>>>> 0ffbfe61e8df83a359cace0f38d1276b54139d34
 	"github.com/hktrib/RetailGo/util"
-	"net/http"
-	"strconv"
 )
 
 type RouteHandler struct {
@@ -39,7 +34,6 @@ func (rh *RouteHandler) HelloWorld(w http.ResponseWriter, r *http.Request) {
 		SetStoreID(1381).
 		Save(ctx)
 
-<<<<<<< HEAD
 	if err != nil {
 		fmt.Println("Create user failed")
 		fmt.Println(err)
@@ -49,11 +43,6 @@ func (rh *RouteHandler) HelloWorld(w http.ResponseWriter, r *http.Request) {
 		Create().
 		SetStoreName("Giridhar's Test Store").
 		SetID(1391).
-=======
-	store, err := rh.Client.Store.
-		Create().
-		SetStoreName("Retail Go").SetID(1321).
->>>>>>> 0ffbfe61e8df83a359cace0f38d1276b54139d34
 		Save(ctx)
 
 	if err != nil {
@@ -82,9 +71,17 @@ func (rh *RouteHandler) HelloWorld(w http.ResponseWriter, r *http.Request) {
 // API to create a new inventory item
 
 func (rh *RouteHandler) CreateItem(w http.ResponseWriter, r *http.Request) {
+	// Take an item's:
+	// Name
+	// Photo
+	// Quantity
+	// Store ID
+	// Category
+
 }
 
 // API to read inventory of a store
+// Route: inventory/?store_id=_
 
 func (rh *RouteHandler) ReadAll(w http.ResponseWriter, r *http.Request) {
 
@@ -106,14 +103,17 @@ func (rh *RouteHandler) ReadAll(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("Failed to retrieve items for this store: %s", err)
 	}
 
-	for _, item := range inventory {
-		fmt.Printf("Item:, %s", item)
-	}
+	inventory_bytes, err := json.MarshalIndent(inventory, "", "")
 
 	// Format and return
 
-	w.Write([]byte("You have reached ReadAll.\n"))
+	if err != nil {
+		fmt.Println("Failed to Convert Inventory to JSON properly")
+	} else {
+		w.Write(inventory_bytes)
+	}
 }
+
 func (rh *RouteHandler) ValidateStore(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		store_id := chi.URLParam(r, "store_id")
