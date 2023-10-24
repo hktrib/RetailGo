@@ -25,7 +25,7 @@ var (
 		Indexes: []*schema.Index{
 			{
 				Name:    "item_store_id",
-				Unique:  true,
+				Unique:  false,
 				Columns: []*schema.Column{ItemsColumns[4]},
 			},
 		},

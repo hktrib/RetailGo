@@ -21,7 +21,7 @@ export default function Home() {
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-600">
               RetailGo is a point-of-sale and inventory management solution
-              designed to give business end-to-end control over their internal
+              designed to give businesses end-to-end control over their internal
               operations.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
