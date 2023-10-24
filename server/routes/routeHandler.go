@@ -4,15 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
+
+	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/hktrib/RetailGo/ent"
 	"github.com/hktrib/RetailGo/ent/item"
 	store2 "github.com/hktrib/RetailGo/ent/store"
 	"github.com/hktrib/RetailGo/util"
-	"net/http"
-	"strconv"
 )
 
 type RouteHandler struct {
@@ -66,53 +66,6 @@ func (rh *RouteHandler) HelloWorld(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Item2: %s\n", item2)
 }
 
-// API to create a new inventory item
-
-func (rh *RouteHandler) CreateItem(w http.ResponseWriter, r *http.Request) {
-	// Take an item's:
-	// Name
-	// Photo
-	// Quantity
-	// Store ID
-	// Category
-
-}
-
-// API to read inventory of a store
-// Route: inventory/?store_id=_
-
-func (rh *RouteHandler) ReadAll(w http.ResponseWriter, r *http.Request) {
-
-	ctx := r.Context()
-
-	// Parse the store id
-	store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
-
-	if err != nil {
-
-		log.Fatal("Not a valid store ID")
-	}
-
-	// Verify valid store id (not SQL Injection)
-
-	// Run the SQL Query by store id on the items table, to get all items belonging to this store
-	inventory, err := rh.Client.Item.Query().Where(item.StoreID(store_id)).All(ctx)
-
-	if err != nil {
-		fmt.Printf("Failed to retrieve items for this store: %s", err)
-	}
-
-	inventory_bytes, err := json.MarshalIndent(inventory, "", "")
-
-	// Format and return
-
-	if err != nil {
-		fmt.Println("Failed to Convert Inventory to JSON properly")
-	} else {
-		w.Write(inventory_bytes)
-	}
-}
-
 func (rh *RouteHandler) ValidateStore(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		store_id := chi.URLParam(r, "store_id")
@@ -135,6 +88,45 @@ func (rh *RouteHandler) ValidateStore(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func (rh *RouteHandler) InvRead(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	// Parse the store id
+	store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
+
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	// Verify valid store id (not SQL Injection)
+
+	// Run the SQL Query by store id on the items table, to get all items belonging to this store
+	inventory, err := rh.Client.Item.Query().Where(item.StoreID(store_id)).All(ctx)
+
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	inventory_bytes, err := json.MarshalIndent(inventory, "", "")
+
+	// Format and return
+
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusAccepted)
+
+	w.Write(inventory_bytes)
+}
+
+func (rh *RouteHandler) InvCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (rh *RouteHandler) InvUpdate(w http.ResponseWriter, r *http.Request) {
