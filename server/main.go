@@ -19,8 +19,8 @@ func setupRoutes(r chi.Router, routes *routes.RouteHandler) {
 	// Public Routes
 	r.Group(func(r chi.Router) {
 		r.Get("/", routes.HelloWorld)
+		r.Get("/inventory/", routes.ReadAll)
 	})
-
 	// Private Routes
 	// r.Group(func(r chi.Router) {
 	//     r.Use(AuthMiddleware)
