@@ -10,7 +10,6 @@ export default function Header() {
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5">
             <span className="sr-only">RetailGo</span>
-
             <span className="font-bold tracking-wide">RetailGo</span>
           </Link>
         </div>
