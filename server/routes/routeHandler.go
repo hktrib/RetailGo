@@ -88,9 +88,10 @@ func (rh *RouteHandler) ReadAll(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	// Parse the store id
-	store_id, err := strconv.Atoi(r.URL.Query().Get("store_id"))
+	store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
 
 	if err != nil {
+
 		log.Fatal("Not a valid store ID")
 	}
 
