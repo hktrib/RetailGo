@@ -19,7 +19,6 @@ func setupRoutes(r chi.Router, routes *routes.RouteHandler) {
 	// Public Routes
 	r.Group(func(r chi.Router) {
 		r.Get("/", routes.HelloWorld)
-		r.Get("/inventory/", routes.ReadAll)
 	})
 	// Private Routes
 	// r.Group(func(r chi.Router) {
@@ -30,10 +29,10 @@ func setupRoutes(r chi.Router, routes *routes.RouteHandler) {
 		r.Route("/{store_id}", func(r chi.Router) {
 			r.Use(routes.ValidateStore) // add user validation
 			r.Route("/inventory", func(r chi.Router) {
-				r.Get("/", routes.HelloWorld)    //
-				r.Post("/", routes.HelloWorld)   //
-				r.Delete("/", routes.HelloWorld) //
-				r.Put("/", routes.HelloWorld)    //
+				r.Get("/", routes.ReadAll)      //
+				r.Post("/", routes.InvUpdate)   //
+				r.Delete("/", routes.InvDelete) //
+				r.Put("/", routes.HelloWorld)   //
 			})
 		})
 	})
@@ -56,7 +55,7 @@ func main() {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
-	routes := routes.RouteHandler{
+	routeHandler := routes.RouteHandler{
 		Client: client,
 		Config: &config,
 	}
@@ -64,7 +63,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
-	setupRoutes(r, &routes)
+	setupRoutes(r, &routeHandler)
 
 	go func() {
 		err := http.ListenAndServe(fmt.Sprintf(":%s", config.ServerAddress), r)
