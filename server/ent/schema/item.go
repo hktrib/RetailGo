@@ -33,6 +33,7 @@ func (Item) Indexes() []ent.Index {
 		// index.Fields("item_name").
 		// 	Edges("store_name").
 		// 	Unique(),
-		index.Fields("store_id"),
+		index.Fields("store_id").
+			Unique(),
 	}
 }
