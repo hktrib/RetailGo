@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/hktrib/RetailGo/ent"
+	"github.com/hktrib/RetailGo/ent/item"
 	store2 "github.com/hktrib/RetailGo/ent/store"
 	"github.com/hktrib/RetailGo/util"
 	"net/http"
@@ -52,16 +53,89 @@ func (rh *RouteHandler) ValidateStore(next http.Handler) http.Handler {
 		}
 		store, err := rh.Client.Store.
 			Query().Where(store2.ID(StoreId)).Only(r.Context())
-		if err != nil {
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusInternalServerError)
-			return
-		}
-		if store == nil {
+		if ent.IsNotFound(err) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
+		} else if err != nil {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
 		}
-		ctx := context.WithValue(r.Context(), "store_var", r.Context())
+
+		ctx := context.WithValue(r.Context(), "store_var", store)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func (rh *RouteHandler) InvUpdate(w http.ResponseWriter, r *http.Request) {
+	// get item id from url query string
+
+	itemId, err := strconv.Atoi(r.URL.Query().Get("item"))
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	change, err := strconv.Atoi(r.URL.Query().Get("change"))
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	targetItem, err := rh.Client.Item.
+		Query().
+		Where(item.ID(itemId)).
+		Only(r.Context())
+	if ent.IsNotFound(err) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	} else if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	_, err = targetItem.Update().SetQuantity(targetItem.Quantity + change).
+		Save(r.Context())
+
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write([]byte("OK"))
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+}
+func (rh *RouteHandler) InvDelete(w http.ResponseWriter, r *http.Request) {
+
+	store := r.Context().Value("store_var").(*ent.Store)
+
+	item_id, err := strconv.Atoi(r.URL.Query().Get("item"))
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	err = rh.Client.
+		Item.DeleteOneID(item_id).
+		Where(item.StoreID(store.ID)).
+		Exec(r.Context())
+
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	if ent.IsNotFound(err) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	} else if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write([]byte("OK"))
+
 }
