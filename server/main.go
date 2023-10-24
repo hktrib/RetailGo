@@ -26,6 +26,17 @@ func setupRoutes(r chi.Router, routes *routes.RouteHandler) {
 	//     r.Use(AuthMiddleware)
 	//     r.Post("/manage", CreateAsset)
 	// })
+	r.Route("/store", func(r chi.Router) {
+		r.Route("/{store_id}", func(r chi.Router) {
+			r.Use(routes.ValidateStore) // add user validation
+			r.Route("/inventory", func(r chi.Router) {
+				r.Get("/", routes.HelloWorld)    //
+				r.Post("/", routes.HelloWorld)   //
+				r.Delete("/", routes.HelloWorld) //
+				r.Put("/", routes.HelloWorld)    //
+			})
+		})
+	})
 }
 
 func main() {
