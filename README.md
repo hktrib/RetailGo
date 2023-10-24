@@ -1,5 +1,5 @@
 # RetailGo
-RetailGo (Organization)
+RetailGo
 
 
 Contributors: Colby Frey, Apramay Singh, David Nguyen, Giridhar Vadhul, Leo Asatoorian, Jonathan Michel
