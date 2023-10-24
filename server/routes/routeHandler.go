@@ -123,11 +123,6 @@ func (rh *RouteHandler) InvDelete(w http.ResponseWriter, r *http.Request) {
 		Where(item.StoreID(store.ID)).
 		Exec(r.Context())
 
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
 	if ent.IsNotFound(err) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
