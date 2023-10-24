@@ -20,7 +20,6 @@ func setupRoutes(r chi.Router, routes *routes.RouteHandler) {
 	r.Group(func(r chi.Router) {
 		r.Get("/", routes.HelloWorld)
 	})
-
 	// Private Routes
 	// r.Group(func(r chi.Router) {
 	//     r.Use(AuthMiddleware)
@@ -30,7 +29,7 @@ func setupRoutes(r chi.Router, routes *routes.RouteHandler) {
 		r.Route("/{store_id}", func(r chi.Router) {
 			r.Use(routes.ValidateStore) // add user validation
 			r.Route("/inventory", func(r chi.Router) {
-				r.Get("/", routes.HelloWorld)   //
+				r.Get("/", routes.ReadAll)      //
 				r.Post("/", routes.InvUpdate)   //
 				r.Delete("/", routes.InvDelete) //
 				r.Put("/", routes.HelloWorld)   //
