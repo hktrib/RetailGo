@@ -10,8 +10,8 @@ interface InfoCardProps {
 
 const InfoCard = ({ bgColor, title, count, icon }: InfoCardProps) => {
   return (
-    <div className={`info-box ${bgColor}`}>
-      <span className="info-icon --color-white">{icon}</span>
+    <div className={`info-box bg-${bgColor}-100  rounded-lg`}>
+      <span className="info-icon --color-black">{icon}</span>
       <span className="info-text">
         <p>{title}</p>
         <h4>{count}</h4>
