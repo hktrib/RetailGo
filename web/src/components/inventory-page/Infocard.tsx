@@ -1,7 +1,14 @@
 import React from "react";
 import "./Infocard.css";
 
-const InfoCard = ({ bgColor, title, count, icon }) => {
+interface InfoCardProps {
+  bgColor: string;
+  title: string;
+  count: number;
+  icon: string;
+}
+
+const InfoCard = ({ bgColor, title, count, icon }: InfoCardProps) => {
   return (
     <div className={`info-box ${bgColor}`}>
       <span className="info-icon --color-white">{icon}</span>

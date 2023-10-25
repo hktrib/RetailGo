@@ -47,7 +47,7 @@ export default function Inventory() {
       <div className='py-24 sm:py-40 lg:py-48'>
         <h1 className="text-2xl font-bold mx-auto max-w-7xl">Inventory Stats</h1>
         <div className=" flex mx-auto max-w-7xl">
-          <Infocard bgColor={"red"} title={"Test"} count={"24"} icon={undefined}></Infocard>
+          <Infocard bgColor={"red"} title={"Test"} count={24} icon={"undefined"}></Infocard>
           <div className="bg-orange-100 rounded-lg p-6 mr-4">
             <h2 className="text-lg font-bold mb-2">Total Items</h2>
             <p className="text-3xl font-bold">{inventory.length}</p>
