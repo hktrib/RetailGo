@@ -17,6 +17,8 @@ const (
 	FieldPhoto = "photo"
 	// FieldQuantity holds the string denoting the quantity field in the database.
 	FieldQuantity = "quantity"
+	// FieldPrice holds the string denoting the price field in the database.
+	FieldPrice = "price"
 	// FieldStoreID holds the string denoting the store_id field in the database.
 	FieldStoreID = "store_id"
 	// FieldCategory holds the string denoting the category field in the database.
@@ -31,6 +33,7 @@ var Columns = []string{
 	FieldName,
 	FieldPhoto,
 	FieldQuantity,
+	FieldPrice,
 	FieldStoreID,
 	FieldCategory,
 }
@@ -61,6 +64,11 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByQuantity orders the results by the quantity field.
 func ByQuantity(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldQuantity, opts...).ToFunc()
+}
+
+// ByPrice orders the results by the price field.
+func ByPrice(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPrice, opts...).ToFunc()
 }
 
 // ByStoreID orders the results by the store_id field.
