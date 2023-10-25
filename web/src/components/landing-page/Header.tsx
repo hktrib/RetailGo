@@ -1,9 +1,6 @@
 import Link from "next/link";
-import { auth } from "@clerk/nextjs";
 
 export default function Header() {
-  const { userId } = auth();
-
   return (
     <header className="absolute inset-x-0 top-0 z-50">
       <nav
@@ -18,29 +15,24 @@ export default function Header() {
         </div>
 
         <div className="hidden lg:flex lg:flex-1 lg:justify-end items-center space-x-4">
-          {userId ? (
-            <Link
-              href="/app"
-              className="bg-amber-500 text-white font-medium px-3 py-1.5 rounded-md text-sm"
-            >
-              My stores
-            </Link>
-          ) : (
-            <>
-              <Link
-                href="/sign-in"
-                className="text-sm font-semibold leading-6 text-gray-900"
-              >
-                Sign in
-              </Link>
-              <Link
-                href="/sign-up"
-                className="bg-amber-500 text-white font-medium px-3 py-1.5 rounded-md text-sm"
-              >
-                Get started <span aria-hidden="true">&rarr;</span>
-              </Link>
-            </>
-          )}
+          <Link
+            href="/sign-in"
+            className="text-sm font-semibold leading-6 text-gray-900"
+          >
+            Sign in
+          </Link>
+          <Link
+            href="/inventory"
+            className="bg-sky-500 text-white font-semibold p-2 rounded-md text-sm"
+          >
+            Inventory <span aria-hidden="true">&rarr;</span>
+          </Link>
+          <Link
+            href="/sign-up"
+            className="bg-amber-500 text-white font-semibold p-2 rounded-md text-sm"
+          >
+            Get started <span aria-hidden="true">&rarr;</span>
+          </Link>
         </div>
       </nav>
     </header>
