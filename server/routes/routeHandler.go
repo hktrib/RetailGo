@@ -22,7 +22,7 @@ type RouteHandler struct {
 }
 type TempItem struct {
 	Name     string
-	Photo    []byte
+	Photo    string
 	Quantity int
 	Category string
 }
@@ -137,6 +137,8 @@ func (rh *RouteHandler) InvRead(w http.ResponseWriter, r *http.Request) {
 func (rh *RouteHandler) InvCreate(w http.ResponseWriter, r *http.Request) {
 	// name, photo, quantity, store_id, category
 
+	ctx := r.Context()
+
 	// Load store_id first
 
 	store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
@@ -172,11 +174,14 @@ func (rh *RouteHandler) InvCreate(w http.ResponseWriter, r *http.Request) {
 
 	// Create item in database with name, photo, quantity, store_id, category
 
-	creat_err := rh.Client.Item.Create().SetName(req_item.Name).SetPhoto(req_item.Photo).SetCategory(req_item.Category).SetQuantity(req_item.Quantity).SetStoreID(store_id)
+	_, create_err := rh.Client.Item.Create().SetName(req_item.Name).SetPhoto([]byte(req_item.Photo)).SetCategory(req_item.Category).SetQuantity(req_item.Quantity).SetStoreID(store_id).Save(ctx)
+
+	// fmt.Println("Create Err:", create_err)
 
 	// If this create doesn't work, InternalServerError
 
-	if creat_err != nil {
+	if create_err != nil {
+		fmt.Println("Create didn't work:", create_err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
