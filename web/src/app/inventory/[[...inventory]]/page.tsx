@@ -36,7 +36,7 @@ export default function Inventory() {
     setNewItem({ name: '', description: '', price: 0, quantity: 0 });
   };
 
-  const handleDeleteItem = (index) => {
+  const handleDeleteItem = (index: number) => {
     const updatedInventory = [...inventory];
     updatedInventory.splice(index, 1);
     setInventory(updatedInventory);
@@ -136,7 +136,7 @@ export default function Inventory() {
               <span>
                 <Search
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setSearch(e.target.value)}
                 />
               </span>
             </div>
