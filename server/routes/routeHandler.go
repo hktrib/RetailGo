@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 
 	"net/http"
 	"strconv"
@@ -19,12 +18,6 @@ import (
 type RouteHandler struct {
 	Client *ent.Client
 	Config *util.Config
-}
-type TempItem struct {
-	Name     string
-	Photo    []byte
-	Quantity int
-	Category string
 }
 
 func (rh *RouteHandler) HelloWorld(w http.ResponseWriter, r *http.Request) {
@@ -133,56 +126,7 @@ func (rh *RouteHandler) InvRead(w http.ResponseWriter, r *http.Request) {
 	w.Write(inventory_bytes)
 }
 
-// POST without id (because item needs to be created)
 func (rh *RouteHandler) InvCreate(w http.ResponseWriter, r *http.Request) {
-	// name, photo, quantity, store_id, category
-
-	// Load store_id first
-
-	store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
-
-	if err != nil {
-		fmt.Println("Invalid store id:", err)
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
-
-	// Load the message parameters (Name, Photo, Quantity, Category)
-	req_body, err := io.ReadAll(r.Body)
-
-	if err != nil {
-		fmt.Println("Server failed to read message body:", err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-	fmt.Printf("Store Id:%d, Req body: %s\n", store_id, req_body)
-
-	var req_item TempItem
-
-	body_parse_err := json.Unmarshal(req_body, &req_item)
-
-	// If any are not present or not do not meet requirements (type for example), BadRequest
-
-	if body_parse_err != nil {
-		fmt.Println("Unmarshalling failed:", body_parse_err)
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
-
-	// Create item in database with name, photo, quantity, store_id, category
-
-	creat_err := rh.Client.Item.Create().SetName(req_item.Name).SetPhoto(req_item.Photo).SetCategory(req_item.Category).SetQuantity(req_item.Quantity).SetStoreID(store_id)
-
-	// If this create doesn't work, InternalServerError
-
-	if creat_err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("OK"))
 }
 
 func (rh *RouteHandler) InvUpdate(w http.ResponseWriter, r *http.Request) {
