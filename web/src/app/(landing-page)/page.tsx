@@ -1,9 +1,31 @@
 import Link from "next/link";
+import { ShoppingBasket, Package, Banknote } from "lucide-react";
+
+const features = [
+  {
+    name: "Point-of-sale system",
+    description:
+      "Fast and customizable, allowing for businesses of any size to scale to their needs.",
+    icon: Banknote,
+  },
+  {
+    name: "Inventory management",
+    description:
+      "Maintain accurate real-time records effortlessly through synchronization with our point-of-sale system.",
+    icon: Package,
+  },
+  {
+    name: "Product recommendations",
+    description:
+      "Get recommendations for the most popular products on the market with our fully integrated recommendation system.",
+    icon: ShoppingBasket,
+  },
+];
 
 export default function Home() {
   return (
     <main>
-      <div className="relative isolate px-6 pt-14 lg:px-8">
+      <section className="relative isolate px-6 pt-14 lg:px-8" id="hero">
         <div
           className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
           aria-hidden="true"
@@ -33,12 +55,12 @@ export default function Home() {
               >
                 Get started
               </Link>
-              <a
-                href="#"
+              <Link
+                href="#features"
                 className="text-sm font-semibold leading-6 text-gray-900"
               >
                 Learn more <span aria-hidden="true">→</span>
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -54,7 +76,42 @@ export default function Home() {
             }}
           />
         </div>
-      </div>
+      </section>
+
+      <section className="py-32 sm:py-40" id="features">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl lg:text-center">
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Designed for small businesses
+            </h2>
+            <p className="mt-6 text-lg leading-8 text-gray-600">
+              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores
+              impedit perferendis suscipit eaque, iste dolor cupiditate
+              blanditiis.
+            </p>
+          </div>
+          <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+            <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
+              {features.map((feature) => (
+                <div key={feature.name} className="flex flex-col">
+                  <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900">
+                    <div className="rounded-lg flex items-center justify-center h-10 w-10 bg-amber-600">
+                      <feature.icon
+                        className="h-5 w-5 flex-none text-white"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    {feature.name}
+                  </dt>
+                  <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
+                    <p className="flex-auto">{feature.description}</p>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
