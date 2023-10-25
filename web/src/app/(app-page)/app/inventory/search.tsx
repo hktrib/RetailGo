@@ -1,7 +1,5 @@
 import React from "react";
-import styles from "./Search.module.css";
-
-
+// import styles from "./Search.module.css";
 
 interface SearchProps {
   value: string;
@@ -10,8 +8,8 @@ interface SearchProps {
 
 const Search = ({ value, onChange }: SearchProps) => {
   return (
-    <div className={styles.search}>
-      <search className={styles.icon} />
+    <div>
+      <search />
       <input
         type="text"
         placeholder="Search products"
