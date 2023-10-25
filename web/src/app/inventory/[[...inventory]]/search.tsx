@@ -1,11 +1,17 @@
 import React from "react";
 import styles from "./Search.module.css";
-import { search } from "lucide-react";
 
-const Search = ({ value, onChange }) => {
+
+
+interface SearchProps {
+  value: string;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const Search = ({ value, onChange }: SearchProps) => {
   return (
     <div className={styles.search}>
-      <search  className={styles.icon} />
+      <search className={styles.icon} />
       <input
         type="text"
         placeholder="Search products"
