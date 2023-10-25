@@ -40,6 +40,8 @@ type ItemMutation struct {
 	photo         *[]byte
 	quantity      *int
 	addquantity   *int
+	price         *float64
+	addprice      *float64
 	store_id      *int
 	addstore_id   *int
 	category      *string
@@ -281,6 +283,62 @@ func (m *ItemMutation) ResetQuantity() {
 	m.addquantity = nil
 }
 
+// SetPrice sets the "price" field.
+func (m *ItemMutation) SetPrice(f float64) {
+	m.price = &f
+	m.addprice = nil
+}
+
+// Price returns the value of the "price" field in the mutation.
+func (m *ItemMutation) Price() (r float64, exists bool) {
+	v := m.price
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPrice returns the old "price" field's value of the Item entity.
+// If the Item object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ItemMutation) OldPrice(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPrice is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPrice requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPrice: %w", err)
+	}
+	return oldValue.Price, nil
+}
+
+// AddPrice adds f to the "price" field.
+func (m *ItemMutation) AddPrice(f float64) {
+	if m.addprice != nil {
+		*m.addprice += f
+	} else {
+		m.addprice = &f
+	}
+}
+
+// AddedPrice returns the value that was added to the "price" field in this mutation.
+func (m *ItemMutation) AddedPrice() (r float64, exists bool) {
+	v := m.addprice
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPrice resets all changes to the "price" field.
+func (m *ItemMutation) ResetPrice() {
+	m.price = nil
+	m.addprice = nil
+}
+
 // SetStoreID sets the "store_id" field.
 func (m *ItemMutation) SetStoreID(i int) {
 	m.store_id = &i
@@ -407,7 +465,7 @@ func (m *ItemMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ItemMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.name != nil {
 		fields = append(fields, item.FieldName)
 	}
@@ -416,6 +474,9 @@ func (m *ItemMutation) Fields() []string {
 	}
 	if m.quantity != nil {
 		fields = append(fields, item.FieldQuantity)
+	}
+	if m.price != nil {
+		fields = append(fields, item.FieldPrice)
 	}
 	if m.store_id != nil {
 		fields = append(fields, item.FieldStoreID)
@@ -437,6 +498,8 @@ func (m *ItemMutation) Field(name string) (ent.Value, bool) {
 		return m.Photo()
 	case item.FieldQuantity:
 		return m.Quantity()
+	case item.FieldPrice:
+		return m.Price()
 	case item.FieldStoreID:
 		return m.StoreID()
 	case item.FieldCategory:
@@ -456,6 +519,8 @@ func (m *ItemMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldPhoto(ctx)
 	case item.FieldQuantity:
 		return m.OldQuantity(ctx)
+	case item.FieldPrice:
+		return m.OldPrice(ctx)
 	case item.FieldStoreID:
 		return m.OldStoreID(ctx)
 	case item.FieldCategory:
@@ -490,6 +555,13 @@ func (m *ItemMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetQuantity(v)
 		return nil
+	case item.FieldPrice:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPrice(v)
+		return nil
 	case item.FieldStoreID:
 		v, ok := value.(int)
 		if !ok {
@@ -515,6 +587,9 @@ func (m *ItemMutation) AddedFields() []string {
 	if m.addquantity != nil {
 		fields = append(fields, item.FieldQuantity)
 	}
+	if m.addprice != nil {
+		fields = append(fields, item.FieldPrice)
+	}
 	if m.addstore_id != nil {
 		fields = append(fields, item.FieldStoreID)
 	}
@@ -528,6 +603,8 @@ func (m *ItemMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case item.FieldQuantity:
 		return m.AddedQuantity()
+	case item.FieldPrice:
+		return m.AddedPrice()
 	case item.FieldStoreID:
 		return m.AddedStoreID()
 	}
@@ -545,6 +622,13 @@ func (m *ItemMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddQuantity(v)
+		return nil
+	case item.FieldPrice:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPrice(v)
 		return nil
 	case item.FieldStoreID:
 		v, ok := value.(int)
@@ -588,6 +672,9 @@ func (m *ItemMutation) ResetField(name string) error {
 		return nil
 	case item.FieldQuantity:
 		m.ResetQuantity()
+		return nil
+	case item.FieldPrice:
+		m.ResetPrice()
 		return nil
 	case item.FieldStoreID:
 		m.ResetStoreID()
