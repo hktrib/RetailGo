@@ -13,14 +13,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
-export type Payment = {
+export type InventoryItem = {
   name: string;
   description: string;
   price: number;
   quantity: number;
 };
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<InventoryItem>[] = [
+  {
+    accessorKey: "id",
+    header: () => <div className="text-xs">ID</div>,
+  },
   {
     accessorKey: "name",
     header: () => <div className="text-xs">Name</div>,
