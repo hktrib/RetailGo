@@ -68,7 +68,7 @@ export default function Inventory() {
 
         <div className="mx-auto max-w-7xl ">
           <button className="bg-blue-500 hover-bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4" onClick={handleAddItem}>
-            Add Item
+            Add Item 
           </button>
           {showAddItemForm && (
             <div className="p-4 border border-gray-300 mb-4">
