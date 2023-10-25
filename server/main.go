@@ -1,259 +1,94 @@
-package routes
+package main
 
 import (
 	"context"
-	"encoding/json"
+	"database/sql"
 	"fmt"
-	"io"
-
+	"log"
 	"net/http"
-	"strconv"
 
+	"entgo.io/ent/dialect"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/hktrib/RetailGo/ent"
-	"github.com/hktrib/RetailGo/ent/item"
-	store2 "github.com/hktrib/RetailGo/ent/store"
+	"github.com/hktrib/RetailGo/routes"
 	"github.com/hktrib/RetailGo/util"
+
+	entsql "entgo.io/ent/dialect/sql"
+	_ "github.com/lib/pq"
 )
 
-type RouteHandler struct {
-	Client *ent.Client
-	Config *util.Config
-}
-type TempItem struct {
-	Name     string
-	Photo    string
-	Quantity int
-	Category string
+func Open(config *util.Config) *ent.Client {
+	db, err := sql.Open(config.DBDriver, config.DBSource)
+	if err != nil {
+		log.Fatal(err)
+	}
+	driver := entsql.OpenDB(dialect.Postgres, db)
+	return ent.NewClient(ent.Driver(driver))
 }
 
-func (rh *RouteHandler) HelloWorld(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello World -> RetailGo!!"))
-
-	ctx := r.Context()
-
-	user, err := rh.Client.User.
-		Create().
-		SetUsername("gvadhul").
-		SetRealName("Giridhar Vadhul").
-		SetEmail("gvadhul@ucsc.edu").
-		SetIsOwner(true).
-		SetStoreID(1381).
-		Save(ctx)
-
-	if err != nil {
-		fmt.Println("Create user failed")
-		fmt.Println(err)
-	}
-
-	store, err := rh.Client.Store.
-		Create().
-		SetStoreName("Giridhar's Test Store").
-		SetID(1391).
-		Save(ctx)
-
-	if err != nil {
-		fmt.Println("Create Store Failed")
-		fmt.Println(err)
-	}
-
-	item1, err := rh.Client.Item.Create().SetName("Giridhar Food 1").SetStoreID(1391).SetPhoto([]byte("myimage")).SetQuantity(1).SetCategory("Food").Save(ctx)
-	if err != nil {
-
-		fmt.Println(err)
-	}
-	item2, err := rh.Client.Item.Create().SetName("Giridhar Food 2").SetStoreID(1391).SetPhoto([]byte("anotherimage")).SetQuantity(2).SetCategory("Grocery").Save(ctx)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	fmt.Println(user)
-	fmt.Println(store)
-	fmt.Printf("Item1: %s\n", item1)
-	fmt.Printf("Item2: %s\n", item2)
-}
-
-func (rh *RouteHandler) ValidateStore(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		store_id := chi.URLParam(r, "store_id")
-		StoreId, err := strconv.Atoi(store_id)
-		if err != nil {
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-			return
-		}
-		store, err := rh.Client.Store.
-			Query().Where(store2.ID(StoreId)).Only(r.Context())
-		if ent.IsNotFound(err) {
-			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-			return
-		} else if err != nil {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
-		}
-
-		ctx := context.WithValue(r.Context(), "store_var", store)
-
-		next.ServeHTTP(w, r.WithContext(ctx))
+func setupRoutes(r chi.Router, routes *routes.RouteHandler) {
+	// Public Routes
+	r.Group(func(r chi.Router) {
+		r.Get("/", routes.HelloWorld)
+	})
+	// Private Routes
+	// r.Group(func(r chi.Router) {
+	//     r.Use(AuthMiddleware)
+	//     r.Post("/manage", CreateAsset)
+	// })
+	r.Route("/store", func(r chi.Router) {
+		r.Route("/{store_id}", func(r chi.Router) {
+			r.Use(routes.ValidateStore) // add user validation
+			r.Route("/inventory", func(r chi.Router) {
+				r.Get("/", routes.InvRead)          //
+				r.Post("/update", routes.InvUpdate) //
+				r.Delete("/", routes.InvDelete)     //
+				r.Post("/create", routes.InvCreate) //
+			})
+		})
 	})
 }
 
-func (rh *RouteHandler) InvRead(w http.ResponseWriter, r *http.Request) {
-
-	ctx := r.Context()
-
-	// Parse the store id
-	store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
-
+func main() {
+	config, err := util.LoadConfig(".")
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
+		log.Fatal(err)
 	}
 
-	// Verify valid store id (not SQL Injection)
+	client := Open(&config)
+	defer client.Close()
 
-	// Run the SQL Query by store id on the items table, to get all items belonging to this store
-	inventory, err := rh.Client.Item.Query().Where(item.StoreID(store_id)).All(ctx)
-
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
+	if err := client.Schema.Create(context.Background()); err != nil {
+		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
-	inventory_bytes, err := json.MarshalIndent(inventory, "", "")
-
-	// Format and return
-
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
+	routeHandler := routes.RouteHandler{
+		Client: client,
+		Config: &config,
 	}
 
-	w.WriteHeader(http.StatusAccepted)
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	}))
 
-	w.Write(inventory_bytes)
-}
+	setupRoutes(r, &routeHandler)
 
-// POST without id (because item needs to be created)
-func (rh *RouteHandler) InvCreate(w http.ResponseWriter, r *http.Request) {
-	// name, photo, quantity, store_id, category
+	go func() {
+		err := http.ListenAndServe(fmt.Sprintf(":%s", config.ServerAddress), r)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
-	ctx := r.Context()
-
-	// Load store_id first
-
-	store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
-
-	if err != nil {
-		fmt.Println("Invalid store id:", err)
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
-
-	// Load the message parameters (Name, Photo, Quantity, Category)
-	req_body, err := io.ReadAll(r.Body)
-
-	if err != nil {
-		fmt.Println("Server failed to read message body:", err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-	fmt.Printf("Store Id:%d, Req body: %s\n", store_id, req_body)
-
-	var req_item TempItem
-
-	body_parse_err := json.Unmarshal(req_body, &req_item)
-
-	// If any are not present or not do not meet requirements (type for example), BadRequest
-
-	if body_parse_err != nil {
-		fmt.Println("Unmarshalling failed:", body_parse_err)
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
-
-	// Create item in database with name, photo, quantity, store_id, category
-
-	_, create_err := rh.Client.Item.Create().SetName(req_item.Name).SetPhoto([]byte(req_item.Photo)).SetCategory(req_item.Category).SetQuantity(req_item.Quantity).SetStoreID(store_id).Save(ctx)
-
-	// fmt.Println("Create Err:", create_err)
-
-	// If this create doesn't work, InternalServerError
-
-	if create_err != nil {
-		fmt.Println("Create didn't work:", create_err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("OK"))
-}
-
-func (rh *RouteHandler) InvUpdate(w http.ResponseWriter, r *http.Request) {
-	// get item id from url query string
-
-	itemId, err := strconv.Atoi(r.URL.Query().Get("item"))
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
-	change, err := strconv.Atoi(r.URL.Query().Get("change"))
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
-
-	targetItem, err := rh.Client.Item.
-		Query().
-		Where(item.ID(itemId)).
-		Only(r.Context())
-	if ent.IsNotFound(err) {
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	} else if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-	_, err = targetItem.Update().SetQuantity(targetItem.Quantity + change).
-		Save(r.Context())
-
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-	_, err = w.Write([]byte("OK"))
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-}
-func (rh *RouteHandler) InvDelete(w http.ResponseWriter, r *http.Request) {
-
-	store := r.Context().Value("store_var").(*ent.Store)
-
-	item_id, err := strconv.Atoi(r.URL.Query().Get("item"))
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
-
-	err = rh.Client.
-		Item.DeleteOneID(item_id).
-		Where(item.StoreID(store.ID)).
-		Exec(r.Context())
-
-	if ent.IsNotFound(err) {
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	} else if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-	_, err = w.Write([]byte("OK"))
-
+	// Makes sure we wait for the go routine running
+	select {}
 }
