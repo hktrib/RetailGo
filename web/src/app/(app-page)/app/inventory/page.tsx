@@ -31,7 +31,7 @@ export default function Inventory() {
 
   return (
     <main className="bg-gray-50 h-full flex-grow">
-      <div className="py-6 px-8 max-w-6xl mx-auto lg:ml-0">
+      <div className="py-6 px-6 md:px-8 max-w-6xl mx-auto lg:ml-0">
         <div className="flex items-center justify-between ">
           <h1 className="text-2xl font-bold">Inventory</h1>
 
@@ -39,7 +39,7 @@ export default function Inventory() {
             <AddItemDialog />
           </div>
         </div>
-        <hr className="my-2" />
+        <hr className="my-4" />
 
         <div className="mt-6">
           <dl className="border rounded-md mx-auto grid grid-cols-1 gap-px bg-gray-900/5 sm:grid-cols-2 lg:grid-cols-4">
