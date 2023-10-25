@@ -19,8 +19,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func Open(databaseUrl string) *ent.Client {
-	db, err := sql.Open("pgx", databaseUrl)
+func Open(config *util.Config) *ent.Client {
+	db, err := sql.Open(config.DBDriver, config.DBSource)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -57,7 +57,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	client := Open(config.DBSource)
+	client := Open(&config)
 	defer client.Close()
 
 	if err := client.Schema.Create(context.Background()); err != nil {
