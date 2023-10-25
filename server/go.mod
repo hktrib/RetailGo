@@ -5,6 +5,7 @@ go 1.20
 require (
 	entgo.io/ent v0.12.4
 	github.com/go-chi/chi/v5 v5.0.10
+	github.com/go-chi/cors v1.2.1
 	github.com/lib/pq v1.10.9
 	github.com/spf13/viper v1.17.0
 )
@@ -37,6 +38,7 @@ require (
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/sys v0.12.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
+	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
