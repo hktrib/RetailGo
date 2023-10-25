@@ -1,4 +1,4 @@
-import Header from "@/components/landing-page/Header";
+import Header from "@/components/landing-page/header";
 
 export default function RootLayout({
   children,
