@@ -29,10 +29,10 @@ func setupRoutes(r chi.Router, routes *routes.RouteHandler) {
 		r.Route("/{store_id}", func(r chi.Router) {
 			r.Use(routes.ValidateStore) // add user validation
 			r.Route("/inventory", func(r chi.Router) {
-				r.Get("/", routes.ReadAll)      //
-				r.Post("/", routes.InvUpdate)   //
-				r.Delete("/", routes.InvDelete) //
-				r.Put("/", routes.HelloWorld)   //
+				r.Get("/", routes.InvRead)          //
+				r.Post("/update", routes.InvUpdate) //
+				r.Delete("/", routes.InvDelete)     //
+				r.Post("/create", routes.InvCreate) //
 			})
 		})
 	})
