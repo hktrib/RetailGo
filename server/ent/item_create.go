@@ -37,6 +37,12 @@ func (ic *ItemCreate) SetQuantity(i int) *ItemCreate {
 	return ic
 }
 
+// SetPrice sets the "price" field.
+func (ic *ItemCreate) SetPrice(f float64) *ItemCreate {
+	ic.mutation.SetPrice(f)
+	return ic
+}
+
 // SetStoreID sets the "store_id" field.
 func (ic *ItemCreate) SetStoreID(i int) *ItemCreate {
 	ic.mutation.SetStoreID(i)
@@ -98,6 +104,9 @@ func (ic *ItemCreate) check() error {
 	if _, ok := ic.mutation.Quantity(); !ok {
 		return &ValidationError{Name: "quantity", err: errors.New(`ent: missing required field "Item.quantity"`)}
 	}
+	if _, ok := ic.mutation.Price(); !ok {
+		return &ValidationError{Name: "price", err: errors.New(`ent: missing required field "Item.price"`)}
+	}
 	if _, ok := ic.mutation.StoreID(); !ok {
 		return &ValidationError{Name: "store_id", err: errors.New(`ent: missing required field "Item.store_id"`)}
 	}
@@ -147,6 +156,10 @@ func (ic *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 	if value, ok := ic.mutation.Quantity(); ok {
 		_spec.SetField(item.FieldQuantity, field.TypeInt, value)
 		_node.Quantity = value
+	}
+	if value, ok := ic.mutation.Price(); ok {
+		_spec.SetField(item.FieldPrice, field.TypeFloat64, value)
+		_node.Price = value
 	}
 	if value, ok := ic.mutation.StoreID(); ok {
 		_spec.SetField(item.FieldStoreID, field.TypeInt, value)
