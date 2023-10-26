@@ -20,6 +20,7 @@ type TempItem struct {
 	Photo    string
 	Quantity int
 	Category string
+	Price    float64
 }
 
 func (srv *Server) HelloWorld(w http.ResponseWriter, r *http.Request) {
@@ -168,9 +169,7 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 
 	// Create item in database with name, photo, quantity, store_id, category
 
-	_, create_err := srv.Client.Item.Create().SetPrice(49.8).SetName(req_item.Name).SetPhoto([]byte(req_item.Photo)).SetCategory(req_item.Category).SetQuantity(req_item.Quantity).SetStoreID(store_id).Save(ctx)
-
-	// fmt.Println("Create Err:", create_err)
+	_, create_err := srv.Client.Item.Create().SetPrice(float64(req_item.Price)).SetName(req_item.Name).SetPhoto([]byte(req_item.Photo)).SetCategory(req_item.Category).SetQuantity(req_item.Quantity).SetStoreID(store_id).Save(ctx)
 
 	// If this create doesn't work, InternalServerError
 
