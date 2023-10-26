@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
+  { name: "Dashboard", href: "/", icon: HomeIcon },
   { name: "Inventory", href: "/inventory", icon: Package2 },
 ];
 
@@ -45,10 +45,10 @@ const SidebarNav = () => {
           <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="h-full">
+      <SheetContent side="left" className="h-full w-[300px]">
         <SheetHeader className="border-b pb-5">
           <div className="px-3 py-1.5 flex items-center gap-x-3 bg-gray-100 rounded-md shadow">
-            <div className="h-5 w-5 bg-white flex items-center justify-center rounded-md">
+            <div className="h-4 w-4 bg-white flex items-center justify-center rounded-md">
               <span className="text-xs">R</span>
             </div>
             <SheetTitle className="text-sm">Current store name</SheetTitle>
@@ -68,7 +68,7 @@ const SidebarNav = () => {
                       href={`/app/${item.href}`}
                       className="text-gray-900 hover:text-black flex items-center gap-x-3 px-3 hover:bg-gray-100 py-1.5 rounded-md"
                     >
-                      <item.icon className="w-5 h-5" aria-hidden="true" />
+                      <item.icon className="w-4 h-4" aria-hidden="true" />
                       <span className="text-sm">{item.name}</span>
                     </Link>
                   </li>
@@ -83,7 +83,7 @@ const SidebarNav = () => {
                 {fakeStores.map((store) => (
                   <li key={store.name}>
                     <div className="group text-gray-900 hover:text-black flex items-center gap-x-3 px-3 hover:bg-gray-100 py-1.5 rounded-md">
-                      <div className="bg-gray-100 group-hover:bg-white h-5 w-5 flex items-center justify-center rounded-md">
+                      <div className="bg-gray-100 group-hover:bg-white h-4 w-4 flex items-center justify-center rounded-md">
                         <span className="text-xs">{store.name.charAt(0)}</span>
                       </div>
                       <span className="text-sm">{store.name}</span>
@@ -96,12 +96,12 @@ const SidebarNav = () => {
             <li className="mt-auto pb-12">
               <ul role="list" className="space-y-1.5">
                 <li className="flex items-center px-3 py-1.5 gap-x-3">
-                  <Settings className="w-5 h-5" aria-hidden="true" />
+                  <Settings className="w-4 h-4" aria-hidden="true" />
                   <span className="text-sm text-gray-900">Settings</span>
                 </li>
 
                 <li className="flex items-center px-3 py-1.5 gap-x-3">
-                  <HelpCircle className="w-5 h-5" aria-hidden="true" />
+                  <HelpCircle className="w-4 h-4" aria-hidden="true" />
                   <span className="text-sm text-gray-900">Help</span>
                 </li>
               </ul>

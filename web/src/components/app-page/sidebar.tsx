@@ -3,7 +3,7 @@ import { UserButton } from "@clerk/nextjs";
 import { HelpCircle, HomeIcon, Package2, Settings } from "lucide-react";
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
+  { name: "Dashboard", href: "/", icon: HomeIcon },
   { name: "Inventory", href: "/inventory", icon: Package2 },
 ];
 
@@ -37,7 +37,7 @@ export default function Sidebar() {
                 {navigation.map((item) => (
                   <li key={item.name}>
                     <Link
-                      href={`/app/${item.href}`}
+                      href={`/app${item.href}`}
                       className="text-gray-900 hover:text-black flex items-center gap-x-3 px-3 hover:bg-gray-100 py-1.5 rounded-md"
                     >
                       <item.icon className="w-4 h-4" aria-hidden="true" />
