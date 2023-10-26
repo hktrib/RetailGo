@@ -2,20 +2,23 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 
+	"entgo.io/ent/dialect"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/hktrib/RetailGo/ent"
 	"github.com/hktrib/RetailGo/routes"
 	"github.com/hktrib/RetailGo/util"
 
+	entsql "entgo.io/ent/dialect/sql"
 	_ "github.com/lib/pq"
 )
 
-<<<<<<< HEAD
 func Open(config *util.Config) *ent.Client {
 	db, err := sql.Open(config.DBDriver, config.DBSource)
 	if err != nil {
@@ -25,8 +28,6 @@ func Open(config *util.Config) *ent.Client {
 	return ent.NewClient(ent.Driver(driver))
 }
 
-=======
->>>>>>> c79e5e84257577c1ed2958b25dea340f6cf088ce
 func setupRoutes(r chi.Router, routes *routes.RouteHandler) {
 	// Public Routes
 	r.Group(func(r chi.Router) {
@@ -51,20 +52,12 @@ func setupRoutes(r chi.Router, routes *routes.RouteHandler) {
 }
 
 func main() {
-
 	config, err := util.LoadConfig(".")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-<<<<<<< HEAD
 	client := Open(&config)
-=======
-	client, err := ent.Open(config.DBDriver, config.DBSource)
-	if err != nil {
-		log.Fatalf("failed opening connection to postgres: %v", err)
-	}
->>>>>>> c79e5e84257577c1ed2958b25dea340f6cf088ce
 	defer client.Close()
 
 	if err := client.Schema.Create(context.Background()); err != nil {
@@ -78,6 +71,14 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	}))
 
 	setupRoutes(r, &routeHandler)
 

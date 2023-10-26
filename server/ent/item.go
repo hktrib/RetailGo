@@ -22,6 +22,8 @@ type Item struct {
 	Photo []byte `json:"photo,omitempty"`
 	// Quantity holds the value of the "quantity" field.
 	Quantity int `json:"quantity,omitempty"`
+	// Price holds the value of the "price" field.
+	Price float64 `json:"price,omitempty"`
 	// StoreID holds the value of the "store_id" field.
 	StoreID int `json:"store_id,omitempty"`
 	// Category holds the value of the "category" field.
@@ -36,6 +38,8 @@ func (*Item) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case item.FieldPhoto:
 			values[i] = new([]byte)
+		case item.FieldPrice:
+			values[i] = new(sql.NullFloat64)
 		case item.FieldID, item.FieldQuantity, item.FieldStoreID:
 			values[i] = new(sql.NullInt64)
 		case item.FieldName, item.FieldCategory:
@@ -78,6 +82,12 @@ func (i *Item) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field quantity", values[j])
 			} else if value.Valid {
 				i.Quantity = int(value.Int64)
+			}
+		case item.FieldPrice:
+			if value, ok := values[j].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field price", values[j])
+			} else if value.Valid {
+				i.Price = value.Float64
 			}
 		case item.FieldStoreID:
 			if value, ok := values[j].(*sql.NullInt64); !ok {
@@ -135,6 +145,9 @@ func (i *Item) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("quantity=")
 	builder.WriteString(fmt.Sprintf("%v", i.Quantity))
+	builder.WriteString(", ")
+	builder.WriteString("price=")
+	builder.WriteString(fmt.Sprintf("%v", i.Price))
 	builder.WriteString(", ")
 	builder.WriteString("store_id=")
 	builder.WriteString(fmt.Sprintf("%v", i.StoreID))

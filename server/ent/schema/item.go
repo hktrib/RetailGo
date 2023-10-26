@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 )
@@ -18,6 +19,10 @@ func (Item) Fields() []ent.Field {
 		field.String("name"),
 		field.Bytes("photo"),
 		field.Int("quantity"),
+		field.Float("price").
+			SchemaType(map[string]string{
+				dialect.Postgres: "decimal(6,2)", // Override MySQL.
+			}),
 		field.Int("store_id"),
 		field.String("category"),
 	}
@@ -30,9 +35,8 @@ func (Item) Edges() []ent.Edge {
 
 func (Item) Indexes() []ent.Index {
 	return []ent.Index{
-		// index.Fields("item_name").
-		// 	Edges("store_name").
-		// 	Unique(),
+		index.Fields("store_id", "category").
+			Unique(),
 		index.Fields("store_id"),
 	}
 }
