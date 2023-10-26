@@ -38,17 +38,12 @@ func (s *Server) MountHandlers() {
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: false,
-		MaxAge:           300, // Maximum value not ignored by any of major browsers
+		MaxAge:           299, // Maximum value not ignored by any of major browsers
 	}))
 
 	s.Router.Group(func(r chi.Router) {
 		r.Get("/", s.HelloWorld)
 	})
-	// Private Routes
-	// r.Group(func(r chi.Router) {
-	//     r.Use(AuthMiddleware)
-	//     r.Post("/manage", CreateAsset)
-	// })
 
 	s.Router.Route("/store", func(r chi.Router) {
 		r.Route("/{store_id}", func(r chi.Router) {
