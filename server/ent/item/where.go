@@ -67,6 +67,11 @@ func Quantity(v int) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldQuantity, v))
 }
 
+// Price applies equality check predicate on the "price" field. It's identical to PriceEQ.
+func Price(v float64) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldPrice, v))
+}
+
 // StoreID applies equality check predicate on the "store_id" field. It's identical to StoreIDEQ.
 func StoreID(v int) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldStoreID, v))
@@ -220,6 +225,46 @@ func QuantityLT(v int) predicate.Item {
 // QuantityLTE applies the LTE predicate on the "quantity" field.
 func QuantityLTE(v int) predicate.Item {
 	return predicate.Item(sql.FieldLTE(FieldQuantity, v))
+}
+
+// PriceEQ applies the EQ predicate on the "price" field.
+func PriceEQ(v float64) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldPrice, v))
+}
+
+// PriceNEQ applies the NEQ predicate on the "price" field.
+func PriceNEQ(v float64) predicate.Item {
+	return predicate.Item(sql.FieldNEQ(FieldPrice, v))
+}
+
+// PriceIn applies the In predicate on the "price" field.
+func PriceIn(vs ...float64) predicate.Item {
+	return predicate.Item(sql.FieldIn(FieldPrice, vs...))
+}
+
+// PriceNotIn applies the NotIn predicate on the "price" field.
+func PriceNotIn(vs ...float64) predicate.Item {
+	return predicate.Item(sql.FieldNotIn(FieldPrice, vs...))
+}
+
+// PriceGT applies the GT predicate on the "price" field.
+func PriceGT(v float64) predicate.Item {
+	return predicate.Item(sql.FieldGT(FieldPrice, v))
+}
+
+// PriceGTE applies the GTE predicate on the "price" field.
+func PriceGTE(v float64) predicate.Item {
+	return predicate.Item(sql.FieldGTE(FieldPrice, v))
+}
+
+// PriceLT applies the LT predicate on the "price" field.
+func PriceLT(v float64) predicate.Item {
+	return predicate.Item(sql.FieldLT(FieldPrice, v))
+}
+
+// PriceLTE applies the LTE predicate on the "price" field.
+func PriceLTE(v float64) predicate.Item {
+	return predicate.Item(sql.FieldLTE(FieldPrice, v))
 }
 
 // StoreIDEQ applies the EQ predicate on the "store_id" field.

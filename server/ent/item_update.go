@@ -52,6 +52,19 @@ func (iu *ItemUpdate) AddQuantity(i int) *ItemUpdate {
 	return iu
 }
 
+// SetPrice sets the "price" field.
+func (iu *ItemUpdate) SetPrice(f float64) *ItemUpdate {
+	iu.mutation.ResetPrice()
+	iu.mutation.SetPrice(f)
+	return iu
+}
+
+// AddPrice adds f to the "price" field.
+func (iu *ItemUpdate) AddPrice(f float64) *ItemUpdate {
+	iu.mutation.AddPrice(f)
+	return iu
+}
+
 // SetStoreID sets the "store_id" field.
 func (iu *ItemUpdate) SetStoreID(i int) *ItemUpdate {
 	iu.mutation.ResetStoreID()
@@ -124,6 +137,12 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := iu.mutation.AddedQuantity(); ok {
 		_spec.AddField(item.FieldQuantity, field.TypeInt, value)
 	}
+	if value, ok := iu.mutation.Price(); ok {
+		_spec.SetField(item.FieldPrice, field.TypeFloat64, value)
+	}
+	if value, ok := iu.mutation.AddedPrice(); ok {
+		_spec.AddField(item.FieldPrice, field.TypeFloat64, value)
+	}
 	if value, ok := iu.mutation.StoreID(); ok {
 		_spec.SetField(item.FieldStoreID, field.TypeInt, value)
 	}
@@ -175,6 +194,19 @@ func (iuo *ItemUpdateOne) SetQuantity(i int) *ItemUpdateOne {
 // AddQuantity adds i to the "quantity" field.
 func (iuo *ItemUpdateOne) AddQuantity(i int) *ItemUpdateOne {
 	iuo.mutation.AddQuantity(i)
+	return iuo
+}
+
+// SetPrice sets the "price" field.
+func (iuo *ItemUpdateOne) SetPrice(f float64) *ItemUpdateOne {
+	iuo.mutation.ResetPrice()
+	iuo.mutation.SetPrice(f)
+	return iuo
+}
+
+// AddPrice adds f to the "price" field.
+func (iuo *ItemUpdateOne) AddPrice(f float64) *ItemUpdateOne {
+	iuo.mutation.AddPrice(f)
 	return iuo
 }
 
@@ -279,6 +311,12 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 	}
 	if value, ok := iuo.mutation.AddedQuantity(); ok {
 		_spec.AddField(item.FieldQuantity, field.TypeInt, value)
+	}
+	if value, ok := iuo.mutation.Price(); ok {
+		_spec.SetField(item.FieldPrice, field.TypeFloat64, value)
+	}
+	if value, ok := iuo.mutation.AddedPrice(); ok {
+		_spec.AddField(item.FieldPrice, field.TypeFloat64, value)
 	}
 	if value, ok := iuo.mutation.StoreID(); ok {
 		_spec.SetField(item.FieldStoreID, field.TypeInt, value)

@@ -14,6 +14,7 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "photo", Type: field.TypeBytes},
 		{Name: "quantity", Type: field.TypeInt},
+		{Name: "price", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "decimal(6,2)"}},
 		{Name: "store_id", Type: field.TypeInt},
 		{Name: "category", Type: field.TypeString},
 	}
@@ -24,9 +25,14 @@ var (
 		PrimaryKey: []*schema.Column{ItemsColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "item_store_id",
+				Name:    "item_store_id_category",
 				Unique:  true,
-				Columns: []*schema.Column{ItemsColumns[4]},
+				Columns: []*schema.Column{ItemsColumns[5], ItemsColumns[6]},
+			},
+			{
+				Name:    "item_store_id",
+				Unique:  false,
+				Columns: []*schema.Column{ItemsColumns[5]},
 			},
 		},
 	}

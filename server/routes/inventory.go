@@ -1,4 +1,4 @@
-package routes
+package server
 
 import (
 	"context"
@@ -13,13 +13,8 @@ import (
 	"github.com/hktrib/RetailGo/ent"
 	"github.com/hktrib/RetailGo/ent/item"
 	store2 "github.com/hktrib/RetailGo/ent/store"
-	"github.com/hktrib/RetailGo/util"
 )
 
-type RouteHandler struct {
-	Client *ent.Client
-	Config *util.Config
-}
 type TempItem struct {
 	Name     string
 	Photo    string
@@ -27,12 +22,12 @@ type TempItem struct {
 	Category string
 }
 
-func (rh *RouteHandler) HelloWorld(w http.ResponseWriter, r *http.Request) {
+func (srv *Server) HelloWorld(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello World -> RetailGo!!"))
 
 	ctx := r.Context()
 
-	user, err := rh.Client.User.
+	user, err := srv.Client.User.
 		Create().
 		SetUsername("gvadhul").
 		SetRealName("Giridhar Vadhul").
@@ -46,7 +41,7 @@ func (rh *RouteHandler) HelloWorld(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
-	store, err := rh.Client.Store.
+	store, err := srv.Client.Store.
 		Create().
 		SetStoreName("Giridhar's Test Store").
 		SetID(1391).
@@ -57,12 +52,12 @@ func (rh *RouteHandler) HelloWorld(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
-	item1, err := rh.Client.Item.Create().SetName("Giridhar Food 1").SetStoreID(1391).SetPhoto([]byte("myimage")).SetQuantity(1).SetCategory("Food").Save(ctx)
+	item1, err := srv.Client.Item.Create().SetName("Giridhar Food 1").SetStoreID(1391).SetPhoto([]byte("myimage")).SetQuantity(1).SetCategory("Food").Save(ctx)
 	if err != nil {
 
 		fmt.Println(err)
 	}
-	item2, err := rh.Client.Item.Create().SetName("Giridhar Food 2").SetStoreID(1391).SetPhoto([]byte("anotherimage")).SetQuantity(2).SetCategory("Grocery").Save(ctx)
+	item2, err := srv.Client.Item.Create().SetName("Giridhar Food 2").SetStoreID(1391).SetPhoto([]byte("anotherimage")).SetQuantity(2).SetCategory("Grocery").Save(ctx)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -73,7 +68,7 @@ func (rh *RouteHandler) HelloWorld(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Item2: %s\n", item2)
 }
 
-func (rh *RouteHandler) ValidateStore(next http.Handler) http.Handler {
+func (srv *Server) ValidateStore(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		store_id := chi.URLParam(r, "store_id")
 		StoreId, err := strconv.Atoi(store_id)
@@ -81,7 +76,7 @@ func (rh *RouteHandler) ValidateStore(next http.Handler) http.Handler {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
-		store, err := rh.Client.Store.
+		store, err := srv.Client.Store.
 			Query().Where(store2.ID(StoreId)).Only(r.Context())
 		if ent.IsNotFound(err) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
@@ -97,8 +92,7 @@ func (rh *RouteHandler) ValidateStore(next http.Handler) http.Handler {
 	})
 }
 
-func (rh *RouteHandler) InvRead(w http.ResponseWriter, r *http.Request) {
-
+func (srv *Server) InvRead(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	// Parse the store id
@@ -112,7 +106,7 @@ func (rh *RouteHandler) InvRead(w http.ResponseWriter, r *http.Request) {
 	// Verify valid store id (not SQL Injection)
 
 	// Run the SQL Query by store id on the items table, to get all items belonging to this store
-	inventory, err := rh.Client.Item.Query().Where(item.StoreID(store_id)).All(ctx)
+	inventory, err := srv.Client.Item.Query().Where(item.StoreID(store_id)).All(ctx)
 
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -134,7 +128,7 @@ func (rh *RouteHandler) InvRead(w http.ResponseWriter, r *http.Request) {
 }
 
 // POST without id (because item needs to be created)
-func (rh *RouteHandler) InvCreate(w http.ResponseWriter, r *http.Request) {
+func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 	// name, photo, quantity, store_id, category
 
 	ctx := r.Context()
@@ -174,7 +168,7 @@ func (rh *RouteHandler) InvCreate(w http.ResponseWriter, r *http.Request) {
 
 	// Create item in database with name, photo, quantity, store_id, category
 
-	_, create_err := rh.Client.Item.Create().SetName(req_item.Name).SetPhoto([]byte(req_item.Photo)).SetCategory(req_item.Category).SetQuantity(req_item.Quantity).SetStoreID(store_id).Save(ctx)
+	_, create_err := srv.Client.Item.Create().SetPrice(49.8).SetName(req_item.Name).SetPhoto([]byte(req_item.Photo)).SetCategory(req_item.Category).SetQuantity(req_item.Quantity).SetStoreID(store_id).Save(ctx)
 
 	// fmt.Println("Create Err:", create_err)
 
@@ -190,7 +184,7 @@ func (rh *RouteHandler) InvCreate(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("OK"))
 }
 
-func (rh *RouteHandler) InvUpdate(w http.ResponseWriter, r *http.Request) {
+func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 	// get item id from url query string
 
 	itemId, err := strconv.Atoi(r.URL.Query().Get("item"))
@@ -204,7 +198,7 @@ func (rh *RouteHandler) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	targetItem, err := rh.Client.Item.
+	targetItem, err := srv.Client.Item.
 		Query().
 		Where(item.ID(itemId)).
 		Only(r.Context())
@@ -231,7 +225,7 @@ func (rh *RouteHandler) InvUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
-func (rh *RouteHandler) InvDelete(w http.ResponseWriter, r *http.Request) {
+func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 
 	store := r.Context().Value("store_var").(*ent.Store)
 
@@ -241,7 +235,7 @@ func (rh *RouteHandler) InvDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = rh.Client.
+	err = srv.Client.
 		Item.DeleteOneID(item_id).
 		Where(item.StoreID(store.ID)).
 		Exec(r.Context())
