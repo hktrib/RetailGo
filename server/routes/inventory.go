@@ -153,9 +153,7 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("Store Id:%d, Req body: %s\n", store_id, req_body)
-
-	var req_item TempItem
+	req_item := ent.Item{}
 
 	body_parse_err := json.Unmarshal(req_body, &req_item)
 
@@ -169,8 +167,7 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 
 	// Create item in database with name, photo, quantity, store_id, category
 
-	_, create_err := srv.Client.Item.Create().SetPrice(float64(req_item.Price)).SetName(req_item.Name).SetPhoto([]byte(req_item.Photo)).SetCategory(req_item.Category).SetQuantity(req_item.Quantity).SetStoreID(store_id).Save(ctx)
-
+	createdItem, create_err := srv.Client.Item.Create().SetPrice(float64(req_item.Price)).SetName(req_item.Name).SetPhoto([]byte(req_item.Photo)).SetCategory(req_item.Category).SetQuantity(req_item.Quantity).SetStoreID(store_id).Save(ctx)
 	// If this create doesn't work, InternalServerError
 
 	if create_err != nil {
@@ -179,8 +176,12 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("OK"))
+	responseBody, _ := json.Marshal(map[string]interface{}{
+		"id": createdItem.ID,
+	})
+
+	w.WriteHeader(http.StatusCreated)
+	w.Write(responseBody)
 }
 
 func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
@@ -209,7 +210,7 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = targetItem.Update().SetQuantity(targetItem.Quantity + change).
+	_, err = targetItem.Update().SetQuantity(change).
 		Save(r.Context())
 
 	if err != nil {
@@ -247,6 +248,5 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	_, err = w.Write([]byte("OK"))
-
+	w.Write([]byte("OK"))
 }

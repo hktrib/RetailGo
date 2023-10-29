@@ -6,6 +6,7 @@ require (
 	entgo.io/ent v0.12.4
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/go-chi/cors v1.2.1
+	github.com/go-playground/assert/v2 v2.2.0
 	github.com/lib/pq v1.10.9
 	github.com/spf13/viper v1.17.0
 )
