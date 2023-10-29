@@ -3,6 +3,7 @@
 package migrate
 
 import (
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/dialect/sql/schema"
 	"entgo.io/ent/schema/field"
 )
@@ -14,7 +15,7 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "photo", Type: field.TypeBytes},
 		{Name: "quantity", Type: field.TypeInt},
-		{Name: "price", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "decimal(6,2)"}},
+		{Name: "price", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "decimal(10,2)"}},
 		{Name: "store_id", Type: field.TypeInt},
 		{Name: "category", Type: field.TypeString},
 	}
@@ -26,13 +27,21 @@ var (
 		Indexes: []*schema.Index{
 			{
 				Name:    "item_store_id_category",
-				Unique:  true,
+				Unique:  false,
 				Columns: []*schema.Column{ItemsColumns[5], ItemsColumns[6]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "store_id IS NOT NULL AND category IS NOT NULL",
+				},
 			},
 			{
 				Name:    "item_store_id",
 				Unique:  false,
 				Columns: []*schema.Column{ItemsColumns[5]},
+			},
+			{
+				Name:    "item_category",
+				Unique:  false,
+				Columns: []*schema.Column{ItemsColumns[6]},
 			},
 		},
 	}
