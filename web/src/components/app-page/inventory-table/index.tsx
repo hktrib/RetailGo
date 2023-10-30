@@ -40,28 +40,21 @@ const initialInventory = [
   },
 ];
 
-const callAPI = async () => {
-  try {
-      const res = await fetch(
-          `https://famous-quotes4.p.rapidapi.com/random?category=all&count=2`,
-          {
-              method: 'GET',
-              /*headers: {
-                  'X-RapidAPI-Key': 'your-rapidapi-key',
-                  'X-RapidAPI-Host': 'famous-quotes4.p.rapidapi.com',
-              },*/
-          }
-      );
-      const data = await res.json();
-      console.log(data);
-  } catch (err) {
-      console.log(err);
+
+export default async function InventoryTable() {
+  let data = initialInventory;  
+  try{
+    const response = await fetch('http://localhost:8080/store/1391/inventory');
+    data = await response.json();
+    console.log(data);
+  }catch{
+    
   }
 
-export default function InventoryTable() {
+
   return (
     <div>
-      <DataTable columns={columns} data={initialInventory} />
+      <DataTable columns={columns} data={data} />
     </div>
   );
 }
