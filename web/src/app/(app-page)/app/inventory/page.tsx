@@ -10,19 +10,19 @@ export default function Inventory() {
       changeType: "positive",
     },
     {
-      name: "Coming soon",
+      name: "Coming soon 1",
       value: "0",
       change: "+0%",
       changeType: "positive",
     },
     {
-      name: "Coming soon",
+      name: "Coming soon 2",
       value: "0",
       change: "+0%",
       changeType: "positive",
     },
     {
-      name: "Coming soon",
+      name: "Coming soon 3",
       value: "0",
       change: "+0%",
       changeType: "positive",

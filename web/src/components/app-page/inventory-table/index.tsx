@@ -45,10 +45,21 @@ const initialInventory = [
   },
 ];
 
-export default function InventoryTable() {
+
+export default async function InventoryTable() {
+  let data = initialInventory;  
+  try{
+    const response = await fetch('http://localhost:8080/store/1391/inventory');
+    data = await response.json();
+    console.log(data);
+  }catch{
+    
+  }
+
+
   return (
     <div>
-      <DataTable columns={columns} data={initialInventory} />
+      <DataTable columns={columns} data={data} />
     </div>
   );
 }
