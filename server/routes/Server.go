@@ -56,5 +56,20 @@ func (s *Server) MountHandlers() {
 			})
 		})
 	})
+	// routes that need user validation
+	s.Router.Route("/user", func(r chi.Router) {
+		r.Route("/{user_id}", func(r chi.Router) {
+			//r.Use(s.ValidateUser) // add user validation
+			r.Route("/info", func(r chi.Router) {
+				r.Get("/", s.UserQuery)  //
+				r.Post("/", s.InvCreate) //
+			})
+		})
+		// routes that dont
+
+		r.Delete("/", s.UserDelete) //
+		//r.Post("/", s.UserCreate)   //
+
+	})
 
 }
