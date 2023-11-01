@@ -254,6 +254,13 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 func (srv *Server) FilterByCategory(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
+	store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
+
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
 	// Get the category parameter from the request parameters
 
 	category := r.URL.Query().Get("category")
@@ -267,7 +274,7 @@ func (srv *Server) FilterByCategory(w http.ResponseWriter, r *http.Request) {
 
 	// Else, Query the database for all items under the given category owned by this store.
 
-	items, err := srv.Client.Item.Query().Where(item.Category(category)).All(ctx)
+	items, err := srv.Client.Item.Query().Where(item.StoreID(store_id)).Where(item.Category(category)).All(ctx)
 
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
