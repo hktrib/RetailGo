@@ -250,3 +250,38 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
 }
+
+func (srv *Server) FilterByCategory(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	// Get the category parameter from the request parameters
+
+	category := r.URL.Query().Get("category")
+
+	// If none or badly formatted, bad request
+
+	if category == "" {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	// Else, Query the database for all items under the given category owned by this store.
+
+	items, err := srv.Client.Item.Query().Where(item.Category(category)).All(ctx)
+
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	itemsJson, err := json.MarshalIndent(items, "", "")
+
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	// If None present, return empty response, else return a JSON file with all of them.
+	w.Write(itemsJson)
+	w.WriteHeader(http.StatusOK)
+}
