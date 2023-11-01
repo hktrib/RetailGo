@@ -49,10 +49,11 @@ func (s *Server) MountHandlers() {
 		r.Route("/{store_id}", func(r chi.Router) {
 			r.Use(s.ValidateStore) // add user validation
 			r.Route("/inventory", func(r chi.Router) {
-				r.Get("/", s.InvRead)          //
-				r.Post("/update", s.InvUpdate) //
-				r.Delete("/", s.InvDelete)     //
-				r.Post("/create", s.InvCreate) //
+				r.Get("/", s.InvRead)                 //
+				r.Post("/update", s.InvUpdate)        //
+				r.Delete("/", s.InvDelete)            //
+				r.Post("/create", s.InvCreate)        //
+				r.Get("/filter/", s.FilterByCategory) //
 			})
 		})
 	})
