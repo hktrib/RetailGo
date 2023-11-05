@@ -85,7 +85,7 @@ func TestInvCreate(tst *testing.T) {
 
 	idVal = it.ID
 
-	checkInvItem, err := srv.Client.Item.Query().Where(item.ID(idVal)).First(req.Context())
+	checkInvItem, err := srv.DBClient.Item.Query().Where(item.ID(idVal)).First(req.Context())
 	if err != nil {
 		log.Fatal(err)
 		tst.Error(err)
@@ -105,7 +105,7 @@ func TestInvItemQuantUpdate(tst *testing.T) {
 
 	checkResponseCode(tst, http.StatusOK, rr.Code)
 
-	checkInvItem, err := srv.Client.Item.Query().Where(item.ID(idVal)).First(req.Context())
+	checkInvItem, err := srv.DBClient.Item.Query().Where(item.ID(idVal)).First(req.Context())
 	if err != nil {
 		log.Fatal(err)
 		tst.Error(err)
@@ -133,7 +133,7 @@ func TestInvDelete(tst *testing.T) {
 		tst.Logf("Hint: Check Database if Item_id=%v Entry existed", idVal)
 	}
 
-	checkInvItem, _ := srv.Client.Item.Query().Where(item.ID(idVal)).First(req.Context())
+	checkInvItem, _ := srv.DBClient.Item.Query().Where(item.ID(idVal)).First(req.Context())
 	if checkInvItem != nil {
 		tst.Logf("Item Name: %v, Item ID: %v", checkInvItem.Name, checkInvItem.ID)
 		tst.Error("Error: Item not Deleted")
@@ -165,9 +165,9 @@ func setupServer() *server.Server {
 		log.Fatal(err)
 	}
 	srv := server.Server{
-		Router: chi.NewRouter(),
-		Client: util.Open(&config),
-		Config: &config,
+		Router:   chi.NewRouter(),
+		DBClient: util.Open(&config),
+		Config:   &config,
 	}
 
 	srv.MountHandlers()
