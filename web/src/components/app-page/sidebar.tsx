@@ -1,17 +1,24 @@
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
-import { HelpCircle, HomeIcon, Package2, Settings } from "lucide-react";
+import {
+  HelpCircle,
+  HomeIcon,
+  Package2,
+  Settings,
+  ShoppingBag,
+} from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon },
   { name: "Inventory", href: "/inventory", icon: Package2 },
+  { name: "POS", href: "/pos", icon: ShoppingBag },
 ];
 
 const fakeStores = [{ name: "RetailGo", id: "123" }];
 
 export default function Sidebar() {
   return (
-    <div className="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-72 xl:flex-col">
+    <div className="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-64 xl:flex-col">
       <div className="flex grow flex-col overflow-y-auto px-6 border-r">
         <div className="flex items-center justify-between py-5 border-b">
           <span className="text-lg font-semibold">RetailGo</span>

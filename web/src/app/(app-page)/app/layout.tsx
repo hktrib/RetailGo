@@ -6,7 +6,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen h-full flex flex-col">
       <MobileNav />
       <Sidebar />
-      <div className="xl:pl-72 h-full flex-grow flex flex-col">{children}</div>
+      <div className="xl:pl-64 h-full flex-grow flex flex-col">{children}</div>
     </div>
   );
 }
