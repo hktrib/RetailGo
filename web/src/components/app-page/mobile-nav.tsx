@@ -1,5 +1,12 @@
 import { UserButton } from "@clerk/nextjs";
-import { HelpCircle, HomeIcon, Menu, Package2, Settings } from "lucide-react";
+import {
+  HelpCircle,
+  HomeIcon,
+  Menu,
+  Package2,
+  Settings,
+  ShoppingBag,
+} from "lucide-react";
 
 import {
   Sheet,
@@ -16,6 +23,7 @@ import Link from "next/link";
 const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon },
   { name: "Inventory", href: "/inventory", icon: Package2 },
+  { name: "POS", href: "/pos", icon: ShoppingBag },
 ];
 
 const fakeStores = [{ name: "RetailGo", id: "123" }];

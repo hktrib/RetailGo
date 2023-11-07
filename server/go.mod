@@ -4,9 +4,9 @@ go 1.20
 
 require (
 	entgo.io/ent v0.12.4
+	github.com/clerkinc/clerk-sdk-go v1.48.4
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/go-chi/cors v1.2.1
-	github.com/go-playground/assert/v2 v2.2.0
 	github.com/lib/pq v1.10.9
 	github.com/spf13/viper v1.17.0
 )
@@ -16,6 +16,7 @@ require (
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
+	github.com/go-jose/go-jose/v3 v3.0.0 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/uuid v1.3.0 // indirect
