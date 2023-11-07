@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/clerkinc/clerk-sdk-go/clerk"
+	_ "github.com/clerkinc/clerk-sdk-go/clerk"
 	server "github.com/hktrib/RetailGo/routes"
 	"github.com/hktrib/RetailGo/util"
 
@@ -15,17 +17,26 @@ import (
 func main() {
 	config, err := util.LoadConfig(".")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
-	client := util.Open(&config)
-	defer client.Close()
+	clerkClient, err := clerk.NewClient(config.ClerkSK)
+	if err != nil {
+		panic(err)
+	}
 
-	if err := client.Schema.Create(context.Background()); err != nil {
+	injectActiveSession := clerk.WithSessionV2(clerkClient)
+
+	entClient := util.Open(&config)
+	defer entClient.Close()
+
+	if err := entClient.Schema.Create(context.Background()); err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
-	srv := server.NewServer(client, &config)
+	srv := server.NewServer(clerkClient, entClient, &config)
+	srv.Router.Use(injectActiveSession)
+
 	srv.MountHandlers()
 
 	go func() {

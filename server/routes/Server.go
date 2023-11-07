@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/clerkinc/clerk-sdk-go/clerk"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -17,15 +18,18 @@ import (
 */
 
 type Server struct {
-	Router *chi.Mux
-	Client *ent.Client
-	Config *util.Config
+	Router      *chi.Mux
+	ClerkClient clerk.Client
+	DBClient    *ent.Client
+	Config      *util.Config
 }
 
-func NewServer(client *ent.Client, config *util.Config) *Server {
+func NewServer(clerkClient clerk.Client, entClient *ent.Client, config *util.Config) *Server {
 	s := &Server{}
 	s.Router = chi.NewRouter()
-	s.Client = client
+	s.Router = chi.NewRouter()
+	s.ClerkClient = clerkClient
+	s.DBClient = entClient
 	s.Config = config
 	return s
 }
@@ -47,30 +51,17 @@ func (s *Server) MountHandlers() {
 
 	s.Router.Route("/store", func(r chi.Router) {
 		r.Route("/{store_id}", func(r chi.Router) {
-			r.Use(s.ValidateStore) // add user validation
+			r.Use(s.ValidateStoreAccess) // add [Employee || Owner] validation
 			r.Route("/inventory", func(r chi.Router) {
-				r.Get("/", s.InvRead)                 //
-				r.Post("/update", s.InvUpdate)        //
-				r.Delete("/", s.InvDelete)            //
-				r.Post("/create", s.InvCreate)        //
-				r.Get("/filter/", s.FilterByCategory) //
+				r.Group(func(r chi.Router) {
+					r.Use(s.ValidateOwner)         // add owner validation validation
+					r.Post("/create", s.InvCreate) //
+					r.Delete("/", s.InvDelete)     //
+				})
+				r.Get("/", s.InvRead)          //
+				r.Post("/update", s.InvUpdate) //
 			})
 		})
-	})
-	// routes that need user validation
-	s.Router.Route("/user", func(r chi.Router) {
-		r.Route("/{user_id}", func(r chi.Router) {
-			//r.Use(s.ValidateUser) // add user validation
-			r.Route("/info", func(r chi.Router) {
-				r.Get("/", s.UserQuery)  //
-				r.Post("/", s.InvCreate) //
-			})
-		})
-		// routes that dont
-
-		r.Delete("/", s.UserDelete) //
-		//r.Post("/", s.UserCreate)   //
-
 	})
 
 }
