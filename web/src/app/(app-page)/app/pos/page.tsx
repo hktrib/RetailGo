@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,24 +13,41 @@ type Product = {
 };
 
 const categories = [
-  { id: 0, name: "Breakfast", items: 13 },
-  { id: 1, name: "Breakfast", items: 13 },
-  { id: 2, name: "Breakfast", items: 13 },
-  { id: 3, name: "Breakfast", items: 13 },
-  { id: 4, name: "Breakfast", items: 13 },
-  { id: 5, name: "Breakfast", items: 13 },
-  { id: 6, name: "Breakfast", items: 13 },
+  { id: 0, name: "Breakfast", items: 3 },
+  { id: 4, name: "Lunch", items: 3 },
+  { id: 1, name: "Vegetables", items: 3 },
+  { id: 2, name: "Drinks", items: 3 },
+  { id: 3, name: "Dairy", items: 3 },
+  { id: 6, name: "Soups", items: 3 },
 ];
 
 const products = [
-  { id: 0, name: "Burger", price: 5.75 },
-  { id: 1, name: "Hamburger", price: 6 },
-  { id: 2, name: "Cheeseburger", price: 6.25 },
+  { id: 0, name: "Burger", price: 5.75, category: 4 },
+  { id: 1, name: "Hamburger", price: 6, category: 4 },
+  { id: 2, name: "Cheeseburger", price: 6.25, category: 4 },
+  { id: 3, name: "Biscuits", price: 3.5, category: 0 },
+  { id: 4, name: "Pancakes (x6)", price: 11, category: 0 },
+  { id: 5, name: "Bacon (x4)", price: 6, category: 0 },
+  { id: 6, name: "Broccoli", price: 0.5, category: 1 },
+  { id: 7, name: "Brussel Sprouts", price: 2, category: 1 },
+  { id: 8, name: "Cabbage", price: 20, category: 1 },
+  { id: 9, name: "Coke", price: 2, category: 2 },
+  { id: 10, name: "Sprite", price: 2, category: 2 },
+  { id: 11, name: "Root Bear", price: 2, category: 2 },
+  { id: 12, name: "Milk", price: 1, category: 3 },
+  { id: 13, name: "Almond Milk", price: 2, category: 3 },
+  { id: 14, name: "Oat Milk", price: 2, category: 3 },
+  { id: 15, name: "Chicken Soup", price: 2, category: 6 },
+  { id: 16, name: "Tomato Soup", price: 2, category: 6 },
+  { id: 17, name: "Lentil Soup", price: 2, category: 6 },
 ];
+
+const TAX_RATE = 1;
 
 export default function POSPage() {
   const [selectedCategory, setSelectedCategory] = useState(-1);
   const [cart, setCart] = useState<(Product & { quantity: number })[]>([]);
+  const [visibleProducts, setVisibleProducts] = useState(products);
 
   const addItemToCart = (pid: number) => {
     console.log(pid, cart);
@@ -75,6 +92,34 @@ export default function POSPage() {
     setCart(newCart);
   };
 
+  const fetchProductsByCategory = (categoryId: number) => {
+    const productsToShow = products.filter(
+      (product) => product.category === categoryId
+    );
+
+    setVisibleProducts([...productsToShow]);
+  };
+
+  useEffect(() => {
+    if (selectedCategory === -1) {
+      setVisibleProducts(products);
+      return;
+    }
+
+    fetchProductsByCategory(selectedCategory);
+  }, [selectedCategory]);
+
+  const fetchCategoryById = (categoryId: number) => {
+    return categories.filter((category) => category.id === categoryId)[0].name;
+  };
+
+  const fetchProductCartQty = (pid: number) => {
+    if (!cart.some((product) => product.id === pid)) return;
+
+    const i = cart.findIndex((i) => i.id === pid);
+    return cart[i].quantity;
+  };
+
   return (
     <div className="py-5 px-8 h-full flex-grow flex flex-col w-full mx-auto max-w-7xl">
       <div>
@@ -104,10 +149,11 @@ export default function POSPage() {
             <CategoryCard
               id={-1}
               name="All"
-              items={13}
+              items={products.length}
               selected={selectedCategory === -1}
               setSelectedCategory={setSelectedCategory}
             />
+
             {categories.map((category) => (
               <CategoryCard
                 key={category.id}
@@ -123,13 +169,16 @@ export default function POSPage() {
           <hr className="my-6" />
 
           <section className="grid xl:grid-cols-3 gap-3">
-            {products.map((product) => (
+            {visibleProducts.map((product) => (
               <ProductCard
                 key={product.id}
-                id={product.id}
-                name={product.name}
-                price={product.price}
-                category="Breakfast"
+                productData={{
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  category: fetchCategoryById(product.category),
+                }}
+                qty={fetchProductCartQty(product.id) ?? 0}
                 addItem={addItemToCart}
                 removeItem={removeItemFromCart}
               />
@@ -157,7 +206,7 @@ const CategoryCard = ({
   return (
     <article
       className={`bg-gray-100 p-4 rounded-lg cursor-pointer ${
-        selected && "ring ring-amber-200"
+        selected && "ring ring-blue-200"
       }`}
       onClick={() => setSelectedCategory(id)}
     >
@@ -170,20 +219,18 @@ const CategoryCard = ({
 };
 
 const ProductCard = ({
-  id,
-  name,
-  price,
-  category,
+  productData,
+  qty,
   addItem,
   removeItem,
 }: {
-  id: number;
-  name: string;
-  price: number;
-  category: string;
+  productData: Product & { category: string };
+  qty: number;
   addItem: (pid: number) => void;
   removeItem: (pid: number) => void;
 }) => {
+  const { id, name, price, category } = productData;
+
   return (
     <article className="bg-gray-100 p-4 rounded-lg">
       <div className="text-xs text-gray-500">{category}</div>
@@ -198,7 +245,7 @@ const ProductCard = ({
         >
           <Minus className="w-4 h-4" />
         </Button>
-        <span>0</span>
+        <span>{qty}</span>
         <Button
           variant="outline"
           className="px-2 h-8"
@@ -216,48 +263,66 @@ const OrderSummary = ({
 }: {
   cart: (Product & { quantity: number })[];
 }) => {
+  const subtotal = cart.reduce(
+    (acc, val) => acc + parseFloat((val.price * val.quantity).toFixed(2)),
+    0
+  );
+
+  const total = parseFloat((subtotal * TAX_RATE).toFixed(2));
+
   return (
     <div className="h-full">
-      <div className="space-y-2">
-        {cart.map((cartItem, idx) => (
-          <div
-            key={cartItem.id}
-            className="flex items-center justify-between bg-gray-100 rounded-lg p-3"
-          >
-            <div className="flex items-center gap-x-2 text-sm">
-              <div className="rounded-full bg-black text-gray-50 w-5 h-5 flex items-center justify-center">
-                <span className="text-xs">{idx + 1}</span>
+      {cart.length ? (
+        <div className="space-y-2">
+          {cart.map((cartItem, idx) => (
+            <div
+              key={cartItem.id}
+              className="flex items-center justify-between bg-gray-100 rounded-lg p-3"
+            >
+              <div className="flex items-center gap-x-2 text-sm">
+                <div className="rounded-full bg-black text-gray-50 w-5 h-5 flex items-center justify-center">
+                  <span className="text-xs">{idx + 1}</span>
+                </div>
+                <span>{cartItem.name}</span>
+                <span className="text-gray-600">x{cartItem.quantity}</span>
               </div>
-              <span>{cartItem.name}</span>
-              <span className="text-gray-600">x{cartItem.quantity}</span>
-            </div>
 
-            <div>
-              <span className="text-sm">
-                ${(cartItem.price * cartItem.quantity).toFixed(2)}
-              </span>
+              <div>
+                <span className="text-sm">
+                  ${(cartItem.price * cartItem.quantity).toFixed(2)}
+                </span>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-gray-100 rounded-lg p-3">
+          No items added to cart.
+        </div>
+      )}
 
       <div className="mt-6 p-3 bg-gray-100 rounded-lg">
         <div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-700">Subtotal</span>
-            <span className="text-sm">$100.00</span>
+            <span className="text-sm">${subtotal.toFixed(2)}</span>
           </div>
 
           <div className="flex items-center justify-between mt-1">
             <span className="text-sm text-gray-700">Tax</span>
-            <span className="text-sm">$0.00</span>
+            <span className="text-sm">
+              $
+              {(
+                subtotal - parseFloat((subtotal * TAX_RATE).toFixed(2))
+              ).toFixed(2)}
+            </span>
           </div>
 
           <hr className="my-3" />
 
           <div className="flex items-center justify-between mt-1">
             <span className="text-gray-700">Total</span>
-            <span className="font-medium">$100.00</span>
+            <span className="font-medium">${total.toFixed(2)}</span>
           </div>
 
           <div className="mt-6">
