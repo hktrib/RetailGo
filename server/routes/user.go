@@ -20,7 +20,7 @@ func (srv *Server) UserDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = srv.Client.
+	err = srv.DBClient.
 		User.DeleteOneID(user_id).
 		Exec(r.Context())
 
@@ -43,7 +43,7 @@ func (srv *Server) UserQuery(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user_data, err := srv.Client.User.Query().Where(user.ID(user_id)).Only(ctx)
+	user_data, err := srv.DBClient.User.Query().Where(user.ID(user_id)).Only(ctx)
 	if ent.IsNotFound(err) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
