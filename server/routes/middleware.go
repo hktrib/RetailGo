@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -44,10 +45,11 @@ func (srv *Server) GetAuthenticatedUserEmail(ctx context.Context) (string, error
 	}
 
 	user, err := srv.ClerkClient.Users().Read(sessClaims.Claims.Subject)
+	email := user.EmailAddresses[0].EmailAddress
 	if err != nil {
 		return "", errors.New("Error: Authentication Error -> Unable to get User from Clerk")
 	}
-	return *user.PrimaryEmailAddressID, nil
+	return email, nil
 }
 
 func (srv *Server) ValidateStoreAccess(next http.Handler) http.Handler {
@@ -66,6 +68,7 @@ func (srv *Server) ValidateStoreAccess(next http.Handler) http.Handler {
 		emailAddress, err := srv.GetAuthenticatedUserEmail(ctx)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
+			log.Fatal(err)
 		}
 
 		user, err := srv.DBClient.User.Query().Where(user2.Email(emailAddress)).Only(ctx)
