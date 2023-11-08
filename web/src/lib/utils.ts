@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { useAuth } from '@clerk/nextjs';
+import {merge} from 'lodash';
 
  
 export function cn(...inputs: ClassValue[]) {
@@ -12,9 +13,10 @@ export function cn(...inputs: ClassValue[]) {
 export function useFetch() {
   const { getToken } = useAuth();
  
-  const authenticatedFetch = async (url: string | Request, init?: RequestInit) => {
+  const authenticatedFetch = async (url: string | Request, init?: RequestInit, headers?: any) => {
     return fetch(url, {
-      headers: { Authorization: `Bearer ${await getToken()}` }
+      ...init,
+      headers: headers !== undefined? merge(headers, { Authorization: `Bearer ${await getToken()}` }) : { Authorization: `Bearer ${await getToken()}` }
     }).then(res => res.json());
   };
  
