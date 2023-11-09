@@ -52,7 +52,7 @@ export default function RegistrationForm() {
   //   setMemberRole('');
   // };
 
-  const handleSubmit = e => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (firstName === '' || lastName === '' || storeName === '' || address === '' || businessType === '') {
