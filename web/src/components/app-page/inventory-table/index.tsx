@@ -1,5 +1,9 @@
+'use client'
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
+import { useFetch } from "../../../lib/utils"
+
+import { Client } from "@clerk/nextjs/server";
 
 // Dummy inventory data
 const initialInventory = [
@@ -45,21 +49,19 @@ const initialInventory = [
   },
 ];
 
-
-export default async function InventoryTable() {
-  let data = initialInventory;  
+export default async function InventoryTable(){
+  let data = initialInventory;
+  let authFetch = useFetch()
   try{
-    const response = await fetch('http://localhost:8080/store/1391/inventory');
-    data = await response.json();
-    console.log(data);
-  }catch{
-    
+    data = await authFetch("http://localhost:8080/store/1391/inventory/");
+  }
+  catch{
+
   }
 
-
-  return (
+  return(
     <div>
-      <DataTable columns={columns} data={data} />
+      <DataTable columns = {columns} data = {data} />
     </div>
   );
 }

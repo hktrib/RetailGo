@@ -12,6 +12,38 @@ import (
 	"github.com/hktrib/RetailGo/ent/user"
 )
 
+func (srv *Server) UserCreate(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	reqBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	reqUser := ent.User{}
+
+	err = json.Unmarshal(reqBody, &reqUser)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	_, err = srv.DBClient.User.Create().
+		SetEmail(reqUser.Email).
+		SetIsOwner(reqUser.IsOwner).
+		SetRealName(reqUser.RealName).
+		SetStoreID(reqUser.StoreID).Save(ctx)
+
+	if err != nil {
+		fmt.Println("User Creation didn't work:", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte("OK\n"))
+}
+
 func (srv *Server) UserDelete(w http.ResponseWriter, r *http.Request) {
 
 	user_id, err := strconv.Atoi(r.URL.Query().Get("user"))

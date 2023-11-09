@@ -68,12 +68,14 @@ func (srv *Server) HelloWorld(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) InvRead(w http.ResponseWriter, r *http.Request) {
+
 	ctx := r.Context()
 
 	// Parse the store id
 	store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
 
 	if err != nil {
+		fmt.Println("Error with Store Id")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -84,6 +86,7 @@ func (srv *Server) InvRead(w http.ResponseWriter, r *http.Request) {
 	inventory, err := srv.DBClient.Item.Query().Where(item.StoreID(store_id)).All(ctx)
 
 	if err != nil {
+		fmt.Println("Issue with querying the DB.")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
