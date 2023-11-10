@@ -29,12 +29,12 @@ export default function RegistrationForm() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(false);
 
-  const handleOwnerFirstName = e => setFirstName(e.target.value);
-  const handleOwnerLastName = e => setLastName(e.target.value);
-  const handleStoreName = e => setStoreName(e.target.value);
-  const handleAddress = e => setAddress(e.target.value);
-  const handleAddress2 = e => setAddress2(e.target.value);
-  const handleBusinessType = e => setBusinessType(e.target.value);
+  const handleOwnerFirstName = (e: React.ChangeEvent<HTMLInputElement>) => setFirstName(e.target.value);
+  const handleOwnerLastName = (e: React.ChangeEvent<HTMLInputElement>) => setLastName(e.target.value);
+  const handleStoreName = (e: React.ChangeEvent<HTMLInputElement>) => setStoreName(e.target.value);
+  const handleAddress = (e: React.ChangeEvent<HTMLInputElement>) => setAddress(e.target.value);
+  const handleAddress2 = (e: React.ChangeEvent<HTMLInputElement>) => setAddress2(e.target.value);
+  const handleBusinessType = (e: React.ChangeEvent<HTMLSelectElement>) => setBusinessType(e.target.value);
   // const handleAddMembersClick = () => setShowMemberFields(true);
   // const handleMemberFirstName = e => setMemberFirstName(e.target.value);
   // const handleMemberLastName = e => setMemberLastName(e.target.value);
@@ -52,7 +52,7 @@ export default function RegistrationForm() {
   //   setMemberRole('');
   // };
 
-  const handleSubmit = e => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (firstName === '' || lastName === '' || storeName === '' || address === '' || businessType === '') {
