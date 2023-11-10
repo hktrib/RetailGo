@@ -51,14 +51,32 @@ func (s *Server) MountHandlers() {
 
 	s.Router.Route("/store", func(r chi.Router) {
 		r.Route("/{store_id}", func(r chi.Router) {
-			r.Use(s.ValidateStoreAccess) // add [Employee || Owner] validation
+			//	r.Use(s.ValidateStoreAccess) // add [Employee || Owner] validation
 			r.Route("/inventory", func(r chi.Router) {
 				r.Group(func(r chi.Router) {
-					r.Use(s.ValidateOwner)         // add owner validation validation
+					//		r.Use(s.ValidateOwner)         // add owner validation validation
 					r.Post("/create", s.InvCreate) //
 					r.Delete("/", s.InvDelete)     //
 				})
 				r.Get("/", s.InvRead)          //
+				r.Post("/update", s.InvUpdate) //
+			})
+			r.Route("/category", func(r chi.Router) {
+				r.Group(func(r chi.Router) {
+					r.Use(s.ValidateStore)     // add owner validation validation
+					r.Post("/", s.CatCreate)   //
+					r.Delete("/", s.CatDelete) //
+				})
+				r.Route("/{category_id}", func(r chi.Router) {
+					r.Group(func(r chi.Router) {
+						//	r.Use(s.ValidateOwner)         // add owner validation validation
+						//	r.Delete("/", s.CatItemDelete) //
+						r.Get("/", s.CatItemRead) //
+						r.Post("/", s.CatItemAdd) //
+					})
+				})
+
+				r.Get("/", s.CatItemList)      //
 				r.Post("/update", s.InvUpdate) //
 			})
 		})

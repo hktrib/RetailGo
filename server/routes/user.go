@@ -120,7 +120,7 @@ func (srv *Server) userAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	createdItem, create_err := srv.Client.User.Create().SetUsername(req.Username).SetRealName(req.RealName).SetEmail(req.Email).SetIsOwner(false).SetStoreID(req.StoreID).Save(ctx)
+	createdItem, create_err := srv.DBClient.User.Create().SetUsername(req.Username).SetRealName(req.RealName).SetEmail(req.Email).SetIsOwner(false).SetStoreID(req.StoreID).Save(ctx)
 
 	if create_err != nil {
 		fmt.Println("Create didn't work:", create_err)
@@ -145,7 +145,7 @@ func (srv *Server) userUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	targetUser, err := srv.Client.User.Query().Where(user.ID(user_id)).Only(ctx)
+	targetUser, err := srv.DBClient.User.Query().Where(user.ID(user_id)).Only(ctx)
 
 	if ent.IsNotFound(err) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)

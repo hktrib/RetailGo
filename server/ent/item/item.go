@@ -4,6 +4,7 @@ package item
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -21,10 +22,33 @@ const (
 	FieldPrice = "price"
 	// FieldStoreID holds the string denoting the store_id field in the database.
 	FieldStoreID = "store_id"
-	// FieldCategory holds the string denoting the category field in the database.
-	FieldCategory = "category"
+	// EdgeCategory holds the string denoting the category edge name in mutations.
+	EdgeCategory = "category"
+	// EdgeStore holds the string denoting the store edge name in mutations.
+	EdgeStore = "store"
+	// EdgeCategoryItem holds the string denoting the category_item edge name in mutations.
+	EdgeCategoryItem = "category_item"
 	// Table holds the table name of the item in the database.
 	Table = "items"
+	// CategoryTable is the table that holds the category relation/edge. The primary key declared below.
+	CategoryTable = "category_items"
+	// CategoryInverseTable is the table name for the Category entity.
+	// It exists in this package in order to avoid circular dependency with the "category" package.
+	CategoryInverseTable = "categories"
+	// StoreTable is the table that holds the store relation/edge.
+	StoreTable = "items"
+	// StoreInverseTable is the table name for the Store entity.
+	// It exists in this package in order to avoid circular dependency with the "store" package.
+	StoreInverseTable = "stores"
+	// StoreColumn is the table column denoting the store relation/edge.
+	StoreColumn = "store_id"
+	// CategoryItemTable is the table that holds the category_item relation/edge.
+	CategoryItemTable = "category_items"
+	// CategoryItemInverseTable is the table name for the CategoryItem entity.
+	// It exists in this package in order to avoid circular dependency with the "categoryitem" package.
+	CategoryItemInverseTable = "category_items"
+	// CategoryItemColumn is the table column denoting the category_item relation/edge.
+	CategoryItemColumn = "item_id"
 )
 
 // Columns holds all SQL columns for item fields.
@@ -35,8 +59,13 @@ var Columns = []string{
 	FieldQuantity,
 	FieldPrice,
 	FieldStoreID,
-	FieldCategory,
 }
+
+var (
+	// CategoryPrimaryKey and CategoryColumn2 are the table columns denoting the
+	// primary key for the category relation (M2M).
+	CategoryPrimaryKey = []string{"category_id", "item_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -76,7 +105,58 @@ func ByStoreID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStoreID, opts...).ToFunc()
 }
 
-// ByCategory orders the results by the category field.
-func ByCategory(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCategory, opts...).ToFunc()
+// ByCategoryCount orders the results by category count.
+func ByCategoryCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCategoryStep(), opts...)
+	}
+}
+
+// ByCategory orders the results by category terms.
+func ByCategory(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCategoryStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByStoreField orders the results by store field.
+func ByStoreField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newStoreStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByCategoryItemCount orders the results by category_item count.
+func ByCategoryItemCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCategoryItemStep(), opts...)
+	}
+}
+
+// ByCategoryItem orders the results by category_item terms.
+func ByCategoryItem(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCategoryItemStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newCategoryStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CategoryInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, CategoryTable, CategoryPrimaryKey...),
+	)
+}
+func newStoreStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(StoreInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, StoreTable, StoreColumn),
+	)
+}
+func newCategoryItemStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CategoryItemInverseTable, CategoryItemColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, CategoryItemTable, CategoryItemColumn),
+	)
 }

@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/hktrib/RetailGo/ent/predicate"
+	"github.com/hktrib/RetailGo/ent/store"
 	"github.com/hktrib/RetailGo/ent/user"
 )
 
@@ -64,9 +65,65 @@ func (uu *UserUpdate) AddStoreID(i int) *UserUpdate {
 	return uu
 }
 
+// SetClerkUserID sets the "clerk_user_id" field.
+func (uu *UserUpdate) SetClerkUserID(s string) *UserUpdate {
+	uu.mutation.SetClerkUserID(s)
+	return uu
+}
+
+// SetNillableClerkUserID sets the "clerk_user_id" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableClerkUserID(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetClerkUserID(*s)
+	}
+	return uu
+}
+
+// ClearClerkUserID clears the value of the "clerk_user_id" field.
+func (uu *UserUpdate) ClearClerkUserID() *UserUpdate {
+	uu.mutation.ClearClerkUserID()
+	return uu
+}
+
+// AddStoreIDs adds the "store" edge to the Store entity by IDs.
+func (uu *UserUpdate) AddStoreIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddStoreIDs(ids...)
+	return uu
+}
+
+// AddStore adds the "store" edges to the Store entity.
+func (uu *UserUpdate) AddStore(s ...*Store) *UserUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uu.AddStoreIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
+}
+
+// ClearStore clears all "store" edges to the Store entity.
+func (uu *UserUpdate) ClearStore() *UserUpdate {
+	uu.mutation.ClearStore()
+	return uu
+}
+
+// RemoveStoreIDs removes the "store" edge to Store entities by IDs.
+func (uu *UserUpdate) RemoveStoreIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveStoreIDs(ids...)
+	return uu
+}
+
+// RemoveStore removes "store" edges to Store entities.
+func (uu *UserUpdate) RemoveStore(s ...*Store) *UserUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uu.RemoveStoreIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -122,6 +179,57 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.AddedStoreID(); ok {
 		_spec.AddField(user.FieldStoreID, field.TypeInt, value)
+	}
+	if value, ok := uu.mutation.ClerkUserID(); ok {
+		_spec.SetField(user.FieldClerkUserID, field.TypeString, value)
+	}
+	if uu.mutation.ClerkUserIDCleared() {
+		_spec.ClearField(user.FieldClerkUserID, field.TypeString)
+	}
+	if uu.mutation.StoreCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.StoreTable,
+			Columns: user.StorePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedStoreIDs(); len(nodes) > 0 && !uu.mutation.StoreCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.StoreTable,
+			Columns: user.StorePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.StoreIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.StoreTable,
+			Columns: user.StorePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -180,9 +288,65 @@ func (uuo *UserUpdateOne) AddStoreID(i int) *UserUpdateOne {
 	return uuo
 }
 
+// SetClerkUserID sets the "clerk_user_id" field.
+func (uuo *UserUpdateOne) SetClerkUserID(s string) *UserUpdateOne {
+	uuo.mutation.SetClerkUserID(s)
+	return uuo
+}
+
+// SetNillableClerkUserID sets the "clerk_user_id" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableClerkUserID(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetClerkUserID(*s)
+	}
+	return uuo
+}
+
+// ClearClerkUserID clears the value of the "clerk_user_id" field.
+func (uuo *UserUpdateOne) ClearClerkUserID() *UserUpdateOne {
+	uuo.mutation.ClearClerkUserID()
+	return uuo
+}
+
+// AddStoreIDs adds the "store" edge to the Store entity by IDs.
+func (uuo *UserUpdateOne) AddStoreIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddStoreIDs(ids...)
+	return uuo
+}
+
+// AddStore adds the "store" edges to the Store entity.
+func (uuo *UserUpdateOne) AddStore(s ...*Store) *UserUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uuo.AddStoreIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
+}
+
+// ClearStore clears all "store" edges to the Store entity.
+func (uuo *UserUpdateOne) ClearStore() *UserUpdateOne {
+	uuo.mutation.ClearStore()
+	return uuo
+}
+
+// RemoveStoreIDs removes the "store" edge to Store entities by IDs.
+func (uuo *UserUpdateOne) RemoveStoreIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveStoreIDs(ids...)
+	return uuo
+}
+
+// RemoveStore removes "store" edges to Store entities.
+func (uuo *UserUpdateOne) RemoveStore(s ...*Store) *UserUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uuo.RemoveStoreIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -268,6 +432,57 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.AddedStoreID(); ok {
 		_spec.AddField(user.FieldStoreID, field.TypeInt, value)
+	}
+	if value, ok := uuo.mutation.ClerkUserID(); ok {
+		_spec.SetField(user.FieldClerkUserID, field.TypeString, value)
+	}
+	if uuo.mutation.ClerkUserIDCleared() {
+		_spec.ClearField(user.FieldClerkUserID, field.TypeString)
+	}
+	if uuo.mutation.StoreCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.StoreTable,
+			Columns: user.StorePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedStoreIDs(); len(nodes) > 0 && !uuo.mutation.StoreCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.StoreTable,
+			Columns: user.StorePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.StoreIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.StoreTable,
+			Columns: user.StorePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues

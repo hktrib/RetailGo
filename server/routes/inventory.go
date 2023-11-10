@@ -51,12 +51,12 @@ func (srv *Server) HelloWorld(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
-	item1, err := srv.DBClient.Item.Create().SetName("Giridhar Food 1").SetStoreID(1391).SetPhoto([]byte("myimage")).SetQuantity(1).SetCategory("Food").Save(ctx)
+	item1, err := srv.DBClient.Item.Create().SetName("Giridhar Food 1").SetStoreID(1391).SetPhoto([]byte("myimage")).SetQuantity(1).Save(ctx)
 	if err != nil {
 
 		fmt.Println(err)
 	}
-	item2, err := srv.DBClient.Item.Create().SetName("Giridhar Food 2").SetStoreID(1391).SetPhoto([]byte("anotherimage")).SetQuantity(2).SetCategory("Grocery").Save(ctx)
+	item2, err := srv.DBClient.Item.Create().SetName("Giridhar Food 2").SetStoreID(1391).SetPhoto([]byte("anotherimage")).SetQuantity(2).Save(ctx)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -144,7 +144,7 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 
 	// Create item in database with name, photo, quantity, store_id, category
 
-	createdItem, create_err := srv.DBClient.Item.Create().SetPrice(float64(req_item.Price)).SetName(req_item.Name).SetPhoto([]byte(req_item.Photo)).SetCategory(req_item.Category).SetQuantity(req_item.Quantity).SetStoreID(store_id).Save(ctx)
+	createdItem, create_err := srv.DBClient.Item.Create().SetPrice(float64(req_item.Price)).SetName(req_item.Name).SetPhoto([]byte(req_item.Photo)).SetQuantity(req_item.Quantity).SetStoreID(store_id).Save(ctx)
 	// If this create doesn't work, InternalServerError
 
 	if create_err != nil {

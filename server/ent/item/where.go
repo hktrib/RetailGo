@@ -4,6 +4,7 @@ package item
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/hktrib/RetailGo/ent/predicate"
 )
 
@@ -75,11 +76,6 @@ func Price(v float64) predicate.Item {
 // StoreID applies equality check predicate on the "store_id" field. It's identical to StoreIDEQ.
 func StoreID(v int) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldStoreID, v))
-}
-
-// Category applies equality check predicate on the "category" field. It's identical to CategoryEQ.
-func Category(v string) predicate.Item {
-	return predicate.Item(sql.FieldEQ(FieldCategory, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -287,89 +283,73 @@ func StoreIDNotIn(vs ...int) predicate.Item {
 	return predicate.Item(sql.FieldNotIn(FieldStoreID, vs...))
 }
 
-// StoreIDGT applies the GT predicate on the "store_id" field.
-func StoreIDGT(v int) predicate.Item {
-	return predicate.Item(sql.FieldGT(FieldStoreID, v))
+// HasCategory applies the HasEdge predicate on the "category" edge.
+func HasCategory() predicate.Item {
+	return predicate.Item(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, CategoryTable, CategoryPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
 }
 
-// StoreIDGTE applies the GTE predicate on the "store_id" field.
-func StoreIDGTE(v int) predicate.Item {
-	return predicate.Item(sql.FieldGTE(FieldStoreID, v))
+// HasCategoryWith applies the HasEdge predicate on the "category" edge with a given conditions (other predicates).
+func HasCategoryWith(preds ...predicate.Category) predicate.Item {
+	return predicate.Item(func(s *sql.Selector) {
+		step := newCategoryStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
-// StoreIDLT applies the LT predicate on the "store_id" field.
-func StoreIDLT(v int) predicate.Item {
-	return predicate.Item(sql.FieldLT(FieldStoreID, v))
+// HasStore applies the HasEdge predicate on the "store" edge.
+func HasStore() predicate.Item {
+	return predicate.Item(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, StoreTable, StoreColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
 }
 
-// StoreIDLTE applies the LTE predicate on the "store_id" field.
-func StoreIDLTE(v int) predicate.Item {
-	return predicate.Item(sql.FieldLTE(FieldStoreID, v))
+// HasStoreWith applies the HasEdge predicate on the "store" edge with a given conditions (other predicates).
+func HasStoreWith(preds ...predicate.Store) predicate.Item {
+	return predicate.Item(func(s *sql.Selector) {
+		step := newStoreStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
-// CategoryEQ applies the EQ predicate on the "category" field.
-func CategoryEQ(v string) predicate.Item {
-	return predicate.Item(sql.FieldEQ(FieldCategory, v))
+// HasCategoryItem applies the HasEdge predicate on the "category_item" edge.
+func HasCategoryItem() predicate.Item {
+	return predicate.Item(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, CategoryItemTable, CategoryItemColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
 }
 
-// CategoryNEQ applies the NEQ predicate on the "category" field.
-func CategoryNEQ(v string) predicate.Item {
-	return predicate.Item(sql.FieldNEQ(FieldCategory, v))
-}
-
-// CategoryIn applies the In predicate on the "category" field.
-func CategoryIn(vs ...string) predicate.Item {
-	return predicate.Item(sql.FieldIn(FieldCategory, vs...))
-}
-
-// CategoryNotIn applies the NotIn predicate on the "category" field.
-func CategoryNotIn(vs ...string) predicate.Item {
-	return predicate.Item(sql.FieldNotIn(FieldCategory, vs...))
-}
-
-// CategoryGT applies the GT predicate on the "category" field.
-func CategoryGT(v string) predicate.Item {
-	return predicate.Item(sql.FieldGT(FieldCategory, v))
-}
-
-// CategoryGTE applies the GTE predicate on the "category" field.
-func CategoryGTE(v string) predicate.Item {
-	return predicate.Item(sql.FieldGTE(FieldCategory, v))
-}
-
-// CategoryLT applies the LT predicate on the "category" field.
-func CategoryLT(v string) predicate.Item {
-	return predicate.Item(sql.FieldLT(FieldCategory, v))
-}
-
-// CategoryLTE applies the LTE predicate on the "category" field.
-func CategoryLTE(v string) predicate.Item {
-	return predicate.Item(sql.FieldLTE(FieldCategory, v))
-}
-
-// CategoryContains applies the Contains predicate on the "category" field.
-func CategoryContains(v string) predicate.Item {
-	return predicate.Item(sql.FieldContains(FieldCategory, v))
-}
-
-// CategoryHasPrefix applies the HasPrefix predicate on the "category" field.
-func CategoryHasPrefix(v string) predicate.Item {
-	return predicate.Item(sql.FieldHasPrefix(FieldCategory, v))
-}
-
-// CategoryHasSuffix applies the HasSuffix predicate on the "category" field.
-func CategoryHasSuffix(v string) predicate.Item {
-	return predicate.Item(sql.FieldHasSuffix(FieldCategory, v))
-}
-
-// CategoryEqualFold applies the EqualFold predicate on the "category" field.
-func CategoryEqualFold(v string) predicate.Item {
-	return predicate.Item(sql.FieldEqualFold(FieldCategory, v))
-}
-
-// CategoryContainsFold applies the ContainsFold predicate on the "category" field.
-func CategoryContainsFold(v string) predicate.Item {
-	return predicate.Item(sql.FieldContainsFold(FieldCategory, v))
+// HasCategoryItemWith applies the HasEdge predicate on the "category_item" edge with a given conditions (other predicates).
+func HasCategoryItemWith(preds ...predicate.CategoryItem) predicate.Item {
+	return predicate.Item(func(s *sql.Selector) {
+		step := newCategoryItemStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

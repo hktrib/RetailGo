@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/hktrib/RetailGo/ent/item"
+	"github.com/hktrib/RetailGo/ent/store"
 )
 
 // Item is the model entity for the Item schema.
@@ -26,9 +27,54 @@ type Item struct {
 	Price float64 `json:"price,omitempty"`
 	// StoreID holds the value of the "store_id" field.
 	StoreID int `json:"store_id,omitempty"`
-	// Category holds the value of the "category" field.
-	Category     string `json:"category,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the ItemQuery when eager-loading is set.
+	Edges        ItemEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// ItemEdges holds the relations/edges for other nodes in the graph.
+type ItemEdges struct {
+	// Category holds the value of the category edge.
+	Category []*Category `json:"category,omitempty"`
+	// Store holds the value of the store edge.
+	Store *Store `json:"store,omitempty"`
+	// CategoryItem holds the value of the category_item edge.
+	CategoryItem []*CategoryItem `json:"category_item,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [3]bool
+}
+
+// CategoryOrErr returns the Category value or an error if the edge
+// was not loaded in eager-loading.
+func (e ItemEdges) CategoryOrErr() ([]*Category, error) {
+	if e.loadedTypes[0] {
+		return e.Category, nil
+	}
+	return nil, &NotLoadedError{edge: "category"}
+}
+
+// StoreOrErr returns the Store value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ItemEdges) StoreOrErr() (*Store, error) {
+	if e.loadedTypes[1] {
+		if e.Store == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: store.Label}
+		}
+		return e.Store, nil
+	}
+	return nil, &NotLoadedError{edge: "store"}
+}
+
+// CategoryItemOrErr returns the CategoryItem value or an error if the edge
+// was not loaded in eager-loading.
+func (e ItemEdges) CategoryItemOrErr() ([]*CategoryItem, error) {
+	if e.loadedTypes[2] {
+		return e.CategoryItem, nil
+	}
+	return nil, &NotLoadedError{edge: "category_item"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -42,7 +88,7 @@ func (*Item) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case item.FieldID, item.FieldQuantity, item.FieldStoreID:
 			values[i] = new(sql.NullInt64)
-		case item.FieldName, item.FieldCategory:
+		case item.FieldName:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -95,12 +141,6 @@ func (i *Item) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				i.StoreID = int(value.Int64)
 			}
-		case item.FieldCategory:
-			if value, ok := values[j].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field category", values[j])
-			} else if value.Valid {
-				i.Category = value.String
-			}
 		default:
 			i.selectValues.Set(columns[j], values[j])
 		}
@@ -112,6 +152,21 @@ func (i *Item) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (i *Item) Value(name string) (ent.Value, error) {
 	return i.selectValues.Get(name)
+}
+
+// QueryCategory queries the "category" edge of the Item entity.
+func (i *Item) QueryCategory() *CategoryQuery {
+	return NewItemClient(i.config).QueryCategory(i)
+}
+
+// QueryStore queries the "store" edge of the Item entity.
+func (i *Item) QueryStore() *StoreQuery {
+	return NewItemClient(i.config).QueryStore(i)
+}
+
+// QueryCategoryItem queries the "category_item" edge of the Item entity.
+func (i *Item) QueryCategoryItem() *CategoryItemQuery {
+	return NewItemClient(i.config).QueryCategoryItem(i)
 }
 
 // Update returns a builder for updating this Item.
@@ -151,9 +206,6 @@ func (i *Item) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("store_id=")
 	builder.WriteString(fmt.Sprintf("%v", i.StoreID))
-	builder.WriteString(", ")
-	builder.WriteString("category=")
-	builder.WriteString(i.Category)
 	builder.WriteByte(')')
 	return builder.String()
 }

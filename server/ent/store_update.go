@@ -10,8 +10,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hktrib/RetailGo/ent/category"
+	"github.com/hktrib/RetailGo/ent/item"
 	"github.com/hktrib/RetailGo/ent/predicate"
 	"github.com/hktrib/RetailGo/ent/store"
+	"github.com/hktrib/RetailGo/ent/user"
 )
 
 // StoreUpdate is the builder for updating Store entities.
@@ -33,9 +36,137 @@ func (su *StoreUpdate) SetStoreName(s string) *StoreUpdate {
 	return su
 }
 
+// SetOwnerEmail sets the "owner_Email" field.
+func (su *StoreUpdate) SetOwnerEmail(s string) *StoreUpdate {
+	su.mutation.SetOwnerEmail(s)
+	return su
+}
+
+// SetNillableOwnerEmail sets the "owner_Email" field if the given value is not nil.
+func (su *StoreUpdate) SetNillableOwnerEmail(s *string) *StoreUpdate {
+	if s != nil {
+		su.SetOwnerEmail(*s)
+	}
+	return su
+}
+
+// ClearOwnerEmail clears the value of the "owner_Email" field.
+func (su *StoreUpdate) ClearOwnerEmail() *StoreUpdate {
+	su.mutation.ClearOwnerEmail()
+	return su
+}
+
+// AddItemIDs adds the "items" edge to the Item entity by IDs.
+func (su *StoreUpdate) AddItemIDs(ids ...int) *StoreUpdate {
+	su.mutation.AddItemIDs(ids...)
+	return su
+}
+
+// AddItems adds the "items" edges to the Item entity.
+func (su *StoreUpdate) AddItems(i ...*Item) *StoreUpdate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return su.AddItemIDs(ids...)
+}
+
+// AddCategoryIDs adds the "categories" edge to the Category entity by IDs.
+func (su *StoreUpdate) AddCategoryIDs(ids ...int) *StoreUpdate {
+	su.mutation.AddCategoryIDs(ids...)
+	return su
+}
+
+// AddCategories adds the "categories" edges to the Category entity.
+func (su *StoreUpdate) AddCategories(c ...*Category) *StoreUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return su.AddCategoryIDs(ids...)
+}
+
+// AddUserIDs adds the "user" edge to the User entity by IDs.
+func (su *StoreUpdate) AddUserIDs(ids ...int) *StoreUpdate {
+	su.mutation.AddUserIDs(ids...)
+	return su
+}
+
+// AddUser adds the "user" edges to the User entity.
+func (su *StoreUpdate) AddUser(u ...*User) *StoreUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return su.AddUserIDs(ids...)
+}
+
 // Mutation returns the StoreMutation object of the builder.
 func (su *StoreUpdate) Mutation() *StoreMutation {
 	return su.mutation
+}
+
+// ClearItems clears all "items" edges to the Item entity.
+func (su *StoreUpdate) ClearItems() *StoreUpdate {
+	su.mutation.ClearItems()
+	return su
+}
+
+// RemoveItemIDs removes the "items" edge to Item entities by IDs.
+func (su *StoreUpdate) RemoveItemIDs(ids ...int) *StoreUpdate {
+	su.mutation.RemoveItemIDs(ids...)
+	return su
+}
+
+// RemoveItems removes "items" edges to Item entities.
+func (su *StoreUpdate) RemoveItems(i ...*Item) *StoreUpdate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return su.RemoveItemIDs(ids...)
+}
+
+// ClearCategories clears all "categories" edges to the Category entity.
+func (su *StoreUpdate) ClearCategories() *StoreUpdate {
+	su.mutation.ClearCategories()
+	return su
+}
+
+// RemoveCategoryIDs removes the "categories" edge to Category entities by IDs.
+func (su *StoreUpdate) RemoveCategoryIDs(ids ...int) *StoreUpdate {
+	su.mutation.RemoveCategoryIDs(ids...)
+	return su
+}
+
+// RemoveCategories removes "categories" edges to Category entities.
+func (su *StoreUpdate) RemoveCategories(c ...*Category) *StoreUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return su.RemoveCategoryIDs(ids...)
+}
+
+// ClearUser clears all "user" edges to the User entity.
+func (su *StoreUpdate) ClearUser() *StoreUpdate {
+	su.mutation.ClearUser()
+	return su
+}
+
+// RemoveUserIDs removes the "user" edge to User entities by IDs.
+func (su *StoreUpdate) RemoveUserIDs(ids ...int) *StoreUpdate {
+	su.mutation.RemoveUserIDs(ids...)
+	return su
+}
+
+// RemoveUser removes "user" edges to User entities.
+func (su *StoreUpdate) RemoveUser(u ...*User) *StoreUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return su.RemoveUserIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -77,6 +208,147 @@ func (su *StoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.StoreName(); ok {
 		_spec.SetField(store.FieldStoreName, field.TypeString, value)
 	}
+	if value, ok := su.mutation.OwnerEmail(); ok {
+		_spec.SetField(store.FieldOwnerEmail, field.TypeString, value)
+	}
+	if su.mutation.OwnerEmailCleared() {
+		_spec.ClearField(store.FieldOwnerEmail, field.TypeString)
+	}
+	if su.mutation.ItemsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   store.ItemsTable,
+			Columns: []string{store.ItemsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.RemovedItemsIDs(); len(nodes) > 0 && !su.mutation.ItemsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   store.ItemsTable,
+			Columns: []string{store.ItemsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.ItemsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   store.ItemsTable,
+			Columns: []string{store.ItemsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if su.mutation.CategoriesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   store.CategoriesTable,
+			Columns: []string{store.CategoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.RemovedCategoriesIDs(); len(nodes) > 0 && !su.mutation.CategoriesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   store.CategoriesTable,
+			Columns: []string{store.CategoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.CategoriesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   store.CategoriesTable,
+			Columns: []string{store.CategoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if su.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   store.UserTable,
+			Columns: store.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.RemovedUserIDs(); len(nodes) > 0 && !su.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   store.UserTable,
+			Columns: store.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   store.UserTable,
+			Columns: store.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{store.Label}
@@ -103,9 +375,137 @@ func (suo *StoreUpdateOne) SetStoreName(s string) *StoreUpdateOne {
 	return suo
 }
 
+// SetOwnerEmail sets the "owner_Email" field.
+func (suo *StoreUpdateOne) SetOwnerEmail(s string) *StoreUpdateOne {
+	suo.mutation.SetOwnerEmail(s)
+	return suo
+}
+
+// SetNillableOwnerEmail sets the "owner_Email" field if the given value is not nil.
+func (suo *StoreUpdateOne) SetNillableOwnerEmail(s *string) *StoreUpdateOne {
+	if s != nil {
+		suo.SetOwnerEmail(*s)
+	}
+	return suo
+}
+
+// ClearOwnerEmail clears the value of the "owner_Email" field.
+func (suo *StoreUpdateOne) ClearOwnerEmail() *StoreUpdateOne {
+	suo.mutation.ClearOwnerEmail()
+	return suo
+}
+
+// AddItemIDs adds the "items" edge to the Item entity by IDs.
+func (suo *StoreUpdateOne) AddItemIDs(ids ...int) *StoreUpdateOne {
+	suo.mutation.AddItemIDs(ids...)
+	return suo
+}
+
+// AddItems adds the "items" edges to the Item entity.
+func (suo *StoreUpdateOne) AddItems(i ...*Item) *StoreUpdateOne {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return suo.AddItemIDs(ids...)
+}
+
+// AddCategoryIDs adds the "categories" edge to the Category entity by IDs.
+func (suo *StoreUpdateOne) AddCategoryIDs(ids ...int) *StoreUpdateOne {
+	suo.mutation.AddCategoryIDs(ids...)
+	return suo
+}
+
+// AddCategories adds the "categories" edges to the Category entity.
+func (suo *StoreUpdateOne) AddCategories(c ...*Category) *StoreUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return suo.AddCategoryIDs(ids...)
+}
+
+// AddUserIDs adds the "user" edge to the User entity by IDs.
+func (suo *StoreUpdateOne) AddUserIDs(ids ...int) *StoreUpdateOne {
+	suo.mutation.AddUserIDs(ids...)
+	return suo
+}
+
+// AddUser adds the "user" edges to the User entity.
+func (suo *StoreUpdateOne) AddUser(u ...*User) *StoreUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return suo.AddUserIDs(ids...)
+}
+
 // Mutation returns the StoreMutation object of the builder.
 func (suo *StoreUpdateOne) Mutation() *StoreMutation {
 	return suo.mutation
+}
+
+// ClearItems clears all "items" edges to the Item entity.
+func (suo *StoreUpdateOne) ClearItems() *StoreUpdateOne {
+	suo.mutation.ClearItems()
+	return suo
+}
+
+// RemoveItemIDs removes the "items" edge to Item entities by IDs.
+func (suo *StoreUpdateOne) RemoveItemIDs(ids ...int) *StoreUpdateOne {
+	suo.mutation.RemoveItemIDs(ids...)
+	return suo
+}
+
+// RemoveItems removes "items" edges to Item entities.
+func (suo *StoreUpdateOne) RemoveItems(i ...*Item) *StoreUpdateOne {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return suo.RemoveItemIDs(ids...)
+}
+
+// ClearCategories clears all "categories" edges to the Category entity.
+func (suo *StoreUpdateOne) ClearCategories() *StoreUpdateOne {
+	suo.mutation.ClearCategories()
+	return suo
+}
+
+// RemoveCategoryIDs removes the "categories" edge to Category entities by IDs.
+func (suo *StoreUpdateOne) RemoveCategoryIDs(ids ...int) *StoreUpdateOne {
+	suo.mutation.RemoveCategoryIDs(ids...)
+	return suo
+}
+
+// RemoveCategories removes "categories" edges to Category entities.
+func (suo *StoreUpdateOne) RemoveCategories(c ...*Category) *StoreUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return suo.RemoveCategoryIDs(ids...)
+}
+
+// ClearUser clears all "user" edges to the User entity.
+func (suo *StoreUpdateOne) ClearUser() *StoreUpdateOne {
+	suo.mutation.ClearUser()
+	return suo
+}
+
+// RemoveUserIDs removes the "user" edge to User entities by IDs.
+func (suo *StoreUpdateOne) RemoveUserIDs(ids ...int) *StoreUpdateOne {
+	suo.mutation.RemoveUserIDs(ids...)
+	return suo
+}
+
+// RemoveUser removes "user" edges to User entities.
+func (suo *StoreUpdateOne) RemoveUser(u ...*User) *StoreUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return suo.RemoveUserIDs(ids...)
 }
 
 // Where appends a list predicates to the StoreUpdate builder.
@@ -176,6 +576,147 @@ func (suo *StoreUpdateOne) sqlSave(ctx context.Context) (_node *Store, err error
 	}
 	if value, ok := suo.mutation.StoreName(); ok {
 		_spec.SetField(store.FieldStoreName, field.TypeString, value)
+	}
+	if value, ok := suo.mutation.OwnerEmail(); ok {
+		_spec.SetField(store.FieldOwnerEmail, field.TypeString, value)
+	}
+	if suo.mutation.OwnerEmailCleared() {
+		_spec.ClearField(store.FieldOwnerEmail, field.TypeString)
+	}
+	if suo.mutation.ItemsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   store.ItemsTable,
+			Columns: []string{store.ItemsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.RemovedItemsIDs(); len(nodes) > 0 && !suo.mutation.ItemsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   store.ItemsTable,
+			Columns: []string{store.ItemsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.ItemsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   store.ItemsTable,
+			Columns: []string{store.ItemsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.CategoriesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   store.CategoriesTable,
+			Columns: []string{store.CategoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.RemovedCategoriesIDs(); len(nodes) > 0 && !suo.mutation.CategoriesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   store.CategoriesTable,
+			Columns: []string{store.CategoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.CategoriesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   store.CategoriesTable,
+			Columns: []string{store.CategoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   store.UserTable,
+			Columns: store.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.RemovedUserIDs(); len(nodes) > 0 && !suo.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   store.UserTable,
+			Columns: store.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   store.UserTable,
+			Columns: store.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Store{config: suo.config}
 	_spec.Assign = _node.assignValues

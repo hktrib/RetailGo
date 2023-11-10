@@ -4,6 +4,7 @@ package user
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -21,8 +22,26 @@ const (
 	FieldRealName = "real_name"
 	// FieldStoreID holds the string denoting the store_id field in the database.
 	FieldStoreID = "store_id"
+	// FieldClerkUserID holds the string denoting the clerk_user_id field in the database.
+	FieldClerkUserID = "clerk_user_id"
+	// EdgeStore holds the string denoting the store edge name in mutations.
+	EdgeStore = "store"
+	// EdgeUserToStore holds the string denoting the usertostore edge name in mutations.
+	EdgeUserToStore = "UserToStore"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// StoreTable is the table that holds the store relation/edge. The primary key declared below.
+	StoreTable = "user_to_stores"
+	// StoreInverseTable is the table name for the Store entity.
+	// It exists in this package in order to avoid circular dependency with the "store" package.
+	StoreInverseTable = "stores"
+	// UserToStoreTable is the table that holds the UserToStore relation/edge.
+	UserToStoreTable = "user_to_stores"
+	// UserToStoreInverseTable is the table name for the UserToStore entity.
+	// It exists in this package in order to avoid circular dependency with the "usertostore" package.
+	UserToStoreInverseTable = "user_to_stores"
+	// UserToStoreColumn is the table column denoting the UserToStore relation/edge.
+	UserToStoreColumn = "user_id"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -33,7 +52,14 @@ var Columns = []string{
 	FieldIsOwner,
 	FieldRealName,
 	FieldStoreID,
+	FieldClerkUserID,
 }
+
+var (
+	// StorePrimaryKey and StoreColumn2 are the table columns denoting the
+	// primary key for the store relation (M2M).
+	StorePrimaryKey = []string{"user_id", "store_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -76,4 +102,51 @@ func ByRealName(opts ...sql.OrderTermOption) OrderOption {
 // ByStoreID orders the results by the store_id field.
 func ByStoreID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStoreID, opts...).ToFunc()
+}
+
+// ByClerkUserID orders the results by the clerk_user_id field.
+func ByClerkUserID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldClerkUserID, opts...).ToFunc()
+}
+
+// ByStoreCount orders the results by store count.
+func ByStoreCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newStoreStep(), opts...)
+	}
+}
+
+// ByStore orders the results by store terms.
+func ByStore(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newStoreStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByUserToStoreCount orders the results by UserToStore count.
+func ByUserToStoreCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUserToStoreStep(), opts...)
+	}
+}
+
+// ByUserToStore orders the results by UserToStore terms.
+func ByUserToStore(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserToStoreStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newStoreStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(StoreInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, StoreTable, StorePrimaryKey...),
+	)
+}
+func newUserToStoreStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserToStoreInverseTable, UserToStoreColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, UserToStoreTable, UserToStoreColumn),
+	)
 }

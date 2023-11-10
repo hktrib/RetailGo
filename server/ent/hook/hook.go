@@ -9,6 +9,30 @@ import (
 	"github.com/hktrib/RetailGo/ent"
 )
 
+// The CategoryFunc type is an adapter to allow the use of ordinary
+// function as Category mutator.
+type CategoryFunc func(context.Context, *ent.CategoryMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CategoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CategoryMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CategoryMutation", m)
+}
+
+// The CategoryItemFunc type is an adapter to allow the use of ordinary
+// function as CategoryItem mutator.
+type CategoryItemFunc func(context.Context, *ent.CategoryItemMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CategoryItemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CategoryItemMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CategoryItemMutation", m)
+}
+
 // The ItemFunc type is an adapter to allow the use of ordinary
 // function as Item mutator.
 type ItemFunc func(context.Context, *ent.ItemMutation) (ent.Value, error)
@@ -43,6 +67,18 @@ func (f UserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserMutation", m)
+}
+
+// The UserToStoreFunc type is an adapter to allow the use of ordinary
+// function as UserToStore mutator.
+type UserToStoreFunc func(context.Context, *ent.UserToStoreMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f UserToStoreFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.UserToStoreMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserToStoreMutation", m)
 }
 
 // Condition is a hook condition function.

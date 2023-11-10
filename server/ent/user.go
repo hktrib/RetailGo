@@ -25,8 +25,42 @@ type User struct {
 	// RealName holds the value of the "real_name" field.
 	RealName string `json:"real_name,omitempty"`
 	// StoreID holds the value of the "store_id" field.
-	StoreID      int `json:"store_id,omitempty"`
+	StoreID int `json:"store_id,omitempty"`
+	// ClerkUserID holds the value of the "clerk_user_id" field.
+	ClerkUserID string `json:"clerk_user_id,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges        UserEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// Store holds the value of the store edge.
+	Store []*Store `json:"store,omitempty"`
+	// UserToStore holds the value of the UserToStore edge.
+	UserToStore []*UserToStore `json:"UserToStore,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// StoreOrErr returns the Store value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) StoreOrErr() ([]*Store, error) {
+	if e.loadedTypes[0] {
+		return e.Store, nil
+	}
+	return nil, &NotLoadedError{edge: "store"}
+}
+
+// UserToStoreOrErr returns the UserToStore value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) UserToStoreOrErr() ([]*UserToStore, error) {
+	if e.loadedTypes[1] {
+		return e.UserToStore, nil
+	}
+	return nil, &NotLoadedError{edge: "UserToStore"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -38,7 +72,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case user.FieldID, user.FieldStoreID:
 			values[i] = new(sql.NullInt64)
-		case user.FieldUsername, user.FieldEmail, user.FieldRealName:
+		case user.FieldUsername, user.FieldEmail, user.FieldRealName, user.FieldClerkUserID:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -91,6 +125,12 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.StoreID = int(value.Int64)
 			}
+		case user.FieldClerkUserID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field clerk_user_id", values[i])
+			} else if value.Valid {
+				u.ClerkUserID = value.String
+			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
 		}
@@ -102,6 +142,16 @@ func (u *User) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
+}
+
+// QueryStore queries the "store" edge of the User entity.
+func (u *User) QueryStore() *StoreQuery {
+	return NewUserClient(u.config).QueryStore(u)
+}
+
+// QueryUserToStore queries the "UserToStore" edge of the User entity.
+func (u *User) QueryUserToStore() *UserToStoreQuery {
+	return NewUserClient(u.config).QueryUserToStore(u)
 }
 
 // Update returns a builder for updating this User.
@@ -141,6 +191,9 @@ func (u *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("store_id=")
 	builder.WriteString(fmt.Sprintf("%v", u.StoreID))
+	builder.WriteString(", ")
+	builder.WriteString("clerk_user_id=")
+	builder.WriteString(u.ClerkUserID)
 	builder.WriteByte(')')
 	return builder.String()
 }
