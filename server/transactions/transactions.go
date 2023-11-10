@@ -7,7 +7,7 @@ import (
 	"github.com/hktrib/RetailGo/ent"
 )
 
-func StoreAndOwnerTransaction(ctx context.Context, dbClient *ent.Client) error {
+func StoreAndOwnerCreationTx(ctx context.Context, dbClient *ent.Client) error {
 	tx, err := dbClient.Tx(ctx)
 	if err != nil {
 		return rollback(tx, fmt.Errorf("tx_error: starting a transaction: %w", err))

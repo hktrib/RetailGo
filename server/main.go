@@ -7,18 +7,36 @@ import (
 	"net/http"
 
 	"github.com/clerkinc/clerk-sdk-go/clerk"
-	_ "github.com/clerkinc/clerk-sdk-go/clerk"
+	"github.com/go-redis/redis"
+	"github.com/hibiken/asynq"
 	server "github.com/hktrib/RetailGo/routes"
 	"github.com/hktrib/RetailGo/util"
+	_ "github.com/redis/go-redis/v9"
 
 	_ "github.com/lib/pq"
 )
 
 func main() {
+
+	// ctx := context.Background()
+
 	config, err := util.LoadConfig(".")
 	if err != nil {
 		panic(err)
 	}
+
+	kvStoreClient := redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("localhost:%v", config.RedisAddress),
+		Password: "",
+		DB:       0,
+	})
+	defer kvStoreClient.Close()
+
+	messageQueueClient := asynq.NewClient(asynq.RedisClientOpt{
+		Addr: fmt.Sprintf("localhost:%v", config.RedisAddress),
+		DB:   1,
+	})
+	defer messageQueueClient.Close()
 
 	clerkClient, err := clerk.NewClient(config.ClerkSK)
 	if err != nil {
