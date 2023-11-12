@@ -164,6 +164,7 @@ func (srv *Server) StoreCreate(next http.Handler) http.Handler {
 		if err != nil {
 			log.Fatal().Err(err).Msg("Reading request body failed..")
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
 		}
 
 		reqBody := Request{}
@@ -172,6 +173,7 @@ func (srv *Server) StoreCreate(next http.Handler) http.Handler {
 		if err != nil {
 			log.Fatal().Err(err).Msg("Reading request body failed..")
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
 		}
 
 		store := ent.Store{}
