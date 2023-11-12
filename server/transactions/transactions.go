@@ -7,15 +7,22 @@ import (
 	"github.com/hktrib/RetailGo/ent"
 )
 
+type StoreKey struct {
+	Store string
+}
+
+type OwnerKey struct {
+	Owner string
+}
+
 func StoreAndOwnerCreationTx(ctx context.Context, dbClient *ent.Client) error {
 	tx, err := dbClient.Tx(ctx)
 	if err != nil {
 		return rollback(tx, fmt.Errorf("tx_error: starting a transaction: %w", err))
 	}
 
-	reqStore := ctx.Value("store").(*ent.Store)
-	// reqEmail := ctx.Value("email").(*ent.Store)
-	reqUser := ctx.Value("user").(*ent.User)
+	reqStore := ctx.Value(StoreKey{"store"}).(*ent.Store)
+	reqUser := ctx.Value(OwnerKey{"owner"}).(*ent.User)
 
 	_, err = tx.Store.Create().SetStoreName(reqStore.StoreName).Save(ctx)
 

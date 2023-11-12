@@ -1,4 +1,4 @@
-package kvRedis
+package kv
 
 import (
 	"context"
@@ -9,46 +9,54 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type redisCache struct {
-	host    string
-	db      int
-	expires time.Duration
-	ctx     context.Context
+type Cache struct {
+	Client        *redis.Client
+	defaultExpiry time.Duration
+	ctx           context.Context
+	opts          *redis.Options
 }
 
-func NewRedisCache(host string, db int, exp time.Duration) *redisCache {
-	return &redisCache{
-		host:    host,
-		db:      db,
-		expires: exp,
-		ctx:     context.Background(),
-	}
+func NewCache(ctx context.Context, opts *redis.Options, defaultExpiry time.Duration) *Cache {
+	cache := &Cache{}
+
+	cache.Client = cache.getClient(opts)
+	cache.defaultExpiry = defaultExpiry
+	cache.ctx = ctx
+	cache.opts = opts
+	return cache
 }
 
-func (cache *redisCache) getClient() *redis.Client {
-	return redis.NewClient(&redis.Options{
-		Addr:     cache.host,
-		Password: "",
-		DB:       cache.db,
-	})
+func (c *Cache) getClient(opts *redis.Options) *redis.Client {
+	return redis.NewClient(opts)
 }
 
-func (cache *redisCache) Set(key string, entity *ent.User) {
-	client := cache.getClient()
-
+func (c *Cache) Set(key string, value *ent.User) {
+	client := c.Client
 	// serialize value object to JSON
-	json, err := json.Marshal(entity)
+	json, err := json.Marshal(value)
 	if err != nil {
 		panic(err)
 	}
 
-	client.Set(cache.ctx, key, json, cache.expires*time.Second)
+	client.Set(c.ctx, key, json, c.defaultExpiry)
 }
 
-func (cache *redisCache) Get(key string) *ent.User {
-	client := cache.getClient()
+func (c *Cache) SetX(key string, value *ent.User, expiresAt time.Duration) {
+	client := c.Client
 
-	val, err := client.Get(cache.ctx, key).Result()
+	// serialize value object to JSON
+	json, err := json.Marshal(value)
+	if err != nil {
+		panic(err)
+	}
+
+	client.Set(c.ctx, key, json, expiresAt)
+}
+
+func (c *Cache) Get(key string) *ent.User {
+	client := c.Client
+
+	val, err := client.Get(c.ctx, key).Result()
 	if err != nil {
 		return nil
 	}

@@ -1,8 +1,19 @@
-package kvRedis
+package kv
 
-import "github.com/hktrib/RetailGo/ent"
+import (
+	"time"
+
+	"github.com/hktrib/RetailGo/ent"
+)
 
 type UserCache interface {
-	Set(key string, entity *ent.User)
+	Set(key string, value *ent.User)
+	SetX(key string, value *ent.User, expiresAt time.Duration)
 	Get(key string) *ent.User
 }
+
+type KeyTypes string
+
+const (
+	OwnerCreatingStore KeyTypes = "OwnerCreatingStore"
+)

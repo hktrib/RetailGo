@@ -28,8 +28,8 @@ type RedisConsumer struct {
 	config      *util.Config
 }
 
-func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, dbClient *ent.Client, clerkclient clerk.Client, config *util.Config) TaskConsumer {
-	logger := NewLogger()
+func NewRedisTaskConsumer(redisOpt asynq.RedisClientOpt, dbClient *ent.Client, clerkclient clerk.Client, config *util.Config) TaskConsumer {
+	logger := util.NewLogger()
 	redis.SetLogger(logger)
 
 	server := asynq.NewServer(

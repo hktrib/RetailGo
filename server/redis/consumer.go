@@ -1,13 +1,11 @@
-package kvRedis
+package kv
 
 import (
 	"fmt"
-
-	"github.com/redis/go-redis/v9"
 )
 
-func (cache *redisCache) Consumer(kvStoreClient *redis.Client) {
-	subscriber := kvStoreClient.Subscribe(cache.ctx, fmt.Sprintf("%v", cache.db))
+func (cache *Cache) Consumer() {
+	subscriber := cache.Client.Subscribe(cache.ctx, fmt.Sprintf("%v", cache.opts.DB))
 
 	defer subscriber.Close()
 

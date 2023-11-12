@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/hibiken/asynq"
 	"github.com/hktrib/RetailGo/ent"
@@ -16,14 +17,14 @@ const (
 	TaskOwnerCreationCheck = "store|owner:create"
 )
 
-func (rp *RedisProducer) TaskOwnerCreationCheck(ctx context.Context, ownerEmailID *string, opts ...asynq.Option) error {
+func (rp *RedisProducer) TaskOwnerCreationCheck(ctx context.Context, ownerEmailID *string, processInTime time.Duration, opts ...asynq.Option) error {
 	payload, err := json.Marshal(ownerEmailID)
 	if err != nil {
 		return err
 	}
-	task := asynq.NewTask(TaskOwnerCreationCheck, payload)
+	task := asynq.NewTask(TaskOwnerCreationCheck, payload, opts...)
 
-	info, err := rp.messageQueueClient.EnqueueContext(ctx, task)
+	info, err := rp.messageQueueClient.EnqueueContext(ctx, task, asynq.ProcessIn(processInTime))
 	if err != nil {
 		return fmt.Errorf("failed to enqueue task: %w", err)
 	}
