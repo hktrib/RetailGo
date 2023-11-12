@@ -7,6 +7,7 @@ type Config struct {
 	DBSource      string `mapstructure:"DB_SOURCE"`
 	ServerAddress string `mapstructure:"SERVER_ADDRESS"`
 	ClerkSK       string `mapstructure:"CLERK_SK"`
+	RedisAddress  string `mapstructure:"REDIS_ADDR"`
 }
 
 func LoadConfig(path string) (config Config, err error) {
