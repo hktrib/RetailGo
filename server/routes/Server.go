@@ -5,7 +5,10 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/hibiken/asynq"
 	"github.com/hktrib/RetailGo/ent"
+	kv "github.com/hktrib/RetailGo/redis"
+	worker "github.com/hktrib/RetailGo/tasks"
 	"github.com/hktrib/RetailGo/util"
 )
 
@@ -18,20 +21,35 @@ import (
 */
 
 type Server struct {
-	Router      *chi.Mux
-	ClerkClient clerk.Client
-	DBClient    *ent.Client
-	Config      *util.Config
+	Router          *chi.Mux
+	ClerkClient     clerk.Client
+	DBClient        *ent.Client
+	TaskQueueClient *asynq.Client
+	Cache           *kv.Cache
+
+	TaskProducer worker.TaskProducer
+	Config       *util.Config
 }
 
-func NewServer(clerkClient clerk.Client, entClient *ent.Client, config *util.Config) *Server {
-	s := &Server{}
-	s.Router = chi.NewRouter()
-	s.Router = chi.NewRouter()
-	s.ClerkClient = clerkClient
-	s.DBClient = entClient
-	s.Config = config
-	return s
+func NewServer(
+	clerkClient clerk.Client,
+	entClient *ent.Client,
+	taskQueueClient *asynq.Client,
+	cache *kv.Cache,
+	taskProducer worker.TaskProducer,
+	config *util.Config,
+) *Server {
+
+	srv := &Server{}
+	srv.Router = chi.NewRouter()
+	srv.ClerkClient = clerkClient
+	srv.DBClient = entClient
+	srv.TaskQueueClient = taskQueueClient
+	srv.Cache = cache
+
+	srv.TaskProducer = taskProducer
+	srv.Config = config
+	return srv
 }
 
 func (s *Server) MountHandlers() {
