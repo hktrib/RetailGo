@@ -4,13 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-chi/chi/v5"
+	"github.com/hktrib/RetailGo/ent"
 	"github.com/hktrib/RetailGo/ent/category"
 	"github.com/hktrib/RetailGo/ent/item"
 	"io"
 	"net/http"
 	"strconv"
-
-	"github.com/hktrib/RetailGo/ent"
 )
 
 func (srv *Server) CatDelete(w http.ResponseWriter, r *http.Request) {
@@ -89,13 +88,12 @@ func (srv *Server) CatItemRead(w http.ResponseWriter, r *http.Request) {
 	}
 	targetCategory, err := srv.DBClient.Category.Query().Where(category.ID(category_id)).Only(ctx)
 	// send json response
-	response := make(map[string][]string)
+	response := make(map[string][]*ent.Item)
 
 	// get items for each targetCategory
 	items, _ := srv.DBClient.Item.Query().Where(item.HasCategoryWith(category.ID(targetCategory.ID))).All(ctx)
 	for _, item := range items {
-		itemData, _ := json.Marshal(item)
-		response[targetCategory.Name] = append(response[targetCategory.Name], string(itemData))
+		response[targetCategory.Name] = append(response[targetCategory.Name], item)
 	}
 
 	responseBody, _ := json.Marshal(response)
@@ -165,14 +163,14 @@ func (srv *Server) CatItemList(w http.ResponseWriter, r *http.Request) {
 	}
 	categories, err := srv.DBClient.Category.Query().Where(category.StoreID(store_id)).All(ctx)
 	// send json response
-	response := make(map[string][]string)
+	response := make(map[string][]*ent.Item)
 
 	for _, cat := range categories {
 		// get items for each category
 		items, _ := srv.DBClient.Item.Query().Where(item.HasCategoryWith(category.ID(cat.ID))).All(ctx)
 		for _, item := range items {
-			itemData, _ := json.Marshal(item)
-			response[cat.Name] = append(response[cat.Name], string(itemData))
+
+			response[cat.Name] = append(response[cat.Name], item)
 		}
 
 	}
