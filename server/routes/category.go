@@ -135,17 +135,25 @@ func (srv *Server) CatItemAdd(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	createdItem, err := srv.DBClient.Item.Create().SetName(req.Name).SetPhoto(req.Photo).SetQuantity(req.Quantity).SetStoreID(store_id).SetPrice(req.Price).AddCategoryIDs(cat_id).Save(ctx)
+	var targetItem *ent.Item
+	if req.ID == 0 {
+		targetItem, err = srv.DBClient.Item.Create().SetName(req.Name).SetPhoto(req.Photo).SetQuantity(req.Quantity).SetStoreID(store_id).SetPrice(req.Price).AddCategoryIDs(cat_id).Save(ctx)
+	} else {
+		targetItem, err = srv.DBClient.Item.Query().Where(item.ID(req.ID)).Only(ctx)
+		if ent.IsNotFound(err) {
+			targetItem, err = srv.DBClient.Item.Create().SetName(req.Name).SetPhoto(req.Photo).SetQuantity(req.Quantity).SetStoreID(store_id).SetPrice(req.Price).SetID(req.ID).AddCategoryIDs(cat_id).Save(ctx)
+		}
+	}
 
 	if err != nil {
 		fmt.Println("Create didn't work:", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	srv.DBClient.Category.UpdateOneID(cat_id).AddItems(createdItem).ExecX(ctx)
+	srv.DBClient.Category.UpdateOneID(cat_id).AddItems(targetItem).ExecX(ctx)
 
 	responseBody, _ := json.Marshal(map[string]interface{}{
-		"id": createdItem.ID,
+		"id": targetItem.ID,
 	})
 
 	w.WriteHeader(http.StatusCreated)
@@ -162,14 +170,12 @@ func (srv *Server) CatItemList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	categories, err := srv.DBClient.Category.Query().Where(category.StoreID(store_id)).All(ctx)
-	// send json response
 	response := make(map[string][]*ent.Item)
 
 	for _, cat := range categories {
 		// get items for each category
 		items, _ := srv.DBClient.Item.Query().Where(item.HasCategoryWith(category.ID(cat.ID))).All(ctx)
 		for _, item := range items {
-
 			response[cat.Name] = append(response[cat.Name], item)
 		}
 
