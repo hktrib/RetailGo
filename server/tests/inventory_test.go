@@ -52,7 +52,6 @@ func TestInvCreate(tst *testing.T) {
 		Photo:    []byte("uhsrgouhsrgouhsrgoushrg"),
 		Quantity: 15,
 		Price:    120.9,
-		Category: "MoodyFoods",
 		StoreID:  1391,
 	}
 
