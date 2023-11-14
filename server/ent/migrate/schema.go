@@ -3,12 +3,64 @@
 package migrate
 
 import (
-	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/dialect/sql/schema"
 	"entgo.io/ent/schema/field"
 )
 
 var (
+	// CategoriesColumns holds the columns for the "categories" table.
+	CategoriesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "photo", Type: field.TypeBytes},
+		{Name: "store_id", Type: field.TypeInt},
+	}
+	// CategoriesTable holds the schema information for the "categories" table.
+	CategoriesTable = &schema.Table{
+		Name:       "categories",
+		Columns:    CategoriesColumns,
+		PrimaryKey: []*schema.Column{CategoriesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "categories_stores_categories",
+				Columns:    []*schema.Column{CategoriesColumns[3]},
+				RefColumns: []*schema.Column{StoresColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "category_name",
+				Unique:  true,
+				Columns: []*schema.Column{CategoriesColumns[1]},
+			},
+		},
+	}
+	// CategoryItemsColumns holds the columns for the "category_items" table.
+	CategoryItemsColumns = []*schema.Column{
+		{Name: "category_id", Type: field.TypeInt},
+		{Name: "item_id", Type: field.TypeInt},
+	}
+	// CategoryItemsTable holds the schema information for the "category_items" table.
+	CategoryItemsTable = &schema.Table{
+		Name:       "category_items",
+		Columns:    CategoryItemsColumns,
+		PrimaryKey: []*schema.Column{CategoryItemsColumns[0], CategoryItemsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "category_items_categories_category",
+				Columns:    []*schema.Column{CategoryItemsColumns[0]},
+				RefColumns: []*schema.Column{CategoriesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "category_items_items_item",
+				Columns:    []*schema.Column{CategoryItemsColumns[1]},
+				RefColumns: []*schema.Column{ItemsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// ItemsColumns holds the columns for the "items" table.
 	ItemsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -17,31 +69,18 @@ var (
 		{Name: "quantity", Type: field.TypeInt},
 		{Name: "price", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "decimal(10,2)"}},
 		{Name: "store_id", Type: field.TypeInt},
-		{Name: "category", Type: field.TypeString},
 	}
 	// ItemsTable holds the schema information for the "items" table.
 	ItemsTable = &schema.Table{
 		Name:       "items",
 		Columns:    ItemsColumns,
 		PrimaryKey: []*schema.Column{ItemsColumns[0]},
-		Indexes: []*schema.Index{
+		ForeignKeys: []*schema.ForeignKey{
 			{
-				Name:    "item_store_id_category",
-				Unique:  false,
-				Columns: []*schema.Column{ItemsColumns[5], ItemsColumns[6]},
-				Annotation: &entsql.IndexAnnotation{
-					Where: "store_id IS NOT NULL AND category IS NOT NULL",
-				},
-			},
-			{
-				Name:    "item_store_id",
-				Unique:  false,
-				Columns: []*schema.Column{ItemsColumns[5]},
-			},
-			{
-				Name:    "item_category",
-				Unique:  false,
-				Columns: []*schema.Column{ItemsColumns[6]},
+				Symbol:     "items_stores_items",
+				Columns:    []*schema.Column{ItemsColumns[5]},
+				RefColumns: []*schema.Column{StoresColumns[0]},
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -49,6 +88,7 @@ var (
 	StoresColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "store_name", Type: field.TypeString},
+		{Name: "owner_email", Type: field.TypeString, Nullable: true},
 	}
 	// StoresTable holds the schema information for the "stores" table.
 	StoresTable = &schema.Table{
@@ -71,6 +111,7 @@ var (
 		{Name: "is_owner", Type: field.TypeBool},
 		{Name: "real_name", Type: field.TypeString},
 		{Name: "store_id", Type: field.TypeInt},
+		{Name: "clerk_user_id", Type: field.TypeString, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
@@ -85,13 +126,49 @@ var (
 			},
 		},
 	}
+	// UserToStoresColumns holds the columns for the "user_to_stores" table.
+	UserToStoresColumns = []*schema.Column{
+		{Name: "permission_level", Type: field.TypeInt},
+		{Name: "joined_at", Type: field.TypeInt},
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "store_id", Type: field.TypeInt},
+	}
+	// UserToStoresTable holds the schema information for the "user_to_stores" table.
+	UserToStoresTable = &schema.Table{
+		Name:       "user_to_stores",
+		Columns:    UserToStoresColumns,
+		PrimaryKey: []*schema.Column{UserToStoresColumns[2], UserToStoresColumns[3]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_to_stores_categories_user",
+				Columns:    []*schema.Column{UserToStoresColumns[2]},
+				RefColumns: []*schema.Column{CategoriesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "user_to_stores_items_store",
+				Columns:    []*schema.Column{UserToStoresColumns[3]},
+				RefColumns: []*schema.Column{ItemsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		CategoriesTable,
+		CategoryItemsTable,
 		ItemsTable,
 		StoresTable,
 		UsersTable,
+		UserToStoresTable,
 	}
 )
 
 func init() {
+	CategoriesTable.ForeignKeys[0].RefTable = StoresTable
+	CategoryItemsTable.ForeignKeys[0].RefTable = CategoriesTable
+	CategoryItemsTable.ForeignKeys[1].RefTable = ItemsTable
+	ItemsTable.ForeignKeys[0].RefTable = StoresTable
+	UserToStoresTable.ForeignKeys[0].RefTable = CategoriesTable
+	UserToStoresTable.ForeignKeys[1].RefTable = ItemsTable
 }

@@ -9,7 +9,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hktrib/RetailGo/ent/category"
 	"github.com/hktrib/RetailGo/ent/item"
+	"github.com/hktrib/RetailGo/ent/store"
 )
 
 // ItemCreate is the builder for creating a Item entity.
@@ -49,16 +51,30 @@ func (ic *ItemCreate) SetStoreID(i int) *ItemCreate {
 	return ic
 }
 
-// SetCategory sets the "category" field.
-func (ic *ItemCreate) SetCategory(s string) *ItemCreate {
-	ic.mutation.SetCategory(s)
-	return ic
-}
-
 // SetID sets the "id" field.
 func (ic *ItemCreate) SetID(i int) *ItemCreate {
 	ic.mutation.SetID(i)
 	return ic
+}
+
+// AddCategoryIDs adds the "category" edge to the Category entity by IDs.
+func (ic *ItemCreate) AddCategoryIDs(ids ...int) *ItemCreate {
+	ic.mutation.AddCategoryIDs(ids...)
+	return ic
+}
+
+// AddCategory adds the "category" edges to the Category entity.
+func (ic *ItemCreate) AddCategory(c ...*Category) *ItemCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ic.AddCategoryIDs(ids...)
+}
+
+// SetStore sets the "store" edge to the Store entity.
+func (ic *ItemCreate) SetStore(s *Store) *ItemCreate {
+	return ic.SetStoreID(s.ID)
 }
 
 // Mutation returns the ItemMutation object of the builder.
@@ -110,8 +126,8 @@ func (ic *ItemCreate) check() error {
 	if _, ok := ic.mutation.StoreID(); !ok {
 		return &ValidationError{Name: "store_id", err: errors.New(`ent: missing required field "Item.store_id"`)}
 	}
-	if _, ok := ic.mutation.Category(); !ok {
-		return &ValidationError{Name: "category", err: errors.New(`ent: missing required field "Item.category"`)}
+	if _, ok := ic.mutation.StoreID(); !ok {
+		return &ValidationError{Name: "store", err: errors.New(`ent: missing required edge "Item.store"`)}
 	}
 	return nil
 }
@@ -161,13 +177,38 @@ func (ic *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 		_spec.SetField(item.FieldPrice, field.TypeFloat64, value)
 		_node.Price = value
 	}
-	if value, ok := ic.mutation.StoreID(); ok {
-		_spec.SetField(item.FieldStoreID, field.TypeInt, value)
-		_node.StoreID = value
+	if nodes := ic.mutation.CategoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   item.CategoryTable,
+			Columns: item.CategoryPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if value, ok := ic.mutation.Category(); ok {
-		_spec.SetField(item.FieldCategory, field.TypeString, value)
-		_node.Category = value
+	if nodes := ic.mutation.StoreIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   item.StoreTable,
+			Columns: []string{item.StoreColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.StoreID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

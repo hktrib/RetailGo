@@ -12,9 +12,12 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/hktrib/RetailGo/ent/category"
+	"github.com/hktrib/RetailGo/ent/categoryitem"
 	"github.com/hktrib/RetailGo/ent/item"
 	"github.com/hktrib/RetailGo/ent/store"
 	"github.com/hktrib/RetailGo/ent/user"
+	"github.com/hktrib/RetailGo/ent/usertostore"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -75,9 +78,12 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			item.Table:  item.ValidColumn,
-			store.Table: store.ValidColumn,
-			user.Table:  user.ValidColumn,
+			category.Table:     category.ValidColumn,
+			categoryitem.Table: categoryitem.ValidColumn,
+			item.Table:         item.ValidColumn,
+			store.Table:        store.ValidColumn,
+			user.Table:         user.ValidColumn,
+			usertostore.Table:  usertostore.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

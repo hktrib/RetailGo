@@ -12,12 +12,18 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// Category is the client for interacting with the Category builders.
+	Category *CategoryClient
+	// CategoryItem is the client for interacting with the CategoryItem builders.
+	CategoryItem *CategoryItemClient
 	// Item is the client for interacting with the Item builders.
 	Item *ItemClient
 	// Store is the client for interacting with the Store builders.
 	Store *StoreClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserToStore is the client for interacting with the UserToStore builders.
+	UserToStore *UserToStoreClient
 
 	// lazily loaded.
 	client     *Client
@@ -149,9 +155,12 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.Category = NewCategoryClient(tx.config)
+	tx.CategoryItem = NewCategoryItemClient(tx.config)
 	tx.Item = NewItemClient(tx.config)
 	tx.Store = NewStoreClient(tx.config)
 	tx.User = NewUserClient(tx.config)
+	tx.UserToStore = NewUserToStoreClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
@@ -161,7 +170,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Item.QueryXXX(), the query will be executed
+// applies a query, for example: Category.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

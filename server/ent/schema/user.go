@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 )
@@ -20,12 +21,15 @@ func (User) Fields() []ent.Field {
 		field.Bool("is_owner"),
 		field.String("real_name"),
 		field.Int("store_id"),
+		field.String("clerk_user_id").Optional(),
 	}
 }
 
 // Edges of the User.
 func (User) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.To("store", Store.Type).Through("UserToStore", UserToStore.Type),
+	}
 }
 
 func (User) Indexes() []ent.Index {

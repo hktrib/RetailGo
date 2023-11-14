@@ -4,6 +4,7 @@ package user
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/hktrib/RetailGo/ent/predicate"
 )
 
@@ -75,6 +76,11 @@ func RealName(v string) predicate.User {
 // StoreID applies equality check predicate on the "store_id" field. It's identical to StoreIDEQ.
 func StoreID(v int) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldStoreID, v))
+}
+
+// ClerkUserID applies equality check predicate on the "clerk_user_id" field. It's identical to ClerkUserIDEQ.
+func ClerkUserID(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldClerkUserID, v))
 }
 
 // UsernameEQ applies the EQ predicate on the "username" field.
@@ -320,6 +326,127 @@ func StoreIDLT(v int) predicate.User {
 // StoreIDLTE applies the LTE predicate on the "store_id" field.
 func StoreIDLTE(v int) predicate.User {
 	return predicate.User(sql.FieldLTE(FieldStoreID, v))
+}
+
+// ClerkUserIDEQ applies the EQ predicate on the "clerk_user_id" field.
+func ClerkUserIDEQ(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldClerkUserID, v))
+}
+
+// ClerkUserIDNEQ applies the NEQ predicate on the "clerk_user_id" field.
+func ClerkUserIDNEQ(v string) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldClerkUserID, v))
+}
+
+// ClerkUserIDIn applies the In predicate on the "clerk_user_id" field.
+func ClerkUserIDIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldIn(FieldClerkUserID, vs...))
+}
+
+// ClerkUserIDNotIn applies the NotIn predicate on the "clerk_user_id" field.
+func ClerkUserIDNotIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldNotIn(FieldClerkUserID, vs...))
+}
+
+// ClerkUserIDGT applies the GT predicate on the "clerk_user_id" field.
+func ClerkUserIDGT(v string) predicate.User {
+	return predicate.User(sql.FieldGT(FieldClerkUserID, v))
+}
+
+// ClerkUserIDGTE applies the GTE predicate on the "clerk_user_id" field.
+func ClerkUserIDGTE(v string) predicate.User {
+	return predicate.User(sql.FieldGTE(FieldClerkUserID, v))
+}
+
+// ClerkUserIDLT applies the LT predicate on the "clerk_user_id" field.
+func ClerkUserIDLT(v string) predicate.User {
+	return predicate.User(sql.FieldLT(FieldClerkUserID, v))
+}
+
+// ClerkUserIDLTE applies the LTE predicate on the "clerk_user_id" field.
+func ClerkUserIDLTE(v string) predicate.User {
+	return predicate.User(sql.FieldLTE(FieldClerkUserID, v))
+}
+
+// ClerkUserIDContains applies the Contains predicate on the "clerk_user_id" field.
+func ClerkUserIDContains(v string) predicate.User {
+	return predicate.User(sql.FieldContains(FieldClerkUserID, v))
+}
+
+// ClerkUserIDHasPrefix applies the HasPrefix predicate on the "clerk_user_id" field.
+func ClerkUserIDHasPrefix(v string) predicate.User {
+	return predicate.User(sql.FieldHasPrefix(FieldClerkUserID, v))
+}
+
+// ClerkUserIDHasSuffix applies the HasSuffix predicate on the "clerk_user_id" field.
+func ClerkUserIDHasSuffix(v string) predicate.User {
+	return predicate.User(sql.FieldHasSuffix(FieldClerkUserID, v))
+}
+
+// ClerkUserIDIsNil applies the IsNil predicate on the "clerk_user_id" field.
+func ClerkUserIDIsNil() predicate.User {
+	return predicate.User(sql.FieldIsNull(FieldClerkUserID))
+}
+
+// ClerkUserIDNotNil applies the NotNil predicate on the "clerk_user_id" field.
+func ClerkUserIDNotNil() predicate.User {
+	return predicate.User(sql.FieldNotNull(FieldClerkUserID))
+}
+
+// ClerkUserIDEqualFold applies the EqualFold predicate on the "clerk_user_id" field.
+func ClerkUserIDEqualFold(v string) predicate.User {
+	return predicate.User(sql.FieldEqualFold(FieldClerkUserID, v))
+}
+
+// ClerkUserIDContainsFold applies the ContainsFold predicate on the "clerk_user_id" field.
+func ClerkUserIDContainsFold(v string) predicate.User {
+	return predicate.User(sql.FieldContainsFold(FieldClerkUserID, v))
+}
+
+// HasStore applies the HasEdge predicate on the "store" edge.
+func HasStore() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, StoreTable, StorePrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasStoreWith applies the HasEdge predicate on the "store" edge with a given conditions (other predicates).
+func HasStoreWith(preds ...predicate.Store) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newStoreStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasUserToStore applies the HasEdge predicate on the "UserToStore" edge.
+func HasUserToStore() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, UserToStoreTable, UserToStoreColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUserToStoreWith applies the HasEdge predicate on the "UserToStore" edge with a given conditions (other predicates).
+func HasUserToStoreWith(preds ...predicate.UserToStore) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newUserToStoreStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

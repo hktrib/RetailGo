@@ -4,23 +4,32 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hktrib/RetailGo/ent/category"
+	"github.com/hktrib/RetailGo/ent/item"
 	"github.com/hktrib/RetailGo/ent/predicate"
 	"github.com/hktrib/RetailGo/ent/store"
+	"github.com/hktrib/RetailGo/ent/user"
+	"github.com/hktrib/RetailGo/ent/usertostore"
 )
 
 // StoreQuery is the builder for querying Store entities.
 type StoreQuery struct {
 	config
-	ctx        *QueryContext
-	order      []store.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Store
+	ctx             *QueryContext
+	order           []store.OrderOption
+	inters          []Interceptor
+	predicates      []predicate.Store
+	withItems       *ItemQuery
+	withCategories  *CategoryQuery
+	withUser        *UserQuery
+	withUserToStore *UserToStoreQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -55,6 +64,94 @@ func (sq *StoreQuery) Unique(unique bool) *StoreQuery {
 func (sq *StoreQuery) Order(o ...store.OrderOption) *StoreQuery {
 	sq.order = append(sq.order, o...)
 	return sq
+}
+
+// QueryItems chains the current query on the "items" edge.
+func (sq *StoreQuery) QueryItems() *ItemQuery {
+	query := (&ItemClient{config: sq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(store.Table, store.FieldID, selector),
+			sqlgraph.To(item.Table, item.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, store.ItemsTable, store.ItemsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCategories chains the current query on the "categories" edge.
+func (sq *StoreQuery) QueryCategories() *CategoryQuery {
+	query := (&CategoryClient{config: sq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(store.Table, store.FieldID, selector),
+			sqlgraph.To(category.Table, category.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, store.CategoriesTable, store.CategoriesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryUser chains the current query on the "user" edge.
+func (sq *StoreQuery) QueryUser() *UserQuery {
+	query := (&UserClient{config: sq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(store.Table, store.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, store.UserTable, store.UserPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryUserToStore chains the current query on the "UserToStore" edge.
+func (sq *StoreQuery) QueryUserToStore() *UserToStoreQuery {
+	query := (&UserToStoreClient{config: sq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(store.Table, store.FieldID, selector),
+			sqlgraph.To(usertostore.Table, usertostore.StoreColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, store.UserToStoreTable, store.UserToStoreColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Store entity from the query.
@@ -244,15 +341,63 @@ func (sq *StoreQuery) Clone() *StoreQuery {
 		return nil
 	}
 	return &StoreQuery{
-		config:     sq.config,
-		ctx:        sq.ctx.Clone(),
-		order:      append([]store.OrderOption{}, sq.order...),
-		inters:     append([]Interceptor{}, sq.inters...),
-		predicates: append([]predicate.Store{}, sq.predicates...),
+		config:          sq.config,
+		ctx:             sq.ctx.Clone(),
+		order:           append([]store.OrderOption{}, sq.order...),
+		inters:          append([]Interceptor{}, sq.inters...),
+		predicates:      append([]predicate.Store{}, sq.predicates...),
+		withItems:       sq.withItems.Clone(),
+		withCategories:  sq.withCategories.Clone(),
+		withUser:        sq.withUser.Clone(),
+		withUserToStore: sq.withUserToStore.Clone(),
 		// clone intermediate query.
 		sql:  sq.sql.Clone(),
 		path: sq.path,
 	}
+}
+
+// WithItems tells the query-builder to eager-load the nodes that are connected to
+// the "items" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *StoreQuery) WithItems(opts ...func(*ItemQuery)) *StoreQuery {
+	query := (&ItemClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withItems = query
+	return sq
+}
+
+// WithCategories tells the query-builder to eager-load the nodes that are connected to
+// the "categories" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *StoreQuery) WithCategories(opts ...func(*CategoryQuery)) *StoreQuery {
+	query := (&CategoryClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withCategories = query
+	return sq
+}
+
+// WithUser tells the query-builder to eager-load the nodes that are connected to
+// the "user" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *StoreQuery) WithUser(opts ...func(*UserQuery)) *StoreQuery {
+	query := (&UserClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withUser = query
+	return sq
+}
+
+// WithUserToStore tells the query-builder to eager-load the nodes that are connected to
+// the "UserToStore" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *StoreQuery) WithUserToStore(opts ...func(*UserToStoreQuery)) *StoreQuery {
+	query := (&UserToStoreClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withUserToStore = query
+	return sq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -331,8 +476,14 @@ func (sq *StoreQuery) prepareQuery(ctx context.Context) error {
 
 func (sq *StoreQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Store, error) {
 	var (
-		nodes = []*Store{}
-		_spec = sq.querySpec()
+		nodes       = []*Store{}
+		_spec       = sq.querySpec()
+		loadedTypes = [4]bool{
+			sq.withItems != nil,
+			sq.withCategories != nil,
+			sq.withUser != nil,
+			sq.withUserToStore != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Store).scanValues(nil, columns)
@@ -340,6 +491,7 @@ func (sq *StoreQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Store,
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Store{config: sq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -351,7 +503,187 @@ func (sq *StoreQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Store,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := sq.withItems; query != nil {
+		if err := sq.loadItems(ctx, query, nodes,
+			func(n *Store) { n.Edges.Items = []*Item{} },
+			func(n *Store, e *Item) { n.Edges.Items = append(n.Edges.Items, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := sq.withCategories; query != nil {
+		if err := sq.loadCategories(ctx, query, nodes,
+			func(n *Store) { n.Edges.Categories = []*Category{} },
+			func(n *Store, e *Category) { n.Edges.Categories = append(n.Edges.Categories, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := sq.withUser; query != nil {
+		if err := sq.loadUser(ctx, query, nodes,
+			func(n *Store) { n.Edges.User = []*User{} },
+			func(n *Store, e *User) { n.Edges.User = append(n.Edges.User, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := sq.withUserToStore; query != nil {
+		if err := sq.loadUserToStore(ctx, query, nodes,
+			func(n *Store) { n.Edges.UserToStore = []*UserToStore{} },
+			func(n *Store, e *UserToStore) { n.Edges.UserToStore = append(n.Edges.UserToStore, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (sq *StoreQuery) loadItems(ctx context.Context, query *ItemQuery, nodes []*Store, init func(*Store), assign func(*Store, *Item)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Store)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(item.FieldStoreID)
+	}
+	query.Where(predicate.Item(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(store.ItemsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.StoreID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "store_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (sq *StoreQuery) loadCategories(ctx context.Context, query *CategoryQuery, nodes []*Store, init func(*Store), assign func(*Store, *Category)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Store)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(category.FieldStoreID)
+	}
+	query.Where(predicate.Category(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(store.CategoriesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.StoreID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "store_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (sq *StoreQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Store, init func(*Store), assign func(*Store, *User)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Store)
+	nids := make(map[int]map[*Store]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(store.UserTable)
+		s.Join(joinT).On(s.C(user.FieldID), joinT.C(store.UserPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(store.UserPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(store.UserPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Store]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*User](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "user" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (sq *StoreQuery) loadUserToStore(ctx context.Context, query *UserToStoreQuery, nodes []*Store, init func(*Store), assign func(*Store, *UserToStore)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Store)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(usertostore.FieldStoreID)
+	}
+	query.Where(predicate.UserToStore(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(store.UserToStoreColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.StoreID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "store_id" returned %v for node %v`, fk, n)
+		}
+		assign(node, n)
+	}
+	return nil
 }
 
 func (sq *StoreQuery) sqlCount(ctx context.Context) (int, error) {

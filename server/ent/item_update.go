@@ -10,8 +10,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hktrib/RetailGo/ent/category"
 	"github.com/hktrib/RetailGo/ent/item"
 	"github.com/hktrib/RetailGo/ent/predicate"
+	"github.com/hktrib/RetailGo/ent/store"
 )
 
 // ItemUpdate is the builder for updating Item entities.
@@ -67,26 +69,60 @@ func (iu *ItemUpdate) AddPrice(f float64) *ItemUpdate {
 
 // SetStoreID sets the "store_id" field.
 func (iu *ItemUpdate) SetStoreID(i int) *ItemUpdate {
-	iu.mutation.ResetStoreID()
 	iu.mutation.SetStoreID(i)
 	return iu
 }
 
-// AddStoreID adds i to the "store_id" field.
-func (iu *ItemUpdate) AddStoreID(i int) *ItemUpdate {
-	iu.mutation.AddStoreID(i)
+// AddCategoryIDs adds the "category" edge to the Category entity by IDs.
+func (iu *ItemUpdate) AddCategoryIDs(ids ...int) *ItemUpdate {
+	iu.mutation.AddCategoryIDs(ids...)
 	return iu
 }
 
-// SetCategory sets the "category" field.
-func (iu *ItemUpdate) SetCategory(s string) *ItemUpdate {
-	iu.mutation.SetCategory(s)
-	return iu
+// AddCategory adds the "category" edges to the Category entity.
+func (iu *ItemUpdate) AddCategory(c ...*Category) *ItemUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return iu.AddCategoryIDs(ids...)
+}
+
+// SetStore sets the "store" edge to the Store entity.
+func (iu *ItemUpdate) SetStore(s *Store) *ItemUpdate {
+	return iu.SetStoreID(s.ID)
 }
 
 // Mutation returns the ItemMutation object of the builder.
 func (iu *ItemUpdate) Mutation() *ItemMutation {
 	return iu.mutation
+}
+
+// ClearCategory clears all "category" edges to the Category entity.
+func (iu *ItemUpdate) ClearCategory() *ItemUpdate {
+	iu.mutation.ClearCategory()
+	return iu
+}
+
+// RemoveCategoryIDs removes the "category" edge to Category entities by IDs.
+func (iu *ItemUpdate) RemoveCategoryIDs(ids ...int) *ItemUpdate {
+	iu.mutation.RemoveCategoryIDs(ids...)
+	return iu
+}
+
+// RemoveCategory removes "category" edges to Category entities.
+func (iu *ItemUpdate) RemoveCategory(c ...*Category) *ItemUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return iu.RemoveCategoryIDs(ids...)
+}
+
+// ClearStore clears the "store" edge to the Store entity.
+func (iu *ItemUpdate) ClearStore() *ItemUpdate {
+	iu.mutation.ClearStore()
+	return iu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -116,7 +152,18 @@ func (iu *ItemUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (iu *ItemUpdate) check() error {
+	if _, ok := iu.mutation.StoreID(); iu.mutation.StoreCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Item.store"`)
+	}
+	return nil
+}
+
 func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := iu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(item.Table, item.Columns, sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt))
 	if ps := iu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -143,14 +190,79 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := iu.mutation.AddedPrice(); ok {
 		_spec.AddField(item.FieldPrice, field.TypeFloat64, value)
 	}
-	if value, ok := iu.mutation.StoreID(); ok {
-		_spec.SetField(item.FieldStoreID, field.TypeInt, value)
+	if iu.mutation.CategoryCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   item.CategoryTable,
+			Columns: item.CategoryPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if value, ok := iu.mutation.AddedStoreID(); ok {
-		_spec.AddField(item.FieldStoreID, field.TypeInt, value)
+	if nodes := iu.mutation.RemovedCategoryIDs(); len(nodes) > 0 && !iu.mutation.CategoryCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   item.CategoryTable,
+			Columns: item.CategoryPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if value, ok := iu.mutation.Category(); ok {
-		_spec.SetField(item.FieldCategory, field.TypeString, value)
+	if nodes := iu.mutation.CategoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   item.CategoryTable,
+			Columns: item.CategoryPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if iu.mutation.StoreCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   item.StoreTable,
+			Columns: []string{item.StoreColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := iu.mutation.StoreIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   item.StoreTable,
+			Columns: []string{item.StoreColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, iu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -212,26 +324,60 @@ func (iuo *ItemUpdateOne) AddPrice(f float64) *ItemUpdateOne {
 
 // SetStoreID sets the "store_id" field.
 func (iuo *ItemUpdateOne) SetStoreID(i int) *ItemUpdateOne {
-	iuo.mutation.ResetStoreID()
 	iuo.mutation.SetStoreID(i)
 	return iuo
 }
 
-// AddStoreID adds i to the "store_id" field.
-func (iuo *ItemUpdateOne) AddStoreID(i int) *ItemUpdateOne {
-	iuo.mutation.AddStoreID(i)
+// AddCategoryIDs adds the "category" edge to the Category entity by IDs.
+func (iuo *ItemUpdateOne) AddCategoryIDs(ids ...int) *ItemUpdateOne {
+	iuo.mutation.AddCategoryIDs(ids...)
 	return iuo
 }
 
-// SetCategory sets the "category" field.
-func (iuo *ItemUpdateOne) SetCategory(s string) *ItemUpdateOne {
-	iuo.mutation.SetCategory(s)
-	return iuo
+// AddCategory adds the "category" edges to the Category entity.
+func (iuo *ItemUpdateOne) AddCategory(c ...*Category) *ItemUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return iuo.AddCategoryIDs(ids...)
+}
+
+// SetStore sets the "store" edge to the Store entity.
+func (iuo *ItemUpdateOne) SetStore(s *Store) *ItemUpdateOne {
+	return iuo.SetStoreID(s.ID)
 }
 
 // Mutation returns the ItemMutation object of the builder.
 func (iuo *ItemUpdateOne) Mutation() *ItemMutation {
 	return iuo.mutation
+}
+
+// ClearCategory clears all "category" edges to the Category entity.
+func (iuo *ItemUpdateOne) ClearCategory() *ItemUpdateOne {
+	iuo.mutation.ClearCategory()
+	return iuo
+}
+
+// RemoveCategoryIDs removes the "category" edge to Category entities by IDs.
+func (iuo *ItemUpdateOne) RemoveCategoryIDs(ids ...int) *ItemUpdateOne {
+	iuo.mutation.RemoveCategoryIDs(ids...)
+	return iuo
+}
+
+// RemoveCategory removes "category" edges to Category entities.
+func (iuo *ItemUpdateOne) RemoveCategory(c ...*Category) *ItemUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return iuo.RemoveCategoryIDs(ids...)
+}
+
+// ClearStore clears the "store" edge to the Store entity.
+func (iuo *ItemUpdateOne) ClearStore() *ItemUpdateOne {
+	iuo.mutation.ClearStore()
+	return iuo
 }
 
 // Where appends a list predicates to the ItemUpdate builder.
@@ -274,7 +420,18 @@ func (iuo *ItemUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (iuo *ItemUpdateOne) check() error {
+	if _, ok := iuo.mutation.StoreID(); iuo.mutation.StoreCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Item.store"`)
+	}
+	return nil
+}
+
 func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) {
+	if err := iuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(item.Table, item.Columns, sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt))
 	id, ok := iuo.mutation.ID()
 	if !ok {
@@ -318,14 +475,79 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 	if value, ok := iuo.mutation.AddedPrice(); ok {
 		_spec.AddField(item.FieldPrice, field.TypeFloat64, value)
 	}
-	if value, ok := iuo.mutation.StoreID(); ok {
-		_spec.SetField(item.FieldStoreID, field.TypeInt, value)
+	if iuo.mutation.CategoryCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   item.CategoryTable,
+			Columns: item.CategoryPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if value, ok := iuo.mutation.AddedStoreID(); ok {
-		_spec.AddField(item.FieldStoreID, field.TypeInt, value)
+	if nodes := iuo.mutation.RemovedCategoryIDs(); len(nodes) > 0 && !iuo.mutation.CategoryCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   item.CategoryTable,
+			Columns: item.CategoryPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if value, ok := iuo.mutation.Category(); ok {
-		_spec.SetField(item.FieldCategory, field.TypeString, value)
+	if nodes := iuo.mutation.CategoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   item.CategoryTable,
+			Columns: item.CategoryPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if iuo.mutation.StoreCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   item.StoreTable,
+			Columns: []string{item.StoreColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := iuo.mutation.StoreIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   item.StoreTable,
+			Columns: []string{item.StoreColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Item{config: iuo.config}
 	_spec.Assign = _node.assignValues

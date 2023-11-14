@@ -14,9 +14,13 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/hktrib/RetailGo/ent/category"
+	"github.com/hktrib/RetailGo/ent/categoryitem"
 	"github.com/hktrib/RetailGo/ent/item"
 	"github.com/hktrib/RetailGo/ent/store"
 	"github.com/hktrib/RetailGo/ent/user"
+	"github.com/hktrib/RetailGo/ent/usertostore"
 )
 
 // Client is the client that holds all ent builders.
@@ -24,12 +28,18 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// Category is the client for interacting with the Category builders.
+	Category *CategoryClient
+	// CategoryItem is the client for interacting with the CategoryItem builders.
+	CategoryItem *CategoryItemClient
 	// Item is the client for interacting with the Item builders.
 	Item *ItemClient
 	// Store is the client for interacting with the Store builders.
 	Store *StoreClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserToStore is the client for interacting with the UserToStore builders.
+	UserToStore *UserToStoreClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -43,9 +53,12 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.Category = NewCategoryClient(c.config)
+	c.CategoryItem = NewCategoryItemClient(c.config)
 	c.Item = NewItemClient(c.config)
 	c.Store = NewStoreClient(c.config)
 	c.User = NewUserClient(c.config)
+	c.UserToStore = NewUserToStoreClient(c.config)
 }
 
 type (
@@ -129,11 +142,14 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Item:   NewItemClient(cfg),
-		Store:  NewStoreClient(cfg),
-		User:   NewUserClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		Category:     NewCategoryClient(cfg),
+		CategoryItem: NewCategoryItemClient(cfg),
+		Item:         NewItemClient(cfg),
+		Store:        NewStoreClient(cfg),
+		User:         NewUserClient(cfg),
+		UserToStore:  NewUserToStoreClient(cfg),
 	}, nil
 }
 
@@ -151,18 +167,21 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Item:   NewItemClient(cfg),
-		Store:  NewStoreClient(cfg),
-		User:   NewUserClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		Category:     NewCategoryClient(cfg),
+		CategoryItem: NewCategoryItemClient(cfg),
+		Item:         NewItemClient(cfg),
+		Store:        NewStoreClient(cfg),
+		User:         NewUserClient(cfg),
+		UserToStore:  NewUserToStoreClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Item.
+//		Category.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -184,30 +203,337 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Item.Use(hooks...)
-	c.Store.Use(hooks...)
-	c.User.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.Category, c.CategoryItem, c.Item, c.Store, c.User, c.UserToStore,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.Item.Intercept(interceptors...)
-	c.Store.Intercept(interceptors...)
-	c.User.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.Category, c.CategoryItem, c.Item, c.Store, c.User, c.UserToStore,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *CategoryMutation:
+		return c.Category.mutate(ctx, m)
+	case *CategoryItemMutation:
+		return c.CategoryItem.mutate(ctx, m)
 	case *ItemMutation:
 		return c.Item.mutate(ctx, m)
 	case *StoreMutation:
 		return c.Store.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
+	case *UserToStoreMutation:
+		return c.UserToStore.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// CategoryClient is a client for the Category schema.
+type CategoryClient struct {
+	config
+}
+
+// NewCategoryClient returns a client for the Category from the given config.
+func NewCategoryClient(c config) *CategoryClient {
+	return &CategoryClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `category.Hooks(f(g(h())))`.
+func (c *CategoryClient) Use(hooks ...Hook) {
+	c.hooks.Category = append(c.hooks.Category, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `category.Intercept(f(g(h())))`.
+func (c *CategoryClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Category = append(c.inters.Category, interceptors...)
+}
+
+// Create returns a builder for creating a Category entity.
+func (c *CategoryClient) Create() *CategoryCreate {
+	mutation := newCategoryMutation(c.config, OpCreate)
+	return &CategoryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Category entities.
+func (c *CategoryClient) CreateBulk(builders ...*CategoryCreate) *CategoryCreateBulk {
+	return &CategoryCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CategoryClient) MapCreateBulk(slice any, setFunc func(*CategoryCreate, int)) *CategoryCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CategoryCreateBulk{err: fmt.Errorf("calling to CategoryClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CategoryCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CategoryCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Category.
+func (c *CategoryClient) Update() *CategoryUpdate {
+	mutation := newCategoryMutation(c.config, OpUpdate)
+	return &CategoryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CategoryClient) UpdateOne(ca *Category) *CategoryUpdateOne {
+	mutation := newCategoryMutation(c.config, OpUpdateOne, withCategory(ca))
+	return &CategoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CategoryClient) UpdateOneID(id int) *CategoryUpdateOne {
+	mutation := newCategoryMutation(c.config, OpUpdateOne, withCategoryID(id))
+	return &CategoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Category.
+func (c *CategoryClient) Delete() *CategoryDelete {
+	mutation := newCategoryMutation(c.config, OpDelete)
+	return &CategoryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CategoryClient) DeleteOne(ca *Category) *CategoryDeleteOne {
+	return c.DeleteOneID(ca.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CategoryClient) DeleteOneID(id int) *CategoryDeleteOne {
+	builder := c.Delete().Where(category.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CategoryDeleteOne{builder}
+}
+
+// Query returns a query builder for Category.
+func (c *CategoryClient) Query() *CategoryQuery {
+	return &CategoryQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCategory},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Category entity by its id.
+func (c *CategoryClient) Get(ctx context.Context, id int) (*Category, error) {
+	return c.Query().Where(category.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CategoryClient) GetX(ctx context.Context, id int) *Category {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryItems queries the items edge of a Category.
+func (c *CategoryClient) QueryItems(ca *Category) *ItemQuery {
+	query := (&ItemClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ca.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(category.Table, category.FieldID, id),
+			sqlgraph.To(item.Table, item.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, category.ItemsTable, category.ItemsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryStore queries the store edge of a Category.
+func (c *CategoryClient) QueryStore(ca *Category) *StoreQuery {
+	query := (&StoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ca.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(category.Table, category.FieldID, id),
+			sqlgraph.To(store.Table, store.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, category.StoreTable, category.StoreColumn),
+		)
+		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCategoryItem queries the category_item edge of a Category.
+func (c *CategoryClient) QueryCategoryItem(ca *Category) *CategoryItemQuery {
+	query := (&CategoryItemClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ca.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(category.Table, category.FieldID, id),
+			sqlgraph.To(categoryitem.Table, categoryitem.CategoryColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, category.CategoryItemTable, category.CategoryItemColumn),
+		)
+		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CategoryClient) Hooks() []Hook {
+	return c.hooks.Category
+}
+
+// Interceptors returns the client interceptors.
+func (c *CategoryClient) Interceptors() []Interceptor {
+	return c.inters.Category
+}
+
+func (c *CategoryClient) mutate(ctx context.Context, m *CategoryMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CategoryCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CategoryUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CategoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CategoryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Category mutation op: %q", m.Op())
+	}
+}
+
+// CategoryItemClient is a client for the CategoryItem schema.
+type CategoryItemClient struct {
+	config
+}
+
+// NewCategoryItemClient returns a client for the CategoryItem from the given config.
+func NewCategoryItemClient(c config) *CategoryItemClient {
+	return &CategoryItemClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `categoryitem.Hooks(f(g(h())))`.
+func (c *CategoryItemClient) Use(hooks ...Hook) {
+	c.hooks.CategoryItem = append(c.hooks.CategoryItem, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `categoryitem.Intercept(f(g(h())))`.
+func (c *CategoryItemClient) Intercept(interceptors ...Interceptor) {
+	c.inters.CategoryItem = append(c.inters.CategoryItem, interceptors...)
+}
+
+// Create returns a builder for creating a CategoryItem entity.
+func (c *CategoryItemClient) Create() *CategoryItemCreate {
+	mutation := newCategoryItemMutation(c.config, OpCreate)
+	return &CategoryItemCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CategoryItem entities.
+func (c *CategoryItemClient) CreateBulk(builders ...*CategoryItemCreate) *CategoryItemCreateBulk {
+	return &CategoryItemCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CategoryItemClient) MapCreateBulk(slice any, setFunc func(*CategoryItemCreate, int)) *CategoryItemCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CategoryItemCreateBulk{err: fmt.Errorf("calling to CategoryItemClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CategoryItemCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CategoryItemCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CategoryItem.
+func (c *CategoryItemClient) Update() *CategoryItemUpdate {
+	mutation := newCategoryItemMutation(c.config, OpUpdate)
+	return &CategoryItemUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CategoryItemClient) UpdateOne(ci *CategoryItem) *CategoryItemUpdateOne {
+	mutation := newCategoryItemMutation(c.config, OpUpdateOne)
+	mutation.category = &ci.CategoryID
+	mutation.item = &ci.ItemID
+	return &CategoryItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CategoryItem.
+func (c *CategoryItemClient) Delete() *CategoryItemDelete {
+	mutation := newCategoryItemMutation(c.config, OpDelete)
+	return &CategoryItemDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Query returns a query builder for CategoryItem.
+func (c *CategoryItemClient) Query() *CategoryItemQuery {
+	return &CategoryItemQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCategoryItem},
+		inters: c.Interceptors(),
+	}
+}
+
+// QueryCategory queries the category edge of a CategoryItem.
+func (c *CategoryItemClient) QueryCategory(ci *CategoryItem) *CategoryQuery {
+	return c.Query().
+		Where(categoryitem.CategoryID(ci.CategoryID), categoryitem.ItemID(ci.ItemID)).
+		QueryCategory()
+}
+
+// QueryItem queries the item edge of a CategoryItem.
+func (c *CategoryItemClient) QueryItem(ci *CategoryItem) *ItemQuery {
+	return c.Query().
+		Where(categoryitem.CategoryID(ci.CategoryID), categoryitem.ItemID(ci.ItemID)).
+		QueryItem()
+}
+
+// Hooks returns the client hooks.
+func (c *CategoryItemClient) Hooks() []Hook {
+	return c.hooks.CategoryItem
+}
+
+// Interceptors returns the client interceptors.
+func (c *CategoryItemClient) Interceptors() []Interceptor {
+	return c.inters.CategoryItem
+}
+
+func (c *CategoryItemClient) mutate(ctx context.Context, m *CategoryItemMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CategoryItemCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CategoryItemUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CategoryItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CategoryItemDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown CategoryItem mutation op: %q", m.Op())
 	}
 }
 
@@ -317,6 +643,54 @@ func (c *ItemClient) GetX(ctx context.Context, id int) *Item {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryCategory queries the category edge of a Item.
+func (c *ItemClient) QueryCategory(i *Item) *CategoryQuery {
+	query := (&CategoryClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := i.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(item.Table, item.FieldID, id),
+			sqlgraph.To(category.Table, category.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, item.CategoryTable, item.CategoryPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryStore queries the store edge of a Item.
+func (c *ItemClient) QueryStore(i *Item) *StoreQuery {
+	query := (&StoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := i.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(item.Table, item.FieldID, id),
+			sqlgraph.To(store.Table, store.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, item.StoreTable, item.StoreColumn),
+		)
+		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCategoryItem queries the category_item edge of a Item.
+func (c *ItemClient) QueryCategoryItem(i *Item) *CategoryItemQuery {
+	query := (&CategoryItemClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := i.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(item.Table, item.FieldID, id),
+			sqlgraph.To(categoryitem.Table, categoryitem.ItemColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, item.CategoryItemTable, item.CategoryItemColumn),
+		)
+		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.
@@ -452,6 +826,70 @@ func (c *StoreClient) GetX(ctx context.Context, id int) *Store {
 	return obj
 }
 
+// QueryItems queries the items edge of a Store.
+func (c *StoreClient) QueryItems(s *Store) *ItemQuery {
+	query := (&ItemClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(store.Table, store.FieldID, id),
+			sqlgraph.To(item.Table, item.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, store.ItemsTable, store.ItemsColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCategories queries the categories edge of a Store.
+func (c *StoreClient) QueryCategories(s *Store) *CategoryQuery {
+	query := (&CategoryClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(store.Table, store.FieldID, id),
+			sqlgraph.To(category.Table, category.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, store.CategoriesTable, store.CategoriesColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUser queries the user edge of a Store.
+func (c *StoreClient) QueryUser(s *Store) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(store.Table, store.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, store.UserTable, store.UserPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUserToStore queries the UserToStore edge of a Store.
+func (c *StoreClient) QueryUserToStore(s *Store) *UserToStoreQuery {
+	query := (&UserToStoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(store.Table, store.FieldID, id),
+			sqlgraph.To(usertostore.Table, usertostore.StoreColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, store.UserToStoreTable, store.UserToStoreColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *StoreClient) Hooks() []Hook {
 	return c.hooks.Store
@@ -585,6 +1023,38 @@ func (c *UserClient) GetX(ctx context.Context, id int) *User {
 	return obj
 }
 
+// QueryStore queries the store edge of a User.
+func (c *UserClient) QueryStore(u *User) *StoreQuery {
+	query := (&StoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(store.Table, store.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.StoreTable, user.StorePrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUserToStore queries the UserToStore edge of a User.
+func (c *UserClient) QueryUserToStore(u *User) *UserToStoreQuery {
+	query := (&UserToStoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(usertostore.Table, usertostore.UserColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.UserToStoreTable, user.UserToStoreColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
@@ -610,12 +1080,128 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 	}
 }
 
+// UserToStoreClient is a client for the UserToStore schema.
+type UserToStoreClient struct {
+	config
+}
+
+// NewUserToStoreClient returns a client for the UserToStore from the given config.
+func NewUserToStoreClient(c config) *UserToStoreClient {
+	return &UserToStoreClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `usertostore.Hooks(f(g(h())))`.
+func (c *UserToStoreClient) Use(hooks ...Hook) {
+	c.hooks.UserToStore = append(c.hooks.UserToStore, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `usertostore.Intercept(f(g(h())))`.
+func (c *UserToStoreClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UserToStore = append(c.inters.UserToStore, interceptors...)
+}
+
+// Create returns a builder for creating a UserToStore entity.
+func (c *UserToStoreClient) Create() *UserToStoreCreate {
+	mutation := newUserToStoreMutation(c.config, OpCreate)
+	return &UserToStoreCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UserToStore entities.
+func (c *UserToStoreClient) CreateBulk(builders ...*UserToStoreCreate) *UserToStoreCreateBulk {
+	return &UserToStoreCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *UserToStoreClient) MapCreateBulk(slice any, setFunc func(*UserToStoreCreate, int)) *UserToStoreCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &UserToStoreCreateBulk{err: fmt.Errorf("calling to UserToStoreClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*UserToStoreCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &UserToStoreCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UserToStore.
+func (c *UserToStoreClient) Update() *UserToStoreUpdate {
+	mutation := newUserToStoreMutation(c.config, OpUpdate)
+	return &UserToStoreUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UserToStoreClient) UpdateOne(uts *UserToStore) *UserToStoreUpdateOne {
+	mutation := newUserToStoreMutation(c.config, OpUpdateOne)
+	mutation.user = &uts.UserID
+	mutation.store = &uts.StoreID
+	return &UserToStoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UserToStore.
+func (c *UserToStoreClient) Delete() *UserToStoreDelete {
+	mutation := newUserToStoreMutation(c.config, OpDelete)
+	return &UserToStoreDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Query returns a query builder for UserToStore.
+func (c *UserToStoreClient) Query() *UserToStoreQuery {
+	return &UserToStoreQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUserToStore},
+		inters: c.Interceptors(),
+	}
+}
+
+// QueryUser queries the user edge of a UserToStore.
+func (c *UserToStoreClient) QueryUser(uts *UserToStore) *CategoryQuery {
+	return c.Query().
+		Where(usertostore.UserID(uts.UserID), usertostore.StoreID(uts.StoreID)).
+		QueryUser()
+}
+
+// QueryStore queries the store edge of a UserToStore.
+func (c *UserToStoreClient) QueryStore(uts *UserToStore) *ItemQuery {
+	return c.Query().
+		Where(usertostore.UserID(uts.UserID), usertostore.StoreID(uts.StoreID)).
+		QueryStore()
+}
+
+// Hooks returns the client hooks.
+func (c *UserToStoreClient) Hooks() []Hook {
+	return c.hooks.UserToStore
+}
+
+// Interceptors returns the client interceptors.
+func (c *UserToStoreClient) Interceptors() []Interceptor {
+	return c.inters.UserToStore
+}
+
+func (c *UserToStoreClient) mutate(ctx context.Context, m *UserToStoreMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UserToStoreCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UserToStoreUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UserToStoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UserToStoreDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UserToStore mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Item, Store, User []ent.Hook
+		Category, CategoryItem, Item, Store, User, UserToStore []ent.Hook
 	}
 	inters struct {
-		Item, Store, User []ent.Interceptor
+		Category, CategoryItem, Item, Store, User, UserToStore []ent.Interceptor
 	}
 )

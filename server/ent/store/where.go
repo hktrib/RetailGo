@@ -4,6 +4,7 @@ package store
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/hktrib/RetailGo/ent/predicate"
 )
 
@@ -55,6 +56,11 @@ func IDLTE(id int) predicate.Store {
 // StoreName applies equality check predicate on the "store_name" field. It's identical to StoreNameEQ.
 func StoreName(v string) predicate.Store {
 	return predicate.Store(sql.FieldEQ(FieldStoreName, v))
+}
+
+// OwnerEmail applies equality check predicate on the "owner_Email" field. It's identical to OwnerEmailEQ.
+func OwnerEmail(v string) predicate.Store {
+	return predicate.Store(sql.FieldEQ(FieldOwnerEmail, v))
 }
 
 // StoreNameEQ applies the EQ predicate on the "store_name" field.
@@ -120,6 +126,173 @@ func StoreNameEqualFold(v string) predicate.Store {
 // StoreNameContainsFold applies the ContainsFold predicate on the "store_name" field.
 func StoreNameContainsFold(v string) predicate.Store {
 	return predicate.Store(sql.FieldContainsFold(FieldStoreName, v))
+}
+
+// OwnerEmailEQ applies the EQ predicate on the "owner_Email" field.
+func OwnerEmailEQ(v string) predicate.Store {
+	return predicate.Store(sql.FieldEQ(FieldOwnerEmail, v))
+}
+
+// OwnerEmailNEQ applies the NEQ predicate on the "owner_Email" field.
+func OwnerEmailNEQ(v string) predicate.Store {
+	return predicate.Store(sql.FieldNEQ(FieldOwnerEmail, v))
+}
+
+// OwnerEmailIn applies the In predicate on the "owner_Email" field.
+func OwnerEmailIn(vs ...string) predicate.Store {
+	return predicate.Store(sql.FieldIn(FieldOwnerEmail, vs...))
+}
+
+// OwnerEmailNotIn applies the NotIn predicate on the "owner_Email" field.
+func OwnerEmailNotIn(vs ...string) predicate.Store {
+	return predicate.Store(sql.FieldNotIn(FieldOwnerEmail, vs...))
+}
+
+// OwnerEmailGT applies the GT predicate on the "owner_Email" field.
+func OwnerEmailGT(v string) predicate.Store {
+	return predicate.Store(sql.FieldGT(FieldOwnerEmail, v))
+}
+
+// OwnerEmailGTE applies the GTE predicate on the "owner_Email" field.
+func OwnerEmailGTE(v string) predicate.Store {
+	return predicate.Store(sql.FieldGTE(FieldOwnerEmail, v))
+}
+
+// OwnerEmailLT applies the LT predicate on the "owner_Email" field.
+func OwnerEmailLT(v string) predicate.Store {
+	return predicate.Store(sql.FieldLT(FieldOwnerEmail, v))
+}
+
+// OwnerEmailLTE applies the LTE predicate on the "owner_Email" field.
+func OwnerEmailLTE(v string) predicate.Store {
+	return predicate.Store(sql.FieldLTE(FieldOwnerEmail, v))
+}
+
+// OwnerEmailContains applies the Contains predicate on the "owner_Email" field.
+func OwnerEmailContains(v string) predicate.Store {
+	return predicate.Store(sql.FieldContains(FieldOwnerEmail, v))
+}
+
+// OwnerEmailHasPrefix applies the HasPrefix predicate on the "owner_Email" field.
+func OwnerEmailHasPrefix(v string) predicate.Store {
+	return predicate.Store(sql.FieldHasPrefix(FieldOwnerEmail, v))
+}
+
+// OwnerEmailHasSuffix applies the HasSuffix predicate on the "owner_Email" field.
+func OwnerEmailHasSuffix(v string) predicate.Store {
+	return predicate.Store(sql.FieldHasSuffix(FieldOwnerEmail, v))
+}
+
+// OwnerEmailIsNil applies the IsNil predicate on the "owner_Email" field.
+func OwnerEmailIsNil() predicate.Store {
+	return predicate.Store(sql.FieldIsNull(FieldOwnerEmail))
+}
+
+// OwnerEmailNotNil applies the NotNil predicate on the "owner_Email" field.
+func OwnerEmailNotNil() predicate.Store {
+	return predicate.Store(sql.FieldNotNull(FieldOwnerEmail))
+}
+
+// OwnerEmailEqualFold applies the EqualFold predicate on the "owner_Email" field.
+func OwnerEmailEqualFold(v string) predicate.Store {
+	return predicate.Store(sql.FieldEqualFold(FieldOwnerEmail, v))
+}
+
+// OwnerEmailContainsFold applies the ContainsFold predicate on the "owner_Email" field.
+func OwnerEmailContainsFold(v string) predicate.Store {
+	return predicate.Store(sql.FieldContainsFold(FieldOwnerEmail, v))
+}
+
+// HasItems applies the HasEdge predicate on the "items" edge.
+func HasItems() predicate.Store {
+	return predicate.Store(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ItemsTable, ItemsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasItemsWith applies the HasEdge predicate on the "items" edge with a given conditions (other predicates).
+func HasItemsWith(preds ...predicate.Item) predicate.Store {
+	return predicate.Store(func(s *sql.Selector) {
+		step := newItemsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCategories applies the HasEdge predicate on the "categories" edge.
+func HasCategories() predicate.Store {
+	return predicate.Store(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, CategoriesTable, CategoriesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCategoriesWith applies the HasEdge predicate on the "categories" edge with a given conditions (other predicates).
+func HasCategoriesWith(preds ...predicate.Category) predicate.Store {
+	return predicate.Store(func(s *sql.Selector) {
+		step := newCategoriesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasUser applies the HasEdge predicate on the "user" edge.
+func HasUser() predicate.Store {
+	return predicate.Store(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, UserTable, UserPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUserWith applies the HasEdge predicate on the "user" edge with a given conditions (other predicates).
+func HasUserWith(preds ...predicate.User) predicate.Store {
+	return predicate.Store(func(s *sql.Selector) {
+		step := newUserStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasUserToStore applies the HasEdge predicate on the "UserToStore" edge.
+func HasUserToStore() predicate.Store {
+	return predicate.Store(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, UserToStoreTable, UserToStoreColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUserToStoreWith applies the HasEdge predicate on the "UserToStore" edge with a given conditions (other predicates).
+func HasUserToStoreWith(preds ...predicate.UserToStore) predicate.Store {
+	return predicate.Store(func(s *sql.Selector) {
+		step := newUserToStoreStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

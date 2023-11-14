@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hktrib/RetailGo/ent/store"
 	"github.com/hktrib/RetailGo/ent/user"
 )
 
@@ -49,10 +50,39 @@ func (uc *UserCreate) SetStoreID(i int) *UserCreate {
 	return uc
 }
 
+// SetClerkUserID sets the "clerk_user_id" field.
+func (uc *UserCreate) SetClerkUserID(s string) *UserCreate {
+	uc.mutation.SetClerkUserID(s)
+	return uc
+}
+
+// SetNillableClerkUserID sets the "clerk_user_id" field if the given value is not nil.
+func (uc *UserCreate) SetNillableClerkUserID(s *string) *UserCreate {
+	if s != nil {
+		uc.SetClerkUserID(*s)
+	}
+	return uc
+}
+
 // SetID sets the "id" field.
 func (uc *UserCreate) SetID(i int) *UserCreate {
 	uc.mutation.SetID(i)
 	return uc
+}
+
+// AddStoreIDs adds the "store" edge to the Store entity by IDs.
+func (uc *UserCreate) AddStoreIDs(ids ...int) *UserCreate {
+	uc.mutation.AddStoreIDs(ids...)
+	return uc
+}
+
+// AddStore adds the "store" edges to the Store entity.
+func (uc *UserCreate) AddStore(s ...*Store) *UserCreate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uc.AddStoreIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -155,6 +185,26 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.StoreID(); ok {
 		_spec.SetField(user.FieldStoreID, field.TypeInt, value)
 		_node.StoreID = value
+	}
+	if value, ok := uc.mutation.ClerkUserID(); ok {
+		_spec.SetField(user.FieldClerkUserID, field.TypeString, value)
+		_node.ClerkUserID = value
+	}
+	if nodes := uc.mutation.StoreIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.StoreTable,
+			Columns: user.StorePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

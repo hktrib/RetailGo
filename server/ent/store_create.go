@@ -9,7 +9,10 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hktrib/RetailGo/ent/category"
+	"github.com/hktrib/RetailGo/ent/item"
 	"github.com/hktrib/RetailGo/ent/store"
+	"github.com/hktrib/RetailGo/ent/user"
 )
 
 // StoreCreate is the builder for creating a Store entity.
@@ -25,10 +28,69 @@ func (sc *StoreCreate) SetStoreName(s string) *StoreCreate {
 	return sc
 }
 
+// SetOwnerEmail sets the "owner_Email" field.
+func (sc *StoreCreate) SetOwnerEmail(s string) *StoreCreate {
+	sc.mutation.SetOwnerEmail(s)
+	return sc
+}
+
+// SetNillableOwnerEmail sets the "owner_Email" field if the given value is not nil.
+func (sc *StoreCreate) SetNillableOwnerEmail(s *string) *StoreCreate {
+	if s != nil {
+		sc.SetOwnerEmail(*s)
+	}
+	return sc
+}
+
 // SetID sets the "id" field.
 func (sc *StoreCreate) SetID(i int) *StoreCreate {
 	sc.mutation.SetID(i)
 	return sc
+}
+
+// AddItemIDs adds the "items" edge to the Item entity by IDs.
+func (sc *StoreCreate) AddItemIDs(ids ...int) *StoreCreate {
+	sc.mutation.AddItemIDs(ids...)
+	return sc
+}
+
+// AddItems adds the "items" edges to the Item entity.
+func (sc *StoreCreate) AddItems(i ...*Item) *StoreCreate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return sc.AddItemIDs(ids...)
+}
+
+// AddCategoryIDs adds the "categories" edge to the Category entity by IDs.
+func (sc *StoreCreate) AddCategoryIDs(ids ...int) *StoreCreate {
+	sc.mutation.AddCategoryIDs(ids...)
+	return sc
+}
+
+// AddCategories adds the "categories" edges to the Category entity.
+func (sc *StoreCreate) AddCategories(c ...*Category) *StoreCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return sc.AddCategoryIDs(ids...)
+}
+
+// AddUserIDs adds the "user" edge to the User entity by IDs.
+func (sc *StoreCreate) AddUserIDs(ids ...int) *StoreCreate {
+	sc.mutation.AddUserIDs(ids...)
+	return sc
+}
+
+// AddUser adds the "user" edges to the User entity.
+func (sc *StoreCreate) AddUser(u ...*User) *StoreCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return sc.AddUserIDs(ids...)
 }
 
 // Mutation returns the StoreMutation object of the builder.
@@ -103,6 +165,58 @@ func (sc *StoreCreate) createSpec() (*Store, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.StoreName(); ok {
 		_spec.SetField(store.FieldStoreName, field.TypeString, value)
 		_node.StoreName = value
+	}
+	if value, ok := sc.mutation.OwnerEmail(); ok {
+		_spec.SetField(store.FieldOwnerEmail, field.TypeString, value)
+		_node.OwnerEmail = value
+	}
+	if nodes := sc.mutation.ItemsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   store.ItemsTable,
+			Columns: []string{store.ItemsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.CategoriesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   store.CategoriesTable,
+			Columns: []string{store.CategoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   store.UserTable,
+			Columns: store.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

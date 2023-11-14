@@ -17,8 +17,64 @@ type Store struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// StoreName holds the value of the "store_name" field.
-	StoreName    string `json:"store_name,omitempty"`
+	StoreName string `json:"store_name,omitempty"`
+	// OwnerEmail holds the value of the "owner_Email" field.
+	OwnerEmail string `json:"owner_Email,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the StoreQuery when eager-loading is set.
+	Edges        StoreEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// StoreEdges holds the relations/edges for other nodes in the graph.
+type StoreEdges struct {
+	// Items holds the value of the items edge.
+	Items []*Item `json:"items,omitempty"`
+	// Categories holds the value of the categories edge.
+	Categories []*Category `json:"categories,omitempty"`
+	// User holds the value of the user edge.
+	User []*User `json:"user,omitempty"`
+	// UserToStore holds the value of the UserToStore edge.
+	UserToStore []*UserToStore `json:"UserToStore,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [4]bool
+}
+
+// ItemsOrErr returns the Items value or an error if the edge
+// was not loaded in eager-loading.
+func (e StoreEdges) ItemsOrErr() ([]*Item, error) {
+	if e.loadedTypes[0] {
+		return e.Items, nil
+	}
+	return nil, &NotLoadedError{edge: "items"}
+}
+
+// CategoriesOrErr returns the Categories value or an error if the edge
+// was not loaded in eager-loading.
+func (e StoreEdges) CategoriesOrErr() ([]*Category, error) {
+	if e.loadedTypes[1] {
+		return e.Categories, nil
+	}
+	return nil, &NotLoadedError{edge: "categories"}
+}
+
+// UserOrErr returns the User value or an error if the edge
+// was not loaded in eager-loading.
+func (e StoreEdges) UserOrErr() ([]*User, error) {
+	if e.loadedTypes[2] {
+		return e.User, nil
+	}
+	return nil, &NotLoadedError{edge: "user"}
+}
+
+// UserToStoreOrErr returns the UserToStore value or an error if the edge
+// was not loaded in eager-loading.
+func (e StoreEdges) UserToStoreOrErr() ([]*UserToStore, error) {
+	if e.loadedTypes[3] {
+		return e.UserToStore, nil
+	}
+	return nil, &NotLoadedError{edge: "UserToStore"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -28,7 +84,7 @@ func (*Store) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case store.FieldID:
 			values[i] = new(sql.NullInt64)
-		case store.FieldStoreName:
+		case store.FieldStoreName, store.FieldOwnerEmail:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -57,6 +113,12 @@ func (s *Store) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.StoreName = value.String
 			}
+		case store.FieldOwnerEmail:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field owner_Email", values[i])
+			} else if value.Valid {
+				s.OwnerEmail = value.String
+			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
 		}
@@ -68,6 +130,26 @@ func (s *Store) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (s *Store) Value(name string) (ent.Value, error) {
 	return s.selectValues.Get(name)
+}
+
+// QueryItems queries the "items" edge of the Store entity.
+func (s *Store) QueryItems() *ItemQuery {
+	return NewStoreClient(s.config).QueryItems(s)
+}
+
+// QueryCategories queries the "categories" edge of the Store entity.
+func (s *Store) QueryCategories() *CategoryQuery {
+	return NewStoreClient(s.config).QueryCategories(s)
+}
+
+// QueryUser queries the "user" edge of the Store entity.
+func (s *Store) QueryUser() *UserQuery {
+	return NewStoreClient(s.config).QueryUser(s)
+}
+
+// QueryUserToStore queries the "UserToStore" edge of the Store entity.
+func (s *Store) QueryUserToStore() *UserToStoreQuery {
+	return NewStoreClient(s.config).QueryUserToStore(s)
 }
 
 // Update returns a builder for updating this Store.
@@ -95,6 +177,9 @@ func (s *Store) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", s.ID))
 	builder.WriteString("store_name=")
 	builder.WriteString(s.StoreName)
+	builder.WriteString(", ")
+	builder.WriteString("owner_Email=")
+	builder.WriteString(s.OwnerEmail)
 	builder.WriteByte(')')
 	return builder.String()
 }
