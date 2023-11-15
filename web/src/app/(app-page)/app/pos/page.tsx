@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -135,7 +135,7 @@ export default function POSPage() {
     return cart[i].quantity;
   };
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange = (e: { target: { value: SetStateAction<string>; }; }) => {
     setSearchTerm(e.target.value);
   };
 
