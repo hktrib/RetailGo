@@ -1,7 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { useFetch } from "../../lib/utils"
+
 import * as z from "zod";
 
 import {
@@ -23,32 +25,38 @@ import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({
   name: z.string(),
-  description: z.string(),
-  price: z.number(),
-  quantity: z.number(),
+  price: z.coerce.number(),
+  quantity: z.coerce.number(),
+  category: z.string()
 });
 
 export default function AddItemDialog() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-  });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const form = useForm<z.infer <typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  });;
+
+  let authFetch = useFetch()
+
+  const onNewItem: SubmitHandler<z.infer<typeof formSchema>> = async (values: z.infer<typeof formSchema>) => {
+
+    // console.log("Submit Triggered:", values)
+
     try {
-      const response = await fetch('http://localhost:8080/store/inventory/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
+      const response = await authFetch("http://localhost:8080/store/1391/inventory/create", 
+        {
+          method: 'POST',
+          body: JSON.stringify(values, (key, value) => key === "quantity" || key === "price" ? parseFloat(value) : value)
         },
-        body: JSON.stringify(values)
-      });
+        {
+          'Content-Type': 'application/json'
+        }
+      )
   
-      if (!response.ok) {
+      if (!response.id) {
         throw new Error('Failed to save the item.');
       }
   
-      const data = await response.json();
-      console.log(data);
     } catch (error) {
       console.error("There was an error:", error);
     }
@@ -64,10 +72,13 @@ export default function AddItemDialog() {
       </DialogTrigger>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+        <form>
           <DialogContent>
+            <form onSubmit = {form.handleSubmit(onNewItem, (data) => console.log("Error:", data))}>
             <DialogHeader>
-              <DialogTitle>Add new item</DialogTitle>
+              <DialogTitle>
+                Add Item
+              </DialogTitle>
             </DialogHeader>
 
             <FormField
@@ -77,7 +88,7 @@ export default function AddItemDialog() {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field}/>
                   </FormControl>
                 </FormItem>
               )}
@@ -85,16 +96,17 @@ export default function AddItemDialog() {
 
             <FormField
               control={form.control}
-              name="description"
+              name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Category</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
                 </FormItem>
               )}
             />
+
 
             <FormField
               control={form.control}
@@ -103,7 +115,7 @@ export default function AddItemDialog() {
                 <FormItem>
                   <FormLabel>Price</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} type = "number"/>
                   </FormControl>
                 </FormItem>
               )}
@@ -116,16 +128,16 @@ export default function AddItemDialog() {
                 <FormItem>
                   <FormLabel>Quantity</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} type = "number"/>
                   </FormControl>
                 </FormItem>
               )}
             />
 
             <DialogFooter className="gap-x-4">
-              <button type="submit">Cancel</button>
               <button type="submit">Save</button>
             </DialogFooter>
+            </form>
           </DialogContent>
         </form>
       </Form>
