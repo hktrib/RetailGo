@@ -5,11 +5,13 @@ import {
   HomeIcon,
   Package2,
   Settings,
+  Users2,
   ShoppingBag,
 } from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon },
+  { name: "Employees", href: "/employees", icon: Users2 },
   { name: "Inventory", href: "/inventory", icon: Package2 },
   { name: "POS", href: "/pos", icon: ShoppingBag },
 ];

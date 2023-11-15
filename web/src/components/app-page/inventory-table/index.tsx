@@ -49,11 +49,11 @@ const initialInventory = [
   },
 ];
 
-export default async function InventoryTable(){
+export default  function InventoryTable(){
   let data = initialInventory;
   let authFetch = useFetch()
   try{
-    data = await authFetch("http://localhost:8080/store/1391/inventory/");
+    //data = await authFetch("http://localhost:8080/store/1391/inventory/");
   }
   catch{
 
