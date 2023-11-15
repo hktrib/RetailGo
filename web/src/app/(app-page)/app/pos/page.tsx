@@ -48,6 +48,7 @@ export default function POSPage() {
   const [selectedCategory, setSelectedCategory] = useState(-1);
   const [cart, setCart] = useState<(Product & { quantity: number })[]>([]);
   const [visibleProducts, setVisibleProducts] = useState(products);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const addItemToCart = (pid: number) => {
     console.log(pid, cart);
@@ -101,13 +102,27 @@ export default function POSPage() {
   };
 
   useEffect(() => {
-    if (selectedCategory === -1) {
-      setVisibleProducts(products);
-      return;
+    let filteredProducts = products;
+
+    if (selectedCategory !== -1) {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.category === selectedCategory
+      );
     }
 
-    fetchProductsByCategory(selectedCategory);
-  }, [selectedCategory]);
+    if (searchTerm) {
+      const query = searchTerm.toLowerCase();
+    
+      filteredProducts = filteredProducts.filter((product) =>
+        product.name.toLowerCase().includes(query) ||
+        product.id.toString().toLowerCase().includes(query)
+      );
+    }
+    
+
+    setVisibleProducts(filteredProducts);
+  }, [selectedCategory, searchTerm]);
+
 
   const fetchCategoryById = (categoryId: number) => {
     return categories.filter((category) => category.id === categoryId)[0].name;
@@ -119,6 +134,11 @@ export default function POSPage() {
     const i = cart.findIndex((i) => i.id === pid);
     return cart[i].quantity;
   };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
 
   return (
     <div className="py-5 px-8 h-full flex-grow flex flex-col w-full mx-auto max-w-7xl">
@@ -136,7 +156,12 @@ export default function POSPage() {
             </div>
           )}
         </div>
-        <Input placeholder="Search items..." className="w-96 mt-2" />
+        <Input
+          placeholder="Search items..."
+          className="w-96 mt-2"
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
       </div>
 
       <div className="flex-grow mt-6 mx-auto grid max-w-2xl w-full grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
@@ -205,9 +230,8 @@ const CategoryCard = ({
 }) => {
   return (
     <article
-      className={`bg-gray-100 p-4 rounded-lg cursor-pointer ${
-        selected && "ring ring-blue-200"
-      }`}
+      className={`bg-gray-100 p-4 rounded-lg cursor-pointer ${selected && "ring ring-blue-200"
+        }`}
       onClick={() => setSelectedCategory(id)}
     >
       <div className="text-xl font-medium">{name}</div>
