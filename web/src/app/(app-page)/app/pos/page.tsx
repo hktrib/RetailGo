@@ -1,16 +1,91 @@
-"use client";
+// "use client";
+
+// import { useEffect, useState } from "react";
+
+// import { Button } from "@/components/ui/button";
+// import { Input } from "@/components/ui/input";
+// import { Minus, MoveRight, Plus } from "lucide-react";
+
+// import { loadStripe } from '@stripe/stripe-js';
+// import { Item } from "@radix-ui/react-dropdown-menu";
+
+// type Product = {
+//   id: number;
+//   name: string;
+//   price: number;
+// };
+
+// type CartItem = {
+//   id: number;
+//   name: string;
+//   price: number;
+//   quantity: number;
+// };
+
+// const [cart, setCart] = useState<CartItem[]>([]);
+
+
+
+// const TAX_RATE = 1;
+
+// export default function POSPage() {
+//   const [selectedCategory, setSelectedCategory] = useState(-1);
+//   const [cart, setCart] = useState<(Product & { quantity: number })[]>([]);
+//   const [visibleProducts, setVisibleProducts] = useState(products);
+
+//   //Stripe 
+
+//   const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
+  
+//   const OrderSummary = ({ cart }) => {
+//     // Existing calculations for subtotal, total, etc.
+//     const subtotal = cart.reduce(
+//       (acc: number, val: CartItem) => acc + parseFloat((val.price * val.quantity).toFixed(2)),
+//       0
+//     );
+//     const total = parseFloat((subtotal * TAX_RATE).toFixed(2));
+  
+//     const handlePlaceOrder = async () => {
+//       // Convert cart items for the API request
+//       const items = cart.map((item: CartItem) => ({
+//         name: item.name,
+//         quantity: item.quantity,
+//         price: item.price,
+//       }));
+  
+//       try {
+//         const response = await fetch('/api/path-to-your-handler', { // Replace with your API route
+//           method: 'POST',
+//           headers: {
+//             'Content-Type': 'application/json',
+//           },
+//           body: JSON.stringify({ items }),
+//         });
+//         const { sessionId } = await response.json();
+  
+//         const stripe = await stripePromise;
+//         stripe!.redirectToCheckout({ sessionId });
+//       } catch (error) {
+//         console.error('Error redirecting to checkout:', error);
+//       }
+//     };
+
+'use client';
 
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Minus, MoveRight, Plus } from "lucide-react";
+import { loadStripe } from '@stripe/stripe-js';
 
 type Product = {
   id: number;
   name: string;
   price: number;
 };
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 const categories = [
   { id: 0, name: "Breakfast", items: 3 },
@@ -270,8 +345,43 @@ const OrderSummary = ({
 
   const total = parseFloat((subtotal * TAX_RATE).toFixed(2));
 
+  const handlePlaceOrder = async (e:React.FormEvent<HTMLFormElement>) => {
+    // Convert cart items for the API request
+
+    e.preventDefault();
+
+    const lineItems = cart.map(item => ({
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: item.name,
+        },
+        unit_amount: Math.round(item.price * 100), // Convert to cents
+      },
+      quantity: item.quantity,
+    }));
+
+    try {
+      const response = await fetch('/api/stripe-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ lineItems }),
+     });
+
+      const session = await response.json();
+      const stripe = await stripePromise;
+      stripe.redirectToCheckout({ sessionId: session.id });
+    } catch (error) {
+      console.error('Error redirecting to checkout:', error);
+    }
+  };
+
   return (
+
     <div className="h-full">
+      <form action="/api/stripe-checkout/" method="POST" onSubmit={handlePlaceOrder} className="p-3 bg-gray-100 rounded-lg">
       {cart.length ? (
         <div className="space-y-2">
           {cart.map((cartItem, idx) => (
@@ -326,10 +436,11 @@ const OrderSummary = ({
           </div>
 
           <div className="mt-6">
-            <Button className="rounded-full w-full py-5">Place order</Button>
+            <Button className="rounded-full w-full py-5" type="submit">Checkout </Button>
           </div>
         </div>
-      </div>
+    </div>
+    </form>
     </div>
   );
 };
