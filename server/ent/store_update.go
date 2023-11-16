@@ -56,6 +56,66 @@ func (su *StoreUpdate) ClearOwnerEmail() *StoreUpdate {
 	return su
 }
 
+// SetStoreAddress sets the "store_address" field.
+func (su *StoreUpdate) SetStoreAddress(s string) *StoreUpdate {
+	su.mutation.SetStoreAddress(s)
+	return su
+}
+
+// SetNillableStoreAddress sets the "store_address" field if the given value is not nil.
+func (su *StoreUpdate) SetNillableStoreAddress(s *string) *StoreUpdate {
+	if s != nil {
+		su.SetStoreAddress(*s)
+	}
+	return su
+}
+
+// ClearStoreAddress clears the value of the "store_address" field.
+func (su *StoreUpdate) ClearStoreAddress() *StoreUpdate {
+	su.mutation.ClearStoreAddress()
+	return su
+}
+
+// SetStorePhone sets the "store_phone" field.
+func (su *StoreUpdate) SetStorePhone(s string) *StoreUpdate {
+	su.mutation.SetStorePhone(s)
+	return su
+}
+
+// SetNillableStorePhone sets the "store_phone" field if the given value is not nil.
+func (su *StoreUpdate) SetNillableStorePhone(s *string) *StoreUpdate {
+	if s != nil {
+		su.SetStorePhone(*s)
+	}
+	return su
+}
+
+// ClearStorePhone clears the value of the "store_phone" field.
+func (su *StoreUpdate) ClearStorePhone() *StoreUpdate {
+	su.mutation.ClearStorePhone()
+	return su
+}
+
+// SetStoreType sets the "store_type" field.
+func (su *StoreUpdate) SetStoreType(s string) *StoreUpdate {
+	su.mutation.SetStoreType(s)
+	return su
+}
+
+// SetNillableStoreType sets the "store_type" field if the given value is not nil.
+func (su *StoreUpdate) SetNillableStoreType(s *string) *StoreUpdate {
+	if s != nil {
+		su.SetStoreType(*s)
+	}
+	return su
+}
+
+// ClearStoreType clears the value of the "store_type" field.
+func (su *StoreUpdate) ClearStoreType() *StoreUpdate {
+	su.mutation.ClearStoreType()
+	return su
+}
+
 // AddItemIDs adds the "items" edge to the Item entity by IDs.
 func (su *StoreUpdate) AddItemIDs(ids ...int) *StoreUpdate {
 	su.mutation.AddItemIDs(ids...)
@@ -213,6 +273,24 @@ func (su *StoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if su.mutation.OwnerEmailCleared() {
 		_spec.ClearField(store.FieldOwnerEmail, field.TypeString)
+	}
+	if value, ok := su.mutation.StoreAddress(); ok {
+		_spec.SetField(store.FieldStoreAddress, field.TypeString, value)
+	}
+	if su.mutation.StoreAddressCleared() {
+		_spec.ClearField(store.FieldStoreAddress, field.TypeString)
+	}
+	if value, ok := su.mutation.StorePhone(); ok {
+		_spec.SetField(store.FieldStorePhone, field.TypeString, value)
+	}
+	if su.mutation.StorePhoneCleared() {
+		_spec.ClearField(store.FieldStorePhone, field.TypeString)
+	}
+	if value, ok := su.mutation.StoreType(); ok {
+		_spec.SetField(store.FieldStoreType, field.TypeString, value)
+	}
+	if su.mutation.StoreTypeCleared() {
+		_spec.ClearField(store.FieldStoreType, field.TypeString)
 	}
 	if su.mutation.ItemsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -392,6 +470,66 @@ func (suo *StoreUpdateOne) SetNillableOwnerEmail(s *string) *StoreUpdateOne {
 // ClearOwnerEmail clears the value of the "owner_Email" field.
 func (suo *StoreUpdateOne) ClearOwnerEmail() *StoreUpdateOne {
 	suo.mutation.ClearOwnerEmail()
+	return suo
+}
+
+// SetStoreAddress sets the "store_address" field.
+func (suo *StoreUpdateOne) SetStoreAddress(s string) *StoreUpdateOne {
+	suo.mutation.SetStoreAddress(s)
+	return suo
+}
+
+// SetNillableStoreAddress sets the "store_address" field if the given value is not nil.
+func (suo *StoreUpdateOne) SetNillableStoreAddress(s *string) *StoreUpdateOne {
+	if s != nil {
+		suo.SetStoreAddress(*s)
+	}
+	return suo
+}
+
+// ClearStoreAddress clears the value of the "store_address" field.
+func (suo *StoreUpdateOne) ClearStoreAddress() *StoreUpdateOne {
+	suo.mutation.ClearStoreAddress()
+	return suo
+}
+
+// SetStorePhone sets the "store_phone" field.
+func (suo *StoreUpdateOne) SetStorePhone(s string) *StoreUpdateOne {
+	suo.mutation.SetStorePhone(s)
+	return suo
+}
+
+// SetNillableStorePhone sets the "store_phone" field if the given value is not nil.
+func (suo *StoreUpdateOne) SetNillableStorePhone(s *string) *StoreUpdateOne {
+	if s != nil {
+		suo.SetStorePhone(*s)
+	}
+	return suo
+}
+
+// ClearStorePhone clears the value of the "store_phone" field.
+func (suo *StoreUpdateOne) ClearStorePhone() *StoreUpdateOne {
+	suo.mutation.ClearStorePhone()
+	return suo
+}
+
+// SetStoreType sets the "store_type" field.
+func (suo *StoreUpdateOne) SetStoreType(s string) *StoreUpdateOne {
+	suo.mutation.SetStoreType(s)
+	return suo
+}
+
+// SetNillableStoreType sets the "store_type" field if the given value is not nil.
+func (suo *StoreUpdateOne) SetNillableStoreType(s *string) *StoreUpdateOne {
+	if s != nil {
+		suo.SetStoreType(*s)
+	}
+	return suo
+}
+
+// ClearStoreType clears the value of the "store_type" field.
+func (suo *StoreUpdateOne) ClearStoreType() *StoreUpdateOne {
+	suo.mutation.ClearStoreType()
 	return suo
 }
 
@@ -582,6 +720,24 @@ func (suo *StoreUpdateOne) sqlSave(ctx context.Context) (_node *Store, err error
 	}
 	if suo.mutation.OwnerEmailCleared() {
 		_spec.ClearField(store.FieldOwnerEmail, field.TypeString)
+	}
+	if value, ok := suo.mutation.StoreAddress(); ok {
+		_spec.SetField(store.FieldStoreAddress, field.TypeString, value)
+	}
+	if suo.mutation.StoreAddressCleared() {
+		_spec.ClearField(store.FieldStoreAddress, field.TypeString)
+	}
+	if value, ok := suo.mutation.StorePhone(); ok {
+		_spec.SetField(store.FieldStorePhone, field.TypeString, value)
+	}
+	if suo.mutation.StorePhoneCleared() {
+		_spec.ClearField(store.FieldStorePhone, field.TypeString)
+	}
+	if value, ok := suo.mutation.StoreType(); ok {
+		_spec.SetField(store.FieldStoreType, field.TypeString, value)
+	}
+	if suo.mutation.StoreTypeCleared() {
+		_spec.ClearField(store.FieldStoreType, field.TypeString)
 	}
 	if suo.mutation.ItemsCleared() {
 		edge := &sqlgraph.EdgeSpec{

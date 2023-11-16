@@ -1764,6 +1764,9 @@ type StoreMutation struct {
 	id                *int
 	store_name        *string
 	owner_Email       *string
+	store_address     *string
+	store_phone       *string
+	store_type        *string
 	clearedFields     map[string]struct{}
 	items             map[int]struct{}
 	removeditems      map[int]struct{}
@@ -1968,6 +1971,153 @@ func (m *StoreMutation) ResetOwnerEmail() {
 	delete(m.clearedFields, store.FieldOwnerEmail)
 }
 
+// SetStoreAddress sets the "store_address" field.
+func (m *StoreMutation) SetStoreAddress(s string) {
+	m.store_address = &s
+}
+
+// StoreAddress returns the value of the "store_address" field in the mutation.
+func (m *StoreMutation) StoreAddress() (r string, exists bool) {
+	v := m.store_address
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStoreAddress returns the old "store_address" field's value of the Store entity.
+// If the Store object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StoreMutation) OldStoreAddress(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStoreAddress is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStoreAddress requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStoreAddress: %w", err)
+	}
+	return oldValue.StoreAddress, nil
+}
+
+// ClearStoreAddress clears the value of the "store_address" field.
+func (m *StoreMutation) ClearStoreAddress() {
+	m.store_address = nil
+	m.clearedFields[store.FieldStoreAddress] = struct{}{}
+}
+
+// StoreAddressCleared returns if the "store_address" field was cleared in this mutation.
+func (m *StoreMutation) StoreAddressCleared() bool {
+	_, ok := m.clearedFields[store.FieldStoreAddress]
+	return ok
+}
+
+// ResetStoreAddress resets all changes to the "store_address" field.
+func (m *StoreMutation) ResetStoreAddress() {
+	m.store_address = nil
+	delete(m.clearedFields, store.FieldStoreAddress)
+}
+
+// SetStorePhone sets the "store_phone" field.
+func (m *StoreMutation) SetStorePhone(s string) {
+	m.store_phone = &s
+}
+
+// StorePhone returns the value of the "store_phone" field in the mutation.
+func (m *StoreMutation) StorePhone() (r string, exists bool) {
+	v := m.store_phone
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStorePhone returns the old "store_phone" field's value of the Store entity.
+// If the Store object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StoreMutation) OldStorePhone(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStorePhone is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStorePhone requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStorePhone: %w", err)
+	}
+	return oldValue.StorePhone, nil
+}
+
+// ClearStorePhone clears the value of the "store_phone" field.
+func (m *StoreMutation) ClearStorePhone() {
+	m.store_phone = nil
+	m.clearedFields[store.FieldStorePhone] = struct{}{}
+}
+
+// StorePhoneCleared returns if the "store_phone" field was cleared in this mutation.
+func (m *StoreMutation) StorePhoneCleared() bool {
+	_, ok := m.clearedFields[store.FieldStorePhone]
+	return ok
+}
+
+// ResetStorePhone resets all changes to the "store_phone" field.
+func (m *StoreMutation) ResetStorePhone() {
+	m.store_phone = nil
+	delete(m.clearedFields, store.FieldStorePhone)
+}
+
+// SetStoreType sets the "store_type" field.
+func (m *StoreMutation) SetStoreType(s string) {
+	m.store_type = &s
+}
+
+// StoreType returns the value of the "store_type" field in the mutation.
+func (m *StoreMutation) StoreType() (r string, exists bool) {
+	v := m.store_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStoreType returns the old "store_type" field's value of the Store entity.
+// If the Store object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StoreMutation) OldStoreType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStoreType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStoreType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStoreType: %w", err)
+	}
+	return oldValue.StoreType, nil
+}
+
+// ClearStoreType clears the value of the "store_type" field.
+func (m *StoreMutation) ClearStoreType() {
+	m.store_type = nil
+	m.clearedFields[store.FieldStoreType] = struct{}{}
+}
+
+// StoreTypeCleared returns if the "store_type" field was cleared in this mutation.
+func (m *StoreMutation) StoreTypeCleared() bool {
+	_, ok := m.clearedFields[store.FieldStoreType]
+	return ok
+}
+
+// ResetStoreType resets all changes to the "store_type" field.
+func (m *StoreMutation) ResetStoreType() {
+	m.store_type = nil
+	delete(m.clearedFields, store.FieldStoreType)
+}
+
 // AddItemIDs adds the "items" edge to the Item entity by ids.
 func (m *StoreMutation) AddItemIDs(ids ...int) {
 	if m.items == nil {
@@ -2164,12 +2314,21 @@ func (m *StoreMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *StoreMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 5)
 	if m.store_name != nil {
 		fields = append(fields, store.FieldStoreName)
 	}
 	if m.owner_Email != nil {
 		fields = append(fields, store.FieldOwnerEmail)
+	}
+	if m.store_address != nil {
+		fields = append(fields, store.FieldStoreAddress)
+	}
+	if m.store_phone != nil {
+		fields = append(fields, store.FieldStorePhone)
+	}
+	if m.store_type != nil {
+		fields = append(fields, store.FieldStoreType)
 	}
 	return fields
 }
@@ -2183,6 +2342,12 @@ func (m *StoreMutation) Field(name string) (ent.Value, bool) {
 		return m.StoreName()
 	case store.FieldOwnerEmail:
 		return m.OwnerEmail()
+	case store.FieldStoreAddress:
+		return m.StoreAddress()
+	case store.FieldStorePhone:
+		return m.StorePhone()
+	case store.FieldStoreType:
+		return m.StoreType()
 	}
 	return nil, false
 }
@@ -2196,6 +2361,12 @@ func (m *StoreMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldStoreName(ctx)
 	case store.FieldOwnerEmail:
 		return m.OldOwnerEmail(ctx)
+	case store.FieldStoreAddress:
+		return m.OldStoreAddress(ctx)
+	case store.FieldStorePhone:
+		return m.OldStorePhone(ctx)
+	case store.FieldStoreType:
+		return m.OldStoreType(ctx)
 	}
 	return nil, fmt.Errorf("unknown Store field %s", name)
 }
@@ -2218,6 +2389,27 @@ func (m *StoreMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetOwnerEmail(v)
+		return nil
+	case store.FieldStoreAddress:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStoreAddress(v)
+		return nil
+	case store.FieldStorePhone:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStorePhone(v)
+		return nil
+	case store.FieldStoreType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStoreType(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Store field %s", name)
@@ -2252,6 +2444,15 @@ func (m *StoreMutation) ClearedFields() []string {
 	if m.FieldCleared(store.FieldOwnerEmail) {
 		fields = append(fields, store.FieldOwnerEmail)
 	}
+	if m.FieldCleared(store.FieldStoreAddress) {
+		fields = append(fields, store.FieldStoreAddress)
+	}
+	if m.FieldCleared(store.FieldStorePhone) {
+		fields = append(fields, store.FieldStorePhone)
+	}
+	if m.FieldCleared(store.FieldStoreType) {
+		fields = append(fields, store.FieldStoreType)
+	}
 	return fields
 }
 
@@ -2269,6 +2470,15 @@ func (m *StoreMutation) ClearField(name string) error {
 	case store.FieldOwnerEmail:
 		m.ClearOwnerEmail()
 		return nil
+	case store.FieldStoreAddress:
+		m.ClearStoreAddress()
+		return nil
+	case store.FieldStorePhone:
+		m.ClearStorePhone()
+		return nil
+	case store.FieldStoreType:
+		m.ClearStoreType()
+		return nil
 	}
 	return fmt.Errorf("unknown Store nullable field %s", name)
 }
@@ -2282,6 +2492,15 @@ func (m *StoreMutation) ResetField(name string) error {
 		return nil
 	case store.FieldOwnerEmail:
 		m.ResetOwnerEmail()
+		return nil
+	case store.FieldStoreAddress:
+		m.ResetStoreAddress()
+		return nil
+	case store.FieldStorePhone:
+		m.ResetStorePhone()
+		return nil
+	case store.FieldStoreType:
+		m.ResetStoreType()
 		return nil
 	}
 	return fmt.Errorf("unknown Store field %s", name)

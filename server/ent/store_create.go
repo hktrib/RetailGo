@@ -42,6 +42,48 @@ func (sc *StoreCreate) SetNillableOwnerEmail(s *string) *StoreCreate {
 	return sc
 }
 
+// SetStoreAddress sets the "store_address" field.
+func (sc *StoreCreate) SetStoreAddress(s string) *StoreCreate {
+	sc.mutation.SetStoreAddress(s)
+	return sc
+}
+
+// SetNillableStoreAddress sets the "store_address" field if the given value is not nil.
+func (sc *StoreCreate) SetNillableStoreAddress(s *string) *StoreCreate {
+	if s != nil {
+		sc.SetStoreAddress(*s)
+	}
+	return sc
+}
+
+// SetStorePhone sets the "store_phone" field.
+func (sc *StoreCreate) SetStorePhone(s string) *StoreCreate {
+	sc.mutation.SetStorePhone(s)
+	return sc
+}
+
+// SetNillableStorePhone sets the "store_phone" field if the given value is not nil.
+func (sc *StoreCreate) SetNillableStorePhone(s *string) *StoreCreate {
+	if s != nil {
+		sc.SetStorePhone(*s)
+	}
+	return sc
+}
+
+// SetStoreType sets the "store_type" field.
+func (sc *StoreCreate) SetStoreType(s string) *StoreCreate {
+	sc.mutation.SetStoreType(s)
+	return sc
+}
+
+// SetNillableStoreType sets the "store_type" field if the given value is not nil.
+func (sc *StoreCreate) SetNillableStoreType(s *string) *StoreCreate {
+	if s != nil {
+		sc.SetStoreType(*s)
+	}
+	return sc
+}
+
 // SetID sets the "id" field.
 func (sc *StoreCreate) SetID(i int) *StoreCreate {
 	sc.mutation.SetID(i)
@@ -169,6 +211,18 @@ func (sc *StoreCreate) createSpec() (*Store, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.OwnerEmail(); ok {
 		_spec.SetField(store.FieldOwnerEmail, field.TypeString, value)
 		_node.OwnerEmail = value
+	}
+	if value, ok := sc.mutation.StoreAddress(); ok {
+		_spec.SetField(store.FieldStoreAddress, field.TypeString, value)
+		_node.StoreAddress = value
+	}
+	if value, ok := sc.mutation.StorePhone(); ok {
+		_spec.SetField(store.FieldStorePhone, field.TypeString, value)
+		_node.StorePhone = value
+	}
+	if value, ok := sc.mutation.StoreType(); ok {
+		_spec.SetField(store.FieldStoreType, field.TypeString, value)
+		_node.StoreType = value
 	}
 	if nodes := sc.mutation.ItemsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
