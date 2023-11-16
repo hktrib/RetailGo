@@ -89,6 +89,9 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "store_name", Type: field.TypeString},
 		{Name: "owner_email", Type: field.TypeString, Nullable: true},
+		{Name: "store_address", Type: field.TypeString, Nullable: true},
+		{Name: "store_phone", Type: field.TypeString, Nullable: true},
+		{Name: "store_type", Type: field.TypeString, Nullable: true},
 	}
 	// StoresTable holds the schema information for the "stores" table.
 	StoresTable = &schema.Table{
