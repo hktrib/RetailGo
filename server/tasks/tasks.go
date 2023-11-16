@@ -24,7 +24,7 @@ func (rp *RedisProducer) TaskOwnerCreationCheck(ctx context.Context, ownerEmailI
 	}
 	task := asynq.NewTask(TaskOwnerCreationCheck, payload, opts...)
 
-	info, err := rp.messageQueueClient.EnqueueContext(ctx, task, asynq.ProcessIn(processInTime))
+	info, err := rp.messageQueueClient.Enqueue(task, asynq.ProcessIn(processInTime))
 	if err != nil {
 		return fmt.Errorf("failed to enqueue task: %w", err)
 	}
@@ -44,11 +44,10 @@ func (rc *RedisConsumer) ConsumeTaskOwnerCreationCheck(ctx context.Context, task
 	if err != nil {
 		if _, isMyErrorType := err.(*ent.NotFoundError); isMyErrorType {
 
-			// Delete user from Clerk storage
-			// Need Clerk ID in Users Table!!!!
+			// TODO: handle user deletion from clerk
+			// TODO: handle user email sending -> using email from task.Payload
 
-			// rc.clerkClient.Users().
-			fmt.Println("Deleting User from Clerk!!!!")
+			log.Info().Msg("Deleting User from Clerk!!!!")
 
 			return fmt.Errorf("Error: User is Not Created!!! Deleting from CLerk%w", err)
 		} else {

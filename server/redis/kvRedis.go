@@ -56,7 +56,8 @@ func (c *Cache) SetX(key string, value *ent.User, expiresAt time.Duration) {
 func (c *Cache) Get(key string) *ent.User {
 	client := c.Client
 
-	val, err := client.Get(c.ctx, key).Result()
+	ctx := context.Background()
+	val, err := client.Get(ctx, key).Result()
 	if err != nil {
 		return nil
 	}
