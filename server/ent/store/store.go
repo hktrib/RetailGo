@@ -16,6 +16,12 @@ const (
 	FieldStoreName = "store_name"
 	// FieldOwnerEmail holds the string denoting the owner_email field in the database.
 	FieldOwnerEmail = "owner_email"
+	// FieldStoreAddress holds the string denoting the store_address field in the database.
+	FieldStoreAddress = "store_address"
+	// FieldStorePhone holds the string denoting the store_phone field in the database.
+	FieldStorePhone = "store_phone"
+	// FieldStoreType holds the string denoting the store_type field in the database.
+	FieldStoreType = "store_type"
 	// EdgeItems holds the string denoting the items edge name in mutations.
 	EdgeItems = "items"
 	// EdgeCategories holds the string denoting the categories edge name in mutations.
@@ -59,6 +65,9 @@ var Columns = []string{
 	FieldID,
 	FieldStoreName,
 	FieldOwnerEmail,
+	FieldStoreAddress,
+	FieldStorePhone,
+	FieldStoreType,
 }
 
 var (
@@ -93,6 +102,21 @@ func ByStoreName(opts ...sql.OrderTermOption) OrderOption {
 // ByOwnerEmail orders the results by the owner_Email field.
 func ByOwnerEmail(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldOwnerEmail, opts...).ToFunc()
+}
+
+// ByStoreAddress orders the results by the store_address field.
+func ByStoreAddress(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStoreAddress, opts...).ToFunc()
+}
+
+// ByStorePhone orders the results by the store_phone field.
+func ByStorePhone(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStorePhone, opts...).ToFunc()
+}
+
+// ByStoreType orders the results by the store_type field.
+func ByStoreType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStoreType, opts...).ToFunc()
 }
 
 // ByItemsCount orders the results by items count.

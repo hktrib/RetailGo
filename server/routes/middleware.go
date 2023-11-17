@@ -14,7 +14,6 @@ import (
 	"github.com/hktrib/RetailGo/ent"
 	store2 "github.com/hktrib/RetailGo/ent/store"
 	user2 "github.com/hktrib/RetailGo/ent/user"
-	"github.com/hktrib/RetailGo/transactions"
 	"github.com/rs/zerolog/log"
 )
 
@@ -49,6 +48,8 @@ func (srv *Server) GetAuthenticatedUserEmail(ctx context.Context) (string, error
 	}
 
 	user, err := srv.ClerkClient.Users().Read(sessClaims.Claims.Subject)
+
+	// Maybe we need to add another check here to validate email existence.
 	email := user.EmailAddresses[0].EmailAddress
 	if err != nil {
 		return "", errors.New("Error: Authentication Error -> Unable to get User from Clerk")
@@ -72,7 +73,8 @@ func (srv *Server) ValidateStoreAccess(next http.Handler) http.Handler {
 		emailAddress, err := srv.GetAuthenticatedUserEmail(ctx)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
-			log.Fatal().Err(err).Msg("failed to identify user by email")
+			log.Err(err).Msg("failed to identify user by email")
+			return
 		}
 
 		user, err := srv.DBClient.User.Query().Where(user2.Email(emailAddress)).Only(ctx)
@@ -91,7 +93,6 @@ func (srv *Server) ValidateStoreAccess(next http.Handler) http.Handler {
 		ctx = context.WithValue(ctx, "user", user)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
-		return
 	})
 }
 
@@ -153,12 +154,7 @@ func (srv *Server) OwnerCreate(next http.Handler) http.Handler {
 func (srv *Server) StoreCreate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		ctx := context.Background()
-
-		type Request struct {
-			Email     string `json:"email"`
-			StoreName string `json:"name"`
-		}
+		ctx := r.Context()
 
 		reqBytes, err := io.ReadAll(r.Body)
 		if err != nil {
@@ -167,21 +163,43 @@ func (srv *Server) StoreCreate(next http.Handler) http.Handler {
 			return
 		}
 
-		reqBody := Request{}
+		store := ent.Store{}
 
-		err = json.Unmarshal(reqBytes, &reqBody)
+		err = json.Unmarshal(reqBytes, &store)
 		if err != nil {
 			log.Fatal().Err(err).Msg("Reading request body failed..")
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 
-		store := ent.Store{}
-		store.StoreName = reqBody.StoreName
-		owner := srv.Cache.Get(reqBody.Email)
+		owner := srv.Cache.Get(store.OwnerEmail)
+		if owner == nil {
+			log.Fatal().Err(err).Msg("Owner's user data is outdated...")
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		ctx = context.WithValue(ctx, "store", &store)
+		ctx = context.WithValue(ctx, "owner", owner)
 
-		ctx = context.WithValue(ctx, transactions.StoreKey{Store: "store"}, store)
-		_ = context.WithValue(ctx, transactions.OwnerKey{Owner: "owner"}, owner)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func (srv *Server) ProtectStoreAndOwnerCreation(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		clerkUserEmailAddress, err := srv.GetAuthenticatedUserEmail(ctx)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			log.Err(err).Msg("failed to identify user by email")
+			return
+		}
+
+		if clerkUserEmailAddress == "" {
+			http.Error(w, errors.New("no email associated with the session claims").Error(), http.StatusBadRequest)
+			log.Err(err).Msg("failed to identify user by email")
+			return
+		}
 
 		next.ServeHTTP(w, r)
 	})

@@ -63,6 +63,21 @@ func OwnerEmail(v string) predicate.Store {
 	return predicate.Store(sql.FieldEQ(FieldOwnerEmail, v))
 }
 
+// StoreAddress applies equality check predicate on the "store_address" field. It's identical to StoreAddressEQ.
+func StoreAddress(v string) predicate.Store {
+	return predicate.Store(sql.FieldEQ(FieldStoreAddress, v))
+}
+
+// StorePhone applies equality check predicate on the "store_phone" field. It's identical to StorePhoneEQ.
+func StorePhone(v string) predicate.Store {
+	return predicate.Store(sql.FieldEQ(FieldStorePhone, v))
+}
+
+// StoreType applies equality check predicate on the "store_type" field. It's identical to StoreTypeEQ.
+func StoreType(v string) predicate.Store {
+	return predicate.Store(sql.FieldEQ(FieldStoreType, v))
+}
+
 // StoreNameEQ applies the EQ predicate on the "store_name" field.
 func StoreNameEQ(v string) predicate.Store {
 	return predicate.Store(sql.FieldEQ(FieldStoreName, v))
@@ -201,6 +216,231 @@ func OwnerEmailEqualFold(v string) predicate.Store {
 // OwnerEmailContainsFold applies the ContainsFold predicate on the "owner_Email" field.
 func OwnerEmailContainsFold(v string) predicate.Store {
 	return predicate.Store(sql.FieldContainsFold(FieldOwnerEmail, v))
+}
+
+// StoreAddressEQ applies the EQ predicate on the "store_address" field.
+func StoreAddressEQ(v string) predicate.Store {
+	return predicate.Store(sql.FieldEQ(FieldStoreAddress, v))
+}
+
+// StoreAddressNEQ applies the NEQ predicate on the "store_address" field.
+func StoreAddressNEQ(v string) predicate.Store {
+	return predicate.Store(sql.FieldNEQ(FieldStoreAddress, v))
+}
+
+// StoreAddressIn applies the In predicate on the "store_address" field.
+func StoreAddressIn(vs ...string) predicate.Store {
+	return predicate.Store(sql.FieldIn(FieldStoreAddress, vs...))
+}
+
+// StoreAddressNotIn applies the NotIn predicate on the "store_address" field.
+func StoreAddressNotIn(vs ...string) predicate.Store {
+	return predicate.Store(sql.FieldNotIn(FieldStoreAddress, vs...))
+}
+
+// StoreAddressGT applies the GT predicate on the "store_address" field.
+func StoreAddressGT(v string) predicate.Store {
+	return predicate.Store(sql.FieldGT(FieldStoreAddress, v))
+}
+
+// StoreAddressGTE applies the GTE predicate on the "store_address" field.
+func StoreAddressGTE(v string) predicate.Store {
+	return predicate.Store(sql.FieldGTE(FieldStoreAddress, v))
+}
+
+// StoreAddressLT applies the LT predicate on the "store_address" field.
+func StoreAddressLT(v string) predicate.Store {
+	return predicate.Store(sql.FieldLT(FieldStoreAddress, v))
+}
+
+// StoreAddressLTE applies the LTE predicate on the "store_address" field.
+func StoreAddressLTE(v string) predicate.Store {
+	return predicate.Store(sql.FieldLTE(FieldStoreAddress, v))
+}
+
+// StoreAddressContains applies the Contains predicate on the "store_address" field.
+func StoreAddressContains(v string) predicate.Store {
+	return predicate.Store(sql.FieldContains(FieldStoreAddress, v))
+}
+
+// StoreAddressHasPrefix applies the HasPrefix predicate on the "store_address" field.
+func StoreAddressHasPrefix(v string) predicate.Store {
+	return predicate.Store(sql.FieldHasPrefix(FieldStoreAddress, v))
+}
+
+// StoreAddressHasSuffix applies the HasSuffix predicate on the "store_address" field.
+func StoreAddressHasSuffix(v string) predicate.Store {
+	return predicate.Store(sql.FieldHasSuffix(FieldStoreAddress, v))
+}
+
+// StoreAddressIsNil applies the IsNil predicate on the "store_address" field.
+func StoreAddressIsNil() predicate.Store {
+	return predicate.Store(sql.FieldIsNull(FieldStoreAddress))
+}
+
+// StoreAddressNotNil applies the NotNil predicate on the "store_address" field.
+func StoreAddressNotNil() predicate.Store {
+	return predicate.Store(sql.FieldNotNull(FieldStoreAddress))
+}
+
+// StoreAddressEqualFold applies the EqualFold predicate on the "store_address" field.
+func StoreAddressEqualFold(v string) predicate.Store {
+	return predicate.Store(sql.FieldEqualFold(FieldStoreAddress, v))
+}
+
+// StoreAddressContainsFold applies the ContainsFold predicate on the "store_address" field.
+func StoreAddressContainsFold(v string) predicate.Store {
+	return predicate.Store(sql.FieldContainsFold(FieldStoreAddress, v))
+}
+
+// StorePhoneEQ applies the EQ predicate on the "store_phone" field.
+func StorePhoneEQ(v string) predicate.Store {
+	return predicate.Store(sql.FieldEQ(FieldStorePhone, v))
+}
+
+// StorePhoneNEQ applies the NEQ predicate on the "store_phone" field.
+func StorePhoneNEQ(v string) predicate.Store {
+	return predicate.Store(sql.FieldNEQ(FieldStorePhone, v))
+}
+
+// StorePhoneIn applies the In predicate on the "store_phone" field.
+func StorePhoneIn(vs ...string) predicate.Store {
+	return predicate.Store(sql.FieldIn(FieldStorePhone, vs...))
+}
+
+// StorePhoneNotIn applies the NotIn predicate on the "store_phone" field.
+func StorePhoneNotIn(vs ...string) predicate.Store {
+	return predicate.Store(sql.FieldNotIn(FieldStorePhone, vs...))
+}
+
+// StorePhoneGT applies the GT predicate on the "store_phone" field.
+func StorePhoneGT(v string) predicate.Store {
+	return predicate.Store(sql.FieldGT(FieldStorePhone, v))
+}
+
+// StorePhoneGTE applies the GTE predicate on the "store_phone" field.
+func StorePhoneGTE(v string) predicate.Store {
+	return predicate.Store(sql.FieldGTE(FieldStorePhone, v))
+}
+
+// StorePhoneLT applies the LT predicate on the "store_phone" field.
+func StorePhoneLT(v string) predicate.Store {
+	return predicate.Store(sql.FieldLT(FieldStorePhone, v))
+}
+
+// StorePhoneLTE applies the LTE predicate on the "store_phone" field.
+func StorePhoneLTE(v string) predicate.Store {
+	return predicate.Store(sql.FieldLTE(FieldStorePhone, v))
+}
+
+// StorePhoneContains applies the Contains predicate on the "store_phone" field.
+func StorePhoneContains(v string) predicate.Store {
+	return predicate.Store(sql.FieldContains(FieldStorePhone, v))
+}
+
+// StorePhoneHasPrefix applies the HasPrefix predicate on the "store_phone" field.
+func StorePhoneHasPrefix(v string) predicate.Store {
+	return predicate.Store(sql.FieldHasPrefix(FieldStorePhone, v))
+}
+
+// StorePhoneHasSuffix applies the HasSuffix predicate on the "store_phone" field.
+func StorePhoneHasSuffix(v string) predicate.Store {
+	return predicate.Store(sql.FieldHasSuffix(FieldStorePhone, v))
+}
+
+// StorePhoneIsNil applies the IsNil predicate on the "store_phone" field.
+func StorePhoneIsNil() predicate.Store {
+	return predicate.Store(sql.FieldIsNull(FieldStorePhone))
+}
+
+// StorePhoneNotNil applies the NotNil predicate on the "store_phone" field.
+func StorePhoneNotNil() predicate.Store {
+	return predicate.Store(sql.FieldNotNull(FieldStorePhone))
+}
+
+// StorePhoneEqualFold applies the EqualFold predicate on the "store_phone" field.
+func StorePhoneEqualFold(v string) predicate.Store {
+	return predicate.Store(sql.FieldEqualFold(FieldStorePhone, v))
+}
+
+// StorePhoneContainsFold applies the ContainsFold predicate on the "store_phone" field.
+func StorePhoneContainsFold(v string) predicate.Store {
+	return predicate.Store(sql.FieldContainsFold(FieldStorePhone, v))
+}
+
+// StoreTypeEQ applies the EQ predicate on the "store_type" field.
+func StoreTypeEQ(v string) predicate.Store {
+	return predicate.Store(sql.FieldEQ(FieldStoreType, v))
+}
+
+// StoreTypeNEQ applies the NEQ predicate on the "store_type" field.
+func StoreTypeNEQ(v string) predicate.Store {
+	return predicate.Store(sql.FieldNEQ(FieldStoreType, v))
+}
+
+// StoreTypeIn applies the In predicate on the "store_type" field.
+func StoreTypeIn(vs ...string) predicate.Store {
+	return predicate.Store(sql.FieldIn(FieldStoreType, vs...))
+}
+
+// StoreTypeNotIn applies the NotIn predicate on the "store_type" field.
+func StoreTypeNotIn(vs ...string) predicate.Store {
+	return predicate.Store(sql.FieldNotIn(FieldStoreType, vs...))
+}
+
+// StoreTypeGT applies the GT predicate on the "store_type" field.
+func StoreTypeGT(v string) predicate.Store {
+	return predicate.Store(sql.FieldGT(FieldStoreType, v))
+}
+
+// StoreTypeGTE applies the GTE predicate on the "store_type" field.
+func StoreTypeGTE(v string) predicate.Store {
+	return predicate.Store(sql.FieldGTE(FieldStoreType, v))
+}
+
+// StoreTypeLT applies the LT predicate on the "store_type" field.
+func StoreTypeLT(v string) predicate.Store {
+	return predicate.Store(sql.FieldLT(FieldStoreType, v))
+}
+
+// StoreTypeLTE applies the LTE predicate on the "store_type" field.
+func StoreTypeLTE(v string) predicate.Store {
+	return predicate.Store(sql.FieldLTE(FieldStoreType, v))
+}
+
+// StoreTypeContains applies the Contains predicate on the "store_type" field.
+func StoreTypeContains(v string) predicate.Store {
+	return predicate.Store(sql.FieldContains(FieldStoreType, v))
+}
+
+// StoreTypeHasPrefix applies the HasPrefix predicate on the "store_type" field.
+func StoreTypeHasPrefix(v string) predicate.Store {
+	return predicate.Store(sql.FieldHasPrefix(FieldStoreType, v))
+}
+
+// StoreTypeHasSuffix applies the HasSuffix predicate on the "store_type" field.
+func StoreTypeHasSuffix(v string) predicate.Store {
+	return predicate.Store(sql.FieldHasSuffix(FieldStoreType, v))
+}
+
+// StoreTypeIsNil applies the IsNil predicate on the "store_type" field.
+func StoreTypeIsNil() predicate.Store {
+	return predicate.Store(sql.FieldIsNull(FieldStoreType))
+}
+
+// StoreTypeNotNil applies the NotNil predicate on the "store_type" field.
+func StoreTypeNotNil() predicate.Store {
+	return predicate.Store(sql.FieldNotNull(FieldStoreType))
+}
+
+// StoreTypeEqualFold applies the EqualFold predicate on the "store_type" field.
+func StoreTypeEqualFold(v string) predicate.Store {
+	return predicate.Store(sql.FieldEqualFold(FieldStoreType, v))
+}
+
+// StoreTypeContainsFold applies the ContainsFold predicate on the "store_type" field.
+func StoreTypeContainsFold(v string) predicate.Store {
+	return predicate.Store(sql.FieldContainsFold(FieldStoreType, v))
 }
 
 // HasItems applies the HasEdge predicate on the "items" edge.

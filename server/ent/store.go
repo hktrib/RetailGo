@@ -20,6 +20,12 @@ type Store struct {
 	StoreName string `json:"store_name,omitempty"`
 	// OwnerEmail holds the value of the "owner_Email" field.
 	OwnerEmail string `json:"owner_Email,omitempty"`
+	// StoreAddress holds the value of the "store_address" field.
+	StoreAddress string `json:"store_address,omitempty"`
+	// StorePhone holds the value of the "store_phone" field.
+	StorePhone string `json:"store_phone,omitempty"`
+	// StoreType holds the value of the "store_type" field.
+	StoreType string `json:"store_type,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the StoreQuery when eager-loading is set.
 	Edges        StoreEdges `json:"edges"`
@@ -84,7 +90,7 @@ func (*Store) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case store.FieldID:
 			values[i] = new(sql.NullInt64)
-		case store.FieldStoreName, store.FieldOwnerEmail:
+		case store.FieldStoreName, store.FieldOwnerEmail, store.FieldStoreAddress, store.FieldStorePhone, store.FieldStoreType:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -118,6 +124,24 @@ func (s *Store) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field owner_Email", values[i])
 			} else if value.Valid {
 				s.OwnerEmail = value.String
+			}
+		case store.FieldStoreAddress:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field store_address", values[i])
+			} else if value.Valid {
+				s.StoreAddress = value.String
+			}
+		case store.FieldStorePhone:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field store_phone", values[i])
+			} else if value.Valid {
+				s.StorePhone = value.String
+			}
+		case store.FieldStoreType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field store_type", values[i])
+			} else if value.Valid {
+				s.StoreType = value.String
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
@@ -180,6 +204,15 @@ func (s *Store) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("owner_Email=")
 	builder.WriteString(s.OwnerEmail)
+	builder.WriteString(", ")
+	builder.WriteString("store_address=")
+	builder.WriteString(s.StoreAddress)
+	builder.WriteString(", ")
+	builder.WriteString("store_phone=")
+	builder.WriteString(s.StorePhone)
+	builder.WriteString(", ")
+	builder.WriteString("store_type=")
+	builder.WriteString(s.StoreType)
 	builder.WriteByte(')')
 	return builder.String()
 }
