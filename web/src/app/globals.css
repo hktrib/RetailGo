@@ -65,6 +65,17 @@
     --ring: 216 12.2% 83.9%;
   }
 }
+
+/* styles.css */
+
+.group:hover .group-hover:block {
+  display: block;
+}
+
+.group .group-hover:block {
+  display: none;
+}
+
  
 @layer base {
   * {

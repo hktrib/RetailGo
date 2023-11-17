@@ -91,6 +91,7 @@ export default function Employees() {
                 <div className="flex items-center justify-between ">
                     <h1 className="text-2xl font-bold">Employees</h1>
                 </div>
+                <hr className="my-4" />
                 <div className="mt-6">
                         <EmployeeTable />
                     </div>

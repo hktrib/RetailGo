@@ -7,18 +7,21 @@ import {
   Settings,
   Users2,
   ShoppingBag,
+  ArrowDown,
+  BookUser 
 } from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon },
-  { name: "Employees", href: "/employees", icon: Users2 },
+  { name: "Employee Management", href: "#0", icon: BookUser, children: [{ name: "Employees", href: "/employees", icon: Users2 }] },
   { name: "Inventory", href: "/inventory", icon: Package2 },
-  { name: "POS", href: "/pos", icon: ShoppingBag },
+  { name: "POS", href: "/pos", icon: ShoppingBag, },
 ];
 
 const fakeStores = [{ name: "RetailGo", id: "123" }];
 
 export default function Sidebar() {
+
   return (
     <div className="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-64 xl:flex-col">
       <div className="flex grow flex-col overflow-y-auto px-6 border-r">
@@ -44,14 +47,23 @@ export default function Sidebar() {
               </div>
               <ul role="list" className="space-y-1.5">
                 {navigation.map((item) => (
-                  <li key={item.name}>
-                    <Link
-                      href={`/app${item.href}`}
-                      className="text-gray-900 hover:text-black flex items-center gap-x-3 px-3 hover:bg-gray-100 py-1.5 rounded-md"
-                    >
+                  <li key={item.name} className="group">
+                    <Link href={`/app${item.href}`} className="text-gray-900 hover:text-black flex items-center gap-x-3 px-3 py-1.5 rounded-md">
                       <item.icon className="w-4 h-4" aria-hidden="true" />
                       <span className="text-sm">{item.name}</span>
                     </Link>
+                    {item.children && (
+                      <ul className="hidden group-hover:block">
+                        {item.children.map((child) => (
+                          <li key={child.name}>
+                            <Link href={`/app${child.href}`} className="text-gray-900 hover:text-black flex items-center gap-x-3 px-3 py-1.5 rounded-md">
+                              <child.icon className="w-4 h-4" aria-hidden="true" />
+                              <span className="text-sm pl-4">{child.name}</span>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </li>
                 ))}
               </ul>

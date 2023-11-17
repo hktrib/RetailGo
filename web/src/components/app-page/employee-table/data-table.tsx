@@ -35,6 +35,7 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [editingCell, setEditingCell] = useState<{ rowIndex: number; columnId: string } | null>(null);
 
   const table = useReactTable({
     data,
@@ -53,7 +54,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Search employees..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -62,6 +63,14 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-sm"
         />
+        <div className="space-x-5">
+          <button className="bg-amber-500 text-sm px-3 py-1.5 text-white font-medium rounded-md">
+            Add Employee
+          </button>
+          <button className="bg-blue-500 text-sm px-3 py-1.5 text-white font-medium rounded-md">
+            Invite
+          </button>
+        </div>
       </div>
 
       <div className="rounded-md border">
@@ -75,9 +84,9 @@ export function DataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   );
                 })}
