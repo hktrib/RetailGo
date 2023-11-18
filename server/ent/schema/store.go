@@ -17,7 +17,7 @@ func (Store) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id").Unique(),
 		field.String("store_name"),
-		field.String("owner_Email").Optional(),
+		field.String("owner_email").Optional(),
 		field.String("store_address").Optional(),
 		field.String("store_phone").Optional(),
 		field.String("store_type").Optional(),

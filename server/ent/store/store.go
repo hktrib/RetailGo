@@ -99,7 +99,7 @@ func ByStoreName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStoreName, opts...).ToFunc()
 }
 
-// ByOwnerEmail orders the results by the owner_Email field.
+// ByOwnerEmail orders the results by the owner_email field.
 func ByOwnerEmail(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldOwnerEmail, opts...).ToFunc()
 }

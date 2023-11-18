@@ -36,13 +36,13 @@ func (su *StoreUpdate) SetStoreName(s string) *StoreUpdate {
 	return su
 }
 
-// SetOwnerEmail sets the "owner_Email" field.
+// SetOwnerEmail sets the "owner_email" field.
 func (su *StoreUpdate) SetOwnerEmail(s string) *StoreUpdate {
 	su.mutation.SetOwnerEmail(s)
 	return su
 }
 
-// SetNillableOwnerEmail sets the "owner_Email" field if the given value is not nil.
+// SetNillableOwnerEmail sets the "owner_email" field if the given value is not nil.
 func (su *StoreUpdate) SetNillableOwnerEmail(s *string) *StoreUpdate {
 	if s != nil {
 		su.SetOwnerEmail(*s)
@@ -50,7 +50,7 @@ func (su *StoreUpdate) SetNillableOwnerEmail(s *string) *StoreUpdate {
 	return su
 }
 
-// ClearOwnerEmail clears the value of the "owner_Email" field.
+// ClearOwnerEmail clears the value of the "owner_email" field.
 func (su *StoreUpdate) ClearOwnerEmail() *StoreUpdate {
 	su.mutation.ClearOwnerEmail()
 	return su
@@ -453,13 +453,13 @@ func (suo *StoreUpdateOne) SetStoreName(s string) *StoreUpdateOne {
 	return suo
 }
 
-// SetOwnerEmail sets the "owner_Email" field.
+// SetOwnerEmail sets the "owner_email" field.
 func (suo *StoreUpdateOne) SetOwnerEmail(s string) *StoreUpdateOne {
 	suo.mutation.SetOwnerEmail(s)
 	return suo
 }
 
-// SetNillableOwnerEmail sets the "owner_Email" field if the given value is not nil.
+// SetNillableOwnerEmail sets the "owner_email" field if the given value is not nil.
 func (suo *StoreUpdateOne) SetNillableOwnerEmail(s *string) *StoreUpdateOne {
 	if s != nil {
 		suo.SetOwnerEmail(*s)
@@ -467,7 +467,7 @@ func (suo *StoreUpdateOne) SetNillableOwnerEmail(s *string) *StoreUpdateOne {
 	return suo
 }
 
-// ClearOwnerEmail clears the value of the "owner_Email" field.
+// ClearOwnerEmail clears the value of the "owner_email" field.
 func (suo *StoreUpdateOne) ClearOwnerEmail() *StoreUpdateOne {
 	suo.mutation.ClearOwnerEmail()
 	return suo

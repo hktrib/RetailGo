@@ -28,13 +28,13 @@ func (sc *StoreCreate) SetStoreName(s string) *StoreCreate {
 	return sc
 }
 
-// SetOwnerEmail sets the "owner_Email" field.
+// SetOwnerEmail sets the "owner_email" field.
 func (sc *StoreCreate) SetOwnerEmail(s string) *StoreCreate {
 	sc.mutation.SetOwnerEmail(s)
 	return sc
 }
 
-// SetNillableOwnerEmail sets the "owner_Email" field if the given value is not nil.
+// SetNillableOwnerEmail sets the "owner_email" field if the given value is not nil.
 func (sc *StoreCreate) SetNillableOwnerEmail(s *string) *StoreCreate {
 	if s != nil {
 		sc.SetOwnerEmail(*s)

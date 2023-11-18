@@ -18,8 +18,8 @@ type Store struct {
 	ID int `json:"id,omitempty"`
 	// StoreName holds the value of the "store_name" field.
 	StoreName string `json:"store_name,omitempty"`
-	// OwnerEmail holds the value of the "owner_Email" field.
-	OwnerEmail string `json:"owner_Email,omitempty"`
+	// OwnerEmail holds the value of the "owner_email" field.
+	OwnerEmail string `json:"owner_email,omitempty"`
 	// StoreAddress holds the value of the "store_address" field.
 	StoreAddress string `json:"store_address,omitempty"`
 	// StorePhone holds the value of the "store_phone" field.
@@ -121,7 +121,7 @@ func (s *Store) assignValues(columns []string, values []any) error {
 			}
 		case store.FieldOwnerEmail:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field owner_Email", values[i])
+				return fmt.Errorf("unexpected type %T for field owner_email", values[i])
 			} else if value.Valid {
 				s.OwnerEmail = value.String
 			}
@@ -202,7 +202,7 @@ func (s *Store) String() string {
 	builder.WriteString("store_name=")
 	builder.WriteString(s.StoreName)
 	builder.WriteString(", ")
-	builder.WriteString("owner_Email=")
+	builder.WriteString("owner_email=")
 	builder.WriteString(s.OwnerEmail)
 	builder.WriteString(", ")
 	builder.WriteString("store_address=")
