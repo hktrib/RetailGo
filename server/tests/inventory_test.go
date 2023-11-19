@@ -11,10 +11,10 @@ import (
 	"testing"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/hktrib/RetailGo/ent"
-	"github.com/hktrib/RetailGo/ent/item"
-	server "github.com/hktrib/RetailGo/routes"
-	"github.com/hktrib/RetailGo/util"
+	server "github.com/hktrib/RetailGo/cmd/api"
+	"github.com/hktrib/RetailGo/internal/ent"
+	"github.com/hktrib/RetailGo/internal/ent/item"
+	"github.com/hktrib/RetailGo/internal/util"
 )
 
 var idVal int
