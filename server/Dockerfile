@@ -1,12 +1,17 @@
-# Use the official Redis image from Bitnami
-FROM docker.io/bitnami/redis:7.2
+# Use the official Golang image as the base image
+FROM golang:latest
 
-# Set environment variables
-ENV ALLOW_EMPTY_PASSWORD=yes
-ENV REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+# Set the working directory inside the container
+WORKDIR /app
 
-# Expose the Redis port
-EXPOSE 6379
+# Copy the entire project into the container
+COPY . .
 
-# Define a volume for Redis data
-VOLUME /bitnami/redis/data
+# Build the Go application
+RUN go build -o main ./cmd/
+
+# Expose the port that your web application will run on
+EXPOSE 8080
+
+# Command to run the executable
+CMD ["./main"]
