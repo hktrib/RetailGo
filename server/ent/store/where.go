@@ -58,7 +58,7 @@ func StoreName(v string) predicate.Store {
 	return predicate.Store(sql.FieldEQ(FieldStoreName, v))
 }
 
-// OwnerEmail applies equality check predicate on the "owner_Email" field. It's identical to OwnerEmailEQ.
+// OwnerEmail applies equality check predicate on the "owner_email" field. It's identical to OwnerEmailEQ.
 func OwnerEmail(v string) predicate.Store {
 	return predicate.Store(sql.FieldEQ(FieldOwnerEmail, v))
 }
@@ -143,77 +143,77 @@ func StoreNameContainsFold(v string) predicate.Store {
 	return predicate.Store(sql.FieldContainsFold(FieldStoreName, v))
 }
 
-// OwnerEmailEQ applies the EQ predicate on the "owner_Email" field.
+// OwnerEmailEQ applies the EQ predicate on the "owner_email" field.
 func OwnerEmailEQ(v string) predicate.Store {
 	return predicate.Store(sql.FieldEQ(FieldOwnerEmail, v))
 }
 
-// OwnerEmailNEQ applies the NEQ predicate on the "owner_Email" field.
+// OwnerEmailNEQ applies the NEQ predicate on the "owner_email" field.
 func OwnerEmailNEQ(v string) predicate.Store {
 	return predicate.Store(sql.FieldNEQ(FieldOwnerEmail, v))
 }
 
-// OwnerEmailIn applies the In predicate on the "owner_Email" field.
+// OwnerEmailIn applies the In predicate on the "owner_email" field.
 func OwnerEmailIn(vs ...string) predicate.Store {
 	return predicate.Store(sql.FieldIn(FieldOwnerEmail, vs...))
 }
 
-// OwnerEmailNotIn applies the NotIn predicate on the "owner_Email" field.
+// OwnerEmailNotIn applies the NotIn predicate on the "owner_email" field.
 func OwnerEmailNotIn(vs ...string) predicate.Store {
 	return predicate.Store(sql.FieldNotIn(FieldOwnerEmail, vs...))
 }
 
-// OwnerEmailGT applies the GT predicate on the "owner_Email" field.
+// OwnerEmailGT applies the GT predicate on the "owner_email" field.
 func OwnerEmailGT(v string) predicate.Store {
 	return predicate.Store(sql.FieldGT(FieldOwnerEmail, v))
 }
 
-// OwnerEmailGTE applies the GTE predicate on the "owner_Email" field.
+// OwnerEmailGTE applies the GTE predicate on the "owner_email" field.
 func OwnerEmailGTE(v string) predicate.Store {
 	return predicate.Store(sql.FieldGTE(FieldOwnerEmail, v))
 }
 
-// OwnerEmailLT applies the LT predicate on the "owner_Email" field.
+// OwnerEmailLT applies the LT predicate on the "owner_email" field.
 func OwnerEmailLT(v string) predicate.Store {
 	return predicate.Store(sql.FieldLT(FieldOwnerEmail, v))
 }
 
-// OwnerEmailLTE applies the LTE predicate on the "owner_Email" field.
+// OwnerEmailLTE applies the LTE predicate on the "owner_email" field.
 func OwnerEmailLTE(v string) predicate.Store {
 	return predicate.Store(sql.FieldLTE(FieldOwnerEmail, v))
 }
 
-// OwnerEmailContains applies the Contains predicate on the "owner_Email" field.
+// OwnerEmailContains applies the Contains predicate on the "owner_email" field.
 func OwnerEmailContains(v string) predicate.Store {
 	return predicate.Store(sql.FieldContains(FieldOwnerEmail, v))
 }
 
-// OwnerEmailHasPrefix applies the HasPrefix predicate on the "owner_Email" field.
+// OwnerEmailHasPrefix applies the HasPrefix predicate on the "owner_email" field.
 func OwnerEmailHasPrefix(v string) predicate.Store {
 	return predicate.Store(sql.FieldHasPrefix(FieldOwnerEmail, v))
 }
 
-// OwnerEmailHasSuffix applies the HasSuffix predicate on the "owner_Email" field.
+// OwnerEmailHasSuffix applies the HasSuffix predicate on the "owner_email" field.
 func OwnerEmailHasSuffix(v string) predicate.Store {
 	return predicate.Store(sql.FieldHasSuffix(FieldOwnerEmail, v))
 }
 
-// OwnerEmailIsNil applies the IsNil predicate on the "owner_Email" field.
+// OwnerEmailIsNil applies the IsNil predicate on the "owner_email" field.
 func OwnerEmailIsNil() predicate.Store {
 	return predicate.Store(sql.FieldIsNull(FieldOwnerEmail))
 }
 
-// OwnerEmailNotNil applies the NotNil predicate on the "owner_Email" field.
+// OwnerEmailNotNil applies the NotNil predicate on the "owner_email" field.
 func OwnerEmailNotNil() predicate.Store {
 	return predicate.Store(sql.FieldNotNull(FieldOwnerEmail))
 }
 
-// OwnerEmailEqualFold applies the EqualFold predicate on the "owner_Email" field.
+// OwnerEmailEqualFold applies the EqualFold predicate on the "owner_email" field.
 func OwnerEmailEqualFold(v string) predicate.Store {
 	return predicate.Store(sql.FieldEqualFold(FieldOwnerEmail, v))
 }
 
-// OwnerEmailContainsFold applies the ContainsFold predicate on the "owner_Email" field.
+// OwnerEmailContainsFold applies the ContainsFold predicate on the "owner_email" field.
 func OwnerEmailContainsFold(v string) predicate.Store {
 	return predicate.Store(sql.FieldContainsFold(FieldOwnerEmail, v))
 }

@@ -1763,7 +1763,7 @@ type StoreMutation struct {
 	typ               string
 	id                *int
 	store_name        *string
-	owner_Email       *string
+	owner_email       *string
 	store_address     *string
 	store_phone       *string
 	store_type        *string
@@ -1922,21 +1922,21 @@ func (m *StoreMutation) ResetStoreName() {
 	m.store_name = nil
 }
 
-// SetOwnerEmail sets the "owner_Email" field.
+// SetOwnerEmail sets the "owner_email" field.
 func (m *StoreMutation) SetOwnerEmail(s string) {
-	m.owner_Email = &s
+	m.owner_email = &s
 }
 
-// OwnerEmail returns the value of the "owner_Email" field in the mutation.
+// OwnerEmail returns the value of the "owner_email" field in the mutation.
 func (m *StoreMutation) OwnerEmail() (r string, exists bool) {
-	v := m.owner_Email
+	v := m.owner_email
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldOwnerEmail returns the old "owner_Email" field's value of the Store entity.
+// OldOwnerEmail returns the old "owner_email" field's value of the Store entity.
 // If the Store object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *StoreMutation) OldOwnerEmail(ctx context.Context) (v string, err error) {
@@ -1953,21 +1953,21 @@ func (m *StoreMutation) OldOwnerEmail(ctx context.Context) (v string, err error)
 	return oldValue.OwnerEmail, nil
 }
 
-// ClearOwnerEmail clears the value of the "owner_Email" field.
+// ClearOwnerEmail clears the value of the "owner_email" field.
 func (m *StoreMutation) ClearOwnerEmail() {
-	m.owner_Email = nil
+	m.owner_email = nil
 	m.clearedFields[store.FieldOwnerEmail] = struct{}{}
 }
 
-// OwnerEmailCleared returns if the "owner_Email" field was cleared in this mutation.
+// OwnerEmailCleared returns if the "owner_email" field was cleared in this mutation.
 func (m *StoreMutation) OwnerEmailCleared() bool {
 	_, ok := m.clearedFields[store.FieldOwnerEmail]
 	return ok
 }
 
-// ResetOwnerEmail resets all changes to the "owner_Email" field.
+// ResetOwnerEmail resets all changes to the "owner_email" field.
 func (m *StoreMutation) ResetOwnerEmail() {
-	m.owner_Email = nil
+	m.owner_email = nil
 	delete(m.clearedFields, store.FieldOwnerEmail)
 }
 
@@ -2318,7 +2318,7 @@ func (m *StoreMutation) Fields() []string {
 	if m.store_name != nil {
 		fields = append(fields, store.FieldStoreName)
 	}
-	if m.owner_Email != nil {
+	if m.owner_email != nil {
 		fields = append(fields, store.FieldOwnerEmail)
 	}
 	if m.store_address != nil {
