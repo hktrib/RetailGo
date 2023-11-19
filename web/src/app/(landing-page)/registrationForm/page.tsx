@@ -5,6 +5,8 @@
 import { useState } from 'react';
 import Head from 'next/head';
 import styles from './Registration.module.css';
+import { useFetch } from '@/lib/utils';
+import { useUser } from "@clerk/nextjs";
 
 // type Member = {
 //   firstName: string;
@@ -14,8 +16,13 @@ import styles from './Registration.module.css';
 // }
 
 export default function RegistrationForm() {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+
+
+  const {user} = useUser()
+  const authFetch = useFetch()
+
+
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [storeName, setStoreName] = useState('');
   const [address, setAddress] = useState('');
   const [address2, setAddress2] = useState('');
@@ -29,8 +36,7 @@ export default function RegistrationForm() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(false);
 
-  const handleOwnerFirstName = (e: React.ChangeEvent<HTMLInputElement>) => setFirstName(e.target.value);
-  const handleOwnerLastName = (e: React.ChangeEvent<HTMLInputElement>) => setLastName(e.target.value);
+  const handleStorePhoneNumber = (e: React.ChangeEvent<HTMLInputElement>) => setPhoneNumber(e.target.value);
   const handleStoreName = (e: React.ChangeEvent<HTMLInputElement>) => setStoreName(e.target.value);
   const handleAddress = (e: React.ChangeEvent<HTMLInputElement>) => setAddress(e.target.value);
   const handleAddress2 = (e: React.ChangeEvent<HTMLInputElement>) => setAddress2(e.target.value);
@@ -52,13 +58,41 @@ export default function RegistrationForm() {
   //   setMemberRole('');
   // };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (firstName === '' || lastName === '' || storeName === '' || address === '' || businessType === '') {
+    if (phoneNumber === '' || storeName === '' || address === '' || businessType === '') {
       setError(true);
     } else {
+
+      // const email = await {}
+
+      const postData = {
+        // Your data to be sent in the POST request body
+        store_name: storeName,
+        store_phone: phoneNumber,
+        store_address: address,
+        store_type: businessType,
+        owner_email: user?.emailAddresses[0]
+      };
+
       setSubmitted(true);
+      try {
+        const response = await authFetch("http://localhost:8080/create/store", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // Any additional headers you need
+          },
+          body: JSON.stringify(postData),
+        });
+    
+        console.log('Response:', response);
+        // Handle the response as needed
+      } catch (error) {
+        console.error('Error making POST request:', error);
+        // Handle errors
+      }
       setError(false);
     }
   };
@@ -90,18 +124,12 @@ export default function RegistrationForm() {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <label className={styles.label}>Owner Name<span className={styles.required}>*</span></label>
-        <div className={styles.nameGroup}>
-          <div className={styles.inputGroup}>
-            <input onChange={handleOwnerFirstName} className={styles.input} value={firstName} type="text" placeholder="First Name" required />
-          </div>
-          <div className={styles.inputGroup}>
-            <input onChange={handleOwnerLastName} className={styles.input} value={lastName} type="text" placeholder="Last Name" required />
-          </div>
-        </div>
 
         <label className={styles.label}>Store Name<span className={styles.required}>*</span></label>
         <input onChange={handleStoreName} className={styles.input} value={storeName} type="text" />
+        
+        <label className={styles.label}>Store Phone Number<span className={styles.required}>*</span></label>
+        <input onChange={handleStorePhoneNumber} className={styles.input} value={phoneNumber} type="text" placeholder="First Name" required />
 
         <label className={styles.label}>Address<span className={styles.required}>*</span></label>
         <input onChange={handleAddress} className={styles.input} value={address} type="text" placeholder = "Line 1" />
