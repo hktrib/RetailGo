@@ -117,5 +117,12 @@ func (s *Server) MountHandlers() {
 
 		})
 	})
+	s.Router.Route("/user", func(r chi.Router) {
+		r.Post("/", s.UserCreate)            // Create a new user
+		r.Delete("/{user_id}", s.UserDelete) // Delete a user by ID
+		r.Get("/{user_id}", s.UserQuery)     // Get a user by ID
+		r.Post("/add", s.userAdd)            // Additional user creation endpoint
+		r.Put("/{user_id}", s.userUpdate)    // Update a user by ID
+	})
 
 }

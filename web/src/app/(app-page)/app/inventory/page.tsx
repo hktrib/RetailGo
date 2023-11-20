@@ -1,5 +1,6 @@
-import AddItemDialog from "@/components/app-page/add-item-dialog";
+import AddItemDialog from "@/components/app-page/item-dialog";
 import InventoryTable from "@/components/app-page/inventory-table";
+import { Item } from "@/models/item";
 
 export default function Inventory() {
   const stats = [
@@ -36,7 +37,7 @@ export default function Inventory() {
           <h1 className="text-2xl font-bold">Inventory</h1>
 
           <div>
-            <AddItemDialog />
+            <AddItemDialog item={new Item} />
           </div>
         </div>
         <hr className="my-4" />

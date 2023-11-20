@@ -30,7 +30,8 @@ func (srv *Server) HelloWorld(w http.ResponseWriter, r *http.Request) {
 	user, err := srv.DBClient.User.
 		Create().
 		SetUsername("gvadhul").
-		SetRealName("Giridhar Vadhul").
+		SetFirstName("Giridhar").
+		SetLastName("Vadhul").
 		SetEmail("gvadhul@ucsc.edu").
 		SetIsOwner(true).
 		SetStoreID(1381).

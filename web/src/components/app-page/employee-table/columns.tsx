@@ -2,27 +2,13 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuLabel,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, PencilIcon, Trash2 } from "lucide-react";
+import React, { useState } from 'react';
+import { Employee } from "@/models/employee";
 
-export type EmployeeItem = {
-  name: string;
-  employeeId: string;
-  position: string;
-  department: string;
-  hireDate: string;
-  location: string;
-};
 
-export const columns: ColumnDef<EmployeeItem>[] = [
+export const columns: ColumnDef<Employee>[] = [
   {
     accessorKey: "employeeId",
     header: () => <div className="text-xs">ID</div>,
@@ -55,28 +41,5 @@ export const columns: ColumnDef<EmployeeItem>[] = [
     accessorKey: "hireDate",
     header: () => <div className="text-xs">ID</div>,
   },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      return (
-        <div className="text-right">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Edit</DropdownMenuItem>
-              <DropdownMenuItem>Delete</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      );
-    },
-  },
 ];
+

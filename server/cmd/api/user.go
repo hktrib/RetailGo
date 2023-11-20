@@ -32,7 +32,8 @@ func (srv *Server) UserCreate(w http.ResponseWriter, r *http.Request) {
 	_, err = srv.DBClient.User.Create().
 		SetEmail(reqUser.Email).
 		SetIsOwner(reqUser.IsOwner).
-		SetRealName(reqUser.RealName).
+		SetFirstName(reqUser.FirstName).
+		SetLastName(reqUser.LastName).
 		SetStoreID(reqUser.StoreID).Save(ctx)
 
 	if err != nil {
@@ -120,7 +121,7 @@ func (srv *Server) userAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	createdItem, create_err := srv.DBClient.User.Create().SetUsername(req.Username).SetRealName(req.RealName).SetEmail(req.Email).SetIsOwner(false).SetStoreID(req.StoreID).Save(ctx)
+	createdItem, create_err := srv.DBClient.User.Create().SetUsername(req.Username).SetFirstName(req.FirstName).SetLastName(req.LastName).SetEmail(req.Email).SetIsOwner(false).SetStoreID(req.StoreID).Save(ctx)
 
 	if create_err != nil {
 		fmt.Println("Create didn't work:", create_err)
@@ -162,8 +163,11 @@ func (srv *Server) userUpdate(w http.ResponseWriter, r *http.Request) {
 	if name, ok := values["username"]; ok {
 		targetUser.Update().SetUsername(name[0]).SaveX(ctx)
 	}
-	if name, ok := values["realname"]; ok {
-		targetUser.Update().SetRealName(name[0]).SaveX(ctx)
+	if name, ok := values["first_name"]; ok {
+		targetUser.Update().SetFirstName(name[0]).SaveX(ctx)
+	}
+	if name, ok := values["last_name"]; ok {
+		targetUser.Update().SetLastName(name[0]).SaveX(ctx)
 	}
 	if name, ok := values["email"]; ok {
 		targetUser.Update().SetEmail(name[0]).SaveX(ctx)

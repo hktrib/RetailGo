@@ -28,6 +28,18 @@ func (uu *UserUpdate) Where(ps ...predicate.User) *UserUpdate {
 	return uu
 }
 
+// SetFirstName sets the "first_name" field.
+func (uu *UserUpdate) SetFirstName(s string) *UserUpdate {
+	uu.mutation.SetFirstName(s)
+	return uu
+}
+
+// SetLastName sets the "last_name" field.
+func (uu *UserUpdate) SetLastName(s string) *UserUpdate {
+	uu.mutation.SetLastName(s)
+	return uu
+}
+
 // SetUsername sets the "username" field.
 func (uu *UserUpdate) SetUsername(s string) *UserUpdate {
 	uu.mutation.SetUsername(s)
@@ -43,12 +55,6 @@ func (uu *UserUpdate) SetEmail(s string) *UserUpdate {
 // SetIsOwner sets the "is_owner" field.
 func (uu *UserUpdate) SetIsOwner(b bool) *UserUpdate {
 	uu.mutation.SetIsOwner(b)
-	return uu
-}
-
-// SetRealName sets the "real_name" field.
-func (uu *UserUpdate) SetRealName(s string) *UserUpdate {
-	uu.mutation.SetRealName(s)
 	return uu
 }
 
@@ -162,6 +168,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := uu.mutation.FirstName(); ok {
+		_spec.SetField(user.FieldFirstName, field.TypeString, value)
+	}
+	if value, ok := uu.mutation.LastName(); ok {
+		_spec.SetField(user.FieldLastName, field.TypeString, value)
+	}
 	if value, ok := uu.mutation.Username(); ok {
 		_spec.SetField(user.FieldUsername, field.TypeString, value)
 	}
@@ -170,9 +182,6 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.IsOwner(); ok {
 		_spec.SetField(user.FieldIsOwner, field.TypeBool, value)
-	}
-	if value, ok := uu.mutation.RealName(); ok {
-		_spec.SetField(user.FieldRealName, field.TypeString, value)
 	}
 	if value, ok := uu.mutation.StoreID(); ok {
 		_spec.SetField(user.FieldStoreID, field.TypeInt, value)
@@ -251,6 +260,18 @@ type UserUpdateOne struct {
 	mutation *UserMutation
 }
 
+// SetFirstName sets the "first_name" field.
+func (uuo *UserUpdateOne) SetFirstName(s string) *UserUpdateOne {
+	uuo.mutation.SetFirstName(s)
+	return uuo
+}
+
+// SetLastName sets the "last_name" field.
+func (uuo *UserUpdateOne) SetLastName(s string) *UserUpdateOne {
+	uuo.mutation.SetLastName(s)
+	return uuo
+}
+
 // SetUsername sets the "username" field.
 func (uuo *UserUpdateOne) SetUsername(s string) *UserUpdateOne {
 	uuo.mutation.SetUsername(s)
@@ -266,12 +287,6 @@ func (uuo *UserUpdateOne) SetEmail(s string) *UserUpdateOne {
 // SetIsOwner sets the "is_owner" field.
 func (uuo *UserUpdateOne) SetIsOwner(b bool) *UserUpdateOne {
 	uuo.mutation.SetIsOwner(b)
-	return uuo
-}
-
-// SetRealName sets the "real_name" field.
-func (uuo *UserUpdateOne) SetRealName(s string) *UserUpdateOne {
-	uuo.mutation.SetRealName(s)
 	return uuo
 }
 
@@ -415,6 +430,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			}
 		}
 	}
+	if value, ok := uuo.mutation.FirstName(); ok {
+		_spec.SetField(user.FieldFirstName, field.TypeString, value)
+	}
+	if value, ok := uuo.mutation.LastName(); ok {
+		_spec.SetField(user.FieldLastName, field.TypeString, value)
+	}
 	if value, ok := uuo.mutation.Username(); ok {
 		_spec.SetField(user.FieldUsername, field.TypeString, value)
 	}
@@ -423,9 +444,6 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.IsOwner(); ok {
 		_spec.SetField(user.FieldIsOwner, field.TypeBool, value)
-	}
-	if value, ok := uuo.mutation.RealName(); ok {
-		_spec.SetField(user.FieldRealName, field.TypeString, value)
 	}
 	if value, ok := uuo.mutation.StoreID(); ok {
 		_spec.SetField(user.FieldStoreID, field.TypeInt, value)

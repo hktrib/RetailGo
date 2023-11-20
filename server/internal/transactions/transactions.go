@@ -26,7 +26,8 @@ func StoreAndOwnerCreationTx(ctx context.Context, dbClient *ent.Client) error {
 		SetUsername(reqUser.Username).
 		SetEmail(reqUser.Email).
 		SetIsOwner(reqUser.IsOwner).
-		SetRealName(reqUser.RealName).
+		SetFirstName(reqUser.FirstName).
+		SetLastName(reqUser.LastName).
 		SetStoreID(store.ID).AddStoreIDs(store.ID).Save(ctx)
 	if err != nil {
 		return rollback(tx, fmt.Errorf("tx_error: Unable to create store: %w", err))

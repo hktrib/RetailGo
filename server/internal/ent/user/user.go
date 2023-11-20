@@ -12,14 +12,16 @@ const (
 	Label = "user"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldFirstName holds the string denoting the first_name field in the database.
+	FieldFirstName = "first_name"
+	// FieldLastName holds the string denoting the last_name field in the database.
+	FieldLastName = "last_name"
 	// FieldUsername holds the string denoting the username field in the database.
 	FieldUsername = "username"
 	// FieldEmail holds the string denoting the email field in the database.
 	FieldEmail = "email"
 	// FieldIsOwner holds the string denoting the is_owner field in the database.
 	FieldIsOwner = "is_owner"
-	// FieldRealName holds the string denoting the real_name field in the database.
-	FieldRealName = "real_name"
 	// FieldStoreID holds the string denoting the store_id field in the database.
 	FieldStoreID = "store_id"
 	// FieldClerkUserID holds the string denoting the clerk_user_id field in the database.
@@ -47,10 +49,11 @@ const (
 // Columns holds all SQL columns for user fields.
 var Columns = []string{
 	FieldID,
+	FieldFirstName,
+	FieldLastName,
 	FieldUsername,
 	FieldEmail,
 	FieldIsOwner,
-	FieldRealName,
 	FieldStoreID,
 	FieldClerkUserID,
 }
@@ -79,6 +82,16 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
+// ByFirstName orders the results by the first_name field.
+func ByFirstName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFirstName, opts...).ToFunc()
+}
+
+// ByLastName orders the results by the last_name field.
+func ByLastName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLastName, opts...).ToFunc()
+}
+
 // ByUsername orders the results by the username field.
 func ByUsername(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUsername, opts...).ToFunc()
@@ -92,11 +105,6 @@ func ByEmail(opts ...sql.OrderTermOption) OrderOption {
 // ByIsOwner orders the results by the is_owner field.
 func ByIsOwner(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsOwner, opts...).ToFunc()
-}
-
-// ByRealName orders the results by the real_name field.
-func ByRealName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldRealName, opts...).ToFunc()
 }
 
 // ByStoreID orders the results by the store_id field.
