@@ -69,10 +69,9 @@ export default async function InventoryTable(){
 
 
   try{
-    data = await authFetch("http://localhost:8080/store/1391/inventory/");
+    data = await authFetch("http://localhost:8080/store/1/inventory/");
   }
   catch{
-
   }
 
   return(
