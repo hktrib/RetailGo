@@ -23,6 +23,7 @@ func (Item) Fields() []ent.Field {
 				dialect.Postgres: "decimal(10,2)",
 			}),
 		field.Int("store_id"),
+		field.String("stripe_price_id"),
 	}
 }
 

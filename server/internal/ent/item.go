@@ -27,6 +27,8 @@ type Item struct {
 	Price float64 `json:"price,omitempty"`
 	// StoreID holds the value of the "store_id" field.
 	StoreID int `json:"store_id,omitempty"`
+	// StripePriceID holds the value of the "stripe_price_id" field.
+	StripePriceID string `json:"stripe_price_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ItemQuery when eager-loading is set.
 	Edges        ItemEdges `json:"edges"`
@@ -88,7 +90,7 @@ func (*Item) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case item.FieldID, item.FieldQuantity, item.FieldStoreID:
 			values[i] = new(sql.NullInt64)
-		case item.FieldName:
+		case item.FieldName, item.FieldStripePriceID:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -140,6 +142,12 @@ func (i *Item) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field store_id", values[j])
 			} else if value.Valid {
 				i.StoreID = int(value.Int64)
+			}
+		case item.FieldStripePriceID:
+			if value, ok := values[j].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field stripe_price_id", values[j])
+			} else if value.Valid {
+				i.StripePriceID = value.String
 			}
 		default:
 			i.selectValues.Set(columns[j], values[j])
@@ -206,6 +214,9 @@ func (i *Item) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("store_id=")
 	builder.WriteString(fmt.Sprintf("%v", i.StoreID))
+	builder.WriteString(", ")
+	builder.WriteString("stripe_price_id=")
+	builder.WriteString(i.StripePriceID)
 	builder.WriteByte(')')
 	return builder.String()
 }

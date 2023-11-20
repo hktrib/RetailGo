@@ -78,6 +78,11 @@ func StoreID(v int) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldStoreID, v))
 }
 
+// StripePriceID applies equality check predicate on the "stripe_price_id" field. It's identical to StripePriceIDEQ.
+func StripePriceID(v string) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldStripePriceID, v))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldName, v))
@@ -281,6 +286,71 @@ func StoreIDIn(vs ...int) predicate.Item {
 // StoreIDNotIn applies the NotIn predicate on the "store_id" field.
 func StoreIDNotIn(vs ...int) predicate.Item {
 	return predicate.Item(sql.FieldNotIn(FieldStoreID, vs...))
+}
+
+// StripePriceIDEQ applies the EQ predicate on the "stripe_price_id" field.
+func StripePriceIDEQ(v string) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldStripePriceID, v))
+}
+
+// StripePriceIDNEQ applies the NEQ predicate on the "stripe_price_id" field.
+func StripePriceIDNEQ(v string) predicate.Item {
+	return predicate.Item(sql.FieldNEQ(FieldStripePriceID, v))
+}
+
+// StripePriceIDIn applies the In predicate on the "stripe_price_id" field.
+func StripePriceIDIn(vs ...string) predicate.Item {
+	return predicate.Item(sql.FieldIn(FieldStripePriceID, vs...))
+}
+
+// StripePriceIDNotIn applies the NotIn predicate on the "stripe_price_id" field.
+func StripePriceIDNotIn(vs ...string) predicate.Item {
+	return predicate.Item(sql.FieldNotIn(FieldStripePriceID, vs...))
+}
+
+// StripePriceIDGT applies the GT predicate on the "stripe_price_id" field.
+func StripePriceIDGT(v string) predicate.Item {
+	return predicate.Item(sql.FieldGT(FieldStripePriceID, v))
+}
+
+// StripePriceIDGTE applies the GTE predicate on the "stripe_price_id" field.
+func StripePriceIDGTE(v string) predicate.Item {
+	return predicate.Item(sql.FieldGTE(FieldStripePriceID, v))
+}
+
+// StripePriceIDLT applies the LT predicate on the "stripe_price_id" field.
+func StripePriceIDLT(v string) predicate.Item {
+	return predicate.Item(sql.FieldLT(FieldStripePriceID, v))
+}
+
+// StripePriceIDLTE applies the LTE predicate on the "stripe_price_id" field.
+func StripePriceIDLTE(v string) predicate.Item {
+	return predicate.Item(sql.FieldLTE(FieldStripePriceID, v))
+}
+
+// StripePriceIDContains applies the Contains predicate on the "stripe_price_id" field.
+func StripePriceIDContains(v string) predicate.Item {
+	return predicate.Item(sql.FieldContains(FieldStripePriceID, v))
+}
+
+// StripePriceIDHasPrefix applies the HasPrefix predicate on the "stripe_price_id" field.
+func StripePriceIDHasPrefix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasPrefix(FieldStripePriceID, v))
+}
+
+// StripePriceIDHasSuffix applies the HasSuffix predicate on the "stripe_price_id" field.
+func StripePriceIDHasSuffix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasSuffix(FieldStripePriceID, v))
+}
+
+// StripePriceIDEqualFold applies the EqualFold predicate on the "stripe_price_id" field.
+func StripePriceIDEqualFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldEqualFold(FieldStripePriceID, v))
+}
+
+// StripePriceIDContainsFold applies the ContainsFold predicate on the "stripe_price_id" field.
+func StripePriceIDContainsFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldContainsFold(FieldStripePriceID, v))
 }
 
 // HasCategory applies the HasEdge predicate on the "category" edge.

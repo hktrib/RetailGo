@@ -1012,6 +1012,7 @@ type ItemMutation struct {
 	addquantity     *int
 	price           *float64
 	addprice        *float64
+	stripe_price_id *string
 	clearedFields   map[string]struct{}
 	category        map[int]struct{}
 	removedcategory map[int]struct{}
@@ -1347,6 +1348,42 @@ func (m *ItemMutation) ResetStoreID() {
 	m.store = nil
 }
 
+// SetStripePriceID sets the "stripe_price_id" field.
+func (m *ItemMutation) SetStripePriceID(s string) {
+	m.stripe_price_id = &s
+}
+
+// StripePriceID returns the value of the "stripe_price_id" field in the mutation.
+func (m *ItemMutation) StripePriceID() (r string, exists bool) {
+	v := m.stripe_price_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStripePriceID returns the old "stripe_price_id" field's value of the Item entity.
+// If the Item object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ItemMutation) OldStripePriceID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStripePriceID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStripePriceID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStripePriceID: %w", err)
+	}
+	return oldValue.StripePriceID, nil
+}
+
+// ResetStripePriceID resets all changes to the "stripe_price_id" field.
+func (m *ItemMutation) ResetStripePriceID() {
+	m.stripe_price_id = nil
+}
+
 // AddCategoryIDs adds the "category" edge to the Category entity by ids.
 func (m *ItemMutation) AddCategoryIDs(ids ...int) {
 	if m.category == nil {
@@ -1462,7 +1499,7 @@ func (m *ItemMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ItemMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.name != nil {
 		fields = append(fields, item.FieldName)
 	}
@@ -1477,6 +1514,9 @@ func (m *ItemMutation) Fields() []string {
 	}
 	if m.store != nil {
 		fields = append(fields, item.FieldStoreID)
+	}
+	if m.stripe_price_id != nil {
+		fields = append(fields, item.FieldStripePriceID)
 	}
 	return fields
 }
@@ -1496,6 +1536,8 @@ func (m *ItemMutation) Field(name string) (ent.Value, bool) {
 		return m.Price()
 	case item.FieldStoreID:
 		return m.StoreID()
+	case item.FieldStripePriceID:
+		return m.StripePriceID()
 	}
 	return nil, false
 }
@@ -1515,6 +1557,8 @@ func (m *ItemMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldPrice(ctx)
 	case item.FieldStoreID:
 		return m.OldStoreID(ctx)
+	case item.FieldStripePriceID:
+		return m.OldStripePriceID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Item field %s", name)
 }
@@ -1558,6 +1602,13 @@ func (m *ItemMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStoreID(v)
+		return nil
+	case item.FieldStripePriceID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStripePriceID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Item field %s", name)
@@ -1649,6 +1700,9 @@ func (m *ItemMutation) ResetField(name string) error {
 		return nil
 	case item.FieldStoreID:
 		m.ResetStoreID()
+		return nil
+	case item.FieldStripePriceID:
+		m.ResetStripePriceID()
 		return nil
 	}
 	return fmt.Errorf("unknown Item field %s", name)

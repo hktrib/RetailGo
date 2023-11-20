@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/stripe/stripe-go/v76"
 	"net/http"
 	"time"
 
@@ -31,9 +32,11 @@ func runTaskConsumer(redisOptions *asynq.RedisClientOpt, dbClient *ent.Client, c
 
 func main() {
 	config, err := util.LoadConfig(".")
+	fmt.Printf("Test")
 	if err != nil {
 		panic(err)
 	}
+	stripe.Key = "sk_test_51ODz7pHWQUATs9zV4fWYLtRag0GwwLPticrlOe5FqicEWwdnWUlsZkRh90o1YOkt3qsOduJQNSbbUJupkm4i9xLm00hcffWjDm"
 
 	taskQueueOptions := asynq.RedisClientOpt{
 		Addr: fmt.Sprintf("0.0.0.0:%v", config.RedisAddress),
