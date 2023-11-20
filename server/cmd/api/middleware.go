@@ -113,7 +113,7 @@ func (srv *Server) ValidateOwner(next http.Handler) http.Handler {
 	})
 }
 
-func (srv *Server) OwnerCreate(next http.Handler) http.Handler {
+func (srv *Server) IsOwnerCreateHandle(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		ctx := r.Context()

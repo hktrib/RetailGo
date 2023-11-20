@@ -70,11 +70,11 @@ func (s *Server) MountHandlers() {
 		r.Route("/create", func(r chi.Router) {
 			r.Use(s.ProtectStoreAndOwnerCreation)
 			r.Group(func(r chi.Router) {
-				r.Use(s.OwnerCreate)
-				r.Post("/owner", s.UserCreate)
+				r.Use(s.IsOwnerCreateHandle)
+				r.Post("/user", s.UserCreate)
 			})
 			r.Group(func(r chi.Router) {
-				r.Use(s.StoreCreate)
+				r.Use(s.StoreCreateHandle)
 				r.Post("/store", s.CreateStore)
 			})
 		})
