@@ -49,25 +49,35 @@ const initialInventory = [
   },
 ];
 
-export default  function InventoryTable(){
+export default async function InventoryTable(){
+  let authFetch = useFetch()
+
   let data = initialInventory;
 
-  const itemQuery = useItems("1")
+  // const itemQuery = useItems("1")
 
-  if (itemQuery.isLoading){
-    return (<div>
-      LOADING...
-    </div>)
-  } else if (itemQuery.isError){
-    console.log("Error loading items:", itemQuery.error)
-    return (<div>
-      There was an error loading your items. Please try again!
-    </div>)
+  // if (itemQuery.isLoading){
+  //   return (<div>
+  //     LOADING...
+  //   </div>)
+  // } else if (itemQuery.isError){
+  //   console.log("Error loading items:", itemQuery.error)
+  //   return (<div>
+  //     There was an error loading your items. Please try again!
+  //   </div>)
+  // }
+
+
+  try{
+    data = await authFetch("http://localhost:8080/store/1391/inventory/");
+  }
+  catch{
+
   }
 
   return(
     <div>
-      <DataTable columns = {columns} data = {itemQuery.data} />
+      <DataTable columns = {columns} data = {data} />
     </div>
   );
 }

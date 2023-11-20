@@ -33,7 +33,10 @@ export default function Inventory() {
 
   const newItem = new Item()
 
+  const queryClient = new QueryClient()
+
   return (
+    // <QueryClientProvider client = {queryClient}>
     <main className="bg-gray-50 h-full flex-grow">
       <div className="py-6 px-6 md:px-8 max-w-6xl mx-auto lg:ml-0">
         <div className="flex items-center justify-between ">
@@ -73,5 +76,6 @@ export default function Inventory() {
         </div>
       </div>
     </main>
+    // </QueryClientProvider>
   );
 }

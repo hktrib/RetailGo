@@ -26,6 +26,12 @@ const storeURL = serverURL + "/store/"
 
 // function updateItem(store: string, item: JSON)
 
+const ITEMS: Item[] = [{name: "Apple", price: 10, quantity: 1000, category: "Fruits"}]
+
+function wait(duration: number){
+    return new Promise(resolve => setTimeout(resolve, duration))
+  }
+
 export function useItems(store: string){
 
     const queryClient = useQueryClient()
@@ -34,8 +40,11 @@ export function useItems(store: string){
 
     return useQuery(
         {
-            queryKey: ["items", store], 
-            queryFn: () => authFetch(storeURL + store + "/inventory/"),
+            queryKey: ["items"], 
+            // queryFn: () => authFetch(storeURL + store + "/inventory/"),
+            queryFn: ({queryKey}) => {
+                return wait(1000).then(() => [...ITEMS])
+              },
             staleTime: 2592000000
         }
     )
