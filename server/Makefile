@@ -19,4 +19,8 @@ test:
 testv:
 	go test -test.v ./tests
 
+run:
+	export $(cat .env | xargs)
+	go run cmd/main.go
+
 .PHONY: devpostres devcreatedb devdropdb startredis stopredis test testv
