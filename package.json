@@ -1,8 +1,0 @@
-{
-	"devDependencies": {
-		"@types/lodash": "^4.14.201"
-	},
-	"dependencies": {
-		"react-datepicker": "^4.21.0"
-	}
-}

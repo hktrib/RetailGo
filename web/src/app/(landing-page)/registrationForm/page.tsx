@@ -1,11 +1,9 @@
-'use client';
+"use client";
 
-//Comments added for add member functionality
-
-import { useState } from 'react';
-import Head from 'next/head';
-import styles from './Registration.module.css';
-import { useFetch } from '@/lib/utils';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { useFetch } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
 
 // type Member = {
@@ -15,32 +13,56 @@ import { useUser } from "@clerk/nextjs";
 //   role: string;
 // }
 
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+const formSchema = z.object({
+  storeName: z.string().min(0),
+  phoneNumber: z.string().min(7, { message: "Invalid phone number" }),
+  address1: z.string().min(0),
+  address2: z.string().optional(),
+  businessType: z.string().min(0),
+});
+
+const businessTypes = [
+  "Clothing",
+  "Grocery",
+  "Convenience",
+  "Departmnet",
+  "Restaurant",
+  "Other",
+];
+
 export default function RegistrationForm() {
+  const { user } = useUser();
+  const authFetch = useFetch();
 
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  });
 
-  const {user} = useUser()
-  const authFetch = useFetch()
-
-
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [storeName, setStoreName] = useState('');
-  const [address, setAddress] = useState('');
-  const [address2, setAddress2] = useState('');
-  const [businessType, setBusinessType] = useState('');
   // const [members, setMembers] = useState<Member[]>([]);
   // const [showMemberFields, setShowMemberFields] = useState(false);
   // const [memberFirstName, setMemberFirstName] = useState('');
   // const [memberLastName, setMemberLastName] = useState('');
   // const [memberEmail, setMemberEmail] = useState('');
   // const [memberRole, setMemberRole] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState(false);
 
-  const handleStorePhoneNumber = (e: React.ChangeEvent<HTMLInputElement>) => setPhoneNumber(e.target.value);
-  const handleStoreName = (e: React.ChangeEvent<HTMLInputElement>) => setStoreName(e.target.value);
-  const handleAddress = (e: React.ChangeEvent<HTMLInputElement>) => setAddress(e.target.value);
-  const handleAddress2 = (e: React.ChangeEvent<HTMLInputElement>) => setAddress2(e.target.value);
-  const handleBusinessType = (e: React.ChangeEvent<HTMLSelectElement>) => setBusinessType(e.target.value);
   // const handleAddMembersClick = () => setShowMemberFields(true);
   // const handleMemberFirstName = e => setMemberFirstName(e.target.value);
   // const handleMemberLastName = e => setMemberLastName(e.target.value);
@@ -58,122 +80,163 @@ export default function RegistrationForm() {
   //   setMemberRole('');
   // };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    // not doing anything with `address2` yet
+    const { storeName, phoneNumber, address1, address2, businessType } = values;
 
-    if (phoneNumber === '' || storeName === '' || address === '' || businessType === '') {
-      setError(true);
-    } else {
+    // data to be sent in POST request body
+    const postData = {
+      store_name: storeName,
+      store_phone: phoneNumber,
+      store_address: address1,
+      store_type: businessType,
+      owner_email: user?.emailAddresses[0],
+    };
 
-      // const email = await {}
+    try {
+      const response = await authFetch("http://localhost:8080/create/store", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // Any additional headers you need
+        },
+        body: JSON.stringify(postData),
+      });
 
-      const postData = {
-        // Your data to be sent in the POST request body
-        store_name: storeName,
-        store_phone: phoneNumber,
-        store_address: address,
-        store_type: businessType,
-        owner_email: user?.emailAddresses[0]
-      };
-
-      setSubmitted(true);
-      try {
-        const response = await authFetch("http://localhost:8080/create/store", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            // Any additional headers you need
-          },
-          body: JSON.stringify(postData),
-        });
-    
-        console.log('Response:', response);
-        // Handle the response as needed
-      } catch (error) {
-        console.error('Error making POST request:', error);
-        // Handle errors
-      }
-      setError(false);
+      console.log("Response:", response);
+      // Handle the response as needed
+    } catch (error) {
+      console.error("Error making POST request:", error);
+      // Handle errors
     }
   };
 
-  const successMessage = () => (
-    <div className={styles.success} style={{ display: submitted ? 'block' : 'none' }}>
-      <h1>{storeName} is successfully registered!</h1>
-    </div>
-  );
-
-  const errorMessage = () => (
-    <div className={styles.error} style={{ display: error ? 'block' : 'none' }}>
-      <h1>Please enter all the fields.</h1>
-    </div>
-  );
-
   return (
-    <div className={styles.formContainer}>
-      <Head>
-        <title>Register Your Business</title>
-      </Head>
-      <div className={styles.formTitle}>
-        <h1>Register Your Business!</h1>
+    <div className="relative isolate px-6 pt-14 lg:px-8 flex-1 flex flex-col justify-center items-center">
+      <div className="mx-auto max-w-2xl w-full bg-gray-50 py-16 px-12 rounded-xl">
+        <h1 className="text-center font-bold text-3xl">
+          Register your business
+        </h1>
+
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-8 mt-12"
+          >
+            <FormField
+              control={form.control}
+              name="storeName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Store name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Store name" {...field} />
+                  </FormControl>
+                  {/* <FormDescription>
+                This is your public display name.
+              </FormDescription> */}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phoneNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone number</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Store phone number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="address1"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Address line 1</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Address line 1" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="address2"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Address line 2</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Address line 2" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="businessType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Business type</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a business type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {businessTypes.map((businessType) => (
+                        <SelectItem key={businessType} value={businessType}>
+                          {businessType}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="text-right">
+              <Button type="submit">Submit</Button>
+            </div>
+          </form>
+        </Form>
       </div>
-
-      <div className={styles.messages}>
-        {errorMessage()}
-        {successMessage()}
-      </div>
-
-      <form onSubmit={handleSubmit}>
-
-        <label className={styles.label}>Store Name<span className={styles.required}>*</span></label>
-        <input onChange={handleStoreName} className={styles.input} value={storeName} type="text" />
-        
-        <label className={styles.label}>Store Phone Number<span className={styles.required}>*</span></label>
-        <input onChange={handleStorePhoneNumber} className={styles.input} value={phoneNumber} type="text" placeholder="First Name" required />
-
-        <label className={styles.label}>Address<span className={styles.required}>*</span></label>
-        <input onChange={handleAddress} className={styles.input} value={address} type="text" placeholder = "Line 1" />
-        <input onChange={handleAddress2} className={styles.input} value={address2} type="text" placeholder = "Line 2" />
-
-        <label className={styles.label}>Business Type<span className={styles.required}>*</span></label>
-        <select onChange={handleBusinessType} className={styles.input} value={businessType}>
-          <option value="">Select Business Type</option>
-          <option value="clothing">Clothing</option>
-          <option value="grocery">Grocery</option>
-          <option value="convenience">Convenience</option>
-          <option value="department">Department</option>
-          <option value="restaurant">Restaurant</option>
-          <option value="other">Other</option>
-        </select>
-        
-        { /* add members component  */}
-        {/* {showMemberFields && (
-          <>
-            <label className={styles.label}>Member's Name</label>
-            <input type="text" className={styles.input} placeholder="First Name" value={memberFirstName} onChange={handleMemberFirstName} />
-            <input type="text" className={styles.input} placeholder="Last Name" value={memberLastName} onChange={handleMemberLastName} />
-            <input type="email" className={styles.input} placeholder="Email" value={memberEmail} onChange={handleMemberEmail} />
-            <select className={styles.input} value={memberRole} onChange={handleMemberRole}>
-              <option value="">Select Role</option>
-              <option value="owner">Owner</option>
-              <option value="manager">Manager</option>
-              <option value="employee">Employee</option>
-            </select>
-            <button type="button" onClick={addMember} className={styles.addButton}>Add Member</button>
-          </>
-        )}
-        <button type="button" onClick={() => setShowMemberFields(!showMemberFields)} className={styles.toggleButton}>
-          {showMemberFields ? 'Close' : 'Add Members'}
-        </button>
-
-        {members.map((member, index) => (
-          <div key={index} className={styles.memberInfo}>
-            {member.firstName} {member.lastName} ({member.email}) - {member.role}
-          </div>
-        ))} */}
-
-        <button className={styles.btn} type="submit">Submit</button>
-      </form>
     </div>
+    //      add members component
+    //     {showMemberFields && (
+    //       <>
+    //         <label className={styles.label}>Member's Name</label>
+    //         <input type="text" className={styles.input} placeholder="First Name" value={memberFirstName} onChange={handleMemberFirstName} />
+    //         <input type="text" className={styles.input} placeholder="Last Name" value={memberLastName} onChange={handleMemberLastName} />
+    //         <input type="email" className={styles.input} placeholder="Email" value={memberEmail} onChange={handleMemberEmail} />
+    //         <select className={styles.input} value={memberRole} onChange={handleMemberRole}>
+    //           <option value="">Select Role</option>
+    //           <option value="owner">Owner</option>
+    //           <option value="manager">Manager</option>
+    //           <option value="employee">Employee</option>
+    //         </select>
+    //         <button type="button" onClick={addMember} className={styles.addButton}>Add Member</button>
+    //       </>
+    //     )}
+    //     <button type="button" onClick={() => setShowMemberFields(!showMemberFields)} className={styles.toggleButton}>
+    //       {showMemberFields ? 'Close' : 'Add Members'}
+    //     </button>
+
+    //     {members.map((member, index) => (
+    //       <div key={index} className={styles.memberInfo}>
+    //         {member.firstName} {member.lastName} ({member.email}) - {member.role}
+    //       </div>
+    //     ))}
   );
 }

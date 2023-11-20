@@ -68,13 +68,13 @@ func (s *Server) MountHandlers() {
 		// Add necessary middleware for protecting owner and store create routes
 		r.Get("/", s.HelloWorld)
 		r.Route("/create", func(r chi.Router) {
-			r.Use(s.ProtectStoreAndOwnerCreation)
+			// r.Use(s.ProtectStoreAndOwnerCreation)
 			r.Group(func(r chi.Router) {
-				r.Use(s.OwnerCreate)
-				r.Post("/owner", s.UserCreate)
+				r.Use(s.IsOwnerCreateHandle)
+				r.Post("/user", s.UserCreate)
 			})
 			r.Group(func(r chi.Router) {
-				r.Use(s.StoreCreate)
+				r.Use(s.StoreCreateHandle)
 				r.Post("/store", s.CreateStore)
 			})
 		})
