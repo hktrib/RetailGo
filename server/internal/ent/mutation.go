@@ -2648,10 +2648,11 @@ type UserMutation struct {
 	op            Op
 	typ           string
 	id            *int
+	first_name    *string
+	last_name     *string
 	username      *string
 	email         *string
 	is_owner      *bool
-	real_name     *string
 	store_id      *int
 	addstore_id   *int
 	clerk_user_id *string
@@ -2768,6 +2769,78 @@ func (m *UserMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
+// SetFirstName sets the "first_name" field.
+func (m *UserMutation) SetFirstName(s string) {
+	m.first_name = &s
+}
+
+// FirstName returns the value of the "first_name" field in the mutation.
+func (m *UserMutation) FirstName() (r string, exists bool) {
+	v := m.first_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFirstName returns the old "first_name" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldFirstName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFirstName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFirstName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFirstName: %w", err)
+	}
+	return oldValue.FirstName, nil
+}
+
+// ResetFirstName resets all changes to the "first_name" field.
+func (m *UserMutation) ResetFirstName() {
+	m.first_name = nil
+}
+
+// SetLastName sets the "last_name" field.
+func (m *UserMutation) SetLastName(s string) {
+	m.last_name = &s
+}
+
+// LastName returns the value of the "last_name" field in the mutation.
+func (m *UserMutation) LastName() (r string, exists bool) {
+	v := m.last_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastName returns the old "last_name" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldLastName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastName: %w", err)
+	}
+	return oldValue.LastName, nil
+}
+
+// ResetLastName resets all changes to the "last_name" field.
+func (m *UserMutation) ResetLastName() {
+	m.last_name = nil
+}
+
 // SetUsername sets the "username" field.
 func (m *UserMutation) SetUsername(s string) {
 	m.username = &s
@@ -2874,42 +2947,6 @@ func (m *UserMutation) OldIsOwner(ctx context.Context) (v bool, err error) {
 // ResetIsOwner resets all changes to the "is_owner" field.
 func (m *UserMutation) ResetIsOwner() {
 	m.is_owner = nil
-}
-
-// SetRealName sets the "real_name" field.
-func (m *UserMutation) SetRealName(s string) {
-	m.real_name = &s
-}
-
-// RealName returns the value of the "real_name" field in the mutation.
-func (m *UserMutation) RealName() (r string, exists bool) {
-	v := m.real_name
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldRealName returns the old "real_name" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldRealName(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldRealName is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldRealName requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldRealName: %w", err)
-	}
-	return oldValue.RealName, nil
-}
-
-// ResetRealName resets all changes to the "real_name" field.
-func (m *UserMutation) ResetRealName() {
-	m.real_name = nil
 }
 
 // SetStoreID sets the "store_id" field.
@@ -3105,7 +3142,13 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
+	if m.first_name != nil {
+		fields = append(fields, user.FieldFirstName)
+	}
+	if m.last_name != nil {
+		fields = append(fields, user.FieldLastName)
+	}
 	if m.username != nil {
 		fields = append(fields, user.FieldUsername)
 	}
@@ -3114,9 +3157,6 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.is_owner != nil {
 		fields = append(fields, user.FieldIsOwner)
-	}
-	if m.real_name != nil {
-		fields = append(fields, user.FieldRealName)
 	}
 	if m.store_id != nil {
 		fields = append(fields, user.FieldStoreID)
@@ -3132,14 +3172,16 @@ func (m *UserMutation) Fields() []string {
 // schema.
 func (m *UserMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case user.FieldFirstName:
+		return m.FirstName()
+	case user.FieldLastName:
+		return m.LastName()
 	case user.FieldUsername:
 		return m.Username()
 	case user.FieldEmail:
 		return m.Email()
 	case user.FieldIsOwner:
 		return m.IsOwner()
-	case user.FieldRealName:
-		return m.RealName()
 	case user.FieldStoreID:
 		return m.StoreID()
 	case user.FieldClerkUserID:
@@ -3153,14 +3195,16 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case user.FieldFirstName:
+		return m.OldFirstName(ctx)
+	case user.FieldLastName:
+		return m.OldLastName(ctx)
 	case user.FieldUsername:
 		return m.OldUsername(ctx)
 	case user.FieldEmail:
 		return m.OldEmail(ctx)
 	case user.FieldIsOwner:
 		return m.OldIsOwner(ctx)
-	case user.FieldRealName:
-		return m.OldRealName(ctx)
 	case user.FieldStoreID:
 		return m.OldStoreID(ctx)
 	case user.FieldClerkUserID:
@@ -3174,6 +3218,20 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 // type.
 func (m *UserMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case user.FieldFirstName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFirstName(v)
+		return nil
+	case user.FieldLastName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastName(v)
+		return nil
 	case user.FieldUsername:
 		v, ok := value.(string)
 		if !ok {
@@ -3194,13 +3252,6 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetIsOwner(v)
-		return nil
-	case user.FieldRealName:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetRealName(v)
 		return nil
 	case user.FieldStoreID:
 		v, ok := value.(int)
@@ -3289,6 +3340,12 @@ func (m *UserMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *UserMutation) ResetField(name string) error {
 	switch name {
+	case user.FieldFirstName:
+		m.ResetFirstName()
+		return nil
+	case user.FieldLastName:
+		m.ResetLastName()
+		return nil
 	case user.FieldUsername:
 		m.ResetUsername()
 		return nil
@@ -3297,9 +3354,6 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldIsOwner:
 		m.ResetIsOwner()
-		return nil
-	case user.FieldRealName:
-		m.ResetRealName()
 		return nil
 	case user.FieldStoreID:
 		m.ResetStoreID()

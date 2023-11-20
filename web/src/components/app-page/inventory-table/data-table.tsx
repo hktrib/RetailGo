@@ -23,13 +23,16 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import ItemDialog from "../item-dialog";
+import { Item } from "@/models/item";
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData extends Item, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends Item, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -75,9 +78,9 @@ export function DataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   );
                 })}
@@ -99,8 +102,17 @@ export function DataTable<TData, TValue>({
                       )}
                     </TableCell>
                   ))}
+                  <TableCell>
+                    <div className="text-right flex flex-row space-x-2 h-8 w-8 p-0">
+                      <ItemDialog item={row.original} mode="edit" />
+                      <button onClick={() => console.log("Delete button clicked")}>
+                        <Trash2 style={{ color: "red" }} className="h-5 w-5 p-0"></Trash2>
+                      </button>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))
+
             ) : (
               <TableRow>
                 <TableCell
@@ -111,6 +123,7 @@ export function DataTable<TData, TValue>({
                 </TableCell>
               </TableRow>
             )}
+
           </TableBody>
         </Table>
       </div>

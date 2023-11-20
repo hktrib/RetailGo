@@ -1,4 +1,4 @@
-import AddItemDialog from "@/components/app-page/add-item-dialog";
+import AddItemDialog from "@/components/app-page/item-dialog";
 import InventoryTable from "@/components/app-page/inventory-table";
 
 export default function Inventory() {

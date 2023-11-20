@@ -83,7 +83,7 @@ export default function EmployeeDialog({ employeeData, mode = 'add' }: { employe
           </button>
         ) : (
           <button className="bg-amber-500 text-sm px-3 py-1.5 text-white font-medium rounded-md">
-            Add item
+            Add Employee
           </button>
         )}
       </DialogTrigger>

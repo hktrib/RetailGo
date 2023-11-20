@@ -29,7 +29,7 @@ import InviteEmployee from "../invite-employee";
 import AddEmployee from "../employee-dialog";
 import { PencilIcon, Trash2 } from "lucide-react";
 import { Employee } from "@/models/employee";
-import AddItemDialog from "../add-item-dialog";
+import AddItemDialog from "../item-dialog";
 import EmployeeDialog from "../employee-dialog";
 
 
@@ -125,7 +125,7 @@ export function DataTable<TData extends Employee, TValue>({
                       <button onClick={() => console.log("Delete button clicked")}>
                         <Trash2 style={{ color: "red" }} className="h-5 w-5 p-0"></Trash2>
                       </button>
-                    </div>                  
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
