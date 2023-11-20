@@ -36,12 +36,12 @@ func main() {
 	}
 
 	taskQueueOptions := asynq.RedisClientOpt{
-		Addr: fmt.Sprintf("0.0.0.0:%v", config.RedisAddress),
+		Addr: config.RedisAddress,
 		DB:   1,
 	}
 
 	cacheOptions := &redis.Options{
-		Addr:     fmt.Sprintf("0.0.0.0:%v", config.RedisAddress),
+		Addr:     config.RedisAddress,
 		Password: "",
 		DB:       0,
 	}
