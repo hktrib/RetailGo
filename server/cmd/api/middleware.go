@@ -151,7 +151,7 @@ func (srv *Server) IsOwnerCreateHandle(next http.Handler) http.Handler {
 	})
 }
 
-func (srv *Server) StoreCreate(next http.Handler) http.Handler {
+func (srv *Server) StoreCreateHandle(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		ctx := r.Context()
