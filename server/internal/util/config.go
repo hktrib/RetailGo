@@ -11,6 +11,7 @@ type Config struct {
 	ServerAddress string // `"SERVER_ADDRESS"`
 	ClerkSK       string // `"CLERK_SK"`
 	RedisAddress  string // `"REDIS_ADDRESS"`
+	StripeSK      string // `"STRIPE_SK"`
 }
 
 func LoadConfig() (config Config, err error) {
@@ -25,6 +26,7 @@ func LoadConfig() (config Config, err error) {
 	config.ServerAddress = envPortOr("8080")
 	config.ClerkSK = os.Getenv("CLERK_SK")
 	config.RedisAddress = os.Getenv("REDIS_ADDRESS")
+	config.StripeSK = os.Getenv("STRIPE_SK")
 
 	fmt.Println(config)
 

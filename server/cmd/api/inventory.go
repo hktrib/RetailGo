@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	. "github.com/hktrib/RetailGo/stripe-components"
 	"net/http"
 	"strconv"
 
@@ -144,9 +145,14 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 
 	// Create item in database with name, photo, quantity, store_id, category
 
-	createdItem, create_err := srv.DBClient.Item.Create().SetPrice(float64(req_item.Price)).SetName(req_item.Name).SetPhoto([]byte(req_item.Photo)).SetQuantity(req_item.Quantity).SetStoreID(store_id).Save(ctx)
-	// If this create doesn't work, InternalServerError
+	ProductId, err := CreateStripeItem(&req_item)
+	if err != nil {
+		fmt.Println("Stripe Create didn't work:", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
 
+	createdItem, create_err := srv.DBClient.Item.Create().SetPrice(float64(req_item.Price)).SetName(req_item.Name).SetStripePriceID(ProductId.DefaultPrice.ID).SetPhoto([]byte(req_item.Photo)).SetQuantity(req_item.Quantity).SetStoreID(store_id).Save(ctx)
+	// If this create doesn't work, InternalServerError
 	if create_err != nil {
 		fmt.Println("Create didn't work:", create_err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
