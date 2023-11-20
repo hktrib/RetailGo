@@ -1,27 +1,41 @@
 package util
 
-import "github.com/spf13/viper"
+import (
+	"fmt"
+	"os"
+)
 
 type Config struct {
-	DBDriver      string `mapstructure:"DB_DRIVER"`
-	DBSource      string `mapstructure:"DB_SOURCE"`
-	ServerAddress string `mapstructure:"SERVER_ADDRESS"`
-	ClerkSK       string `mapstructure:"CLERK_SK"`
-	RedisAddress  string `mapstructure:"REDIS_ADDRESS"`
+	DBDriver      string // `"DB_DRIVER"`
+	DBSource      string // "DB_SOURCE"`
+	ServerAddress string // `"SERVER_ADDRESS"`
+	ClerkSK       string // `"CLERK_SK"`
+	RedisAddress  string // `"REDIS_ADDRESS"`
 }
 
-func LoadConfig(path string) (config Config, err error) {
-	viper.AddConfigPath(path)
-	viper.SetConfigName("app")
-	viper.SetConfigType("env")
+func LoadConfig() (config Config, err error) {
+	// viper.AddConfigPath("./util/config")
+	// viper.SetConfigName(".env")
+	// viper.SetConfigType("env")
 
-	viper.AutomaticEnv()
+	// viper.AutomaticEnv()
 
-	err = viper.ReadInConfig()
-	if err != nil {
-		return
-	}
+	config.DBDriver = os.Getenv("DB_DRIVER")
+	config.DBSource = os.Getenv("DB_SOURCE")
+	config.ServerAddress = envPortOr("8080")
+	config.ClerkSK = os.Getenv("CLERK_SK")
+	config.RedisAddress = os.Getenv("REDIS_ADDRESS")
 
-	err = viper.Unmarshal(&config)
+	fmt.Println(config)
+
 	return
+}
+
+func envPortOr(port string) string {
+	// If `PORT` variable in environment exists, return it
+	if envPort := os.Getenv("PORT"); envPort != "" {
+		return envPort
+	}
+	// Otherwise, return the value of `port` variable from function argument
+	return port
 }

@@ -159,7 +159,7 @@ func checkResponseCode(tst *testing.T, expected, actual int) {
 	}
 }
 func setupServer() *server.Server {
-	config, err := util.LoadConfig("../")
+	config, err := util.LoadConfig()
 	if err != nil {
 		log.Fatal(err)
 	}

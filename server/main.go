@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/stripe/stripe-go/v76"
 	"net/http"
 	"time"
 
@@ -31,20 +30,18 @@ func runTaskConsumer(redisOptions *asynq.RedisClientOpt, dbClient *ent.Client, c
 }
 
 func main() {
-	config, err := util.LoadConfig(".")
-	fmt.Printf("Test")
+	config, err := util.LoadConfig()
 	if err != nil {
 		panic(err)
 	}
-	stripe.Key = "sk_test_51ODz7pHWQUATs9zV4fWYLtRag0GwwLPticrlOe5FqicEWwdnWUlsZkRh90o1YOkt3qsOduJQNSbbUJupkm4i9xLm00hcffWjDm"
 
 	taskQueueOptions := asynq.RedisClientOpt{
-		Addr: fmt.Sprintf("0.0.0.0:%v", config.RedisAddress),
+		Addr: config.RedisAddress,
 		DB:   1,
 	}
 
 	cacheOptions := &redis.Options{
-		Addr:     fmt.Sprintf("0.0.0.0:%v", config.RedisAddress),
+		Addr:     config.RedisAddress,
 		Password: "",
 		DB:       0,
 	}
@@ -76,7 +73,7 @@ func main() {
 		srv.Router.Use(injectActiveSession)
 
 		srv.MountHandlers()
-		err := http.ListenAndServe(fmt.Sprintf(":%s", config.ServerAddress), srv.Router)
+		err := http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", config.ServerAddress), srv.Router)
 		if err != nil {
 			log.Fatal().Err(err).Msg("failed in starting server")
 		}
