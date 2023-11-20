@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+//import { InviteEmployee } from "../invite-employee"; // Import the InviteEmployee component
+
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -23,6 +25,8 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import InviteEmployee from "../invite-employee";
+import AddEmployee from "../add-employee";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -63,14 +67,11 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-sm"
         />
-        <div className="space-x-5">
-          <button className="bg-amber-500 text-sm px-3 py-1.5 text-white font-medium rounded-md">
-            Add Employee
-          </button>
-          <button className="bg-blue-500 text-sm px-3 py-1.5 text-white font-medium rounded-md">
-            Invite
-          </button>
+        <div className="flex items-center space-x-5">
+          <AddEmployee />
+          <InviteEmployee />
         </div>
+
       </div>
 
       <div className="rounded-md border">
