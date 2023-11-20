@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	. "github.com/hktrib/RetailGo/stripe-components"
 	"io"
 	"net/http"
 	"strconv"
@@ -139,11 +140,24 @@ func (srv *Server) CatItemAdd(w http.ResponseWriter, r *http.Request) {
 	var targetItem *ent.Item
 	if req.ID == 0 {
 		targetItem, err = srv.DBClient.Item.Create().SetName(req.Name).SetPhoto(req.Photo).SetQuantity(req.Quantity).SetStoreID(store_id).SetPrice(req.Price).AddCategoryIDs(cat_id).Save(ctx)
+		ProductId, err := CreateStripeItem(targetItem)
+		if err != nil {
+			fmt.Println("Stripe Create didn't work:", err)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+		targetItem, err = targetItem.Update().SetStripePriceID(ProductId.DefaultPrice.ID).Save(ctx)
 	} else {
 		targetItem, err = srv.DBClient.Item.Query().Where(item.ID(req.ID)).Only(ctx)
 		if ent.IsNotFound(err) {
 			targetItem, err = srv.DBClient.Item.Create().SetName(req.Name).SetPhoto(req.Photo).SetQuantity(req.Quantity).SetStoreID(store_id).SetPrice(req.Price).SetID(req.ID).AddCategoryIDs(cat_id).Save(ctx)
+			ProductId, err := CreateStripeItem(targetItem)
+			if err != nil {
+				fmt.Println("Stripe Create didn't work:", err)
+				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			}
+			targetItem, err = targetItem.Update().SetStripePriceID(ProductId.DefaultPrice.ID).Save(ctx)
 		}
+
 	}
 
 	if err != nil {

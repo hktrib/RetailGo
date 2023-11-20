@@ -109,7 +109,12 @@ func (s *Server) MountHandlers() {
 
 				r.Get("/", s.CatItemList)      //
 				r.Post("/update", s.InvUpdate) //
+
 			})
+			r.Route("/pos", func(r chi.Router) {
+				r.Get("/checkout", s.StoreCheckout)
+			})
+
 		})
 	})
 	s.Router.Route("/user", func(r chi.Router) {
