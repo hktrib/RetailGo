@@ -70,11 +70,11 @@ func (s *Server) MountHandlers() {
 		r.Route("/create", func(r chi.Router) {
 			r.Use(s.ProtectStoreAndOwnerCreation)
 			r.Group(func(r chi.Router) {
-				r.Use(s.OwnerCreate)
-				r.Post("/owner", s.UserCreate)
+				r.Use(s.IsOwnerCreateHandle)
+				r.Post("/user", s.UserCreate)
 			})
 			r.Group(func(r chi.Router) {
-				r.Use(s.StoreCreate)
+				r.Use(s.StoreCreateHandle)
 				r.Post("/store", s.CreateStore)
 			})
 		})
@@ -109,8 +109,20 @@ func (s *Server) MountHandlers() {
 
 				r.Get("/", s.CatItemList)      //
 				r.Post("/update", s.InvUpdate) //
+
 			})
+			r.Route("/pos", func(r chi.Router) {
+				r.Get("/checkout", s.StoreCheckout)
+			})
+
 		})
+	})
+	s.Router.Route("/user", func(r chi.Router) {
+		r.Post("/", s.UserCreate)            // Create a new user
+		r.Delete("/{user_id}", s.UserDelete) // Delete a user by ID
+		r.Get("/{user_id}", s.UserQuery)     // Get a user by ID
+		r.Post("/add", s.userAdd)            // Additional user creation endpoint
+		r.Put("/{user_id}", s.userUpdate)    // Update a user by ID
 	})
 
 }

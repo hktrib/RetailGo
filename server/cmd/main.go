@@ -3,9 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"net/http"
-	"time"
-
 	"github.com/clerkinc/clerk-sdk-go/clerk"
 	"github.com/hibiken/asynq"
 	server "github.com/hktrib/RetailGo/cmd/api"
@@ -13,10 +10,13 @@ import (
 	kvRedis "github.com/hktrib/RetailGo/internal/redis"
 	worker "github.com/hktrib/RetailGo/internal/tasks"
 	"github.com/hktrib/RetailGo/internal/util"
+	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
-
-	_ "github.com/lib/pq"
+	"github.com/stripe/stripe-go/v76"
+	"net/http"
+	"os"
+	"time"
 )
 
 // var log = util.NewLogger()
@@ -31,6 +31,8 @@ func runTaskConsumer(redisOptions *asynq.RedisClientOpt, dbClient *ent.Client, c
 
 func main() {
 	config, err := util.LoadConfig()
+	stripe.Key = os.Getenv("STRIPE_SK")
+	fmt.Println(stripe.Key)
 	if err != nil {
 		panic(err)
 	}
@@ -73,7 +75,7 @@ func main() {
 		srv.Router.Use(injectActiveSession)
 
 		srv.MountHandlers()
-		err := http.ListenAndServe(fmt.Sprintf(":%s", config.ServerAddress), srv.Router)
+		err := http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", config.ServerAddress), srv.Router)
 		if err != nil {
 			log.Fatal().Err(err).Msg("failed in starting server")
 		}

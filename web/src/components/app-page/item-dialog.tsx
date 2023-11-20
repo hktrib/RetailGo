@@ -22,6 +22,9 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Item } from "@/models/item";
+import { useEffect } from "react";
+import { PencilIcon } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string(),
@@ -30,13 +33,21 @@ const formSchema = z.object({
   category: z.string()
 });
 
-export default function AddItemDialog() {
+export default function ItemDialog({ item, mode = 'add' }: { item: Item, mode?: string }) {
 
   const form = useForm<z.infer <typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });;
 
   let authFetch = useFetch()
+
+  useEffect(() => {
+
+    if (item != null) {
+      console.log('Item Data:', item);
+      form.reset(item);
+    }
+  }, [item, form]);
 
   const onNewItem: SubmitHandler<z.infer<typeof formSchema>> = async (values: z.infer<typeof formSchema>) => {
 
@@ -66,9 +77,15 @@ export default function AddItemDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button className="bg-amber-500 text-sm px-3 py-1.5 text-white font-medium rounded-md">
-          Add item
-        </button>
+        {mode === "edit" ? (
+          <button className="icon-button">
+            <PencilIcon style={{ color: "orange" }} className="h-5 w-5 p-0"></PencilIcon>
+          </button>
+        ) : (
+          <button className="bg-amber-500 text-sm px-3 py-1.5 text-white font-medium rounded-md">
+            Add item
+          </button>
+        )}
       </DialogTrigger>
 
       <Form {...form}>
@@ -77,7 +94,7 @@ export default function AddItemDialog() {
             <form onSubmit = {form.handleSubmit(onNewItem, (data) => console.log("Error:", data))}>
             <DialogHeader>
               <DialogTitle>
-                Add Item
+              {mode === "edit" ? 'Edit' : 'Add'} Item
               </DialogTitle>
             </DialogHeader>
 
@@ -135,7 +152,7 @@ export default function AddItemDialog() {
             />
 
             <DialogFooter className="gap-x-4">
-              <button type="submit">Save</button>
+              <button type="submit">{mode === "edit" ? 'Save' : 'Add'}</button>
             </DialogFooter>
             </form>
           </DialogContent>

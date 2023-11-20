@@ -68,6 +68,7 @@ var (
 		{Name: "photo", Type: field.TypeBytes},
 		{Name: "quantity", Type: field.TypeInt},
 		{Name: "price", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "decimal(10,2)"}},
+		{Name: "stripe_price_id", Type: field.TypeString},
 		{Name: "store_id", Type: field.TypeInt},
 	}
 	// ItemsTable holds the schema information for the "items" table.
@@ -78,7 +79,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "items_stores_items",
-				Columns:    []*schema.Column{ItemsColumns[5]},
+				Columns:    []*schema.Column{ItemsColumns[6]},
 				RefColumns: []*schema.Column{StoresColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -109,10 +110,11 @@ var (
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "first_name", Type: field.TypeString},
+		{Name: "last_name", Type: field.TypeString},
 		{Name: "username", Type: field.TypeString, Unique: true},
 		{Name: "email", Type: field.TypeString},
 		{Name: "is_owner", Type: field.TypeBool},
-		{Name: "real_name", Type: field.TypeString},
 		{Name: "store_id", Type: field.TypeInt},
 		{Name: "clerk_user_id", Type: field.TypeString, Nullable: true},
 	}
@@ -125,7 +127,7 @@ var (
 			{
 				Name:    "user_username_email",
 				Unique:  false,
-				Columns: []*schema.Column{UsersColumns[1], UsersColumns[2]},
+				Columns: []*schema.Column{UsersColumns[3], UsersColumns[4]},
 			},
 		},
 	}
