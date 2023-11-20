@@ -15,6 +15,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/stripe/stripe-go/v76"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -30,7 +31,8 @@ func runTaskConsumer(redisOptions *asynq.RedisClientOpt, dbClient *ent.Client, c
 
 func main() {
 	config, err := util.LoadConfig()
-	stripe.Key = config.StripeSK
+	stripe.Key = os.Getenv("STRIPE_SK")
+	fmt.Println(stripe.Key)
 	if err != nil {
 		panic(err)
 	}
