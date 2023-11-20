@@ -1,27 +1,28 @@
 package util
 
-import "github.com/spf13/viper"
+import (
+	"os"
+)
 
 type Config struct {
-	DBDriver      string `mapstructure:"DB_DRIVER"`
-	DBSource      string `mapstructure:"DB_SOURCE"`
-	ServerAddress string `mapstructure:"SERVER_ADDRESS"`
-	ClerkSK       string `mapstructure:"CLERK_SK"`
-	RedisAddress  string `mapstructure:"REDIS_ADDRESS"`
+	DBDriver      string // `"DB_DRIVER"`
+	DBSource      string // "DB_SOURCE"`
+	ServerAddress string // `"SERVER_ADDRESS"`
+	ClerkSK       string // `"CLERK_SK"`
+	RedisAddress  string // `"REDIS_ADDRESS"`
 }
 
-func LoadConfig(path string) (config Config, err error) {
-	viper.AddConfigPath(path)
-	viper.SetConfigName(".env")
-	viper.SetConfigType("env")
+func LoadConfig() (config Config, err error) {
+	// viper.AddConfigPath("./util/config")
+	// viper.SetConfigName(".env")
+	// viper.SetConfigType("env")
 
-	viper.AutomaticEnv()
+	// viper.AutomaticEnv()
 
-	err = viper.ReadInConfig()
-	if err != nil {
-		return
-	}
-
-	err = viper.Unmarshal(&config)
+	config.DBDriver = os.Getenv("DB_DRIVER")
+	config.DBSource = os.Getenv("DB_SOURCE")
+	config.ServerAddress = os.Getenv("SERVER_ADDRESS")
+	config.ClerkSK = os.Getenv("CLERK_SK")
+	config.RedisAddress = os.Getenv("REDIS_ADDRESS")
 	return
 }

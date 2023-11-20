@@ -7,6 +7,13 @@ WORKDIR /app
 # Copy the entire project into the container
 COPY . .
 
+# Copy the .env file into the container only if it exists
+COPY .env .env
+
+# Set environment variables from the .env file if it exists
+RUN [ -f .env ] && export $(cat .env | xargs)
+
+
 # Build the Go application
 RUN go build -o main ./cmd/
 
