@@ -2,7 +2,7 @@
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
 import { useFetch } from "../../../lib/utils"
-
+import { useItems } from "@/app/(app-page)/app/hooks/items";
 import { Client } from "@clerk/nextjs/server";
 
 // Dummy inventory data
@@ -51,17 +51,23 @@ const initialInventory = [
 
 export default  function InventoryTable(){
   let data = initialInventory;
-  let authFetch = useFetch()
-  try{
-    //data = await authFetch("http://localhost:8080/store/1391/inventory/");
-  }
-  catch{
 
+  const itemQuery = useItems("1")
+
+  if (itemQuery.isLoading){
+    return (<div>
+      LOADING...
+    </div>)
+  } else if (itemQuery.isError){
+    console.log("Error loading items:", itemQuery.error)
+    return (<div>
+      There was an error loading your items. Please try again!
+    </div>)
   }
 
   return(
     <div>
-      <DataTable columns = {columns} data = {data} />
+      <DataTable columns = {columns} data = {itemQuery.data} />
     </div>
   );
 }

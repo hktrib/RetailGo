@@ -21,14 +21,15 @@ func LoadConfig() (config Config, err error) {
 
 	// viper.AutomaticEnv()
 
-	config.DBDriver = os.Getenv("DB_DRIVER")
-	config.DBSource = os.Getenv("DB_SOURCE")
+	config.DBDriver = "postgres"                                                                                 //os.Getenv("DB_DRIVER")
+	config.DBSource = "postgresql://postgres:76ashcuCoOhkEhgb@db.zvevvgcnviqxagbysekg.supabase.co:5432/postgres" // os.Getenv("DB_SOURCE")
 	config.ServerAddress = envPortOr("8080")
-	config.ClerkSK = os.Getenv("CLERK_SK")
-	config.RedisAddress = os.Getenv("REDIS_ADDRESS")
-	config.StripeSK = os.Getenv("STRIPE_SK")
+	config.ClerkSK = "sk_test_wCmeudOz44ArIXVFbzTjFOOqhbPquW94kdazRMmjfQ"
+	fmt.Println("ClerkSK:", config.ClerkSK)
+	config.RedisAddress = "redis://default:HBCmEOKMFFGN6525oJombkA6IfnfKaHn@viaduct.proxy.rlwy.net:38806"
+	config.StripeSK = "sk_test_51ODz7pHWQUATs9zV4fWYLtRag0GwwLPticrlOe5FqicEWwdnWUlsZkRh90o1YOkt3qsOduJQNSbbUJupkm4i9xLm00hcffWjDm"
 
-	fmt.Println(config)
+	// fmt.Println(config)
 
 	return
 }

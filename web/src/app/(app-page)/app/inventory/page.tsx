@@ -1,6 +1,7 @@
 import AddItemDialog from "@/components/app-page/item-dialog";
 import InventoryTable from "@/components/app-page/inventory-table";
 import { Item } from "@/models/item";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
 export default function Inventory() {
   const stats = [
@@ -30,6 +31,8 @@ export default function Inventory() {
     },
   ];
 
+  const newItem = new Item()
+
   return (
     <main className="bg-gray-50 h-full flex-grow">
       <div className="py-6 px-6 md:px-8 max-w-6xl mx-auto lg:ml-0">
@@ -37,7 +40,7 @@ export default function Inventory() {
           <h1 className="text-2xl font-bold">Inventory</h1>
 
           <div>
-            <AddItemDialog item={new Item} />
+            <AddItemDialog item = {newItem}/>
           </div>
         </div>
         <hr className="my-4" />
