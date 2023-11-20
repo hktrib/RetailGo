@@ -3,7 +3,6 @@ import { headers } from "next/headers";
 import { clerkClient } from "@clerk/nextjs";
 import { Webhook } from "svix";
 import type { User } from "@clerk/nextjs/api";
-import { useAuth } from "@clerk/nextjs";
 
 type UnwantedKeys = "emailAddresses" | "primaryEmailAddressId" | "id";
 
@@ -14,15 +13,6 @@ interface UserInterface extends Omit<User, UnwantedKeys> {
   }[];
   primary_email_address_id: string;
   id: string;
-}
-
-
-interface RequestBody{
-  username : string, 
-  is_owner : boolean, 
-  real_name : string, 
-  email : string, 
-  
 }
 
 type Event = {
@@ -80,33 +70,8 @@ export async function POST(req: NextRequest) {
 
     const email = emailObject.email_address;
 
-    const requestBody<RequestBody> = {}
-
     // add user to db:
-    fetch("https://retailgo-production.up.railway.app/create/user", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestBody),
-    }).then((response) => {
-      if (response.ok) {
-        console.log("User data successfully sent to backend API");
-        return NextResponse.json({ status: 200 });
-      } else {
-        console.error("Error sending user data to backend API:", response.status);
-        return new Response("Error sending user data", {
-          status: 500,
-        });
-      }
-    })
-    .catch((error) => {
-      console.error("Error fetching backend API:", error);
-      return new Response("Error fetching backend API", {
-        status: 500,
-      });
-    });
-    }
+  }
 
   return NextResponse.json({ status: 200 });
 }
