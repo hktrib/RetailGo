@@ -2,27 +2,13 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuLabel,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, MoreHorizontal, PencilIcon, Trash2 } from "lucide-react";
+import React, { useState } from 'react';
+import { Employee } from "@/models/employee";
 
-export type EmployeeItem = {
-  name: string;
-  employeeId: string;
-  position: string;
-  department: string;
-  hireDate: string;
-  location: string;
-};
 
-export const columns: ColumnDef<EmployeeItem>[] = [
+export const columns: ColumnDef<Employee>[] = [
   {
     accessorKey: "employeeId",
     header: () => <div className="text-xs">ID</div>,
@@ -55,21 +41,5 @@ export const columns: ColumnDef<EmployeeItem>[] = [
     accessorKey: "hireDate",
     header: () => <div className="text-xs">ID</div>,
   },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      return (
-        <div className="text-right flex flex-row space-x-2 h-8 w-8 p-0">
-          <button onClick={() => console.log("Edit button clicked")}>
-            <PencilIcon style={{ color: "orange" }} className="h-5 w-5 p-0"></PencilIcon>
-          </button>
-          <button onClick={() => console.log("Delete button clicked")}>
-            <Trash2 style={{ color: "red" }} className="h-5 w-5 p-0"></Trash2>
-          </button>
-        </div>
-
-      );
-    },
-  },
 ];
+

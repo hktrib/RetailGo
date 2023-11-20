@@ -1,17 +1,10 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
+import React, { useState } from 'react';
 
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuLabel,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, PencilIcon, Trash2 } from "lucide-react";
 
 export type InventoryItem = {
   id: number;
@@ -21,6 +14,12 @@ export type InventoryItem = {
   price: number;
   quantity: number;
 };
+
+
+// Inside your component
+const [isEditing, setIsEditing] = useState(false);
+const [selectedEmployee, setSelectedEmployee] = useState(null);
+
 
 export const columns: ColumnDef<InventoryItem>[] = [
   {
@@ -93,21 +92,13 @@ export const columns: ColumnDef<InventoryItem>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       return (
-        <div className="text-right">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Edit</DropdownMenuItem>
-              <DropdownMenuItem>Delete</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="text-right flex flex-row space-x-2 h-8 w-8 p-0">
+          <button onClick={() => console.log("Edit button clicked")}>
+            <PencilIcon style={{ color: "orange" }} className="h-5 w-5 p-0"></PencilIcon>
+          </button>
+          <button onClick={() => console.log("Delete button clicked")}>
+            <Trash2 style={{ color: "red" }} className="h-5 w-5 p-0"></Trash2>
+          </button>
         </div>
       );
     },

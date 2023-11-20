@@ -26,21 +26,32 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import InviteEmployee from "../invite-employee";
-import AddEmployee from "../add-employee";
+import AddEmployee from "../employee-dialog";
+import { PencilIcon, Trash2 } from "lucide-react";
+import { Employee } from "@/models/employee";
+import AddItemDialog from "../add-item-dialog";
+import EmployeeDialog from "../employee-dialog";
 
-interface DataTableProps<TData, TValue> {
+
+
+interface DataTableProps<TData extends Employee, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function DataTable<TData, TValue>({
+
+
+export function DataTable<TData extends Employee, TValue>({
   columns,
   data,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<Employee, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [editingCell, setEditingCell] = useState<{ rowIndex: number; columnId: string } | null>(null);
-
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
+  let employeeObj = new Employee();
   const table = useReactTable({
     data,
     columns,
@@ -58,7 +69,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center justify-between py-4">
+      <div className="flex items-center  justify-between py-4">
         <Input
           placeholder="Search employees..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -68,10 +79,9 @@ export function DataTable<TData, TValue>({
           className="max-w-sm"
         />
         <div className="flex items-center space-x-5">
-          <AddEmployee />
+          <AddEmployee employeeData={new Employee} mode="add" />
           <InviteEmployee />
         </div>
-
       </div>
 
       <div className="rounded-md border">
@@ -109,6 +119,14 @@ export function DataTable<TData, TValue>({
                       )}
                     </TableCell>
                   ))}
+                  <TableCell>
+                    <div className="text-right flex flex-row space-x-2 h-8 w-8 p-0">
+                      <EmployeeDialog employeeData={row.original} mode="edit" />
+                      <button onClick={() => console.log("Delete button clicked")}>
+                        <Trash2 style={{ color: "red" }} className="h-5 w-5 p-0"></Trash2>
+                      </button>
+                    </div>                  
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
@@ -144,5 +162,6 @@ export function DataTable<TData, TValue>({
         </Button>
       </div>
     </div>
+
   );
 }

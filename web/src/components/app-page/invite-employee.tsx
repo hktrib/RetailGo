@@ -34,7 +34,7 @@ const form = useForm<z.infer <typeof formSchema>>({
   });;
 
   const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (data) => {
-    try {p
+    try {
       const response = await fetch('/ai/send-invite', {
         method: 'POST',
         headers: {
