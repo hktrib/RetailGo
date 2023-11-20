@@ -73,7 +73,7 @@ func main() {
 		srv.Router.Use(injectActiveSession)
 
 		srv.MountHandlers()
-		err := http.ListenAndServe(fmt.Sprintf(":%s", config.ServerAddress), srv.Router)
+		err := http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", config.ServerAddress), srv.Router)
 		if err != nil {
 			log.Fatal().Err(err).Msg("failed in starting server")
 		}
