@@ -10,9 +10,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/hktrib/RetailGo/internal/ent/category"
-	"github.com/hktrib/RetailGo/internal/ent/item"
 	"github.com/hktrib/RetailGo/internal/ent/predicate"
+	"github.com/hktrib/RetailGo/internal/ent/store"
+	"github.com/hktrib/RetailGo/internal/ent/user"
 	"github.com/hktrib/RetailGo/internal/ent/usertostore"
 )
 
@@ -48,9 +48,23 @@ func (utsu *UserToStoreUpdate) SetPermissionLevel(i int) *UserToStoreUpdate {
 	return utsu
 }
 
+// SetNillablePermissionLevel sets the "permission_level" field if the given value is not nil.
+func (utsu *UserToStoreUpdate) SetNillablePermissionLevel(i *int) *UserToStoreUpdate {
+	if i != nil {
+		utsu.SetPermissionLevel(*i)
+	}
+	return utsu
+}
+
 // AddPermissionLevel adds i to the "permission_level" field.
 func (utsu *UserToStoreUpdate) AddPermissionLevel(i int) *UserToStoreUpdate {
 	utsu.mutation.AddPermissionLevel(i)
+	return utsu
+}
+
+// ClearPermissionLevel clears the value of the "permission_level" field.
+func (utsu *UserToStoreUpdate) ClearPermissionLevel() *UserToStoreUpdate {
+	utsu.mutation.ClearPermissionLevel()
 	return utsu
 }
 
@@ -61,20 +75,34 @@ func (utsu *UserToStoreUpdate) SetJoinedAt(i int) *UserToStoreUpdate {
 	return utsu
 }
 
+// SetNillableJoinedAt sets the "joined_at" field if the given value is not nil.
+func (utsu *UserToStoreUpdate) SetNillableJoinedAt(i *int) *UserToStoreUpdate {
+	if i != nil {
+		utsu.SetJoinedAt(*i)
+	}
+	return utsu
+}
+
 // AddJoinedAt adds i to the "joined_at" field.
 func (utsu *UserToStoreUpdate) AddJoinedAt(i int) *UserToStoreUpdate {
 	utsu.mutation.AddJoinedAt(i)
 	return utsu
 }
 
-// SetUser sets the "user" edge to the Category entity.
-func (utsu *UserToStoreUpdate) SetUser(c *Category) *UserToStoreUpdate {
-	return utsu.SetUserID(c.ID)
+// ClearJoinedAt clears the value of the "joined_at" field.
+func (utsu *UserToStoreUpdate) ClearJoinedAt() *UserToStoreUpdate {
+	utsu.mutation.ClearJoinedAt()
+	return utsu
 }
 
-// SetStore sets the "store" edge to the Item entity.
-func (utsu *UserToStoreUpdate) SetStore(i *Item) *UserToStoreUpdate {
-	return utsu.SetStoreID(i.ID)
+// SetUser sets the "user" edge to the User entity.
+func (utsu *UserToStoreUpdate) SetUser(u *User) *UserToStoreUpdate {
+	return utsu.SetUserID(u.ID)
+}
+
+// SetStore sets the "store" edge to the Store entity.
+func (utsu *UserToStoreUpdate) SetStore(s *Store) *UserToStoreUpdate {
+	return utsu.SetStoreID(s.ID)
 }
 
 // Mutation returns the UserToStoreMutation object of the builder.
@@ -82,13 +110,13 @@ func (utsu *UserToStoreUpdate) Mutation() *UserToStoreMutation {
 	return utsu.mutation
 }
 
-// ClearUser clears the "user" edge to the Category entity.
+// ClearUser clears the "user" edge to the User entity.
 func (utsu *UserToStoreUpdate) ClearUser() *UserToStoreUpdate {
 	utsu.mutation.ClearUser()
 	return utsu
 }
 
-// ClearStore clears the "store" edge to the Item entity.
+// ClearStore clears the "store" edge to the Store entity.
 func (utsu *UserToStoreUpdate) ClearStore() *UserToStoreUpdate {
 	utsu.mutation.ClearStore()
 	return utsu
@@ -150,11 +178,17 @@ func (utsu *UserToStoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := utsu.mutation.AddedPermissionLevel(); ok {
 		_spec.AddField(usertostore.FieldPermissionLevel, field.TypeInt, value)
 	}
+	if utsu.mutation.PermissionLevelCleared() {
+		_spec.ClearField(usertostore.FieldPermissionLevel, field.TypeInt)
+	}
 	if value, ok := utsu.mutation.JoinedAt(); ok {
 		_spec.SetField(usertostore.FieldJoinedAt, field.TypeInt, value)
 	}
 	if value, ok := utsu.mutation.AddedJoinedAt(); ok {
 		_spec.AddField(usertostore.FieldJoinedAt, field.TypeInt, value)
+	}
+	if utsu.mutation.JoinedAtCleared() {
+		_spec.ClearField(usertostore.FieldJoinedAt, field.TypeInt)
 	}
 	if utsu.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -164,7 +198,7 @@ func (utsu *UserToStoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{usertostore.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -177,7 +211,7 @@ func (utsu *UserToStoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{usertostore.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -193,7 +227,7 @@ func (utsu *UserToStoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{usertostore.StoreColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -206,7 +240,7 @@ func (utsu *UserToStoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{usertostore.StoreColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -253,9 +287,23 @@ func (utsuo *UserToStoreUpdateOne) SetPermissionLevel(i int) *UserToStoreUpdateO
 	return utsuo
 }
 
+// SetNillablePermissionLevel sets the "permission_level" field if the given value is not nil.
+func (utsuo *UserToStoreUpdateOne) SetNillablePermissionLevel(i *int) *UserToStoreUpdateOne {
+	if i != nil {
+		utsuo.SetPermissionLevel(*i)
+	}
+	return utsuo
+}
+
 // AddPermissionLevel adds i to the "permission_level" field.
 func (utsuo *UserToStoreUpdateOne) AddPermissionLevel(i int) *UserToStoreUpdateOne {
 	utsuo.mutation.AddPermissionLevel(i)
+	return utsuo
+}
+
+// ClearPermissionLevel clears the value of the "permission_level" field.
+func (utsuo *UserToStoreUpdateOne) ClearPermissionLevel() *UserToStoreUpdateOne {
+	utsuo.mutation.ClearPermissionLevel()
 	return utsuo
 }
 
@@ -266,20 +314,34 @@ func (utsuo *UserToStoreUpdateOne) SetJoinedAt(i int) *UserToStoreUpdateOne {
 	return utsuo
 }
 
+// SetNillableJoinedAt sets the "joined_at" field if the given value is not nil.
+func (utsuo *UserToStoreUpdateOne) SetNillableJoinedAt(i *int) *UserToStoreUpdateOne {
+	if i != nil {
+		utsuo.SetJoinedAt(*i)
+	}
+	return utsuo
+}
+
 // AddJoinedAt adds i to the "joined_at" field.
 func (utsuo *UserToStoreUpdateOne) AddJoinedAt(i int) *UserToStoreUpdateOne {
 	utsuo.mutation.AddJoinedAt(i)
 	return utsuo
 }
 
-// SetUser sets the "user" edge to the Category entity.
-func (utsuo *UserToStoreUpdateOne) SetUser(c *Category) *UserToStoreUpdateOne {
-	return utsuo.SetUserID(c.ID)
+// ClearJoinedAt clears the value of the "joined_at" field.
+func (utsuo *UserToStoreUpdateOne) ClearJoinedAt() *UserToStoreUpdateOne {
+	utsuo.mutation.ClearJoinedAt()
+	return utsuo
 }
 
-// SetStore sets the "store" edge to the Item entity.
-func (utsuo *UserToStoreUpdateOne) SetStore(i *Item) *UserToStoreUpdateOne {
-	return utsuo.SetStoreID(i.ID)
+// SetUser sets the "user" edge to the User entity.
+func (utsuo *UserToStoreUpdateOne) SetUser(u *User) *UserToStoreUpdateOne {
+	return utsuo.SetUserID(u.ID)
+}
+
+// SetStore sets the "store" edge to the Store entity.
+func (utsuo *UserToStoreUpdateOne) SetStore(s *Store) *UserToStoreUpdateOne {
+	return utsuo.SetStoreID(s.ID)
 }
 
 // Mutation returns the UserToStoreMutation object of the builder.
@@ -287,13 +349,13 @@ func (utsuo *UserToStoreUpdateOne) Mutation() *UserToStoreMutation {
 	return utsuo.mutation
 }
 
-// ClearUser clears the "user" edge to the Category entity.
+// ClearUser clears the "user" edge to the User entity.
 func (utsuo *UserToStoreUpdateOne) ClearUser() *UserToStoreUpdateOne {
 	utsuo.mutation.ClearUser()
 	return utsuo
 }
 
-// ClearStore clears the "store" edge to the Item entity.
+// ClearStore clears the "store" edge to the Store entity.
 func (utsuo *UserToStoreUpdateOne) ClearStore() *UserToStoreUpdateOne {
 	utsuo.mutation.ClearStore()
 	return utsuo
@@ -387,11 +449,17 @@ func (utsuo *UserToStoreUpdateOne) sqlSave(ctx context.Context) (_node *UserToSt
 	if value, ok := utsuo.mutation.AddedPermissionLevel(); ok {
 		_spec.AddField(usertostore.FieldPermissionLevel, field.TypeInt, value)
 	}
+	if utsuo.mutation.PermissionLevelCleared() {
+		_spec.ClearField(usertostore.FieldPermissionLevel, field.TypeInt)
+	}
 	if value, ok := utsuo.mutation.JoinedAt(); ok {
 		_spec.SetField(usertostore.FieldJoinedAt, field.TypeInt, value)
 	}
 	if value, ok := utsuo.mutation.AddedJoinedAt(); ok {
 		_spec.AddField(usertostore.FieldJoinedAt, field.TypeInt, value)
+	}
+	if utsuo.mutation.JoinedAtCleared() {
+		_spec.ClearField(usertostore.FieldJoinedAt, field.TypeInt)
 	}
 	if utsuo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -401,7 +469,7 @@ func (utsuo *UserToStoreUpdateOne) sqlSave(ctx context.Context) (_node *UserToSt
 			Columns: []string{usertostore.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -414,7 +482,7 @@ func (utsuo *UserToStoreUpdateOne) sqlSave(ctx context.Context) (_node *UserToSt
 			Columns: []string{usertostore.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -430,7 +498,7 @@ func (utsuo *UserToStoreUpdateOne) sqlSave(ctx context.Context) (_node *UserToSt
 			Columns: []string{usertostore.StoreColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -443,7 +511,7 @@ func (utsuo *UserToStoreUpdateOne) sqlSave(ctx context.Context) (_node *UserToSt
 			Columns: []string{usertostore.StoreColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

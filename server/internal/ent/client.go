@@ -1158,14 +1158,14 @@ func (c *UserToStoreClient) Query() *UserToStoreQuery {
 }
 
 // QueryUser queries the user edge of a UserToStore.
-func (c *UserToStoreClient) QueryUser(uts *UserToStore) *CategoryQuery {
+func (c *UserToStoreClient) QueryUser(uts *UserToStore) *UserQuery {
 	return c.Query().
 		Where(usertostore.UserID(uts.UserID), usertostore.StoreID(uts.StoreID)).
 		QueryUser()
 }
 
 // QueryStore queries the store edge of a UserToStore.
-func (c *UserToStoreClient) QueryStore(uts *UserToStore) *ItemQuery {
+func (c *UserToStoreClient) QueryStore(uts *UserToStore) *StoreQuery {
 	return c.Query().
 		Where(usertostore.UserID(uts.UserID), usertostore.StoreID(uts.StoreID)).
 		QueryStore()

@@ -22,14 +22,14 @@ func (UserToStore) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("user_id"),
 		field.Int("store_id"),
-		field.Int("permission_level"),
-		field.Int("joined_at"),
+		field.Int("permission_level").Optional(),
+		field.Int("joined_at").Optional(),
 	}
 }
 
 func (UserToStore) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("user", Category.Type).Unique().Required().Field("user_id"),
-		edge.To("store", Item.Type).Unique().Required().Field("store_id"),
+		edge.To("user", User.Type).Unique().Required().Field("user_id"),
+		edge.To("store", Store.Type).Unique().Required().Field("store_id"),
 	}
 }

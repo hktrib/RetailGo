@@ -9,9 +9,9 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/hktrib/RetailGo/internal/ent/category"
-	"github.com/hktrib/RetailGo/internal/ent/item"
 	"github.com/hktrib/RetailGo/internal/ent/predicate"
+	"github.com/hktrib/RetailGo/internal/ent/store"
+	"github.com/hktrib/RetailGo/internal/ent/user"
 	"github.com/hktrib/RetailGo/internal/ent/usertostore"
 )
 
@@ -22,8 +22,8 @@ type UserToStoreQuery struct {
 	order      []usertostore.OrderOption
 	inters     []Interceptor
 	predicates []predicate.UserToStore
-	withUser   *CategoryQuery
-	withStore  *ItemQuery
+	withUser   *UserQuery
+	withStore  *StoreQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -61,8 +61,8 @@ func (utsq *UserToStoreQuery) Order(o ...usertostore.OrderOption) *UserToStoreQu
 }
 
 // QueryUser chains the current query on the "user" edge.
-func (utsq *UserToStoreQuery) QueryUser() *CategoryQuery {
-	query := (&CategoryClient{config: utsq.config}).Query()
+func (utsq *UserToStoreQuery) QueryUser() *UserQuery {
+	query := (&UserClient{config: utsq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := utsq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -73,7 +73,7 @@ func (utsq *UserToStoreQuery) QueryUser() *CategoryQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(usertostore.Table, usertostore.UserColumn, selector),
-			sqlgraph.To(category.Table, category.FieldID),
+			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, usertostore.UserTable, usertostore.UserColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(utsq.driver.Dialect(), step)
@@ -83,8 +83,8 @@ func (utsq *UserToStoreQuery) QueryUser() *CategoryQuery {
 }
 
 // QueryStore chains the current query on the "store" edge.
-func (utsq *UserToStoreQuery) QueryStore() *ItemQuery {
-	query := (&ItemClient{config: utsq.config}).Query()
+func (utsq *UserToStoreQuery) QueryStore() *StoreQuery {
+	query := (&StoreClient{config: utsq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := utsq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -95,7 +95,7 @@ func (utsq *UserToStoreQuery) QueryStore() *ItemQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(usertostore.Table, usertostore.StoreColumn, selector),
-			sqlgraph.To(item.Table, item.FieldID),
+			sqlgraph.To(store.Table, store.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, usertostore.StoreTable, usertostore.StoreColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(utsq.driver.Dialect(), step)
@@ -234,8 +234,8 @@ func (utsq *UserToStoreQuery) Clone() *UserToStoreQuery {
 
 // WithUser tells the query-builder to eager-load the nodes that are connected to
 // the "user" edge. The optional arguments are used to configure the query builder of the edge.
-func (utsq *UserToStoreQuery) WithUser(opts ...func(*CategoryQuery)) *UserToStoreQuery {
-	query := (&CategoryClient{config: utsq.config}).Query()
+func (utsq *UserToStoreQuery) WithUser(opts ...func(*UserQuery)) *UserToStoreQuery {
+	query := (&UserClient{config: utsq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -245,8 +245,8 @@ func (utsq *UserToStoreQuery) WithUser(opts ...func(*CategoryQuery)) *UserToStor
 
 // WithStore tells the query-builder to eager-load the nodes that are connected to
 // the "store" edge. The optional arguments are used to configure the query builder of the edge.
-func (utsq *UserToStoreQuery) WithStore(opts ...func(*ItemQuery)) *UserToStoreQuery {
-	query := (&ItemClient{config: utsq.config}).Query()
+func (utsq *UserToStoreQuery) WithStore(opts ...func(*StoreQuery)) *UserToStoreQuery {
+	query := (&StoreClient{config: utsq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -357,20 +357,20 @@ func (utsq *UserToStoreQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 	}
 	if query := utsq.withUser; query != nil {
 		if err := utsq.loadUser(ctx, query, nodes, nil,
-			func(n *UserToStore, e *Category) { n.Edges.User = e }); err != nil {
+			func(n *UserToStore, e *User) { n.Edges.User = e }); err != nil {
 			return nil, err
 		}
 	}
 	if query := utsq.withStore; query != nil {
 		if err := utsq.loadStore(ctx, query, nodes, nil,
-			func(n *UserToStore, e *Item) { n.Edges.Store = e }); err != nil {
+			func(n *UserToStore, e *Store) { n.Edges.Store = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (utsq *UserToStoreQuery) loadUser(ctx context.Context, query *CategoryQuery, nodes []*UserToStore, init func(*UserToStore), assign func(*UserToStore, *Category)) error {
+func (utsq *UserToStoreQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*UserToStore, init func(*UserToStore), assign func(*UserToStore, *User)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*UserToStore)
 	for i := range nodes {
@@ -383,7 +383,7 @@ func (utsq *UserToStoreQuery) loadUser(ctx context.Context, query *CategoryQuery
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(category.IDIn(ids...))
+	query.Where(user.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -399,7 +399,7 @@ func (utsq *UserToStoreQuery) loadUser(ctx context.Context, query *CategoryQuery
 	}
 	return nil
 }
-func (utsq *UserToStoreQuery) loadStore(ctx context.Context, query *ItemQuery, nodes []*UserToStore, init func(*UserToStore), assign func(*UserToStore, *Item)) error {
+func (utsq *UserToStoreQuery) loadStore(ctx context.Context, query *StoreQuery, nodes []*UserToStore, init func(*UserToStore), assign func(*UserToStore, *Store)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*UserToStore)
 	for i := range nodes {
@@ -412,7 +412,7 @@ func (utsq *UserToStoreQuery) loadStore(ctx context.Context, query *ItemQuery, n
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(item.IDIn(ids...))
+	query.Where(store.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err

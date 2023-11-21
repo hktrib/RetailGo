@@ -3,7 +3,6 @@ import { headers } from "next/headers";
 import { clerkClient } from "@clerk/nextjs";
 import { Webhook } from "svix";
 import type { User } from "@clerk/nextjs/api";
-import { useAuth } from "@clerk/nextjs";
 
 type UnwantedKeys = "emailAddresses" | "primaryEmailAddressId" | "id";
 
@@ -72,13 +71,6 @@ export async function POST(req: NextRequest) {
     const email = emailObject.email_address;
 
     // add user to db:
-    fetch("https://retailgo-production.up.railway.app/create/user", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-    
   }
 
   return NextResponse.json({ status: 200 });
