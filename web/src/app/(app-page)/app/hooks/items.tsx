@@ -41,11 +41,7 @@ export function useItems(store: string){
     return useQuery(
         {
             queryKey: ["items", store], 
-            // queryFn: () => authFetch(storeURL + store + "/inventory/"),
-            queryFn: ({queryKey}) => {
-                return wait(1000)
-              }
-        },
-        queryClient
+            queryFn: () => authFetch(storeURL + store + "/inventory/"),
+        }
     )
 }
