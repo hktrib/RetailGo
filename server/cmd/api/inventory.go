@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"io"
 
+	. "github.com/hktrib/RetailGo/cmd/api/stripe-components"
+
 	"net/http"
 	"strconv"
-
-	. "github.com/hktrib/RetailGo/stripe-components"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/hktrib/RetailGo/internal/ent"
@@ -155,7 +155,7 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("req_item:", req_item.Price, req_item.Name, ProductId.DefaultPrice.ID, req_item.Photo, req_item.Quantity, store_id)
 
-	createdItem, create_err := srv.DBClient.Item.Create().SetPrice(float64(req_item.Price)).SetName(req_item.Name).SetStripePriceID(ProductId.DefaultPrice.ID).SetPhoto([]byte(req_item.Photo)).SetQuantity(req_item.Quantity).SetStoreID(store_id).Save(ctx)
+	createdItem, create_err := srv.DBClient.Item.Create().SetPrice(float64(req_item.Price)).SetName(req_item.Name).SetStripePriceID(ProductId.DefaultPrice.ID).SetStripeProductID(ProductId.ID).SetPhoto([]byte(req_item.Photo)).SetQuantity(req_item.Quantity).SetStoreID(store_id).Save(ctx)
 	// If this create doesn't work, InternalServerError
 	if create_err != nil {
 		fmt.Println("Create didn't work:", create_err)
@@ -201,7 +201,7 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = targetItem.Update().SetQuantity(change).
+	_, err = targetItem.Update().SetQuantity(targetItem.Quantity - change).
 		Save(r.Context())
 
 	if err != nil {

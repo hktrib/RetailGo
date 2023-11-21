@@ -3,7 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	. "github.com/hktrib/RetailGo/stripe-components"
+	. "github.com/hktrib/RetailGo/cmd/api/stripe-components"
 	"io"
 	"net/http"
 	"strconv"

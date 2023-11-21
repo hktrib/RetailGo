@@ -5,6 +5,7 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 )
 
 // Item holds the schema definition for the Item entity.
@@ -24,6 +25,7 @@ func (Item) Fields() []ent.Field {
 			}),
 		field.Int("store_id"),
 		field.String("stripe_price_id"),
+		field.String("stripe_product_id"),
 	}
 }
 
@@ -31,5 +33,13 @@ func (Item) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("category", Category.Type).Ref("items").Through("category_item", CategoryItem.Type),
 		edge.From("store", Store.Type).Ref("items").Required().Field("store_id").Unique(),
+	}
+}
+
+func (Item) Indexes() []ent.Index {
+	return []ent.Index{
+
+		index.Fields("id"),
+		index.Fields("stripe_product_id"),
 	}
 }

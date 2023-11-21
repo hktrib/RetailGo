@@ -1003,25 +1003,26 @@ func (m *CategoryItemMutation) ResetEdge(name string) error {
 // ItemMutation represents an operation that mutates the Item nodes in the graph.
 type ItemMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *int
-	name            *string
-	photo           *[]byte
-	quantity        *int
-	addquantity     *int
-	price           *float64
-	addprice        *float64
-	stripe_price_id *string
-	clearedFields   map[string]struct{}
-	category        map[int]struct{}
-	removedcategory map[int]struct{}
-	clearedcategory bool
-	store           *int
-	clearedstore    bool
-	done            bool
-	oldValue        func(context.Context) (*Item, error)
-	predicates      []predicate.Item
+	op                Op
+	typ               string
+	id                *int
+	name              *string
+	photo             *[]byte
+	quantity          *int
+	addquantity       *int
+	price             *float64
+	addprice          *float64
+	stripe_price_id   *string
+	stripe_product_id *string
+	clearedFields     map[string]struct{}
+	category          map[int]struct{}
+	removedcategory   map[int]struct{}
+	clearedcategory   bool
+	store             *int
+	clearedstore      bool
+	done              bool
+	oldValue          func(context.Context) (*Item, error)
+	predicates        []predicate.Item
 }
 
 var _ ent.Mutation = (*ItemMutation)(nil)
@@ -1384,6 +1385,42 @@ func (m *ItemMutation) ResetStripePriceID() {
 	m.stripe_price_id = nil
 }
 
+// SetStripeProductID sets the "stripe_product_id" field.
+func (m *ItemMutation) SetStripeProductID(s string) {
+	m.stripe_product_id = &s
+}
+
+// StripeProductID returns the value of the "stripe_product_id" field in the mutation.
+func (m *ItemMutation) StripeProductID() (r string, exists bool) {
+	v := m.stripe_product_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStripeProductID returns the old "stripe_product_id" field's value of the Item entity.
+// If the Item object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ItemMutation) OldStripeProductID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStripeProductID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStripeProductID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStripeProductID: %w", err)
+	}
+	return oldValue.StripeProductID, nil
+}
+
+// ResetStripeProductID resets all changes to the "stripe_product_id" field.
+func (m *ItemMutation) ResetStripeProductID() {
+	m.stripe_product_id = nil
+}
+
 // AddCategoryIDs adds the "category" edge to the Category entity by ids.
 func (m *ItemMutation) AddCategoryIDs(ids ...int) {
 	if m.category == nil {
@@ -1499,7 +1536,7 @@ func (m *ItemMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ItemMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.name != nil {
 		fields = append(fields, item.FieldName)
 	}
@@ -1517,6 +1554,9 @@ func (m *ItemMutation) Fields() []string {
 	}
 	if m.stripe_price_id != nil {
 		fields = append(fields, item.FieldStripePriceID)
+	}
+	if m.stripe_product_id != nil {
+		fields = append(fields, item.FieldStripeProductID)
 	}
 	return fields
 }
@@ -1538,6 +1578,8 @@ func (m *ItemMutation) Field(name string) (ent.Value, bool) {
 		return m.StoreID()
 	case item.FieldStripePriceID:
 		return m.StripePriceID()
+	case item.FieldStripeProductID:
+		return m.StripeProductID()
 	}
 	return nil, false
 }
@@ -1559,6 +1601,8 @@ func (m *ItemMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldStoreID(ctx)
 	case item.FieldStripePriceID:
 		return m.OldStripePriceID(ctx)
+	case item.FieldStripeProductID:
+		return m.OldStripeProductID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Item field %s", name)
 }
@@ -1609,6 +1653,13 @@ func (m *ItemMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStripePriceID(v)
+		return nil
+	case item.FieldStripeProductID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStripeProductID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Item field %s", name)
@@ -1703,6 +1754,9 @@ func (m *ItemMutation) ResetField(name string) error {
 		return nil
 	case item.FieldStripePriceID:
 		m.ResetStripePriceID()
+		return nil
+	case item.FieldStripeProductID:
+		m.ResetStripeProductID()
 		return nil
 	}
 	return fmt.Errorf("unknown Item field %s", name)
@@ -3631,10 +3685,24 @@ func (m *UserToStoreMutation) AddedPermissionLevel() (r int, exists bool) {
 	return *v, true
 }
 
+// ClearPermissionLevel clears the value of the "permission_level" field.
+func (m *UserToStoreMutation) ClearPermissionLevel() {
+	m.permission_level = nil
+	m.addpermission_level = nil
+	m.clearedFields[usertostore.FieldPermissionLevel] = struct{}{}
+}
+
+// PermissionLevelCleared returns if the "permission_level" field was cleared in this mutation.
+func (m *UserToStoreMutation) PermissionLevelCleared() bool {
+	_, ok := m.clearedFields[usertostore.FieldPermissionLevel]
+	return ok
+}
+
 // ResetPermissionLevel resets all changes to the "permission_level" field.
 func (m *UserToStoreMutation) ResetPermissionLevel() {
 	m.permission_level = nil
 	m.addpermission_level = nil
+	delete(m.clearedFields, usertostore.FieldPermissionLevel)
 }
 
 // SetJoinedAt sets the "joined_at" field.
@@ -3670,19 +3738,33 @@ func (m *UserToStoreMutation) AddedJoinedAt() (r int, exists bool) {
 	return *v, true
 }
 
+// ClearJoinedAt clears the value of the "joined_at" field.
+func (m *UserToStoreMutation) ClearJoinedAt() {
+	m.joined_at = nil
+	m.addjoined_at = nil
+	m.clearedFields[usertostore.FieldJoinedAt] = struct{}{}
+}
+
+// JoinedAtCleared returns if the "joined_at" field was cleared in this mutation.
+func (m *UserToStoreMutation) JoinedAtCleared() bool {
+	_, ok := m.clearedFields[usertostore.FieldJoinedAt]
+	return ok
+}
+
 // ResetJoinedAt resets all changes to the "joined_at" field.
 func (m *UserToStoreMutation) ResetJoinedAt() {
 	m.joined_at = nil
 	m.addjoined_at = nil
+	delete(m.clearedFields, usertostore.FieldJoinedAt)
 }
 
-// ClearUser clears the "user" edge to the Category entity.
+// ClearUser clears the "user" edge to the User entity.
 func (m *UserToStoreMutation) ClearUser() {
 	m.cleareduser = true
 	m.clearedFields[usertostore.FieldUserID] = struct{}{}
 }
 
-// UserCleared reports if the "user" edge to the Category entity was cleared.
+// UserCleared reports if the "user" edge to the User entity was cleared.
 func (m *UserToStoreMutation) UserCleared() bool {
 	return m.cleareduser
 }
@@ -3703,13 +3785,13 @@ func (m *UserToStoreMutation) ResetUser() {
 	m.cleareduser = false
 }
 
-// ClearStore clears the "store" edge to the Item entity.
+// ClearStore clears the "store" edge to the Store entity.
 func (m *UserToStoreMutation) ClearStore() {
 	m.clearedstore = true
 	m.clearedFields[usertostore.FieldStoreID] = struct{}{}
 }
 
-// StoreCleared reports if the "store" edge to the Item entity was cleared.
+// StoreCleared reports if the "store" edge to the Store entity was cleared.
 func (m *UserToStoreMutation) StoreCleared() bool {
 	return m.clearedstore
 }
@@ -3893,7 +3975,14 @@ func (m *UserToStoreMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *UserToStoreMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(usertostore.FieldPermissionLevel) {
+		fields = append(fields, usertostore.FieldPermissionLevel)
+	}
+	if m.FieldCleared(usertostore.FieldJoinedAt) {
+		fields = append(fields, usertostore.FieldJoinedAt)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -3906,6 +3995,14 @@ func (m *UserToStoreMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *UserToStoreMutation) ClearField(name string) error {
+	switch name {
+	case usertostore.FieldPermissionLevel:
+		m.ClearPermissionLevel()
+		return nil
+	case usertostore.FieldJoinedAt:
+		m.ClearJoinedAt()
+		return nil
+	}
 	return fmt.Errorf("unknown UserToStore nullable field %s", name)
 }
 
