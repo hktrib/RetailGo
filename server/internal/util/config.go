@@ -6,12 +6,14 @@ import (
 )
 
 type Config struct {
-	DBDriver      string // `"DB_DRIVER"`
-	DBSource      string // "DB_SOURCE"`
-	ServerAddress string // `"SERVER_ADDRESS"`
-	ClerkSK       string // `"CLERK_SK"`
-	RedisAddress  string // `"REDIS_ADDRESS"`
-	StripeSK      string // `"STRIPE_SK"`
+	DB_DRIVER      string // `"DB_DRIVER"`
+	DB_SOURCE      string // "DB_SOURCE"`
+	SERVER_ADDRESS string // `"SERVER_ADDRESS"`
+	CLERK_SK       string // `"CLERK_SK"`
+	REDIS_HOSTNAME string // `"REDIS_HOSTNAME"`
+	REDIS_PORT     string // `"REDIS_PORT"`
+	REDIS_PASSWORD string // `"REDIS_PASSWORD"`
+	STRIPE_SK      string // `"STRIPE_SK"`
 }
 
 func LoadConfig() (config Config, err error) {
@@ -21,12 +23,14 @@ func LoadConfig() (config Config, err error) {
 
 	// viper.AutomaticEnv()
 
-	config.DBDriver = os.Getenv("DB_DRIVER")
-	config.DBSource = os.Getenv("DB_SOURCE")
-	config.ServerAddress = envPortOr("8080")
-	config.ClerkSK = os.Getenv("CLERK_SK")
-	config.RedisAddress = os.Getenv("REDIS_ADDRESS")
-	config.StripeSK = os.Getenv("STRIPE_SK")
+	config.DB_DRIVER = os.Getenv("DB_DRIVER")
+	config.DB_SOURCE = os.Getenv("DB_SOURCE")
+	config.SERVER_ADDRESS = envPortOr("8080")
+	config.CLERK_SK = os.Getenv("CLERK_SK")
+	config.REDIS_HOSTNAME = os.Getenv("REDIS_HOSTNAME")
+	config.REDIS_PORT = os.Getenv("REDIS_PORT")
+	config.REDIS_PASSWORD = os.Getenv("REDIS_PASSWORD")
+	config.STRIPE_SK = os.Getenv("STRIPE_SK")
 
 	fmt.Println(config)
 
