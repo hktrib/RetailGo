@@ -142,7 +142,7 @@ func (srv *Server) IsOwnerCreateHandle(next http.Handler) http.Handler {
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 				return
 			}
-			srv.Cache.SetX(potentialOwner.Email, &potentialOwner, taskLifeTime)
+			srv.Cache.SetX(potentialOwner.Email, &potentialOwner, 10*taskLifeTime)
 			w.WriteHeader(http.StatusCreated)
 			w.Write([]byte("OK!"))
 			return
