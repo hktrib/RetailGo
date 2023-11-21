@@ -111,6 +111,11 @@ func (s *Server) MountHandlers() {
 				r.Post("/update", s.InvUpdate) //
 
 			})
+
+			r.Route("/staff", func(r chi.Router) {
+				r.Get("/", s.GetAllEmployees) //
+			})
+
 			r.Route("/pos", func(r chi.Router) {
 				r.Get("/checkout", s.StoreCheckout)
 			})
