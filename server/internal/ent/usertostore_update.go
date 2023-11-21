@@ -48,9 +48,23 @@ func (utsu *UserToStoreUpdate) SetPermissionLevel(i int) *UserToStoreUpdate {
 	return utsu
 }
 
+// SetNillablePermissionLevel sets the "permission_level" field if the given value is not nil.
+func (utsu *UserToStoreUpdate) SetNillablePermissionLevel(i *int) *UserToStoreUpdate {
+	if i != nil {
+		utsu.SetPermissionLevel(*i)
+	}
+	return utsu
+}
+
 // AddPermissionLevel adds i to the "permission_level" field.
 func (utsu *UserToStoreUpdate) AddPermissionLevel(i int) *UserToStoreUpdate {
 	utsu.mutation.AddPermissionLevel(i)
+	return utsu
+}
+
+// ClearPermissionLevel clears the value of the "permission_level" field.
+func (utsu *UserToStoreUpdate) ClearPermissionLevel() *UserToStoreUpdate {
+	utsu.mutation.ClearPermissionLevel()
 	return utsu
 }
 
@@ -61,9 +75,23 @@ func (utsu *UserToStoreUpdate) SetJoinedAt(i int) *UserToStoreUpdate {
 	return utsu
 }
 
+// SetNillableJoinedAt sets the "joined_at" field if the given value is not nil.
+func (utsu *UserToStoreUpdate) SetNillableJoinedAt(i *int) *UserToStoreUpdate {
+	if i != nil {
+		utsu.SetJoinedAt(*i)
+	}
+	return utsu
+}
+
 // AddJoinedAt adds i to the "joined_at" field.
 func (utsu *UserToStoreUpdate) AddJoinedAt(i int) *UserToStoreUpdate {
 	utsu.mutation.AddJoinedAt(i)
+	return utsu
+}
+
+// ClearJoinedAt clears the value of the "joined_at" field.
+func (utsu *UserToStoreUpdate) ClearJoinedAt() *UserToStoreUpdate {
+	utsu.mutation.ClearJoinedAt()
 	return utsu
 }
 
@@ -150,11 +178,17 @@ func (utsu *UserToStoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := utsu.mutation.AddedPermissionLevel(); ok {
 		_spec.AddField(usertostore.FieldPermissionLevel, field.TypeInt, value)
 	}
+	if utsu.mutation.PermissionLevelCleared() {
+		_spec.ClearField(usertostore.FieldPermissionLevel, field.TypeInt)
+	}
 	if value, ok := utsu.mutation.JoinedAt(); ok {
 		_spec.SetField(usertostore.FieldJoinedAt, field.TypeInt, value)
 	}
 	if value, ok := utsu.mutation.AddedJoinedAt(); ok {
 		_spec.AddField(usertostore.FieldJoinedAt, field.TypeInt, value)
+	}
+	if utsu.mutation.JoinedAtCleared() {
+		_spec.ClearField(usertostore.FieldJoinedAt, field.TypeInt)
 	}
 	if utsu.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -253,9 +287,23 @@ func (utsuo *UserToStoreUpdateOne) SetPermissionLevel(i int) *UserToStoreUpdateO
 	return utsuo
 }
 
+// SetNillablePermissionLevel sets the "permission_level" field if the given value is not nil.
+func (utsuo *UserToStoreUpdateOne) SetNillablePermissionLevel(i *int) *UserToStoreUpdateOne {
+	if i != nil {
+		utsuo.SetPermissionLevel(*i)
+	}
+	return utsuo
+}
+
 // AddPermissionLevel adds i to the "permission_level" field.
 func (utsuo *UserToStoreUpdateOne) AddPermissionLevel(i int) *UserToStoreUpdateOne {
 	utsuo.mutation.AddPermissionLevel(i)
+	return utsuo
+}
+
+// ClearPermissionLevel clears the value of the "permission_level" field.
+func (utsuo *UserToStoreUpdateOne) ClearPermissionLevel() *UserToStoreUpdateOne {
+	utsuo.mutation.ClearPermissionLevel()
 	return utsuo
 }
 
@@ -266,9 +314,23 @@ func (utsuo *UserToStoreUpdateOne) SetJoinedAt(i int) *UserToStoreUpdateOne {
 	return utsuo
 }
 
+// SetNillableJoinedAt sets the "joined_at" field if the given value is not nil.
+func (utsuo *UserToStoreUpdateOne) SetNillableJoinedAt(i *int) *UserToStoreUpdateOne {
+	if i != nil {
+		utsuo.SetJoinedAt(*i)
+	}
+	return utsuo
+}
+
 // AddJoinedAt adds i to the "joined_at" field.
 func (utsuo *UserToStoreUpdateOne) AddJoinedAt(i int) *UserToStoreUpdateOne {
 	utsuo.mutation.AddJoinedAt(i)
+	return utsuo
+}
+
+// ClearJoinedAt clears the value of the "joined_at" field.
+func (utsuo *UserToStoreUpdateOne) ClearJoinedAt() *UserToStoreUpdateOne {
+	utsuo.mutation.ClearJoinedAt()
 	return utsuo
 }
 
@@ -387,11 +449,17 @@ func (utsuo *UserToStoreUpdateOne) sqlSave(ctx context.Context) (_node *UserToSt
 	if value, ok := utsuo.mutation.AddedPermissionLevel(); ok {
 		_spec.AddField(usertostore.FieldPermissionLevel, field.TypeInt, value)
 	}
+	if utsuo.mutation.PermissionLevelCleared() {
+		_spec.ClearField(usertostore.FieldPermissionLevel, field.TypeInt)
+	}
 	if value, ok := utsuo.mutation.JoinedAt(); ok {
 		_spec.SetField(usertostore.FieldJoinedAt, field.TypeInt, value)
 	}
 	if value, ok := utsuo.mutation.AddedJoinedAt(); ok {
 		_spec.AddField(usertostore.FieldJoinedAt, field.TypeInt, value)
+	}
+	if utsuo.mutation.JoinedAtCleared() {
+		_spec.ClearField(usertostore.FieldJoinedAt, field.TypeInt)
 	}
 	if utsuo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -146,8 +146,8 @@ var (
 	}
 	// UserToStoresColumns holds the columns for the "user_to_stores" table.
 	UserToStoresColumns = []*schema.Column{
-		{Name: "permission_level", Type: field.TypeInt},
-		{Name: "joined_at", Type: field.TypeInt},
+		{Name: "permission_level", Type: field.TypeInt, Nullable: true},
+		{Name: "joined_at", Type: field.TypeInt, Nullable: true},
 		{Name: "user_id", Type: field.TypeInt},
 		{Name: "store_id", Type: field.TypeInt},
 	}

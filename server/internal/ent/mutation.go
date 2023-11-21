@@ -3685,10 +3685,24 @@ func (m *UserToStoreMutation) AddedPermissionLevel() (r int, exists bool) {
 	return *v, true
 }
 
+// ClearPermissionLevel clears the value of the "permission_level" field.
+func (m *UserToStoreMutation) ClearPermissionLevel() {
+	m.permission_level = nil
+	m.addpermission_level = nil
+	m.clearedFields[usertostore.FieldPermissionLevel] = struct{}{}
+}
+
+// PermissionLevelCleared returns if the "permission_level" field was cleared in this mutation.
+func (m *UserToStoreMutation) PermissionLevelCleared() bool {
+	_, ok := m.clearedFields[usertostore.FieldPermissionLevel]
+	return ok
+}
+
 // ResetPermissionLevel resets all changes to the "permission_level" field.
 func (m *UserToStoreMutation) ResetPermissionLevel() {
 	m.permission_level = nil
 	m.addpermission_level = nil
+	delete(m.clearedFields, usertostore.FieldPermissionLevel)
 }
 
 // SetJoinedAt sets the "joined_at" field.
@@ -3724,10 +3738,24 @@ func (m *UserToStoreMutation) AddedJoinedAt() (r int, exists bool) {
 	return *v, true
 }
 
+// ClearJoinedAt clears the value of the "joined_at" field.
+func (m *UserToStoreMutation) ClearJoinedAt() {
+	m.joined_at = nil
+	m.addjoined_at = nil
+	m.clearedFields[usertostore.FieldJoinedAt] = struct{}{}
+}
+
+// JoinedAtCleared returns if the "joined_at" field was cleared in this mutation.
+func (m *UserToStoreMutation) JoinedAtCleared() bool {
+	_, ok := m.clearedFields[usertostore.FieldJoinedAt]
+	return ok
+}
+
 // ResetJoinedAt resets all changes to the "joined_at" field.
 func (m *UserToStoreMutation) ResetJoinedAt() {
 	m.joined_at = nil
 	m.addjoined_at = nil
+	delete(m.clearedFields, usertostore.FieldJoinedAt)
 }
 
 // ClearUser clears the "user" edge to the Category entity.
@@ -3947,7 +3975,14 @@ func (m *UserToStoreMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *UserToStoreMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(usertostore.FieldPermissionLevel) {
+		fields = append(fields, usertostore.FieldPermissionLevel)
+	}
+	if m.FieldCleared(usertostore.FieldJoinedAt) {
+		fields = append(fields, usertostore.FieldJoinedAt)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -3960,6 +3995,14 @@ func (m *UserToStoreMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *UserToStoreMutation) ClearField(name string) error {
+	switch name {
+	case usertostore.FieldPermissionLevel:
+		m.ClearPermissionLevel()
+		return nil
+	case usertostore.FieldJoinedAt:
+		m.ClearJoinedAt()
+		return nil
+	}
 	return fmt.Errorf("unknown UserToStore nullable field %s", name)
 }
 

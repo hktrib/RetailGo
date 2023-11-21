@@ -39,9 +39,25 @@ func (utsc *UserToStoreCreate) SetPermissionLevel(i int) *UserToStoreCreate {
 	return utsc
 }
 
+// SetNillablePermissionLevel sets the "permission_level" field if the given value is not nil.
+func (utsc *UserToStoreCreate) SetNillablePermissionLevel(i *int) *UserToStoreCreate {
+	if i != nil {
+		utsc.SetPermissionLevel(*i)
+	}
+	return utsc
+}
+
 // SetJoinedAt sets the "joined_at" field.
 func (utsc *UserToStoreCreate) SetJoinedAt(i int) *UserToStoreCreate {
 	utsc.mutation.SetJoinedAt(i)
+	return utsc
+}
+
+// SetNillableJoinedAt sets the "joined_at" field if the given value is not nil.
+func (utsc *UserToStoreCreate) SetNillableJoinedAt(i *int) *UserToStoreCreate {
+	if i != nil {
+		utsc.SetJoinedAt(*i)
+	}
 	return utsc
 }
 
@@ -94,12 +110,6 @@ func (utsc *UserToStoreCreate) check() error {
 	}
 	if _, ok := utsc.mutation.StoreID(); !ok {
 		return &ValidationError{Name: "store_id", err: errors.New(`ent: missing required field "UserToStore.store_id"`)}
-	}
-	if _, ok := utsc.mutation.PermissionLevel(); !ok {
-		return &ValidationError{Name: "permission_level", err: errors.New(`ent: missing required field "UserToStore.permission_level"`)}
-	}
-	if _, ok := utsc.mutation.JoinedAt(); !ok {
-		return &ValidationError{Name: "joined_at", err: errors.New(`ent: missing required field "UserToStore.joined_at"`)}
 	}
 	if _, ok := utsc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "UserToStore.user"`)}
