@@ -30,7 +30,8 @@ const formSchema = z.object({
   name: z.string(),
   price: z.coerce.number(),
   quantity: z.coerce.number(),
-  category: z.string()
+  category: z.string(),
+  id: z.optional(z.string())
 });
 
 export default function ItemDialog({ item, mode = 'add' }: { item: Item, mode?: string }) {
@@ -51,28 +52,44 @@ export default function ItemDialog({ item, mode = 'add' }: { item: Item, mode?: 
 
   const onNewItem: SubmitHandler<z.infer<typeof formSchema>> = async (values: z.infer<typeof formSchema>) => {
 
-    // console.log("Submit Triggered:", values)
-
-    try {
-      const response = await authFetch("http://localhost:8080/store/1391/inventory/create", 
-        {
-          method: 'POST',
-          body: JSON.stringify(values, (key, value) => key === "quantity" || key === "price" ? parseFloat(value) : value)
-        },
-        {
-          'Content-Type': 'application/json'
+    console.log("Submit Triggered:", values)
+      try {
+        const response = await authFetch("http://localhost:8080/store/1/inventory/" + mode === "add" ? "create" : "update", 
+          {
+            method: 'POST',
+            body: JSON.stringify(values, (key, value) => key === "quantity" || key === "price" ? parseFloat(value) : value)
+          },
+          {
+            'Content-Type': 'application/json'
+          }
+        )
+    
+        if (!response.id) {
+          throw new Error('Failed to save the item.');
         }
-      )
-  
-      if (!response.id) {
-        throw new Error('Failed to save the item.');
+    
+      } catch (error) {
+        console.error("There was an error:", error);
       }
-  
-    } catch (error) {
-      console.error("There was an error:", error);
-    }
-  };
-  
+      try {
+        const response = await authFetch("http://localhost:8080/store/1/inventory/update", 
+          {
+            method: 'POST',
+            body: JSON.stringify(values, (key, value) => key === "quantity" || key === "price" ? parseFloat(value) : value)
+          },
+          {
+            'Content-Type': 'application/json'
+          }
+        )
+    
+        if (!response.id) {
+          throw new Error('Failed to save the item.');
+        }
+    
+      } catch (error) {
+        console.error("There was an error:", error);
+      } 
+  }
 
   return (
     <Dialog>
