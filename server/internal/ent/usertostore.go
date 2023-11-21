@@ -8,8 +8,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/hktrib/RetailGo/internal/ent/category"
-	"github.com/hktrib/RetailGo/internal/ent/item"
+	"github.com/hktrib/RetailGo/internal/ent/store"
+	"github.com/hktrib/RetailGo/internal/ent/user"
 	"github.com/hktrib/RetailGo/internal/ent/usertostore"
 )
 
@@ -33,9 +33,9 @@ type UserToStore struct {
 // UserToStoreEdges holds the relations/edges for other nodes in the graph.
 type UserToStoreEdges struct {
 	// User holds the value of the user edge.
-	User *Category `json:"user,omitempty"`
+	User *User `json:"user,omitempty"`
 	// Store holds the value of the store edge.
-	Store *Item `json:"store,omitempty"`
+	Store *Store `json:"store,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
@@ -43,11 +43,11 @@ type UserToStoreEdges struct {
 
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e UserToStoreEdges) UserOrErr() (*Category, error) {
+func (e UserToStoreEdges) UserOrErr() (*User, error) {
 	if e.loadedTypes[0] {
 		if e.User == nil {
 			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: category.Label}
+			return nil, &NotFoundError{label: user.Label}
 		}
 		return e.User, nil
 	}
@@ -56,11 +56,11 @@ func (e UserToStoreEdges) UserOrErr() (*Category, error) {
 
 // StoreOrErr returns the Store value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e UserToStoreEdges) StoreOrErr() (*Item, error) {
+func (e UserToStoreEdges) StoreOrErr() (*Store, error) {
 	if e.loadedTypes[1] {
 		if e.Store == nil {
 			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: item.Label}
+			return nil, &NotFoundError{label: store.Label}
 		}
 		return e.Store, nil
 	}
@@ -127,12 +127,12 @@ func (uts *UserToStore) Value(name string) (ent.Value, error) {
 }
 
 // QueryUser queries the "user" edge of the UserToStore entity.
-func (uts *UserToStore) QueryUser() *CategoryQuery {
+func (uts *UserToStore) QueryUser() *UserQuery {
 	return NewUserToStoreClient(uts.config).QueryUser(uts)
 }
 
 // QueryStore queries the "store" edge of the UserToStore entity.
-func (uts *UserToStore) QueryStore() *ItemQuery {
+func (uts *UserToStore) QueryStore() *StoreQuery {
 	return NewUserToStoreClient(uts.config).QueryStore(uts)
 }
 

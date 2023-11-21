@@ -29,7 +29,7 @@ func (UserToStore) Fields() []ent.Field {
 
 func (UserToStore) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("user", Category.Type).Unique().Required().Field("user_id"),
-		edge.To("store", Item.Type).Unique().Required().Field("store_id"),
+		edge.To("user", User.Type).Unique().Required().Field("user_id"),
+		edge.To("store", Store.Type).Unique().Required().Field("store_id"),
 	}
 }

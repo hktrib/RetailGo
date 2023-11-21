@@ -3758,13 +3758,13 @@ func (m *UserToStoreMutation) ResetJoinedAt() {
 	delete(m.clearedFields, usertostore.FieldJoinedAt)
 }
 
-// ClearUser clears the "user" edge to the Category entity.
+// ClearUser clears the "user" edge to the User entity.
 func (m *UserToStoreMutation) ClearUser() {
 	m.cleareduser = true
 	m.clearedFields[usertostore.FieldUserID] = struct{}{}
 }
 
-// UserCleared reports if the "user" edge to the Category entity was cleared.
+// UserCleared reports if the "user" edge to the User entity was cleared.
 func (m *UserToStoreMutation) UserCleared() bool {
 	return m.cleareduser
 }
@@ -3785,13 +3785,13 @@ func (m *UserToStoreMutation) ResetUser() {
 	m.cleareduser = false
 }
 
-// ClearStore clears the "store" edge to the Item entity.
+// ClearStore clears the "store" edge to the Store entity.
 func (m *UserToStoreMutation) ClearStore() {
 	m.clearedstore = true
 	m.clearedFields[usertostore.FieldStoreID] = struct{}{}
 }
 
-// StoreCleared reports if the "store" edge to the Item entity was cleared.
+// StoreCleared reports if the "store" edge to the Store entity was cleared.
 func (m *UserToStoreMutation) StoreCleared() bool {
 	return m.clearedstore
 }

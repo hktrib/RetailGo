@@ -158,15 +158,15 @@ var (
 		PrimaryKey: []*schema.Column{UserToStoresColumns[2], UserToStoresColumns[3]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "user_to_stores_categories_user",
+				Symbol:     "user_to_stores_users_user",
 				Columns:    []*schema.Column{UserToStoresColumns[2]},
-				RefColumns: []*schema.Column{CategoriesColumns[0]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "user_to_stores_items_store",
+				Symbol:     "user_to_stores_stores_store",
 				Columns:    []*schema.Column{UserToStoresColumns[3]},
-				RefColumns: []*schema.Column{ItemsColumns[0]},
+				RefColumns: []*schema.Column{StoresColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -187,6 +187,6 @@ func init() {
 	CategoryItemsTable.ForeignKeys[0].RefTable = CategoriesTable
 	CategoryItemsTable.ForeignKeys[1].RefTable = ItemsTable
 	ItemsTable.ForeignKeys[0].RefTable = StoresTable
-	UserToStoresTable.ForeignKeys[0].RefTable = CategoriesTable
-	UserToStoresTable.ForeignKeys[1].RefTable = ItemsTable
+	UserToStoresTable.ForeignKeys[0].RefTable = UsersTable
+	UserToStoresTable.ForeignKeys[1].RefTable = StoresTable
 }

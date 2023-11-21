@@ -180,7 +180,7 @@ func HasUser() predicate.UserToStore {
 }
 
 // HasUserWith applies the HasEdge predicate on the "user" edge with a given conditions (other predicates).
-func HasUserWith(preds ...predicate.Category) predicate.UserToStore {
+func HasUserWith(preds ...predicate.User) predicate.UserToStore {
 	return predicate.UserToStore(func(s *sql.Selector) {
 		step := newUserStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
@@ -203,7 +203,7 @@ func HasStore() predicate.UserToStore {
 }
 
 // HasStoreWith applies the HasEdge predicate on the "store" edge with a given conditions (other predicates).
-func HasStoreWith(preds ...predicate.Item) predicate.UserToStore {
+func HasStoreWith(preds ...predicate.Store) predicate.UserToStore {
 	return predicate.UserToStore(func(s *sql.Selector) {
 		step := newStoreStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

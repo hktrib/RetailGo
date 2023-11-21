@@ -9,8 +9,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/hktrib/RetailGo/internal/ent/category"
-	"github.com/hktrib/RetailGo/internal/ent/item"
+	"github.com/hktrib/RetailGo/internal/ent/store"
+	"github.com/hktrib/RetailGo/internal/ent/user"
 	"github.com/hktrib/RetailGo/internal/ent/usertostore"
 )
 
@@ -61,14 +61,14 @@ func (utsc *UserToStoreCreate) SetNillableJoinedAt(i *int) *UserToStoreCreate {
 	return utsc
 }
 
-// SetUser sets the "user" edge to the Category entity.
-func (utsc *UserToStoreCreate) SetUser(c *Category) *UserToStoreCreate {
-	return utsc.SetUserID(c.ID)
+// SetUser sets the "user" edge to the User entity.
+func (utsc *UserToStoreCreate) SetUser(u *User) *UserToStoreCreate {
+	return utsc.SetUserID(u.ID)
 }
 
-// SetStore sets the "store" edge to the Item entity.
-func (utsc *UserToStoreCreate) SetStore(i *Item) *UserToStoreCreate {
-	return utsc.SetStoreID(i.ID)
+// SetStore sets the "store" edge to the Store entity.
+func (utsc *UserToStoreCreate) SetStore(s *Store) *UserToStoreCreate {
+	return utsc.SetStoreID(s.ID)
 }
 
 // Mutation returns the UserToStoreMutation object of the builder.
@@ -155,7 +155,7 @@ func (utsc *UserToStoreCreate) createSpec() (*UserToStore, *sqlgraph.CreateSpec)
 			Columns: []string{usertostore.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -172,7 +172,7 @@ func (utsc *UserToStoreCreate) createSpec() (*UserToStore, *sqlgraph.CreateSpec)
 			Columns: []string{usertostore.StoreColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -10,9 +10,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/hktrib/RetailGo/internal/ent/category"
-	"github.com/hktrib/RetailGo/internal/ent/item"
 	"github.com/hktrib/RetailGo/internal/ent/predicate"
+	"github.com/hktrib/RetailGo/internal/ent/store"
+	"github.com/hktrib/RetailGo/internal/ent/user"
 	"github.com/hktrib/RetailGo/internal/ent/usertostore"
 )
 
@@ -95,14 +95,14 @@ func (utsu *UserToStoreUpdate) ClearJoinedAt() *UserToStoreUpdate {
 	return utsu
 }
 
-// SetUser sets the "user" edge to the Category entity.
-func (utsu *UserToStoreUpdate) SetUser(c *Category) *UserToStoreUpdate {
-	return utsu.SetUserID(c.ID)
+// SetUser sets the "user" edge to the User entity.
+func (utsu *UserToStoreUpdate) SetUser(u *User) *UserToStoreUpdate {
+	return utsu.SetUserID(u.ID)
 }
 
-// SetStore sets the "store" edge to the Item entity.
-func (utsu *UserToStoreUpdate) SetStore(i *Item) *UserToStoreUpdate {
-	return utsu.SetStoreID(i.ID)
+// SetStore sets the "store" edge to the Store entity.
+func (utsu *UserToStoreUpdate) SetStore(s *Store) *UserToStoreUpdate {
+	return utsu.SetStoreID(s.ID)
 }
 
 // Mutation returns the UserToStoreMutation object of the builder.
@@ -110,13 +110,13 @@ func (utsu *UserToStoreUpdate) Mutation() *UserToStoreMutation {
 	return utsu.mutation
 }
 
-// ClearUser clears the "user" edge to the Category entity.
+// ClearUser clears the "user" edge to the User entity.
 func (utsu *UserToStoreUpdate) ClearUser() *UserToStoreUpdate {
 	utsu.mutation.ClearUser()
 	return utsu
 }
 
-// ClearStore clears the "store" edge to the Item entity.
+// ClearStore clears the "store" edge to the Store entity.
 func (utsu *UserToStoreUpdate) ClearStore() *UserToStoreUpdate {
 	utsu.mutation.ClearStore()
 	return utsu
@@ -198,7 +198,7 @@ func (utsu *UserToStoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{usertostore.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -211,7 +211,7 @@ func (utsu *UserToStoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{usertostore.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -227,7 +227,7 @@ func (utsu *UserToStoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{usertostore.StoreColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -240,7 +240,7 @@ func (utsu *UserToStoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{usertostore.StoreColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -334,14 +334,14 @@ func (utsuo *UserToStoreUpdateOne) ClearJoinedAt() *UserToStoreUpdateOne {
 	return utsuo
 }
 
-// SetUser sets the "user" edge to the Category entity.
-func (utsuo *UserToStoreUpdateOne) SetUser(c *Category) *UserToStoreUpdateOne {
-	return utsuo.SetUserID(c.ID)
+// SetUser sets the "user" edge to the User entity.
+func (utsuo *UserToStoreUpdateOne) SetUser(u *User) *UserToStoreUpdateOne {
+	return utsuo.SetUserID(u.ID)
 }
 
-// SetStore sets the "store" edge to the Item entity.
-func (utsuo *UserToStoreUpdateOne) SetStore(i *Item) *UserToStoreUpdateOne {
-	return utsuo.SetStoreID(i.ID)
+// SetStore sets the "store" edge to the Store entity.
+func (utsuo *UserToStoreUpdateOne) SetStore(s *Store) *UserToStoreUpdateOne {
+	return utsuo.SetStoreID(s.ID)
 }
 
 // Mutation returns the UserToStoreMutation object of the builder.
@@ -349,13 +349,13 @@ func (utsuo *UserToStoreUpdateOne) Mutation() *UserToStoreMutation {
 	return utsuo.mutation
 }
 
-// ClearUser clears the "user" edge to the Category entity.
+// ClearUser clears the "user" edge to the User entity.
 func (utsuo *UserToStoreUpdateOne) ClearUser() *UserToStoreUpdateOne {
 	utsuo.mutation.ClearUser()
 	return utsuo
 }
 
-// ClearStore clears the "store" edge to the Item entity.
+// ClearStore clears the "store" edge to the Store entity.
 func (utsuo *UserToStoreUpdateOne) ClearStore() *UserToStoreUpdateOne {
 	utsuo.mutation.ClearStore()
 	return utsuo
@@ -469,7 +469,7 @@ func (utsuo *UserToStoreUpdateOne) sqlSave(ctx context.Context) (_node *UserToSt
 			Columns: []string{usertostore.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -482,7 +482,7 @@ func (utsuo *UserToStoreUpdateOne) sqlSave(ctx context.Context) (_node *UserToSt
 			Columns: []string{usertostore.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -498,7 +498,7 @@ func (utsuo *UserToStoreUpdateOne) sqlSave(ctx context.Context) (_node *UserToSt
 			Columns: []string{usertostore.StoreColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -511,7 +511,7 @@ func (utsuo *UserToStoreUpdateOne) sqlSave(ctx context.Context) (_node *UserToSt
 			Columns: []string{usertostore.StoreColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(store.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
