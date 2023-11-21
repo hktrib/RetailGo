@@ -1,7 +1,8 @@
 import { Item } from "@/models/item"
 import {useFetch} from "../../../../lib/utils"
 import { auth } from "@clerk/nextjs"
-import {useQuery, QueryFunctionContext, useQueryClient} from "@tanstack/react-query"
+import {useQuery, QueryFunctionContext, useQueryClient, QueryClient} from "@tanstack/react-query"
+import queryClient from "../../app/inventory/page"
 
 const serverURL = "http://localhost:8080"
 
@@ -26,7 +27,7 @@ const storeURL = serverURL + "/store/"
 
 // function updateItem(store: string, item: JSON)
 
-const ITEMS: Item[] = [{name: "Apple", price: 10, quantity: 1000, category: "Fruits"}]
+// const ITEMS: Item[] = [{name: "Apple", price: 10, quantity: 1000, category: "Fruits"}]
 
 function wait(duration: number){
     return new Promise(resolve => setTimeout(resolve, duration))
@@ -34,18 +35,17 @@ function wait(duration: number){
 
 export function useItems(store: string){
 
-    const queryClient = useQueryClient()
-
+    // const queryClient = useQueryClient()
     const authFetch = useFetch()
 
     return useQuery(
         {
-            queryKey: ["items"], 
+            queryKey: ["items", store], 
             // queryFn: () => authFetch(storeURL + store + "/inventory/"),
             queryFn: ({queryKey}) => {
-                return wait(1000).then(() => [...ITEMS])
-              },
-            staleTime: 2592000000
-        }
+                return wait(1000)
+              }
+        },
+        queryClient
     )
 }

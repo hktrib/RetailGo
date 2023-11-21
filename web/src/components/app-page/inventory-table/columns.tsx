@@ -6,6 +6,8 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, MoreHorizontal, PencilIcon, Trash2 } from "lucide-react";
 
+import { Item } from "@/models/item";
+
 export type InventoryItem = {
   id: number;
   name: string;
@@ -16,7 +18,7 @@ export type InventoryItem = {
 };
 
 
-export const columns: ColumnDef<InventoryItem>[] = [
+export const columns: ColumnDef<Item>[] = [
   {
     accessorKey: "id",
     header: () => <div className="text-xs">ID</div>,
