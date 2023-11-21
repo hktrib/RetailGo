@@ -20,7 +20,7 @@ func StoreAndOwnerCreationTx(ctx context.Context, dbClient *ent.Client) error {
 		SetStoreAddress(reqStore.StoreAddress).SetStoreType(reqStore.StoreType).Save(ctx)
 
 	if err != nil {
-		return rollback(tx, fmt.Errorf("tx_error: Unable to create owner: %w", err))
+		return rollback(tx, fmt.Errorf("tx_error: Unable to create store: %w", err))
 	}
 	_, err = tx.User.Create().
 		SetUsername(reqUser.Username).
@@ -30,7 +30,7 @@ func StoreAndOwnerCreationTx(ctx context.Context, dbClient *ent.Client) error {
 		SetLastName(reqUser.LastName).
 		SetStoreID(store.ID).AddStoreIDs(store.ID).Save(ctx)
 	if err != nil {
-		return rollback(tx, fmt.Errorf("tx_error: Unable to create store: %w", err))
+		return rollback(tx, fmt.Errorf("tx_error: Unable to create owner: %w", err))
 	}
 	return tx.Commit()
 }
