@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"io"
 
-	. "github.com/hktrib/RetailGo/stripe-components"
 	"net/http"
 	"strconv"
+
+	. "github.com/hktrib/RetailGo/stripe-components"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/hktrib/RetailGo/internal/ent"
@@ -152,6 +153,8 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 
+	fmt.Println("req_item:", req_item.Price, req_item.Name, ProductId.DefaultPrice.ID, req_item.Photo, req_item.Quantity, store_id)
+
 	createdItem, create_err := srv.DBClient.Item.Create().SetPrice(float64(req_item.Price)).SetName(req_item.Name).SetStripePriceID(ProductId.DefaultPrice.ID).SetPhoto([]byte(req_item.Photo)).SetQuantity(req_item.Quantity).SetStoreID(store_id).Save(ctx)
 	// If this create doesn't work, InternalServerError
 	if create_err != nil {
@@ -170,6 +173,10 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 
 func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 	// get item id from url query string
+
+	// ctx := r.Context()
+
+	// store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
 
 	itemId, err := strconv.Atoi(r.URL.Query().Get("item"))
 	if err != nil {

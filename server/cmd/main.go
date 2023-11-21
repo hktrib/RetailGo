@@ -3,6 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/clerkinc/clerk-sdk-go/clerk"
 	"github.com/hibiken/asynq"
 	server "github.com/hktrib/RetailGo/cmd/api"
@@ -14,9 +17,6 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 	"github.com/stripe/stripe-go/v76"
-	"net/http"
-	"os"
-	"time"
 )
 
 // var log = util.NewLogger()
@@ -31,7 +31,7 @@ func runTaskConsumer(redisOptions *asynq.RedisClientOpt, dbClient *ent.Client, c
 
 func main() {
 	config, err := util.LoadConfig()
-	stripe.Key = os.Getenv("STRIPE_SK")
+	stripe.Key = "sk_test_51ODz7pHWQUATs9zV4fWYLtRag0GwwLPticrlOe5FqicEWwdnWUlsZkRh90o1YOkt3qsOduJQNSbbUJupkm4i9xLm00hcffWjDm"
 	fmt.Println(stripe.Key)
 	if err != nil {
 		panic(err)
