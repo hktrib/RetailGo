@@ -79,6 +79,12 @@ func (iu *ItemUpdate) SetStripePriceID(s string) *ItemUpdate {
 	return iu
 }
 
+// SetStripeProductID sets the "stripe_product_id" field.
+func (iu *ItemUpdate) SetStripeProductID(s string) *ItemUpdate {
+	iu.mutation.SetStripeProductID(s)
+	return iu
+}
+
 // AddCategoryIDs adds the "category" edge to the Category entity by IDs.
 func (iu *ItemUpdate) AddCategoryIDs(ids ...int) *ItemUpdate {
 	iu.mutation.AddCategoryIDs(ids...)
@@ -198,6 +204,9 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := iu.mutation.StripePriceID(); ok {
 		_spec.SetField(item.FieldStripePriceID, field.TypeString, value)
+	}
+	if value, ok := iu.mutation.StripeProductID(); ok {
+		_spec.SetField(item.FieldStripeProductID, field.TypeString, value)
 	}
 	if iu.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -340,6 +349,12 @@ func (iuo *ItemUpdateOne) SetStoreID(i int) *ItemUpdateOne {
 // SetStripePriceID sets the "stripe_price_id" field.
 func (iuo *ItemUpdateOne) SetStripePriceID(s string) *ItemUpdateOne {
 	iuo.mutation.SetStripePriceID(s)
+	return iuo
+}
+
+// SetStripeProductID sets the "stripe_product_id" field.
+func (iuo *ItemUpdateOne) SetStripeProductID(s string) *ItemUpdateOne {
+	iuo.mutation.SetStripeProductID(s)
 	return iuo
 }
 
@@ -492,6 +507,9 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 	}
 	if value, ok := iuo.mutation.StripePriceID(); ok {
 		_spec.SetField(item.FieldStripePriceID, field.TypeString, value)
+	}
+	if value, ok := iuo.mutation.StripeProductID(); ok {
+		_spec.SetField(item.FieldStripeProductID, field.TypeString, value)
 	}
 	if iuo.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
