@@ -3,9 +3,9 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	. "github.com/hktrib/RetailGo/cmd/api/stripe-components"
 	"io"
 
-	. "github.com/hktrib/RetailGo/stripe-components"
 	"net/http"
 	"strconv"
 
@@ -152,7 +152,7 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 
-	createdItem, create_err := srv.DBClient.Item.Create().SetPrice(float64(req_item.Price)).SetName(req_item.Name).SetStripePriceID(ProductId.DefaultPrice.ID).SetPhoto([]byte(req_item.Photo)).SetQuantity(req_item.Quantity).SetStoreID(store_id).Save(ctx)
+	createdItem, create_err := srv.DBClient.Item.Create().SetPrice(float64(req_item.Price)).SetName(req_item.Name).SetStripePriceID(ProductId.DefaultPrice.ID).SetStripeProductID(ProductId.ID).SetPhoto([]byte(req_item.Photo)).SetQuantity(req_item.Quantity).SetStoreID(store_id).Save(ctx)
 	// If this create doesn't work, InternalServerError
 	if create_err != nil {
 		fmt.Println("Create didn't work:", create_err)
@@ -194,7 +194,7 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = targetItem.Update().SetQuantity(change).
+	_, err = targetItem.Update().SetQuantity(targetItem.Quantity - change).
 		Save(r.Context())
 
 	if err != nil {

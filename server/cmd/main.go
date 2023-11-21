@@ -15,7 +15,6 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/stripe/stripe-go/v76"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -31,7 +30,7 @@ func runTaskConsumer(redisOptions *asynq.RedisClientOpt, dbClient *ent.Client, c
 
 func main() {
 	config, err := util.LoadConfig()
-	stripe.Key = os.Getenv("STRIPE_SK")
+	stripe.Key = "sk_test_51ODz7pHWQUATs9zV4fWYLtRag0GwwLPticrlOe5FqicEWwdnWUlsZkRh90o1YOkt3qsOduJQNSbbUJupkm4i9xLm00hcffWjDm"
 	fmt.Println(stripe.Key)
 	if err != nil {
 		panic(err)
@@ -75,7 +74,11 @@ func main() {
 		srv.Router.Use(injectActiveSession)
 
 		srv.MountHandlers()
+		http.HandleFunc("/webhook", func(writer http.ResponseWriter, request *http.Request) {
+			srv.HandleSuccess(writer, request)
+		})
 		err := http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", config.ServerAddress), srv.Router)
+
 		if err != nil {
 			log.Fatal().Err(err).Msg("failed in starting server")
 		}
