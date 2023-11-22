@@ -150,6 +150,7 @@ func HandleClerkWebhook(w http.ResponseWriter, r *http.Request) {
 		// 	return
 		// }
 
+		log.Debug().Msg(fmt.Sprintf("Response Code: %v, Response body: %v", resp.StatusCode, responseBody))
 		w.WriteHeader(resp.StatusCode)
 		w.Write(responseBody)
 		return
