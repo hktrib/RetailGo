@@ -80,11 +80,6 @@ func main() {
 		srv.Router.Use(injectActiveSession)
 
 		srv.MountHandlers()
-		http.HandleFunc("/webhook", func(writer http.ResponseWriter, request *http.Request) {
-			srv.HandleSuccess(writer, request)
-		})
-
-		http.HandleFunc("/clerkwebhook", webhook.HandleClerkWebhook)
 
 		err := http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", config.SERVER_ADDRESS), srv.Router)
 
