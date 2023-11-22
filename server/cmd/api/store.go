@@ -63,6 +63,8 @@ func (srv *Server) GetStoreUsers(w http.ResponseWriter, r *http.Request) {
 	for i := range userInfo {
 		delete(userInfo[i], "clerk_user_id")
 		delete(userInfo[i], "store_id")
+		delete(userInfo[i], "edges")
+
 	}
 
 	resp, err = json.Marshal(userInfo)
