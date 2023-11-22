@@ -3,7 +3,7 @@ import {useFetch} from "../../../../lib/utils"
 import { auth } from "@clerk/nextjs"
 import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query"
 
-const serverURL = "https://retailgo-production.up.railway.app/"
+const serverURL = "http://localhost:8080/"// "https://retailgo-production.up.railway.app/"
 
 const storeURL = serverURL + "store/"
 
@@ -30,7 +30,7 @@ export function useItems(store: string){
     return useQuery(
         {
             queryKey: ["items", store], 
-            queryFn: () => authFetch(storeURL + store + "/inventory/"),
+            queryFn: () => authFetch(storeURL + store + "/inventory/", {}, {}, true),
         }
     )
 }
@@ -65,6 +65,9 @@ export function useCreateItem(store: string){
                 console.log("Error while creating", newItem.name, ":", err)
                 queryClient.setQueryData(["items", store], context?.prevItems)
             },
+            onSuccess: (newItem: ItemWithoutId) => {
+                queryClient.invalidateQueries({queryKey: ["items", store]})
+            }
         }
     )
 
@@ -98,6 +101,38 @@ export function useEditItem(store: string){
             },
             onError: (err, newItem: ItemWithoutId, context) => {
                 console.log("Error while creating", newItem.name, ":", err)
+                queryClient.setQueryData(["items", store], context?.prevItems)
+            },
+        }
+    )
+
+}
+
+export function useDeleteItem(store: string){
+
+    const authFetch = useFetch()
+
+    const queryClient = useQueryClient()
+
+    return useMutation(
+        {
+            mutationFn: (id: number) => authFetch(
+                      storeURL + store + "/inventory/?id=" + id, 
+                      {
+                        method: 'DELETE',
+                        body: JSON.stringify({id: id})
+                      }
+                    ),
+            onMutate: (id: number) => {
+                // await queryClient.cancelQueries({ queryKey: ['todos'] })
+                const prevItems = queryClient.getQueryData(["items", store]) as Item[];
+                queryClient.setQueryData(["items", store], (old: Item[]) => {
+                    return prevItems.filter((item) => item.id !== id)
+                })   
+                return {prevItems}
+            },
+            onError: (err, id: number, context) => {
+                console.log("Error while deleting", id, ":", err)
                 queryClient.setQueryData(["items", store], context?.prevItems)
             },
         }

@@ -218,17 +218,26 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 }
 func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 
-	store := r.Context().Value("store_var").(*ent.Store)
+	// store := r.Context().Value("store_var").(*ent.Store)
 
-	item_id, err := strconv.Atoi(r.URL.Query().Get("item"))
+	store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
+
 	if err != nil {
+		fmt.Println("Store Id parsing failed")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	item_id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		fmt.Println("Item id parsing failed")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	err = srv.DBClient.
 		Item.DeleteOneID(item_id).
-		Where(item.StoreID(store.ID)).
+		Where(item.StoreID(store_id)).
 		Exec(r.Context())
 
 	if ent.IsNotFound(err) {

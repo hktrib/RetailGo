@@ -1,5 +1,6 @@
 "use client";
 
+import {useState} from "react"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useFetch } from "../../lib/utils"
@@ -23,7 +24,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Item } from "@/models/item";
+import { Item, ItemWithoutId } from "@/models/item";
 import { useEffect } from "react";
 import { PencilIcon } from "lucide-react";
 
@@ -42,6 +43,7 @@ export default function ItemDialog({ item, mode = 'add' }: { item: Item, mode?: 
 
   const createItemMutation = useCreateItem("1")
   const editItemMutation = useCreateItem("1")
+
 
   return (
     <Dialog>

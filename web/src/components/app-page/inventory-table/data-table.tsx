@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useDeleteItem } from "@/app/(app-page)/app/hooks/items";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -38,6 +39,7 @@ export function DataTable<TData extends Item, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const deleteItemMutation = useDeleteItem("1")
 
   const table = useReactTable({
     data,
@@ -105,7 +107,7 @@ export function DataTable<TData extends Item, TValue>({
                   <TableCell>
                     <div className="text-right flex flex-row space-x-2 h-8 w-8 p-0">
                       <ItemDialog item={row.original} mode="edit" />
-                      <button onClick={() => console.log("Delete button clicked")}>
+                      <button onClick={() => deleteItemMutation.mutate(row.original.id)}>
                         <Trash2 style={{ color: "red" }} className="h-5 w-5 p-0"></Trash2>
                       </button>
                     </div>
