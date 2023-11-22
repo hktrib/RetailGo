@@ -6,9 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"net/http"
-	"time"
-
 	"github.com/clerkinc/clerk-sdk-go/clerk"
 	"github.com/hibiken/asynq"
 	server "github.com/hktrib/RetailGo/cmd/api"
@@ -35,7 +32,7 @@ func runTaskConsumer(redisOptions *asynq.RedisClientOpt, dbClient *ent.Client, c
 func main() {
 	config, err := util.LoadConfig()
 	stripe.Key = config.STRIPE_SK
-	fmt.Println(stripe.Key)
+	fmt.Println("Stripe Key:", stripe.Key)
 	if err != nil {
 		panic(err)
 	}
