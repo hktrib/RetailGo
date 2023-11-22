@@ -32,7 +32,6 @@ func runTaskConsumer(redisOptions *asynq.RedisClientOpt, dbClient *ent.Client, c
 func main() {
 	config, err := util.LoadConfig()
 	stripe.Key = config.STRIPE_SK
-	fmt.Println("Stripe Key:", stripe.Key)
 	if err != nil {
 		panic(err)
 	}
