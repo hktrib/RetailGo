@@ -28,7 +28,7 @@ func LoadConfig() (config Config, err error) {
 	config.DB_SOURCE = os.Getenv("DB_SOURCE")
 	config.SERVER_ADDRESS = envPortOr("8080")
 	config.CLERK_SK = os.Getenv("CLERK_SK")
-	config.CLERK_SK = os.Getenv("CLERK_WEBHOOK_SECRET")
+	config.CLERK_WEBHOOK_SECRET = os.Getenv("CLERK_WEBHOOK_SECRET")
 	config.REDIS_HOSTNAME = os.Getenv("REDIS_HOSTNAME")
 	config.REDIS_PORT = os.Getenv("REDIS_PORT")
 	config.REDIS_PASSWORD = os.Getenv("REDIS_PASSWORD")
