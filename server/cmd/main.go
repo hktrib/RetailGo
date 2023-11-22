@@ -70,9 +70,6 @@ func main() {
 		log.Fatal().Err(err).Msg("failed creating schema resources")
 	}
 
-	webhook.Config = &config
-	webhook.ClerkClient = clerkClient
-
 	go func() {
 		injectActiveSession := clerk.WithSessionV2(clerkClient)
 
@@ -80,6 +77,9 @@ func main() {
 		srv.Router.Use(injectActiveSession)
 
 		srv.MountHandlers()
+
+		webhook.Config = &config
+		webhook.ClerkClient = clerkClient
 
 		err := http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", config.SERVER_ADDRESS), srv.Router)
 
