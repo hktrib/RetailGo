@@ -13,6 +13,7 @@ import (
 	kvRedis "github.com/hktrib/RetailGo/internal/redis"
 	worker "github.com/hktrib/RetailGo/internal/tasks"
 	"github.com/hktrib/RetailGo/internal/util"
+	"github.com/hktrib/RetailGo/internal/webhook"
 	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
@@ -69,6 +70,9 @@ func main() {
 		log.Fatal().Err(err).Msg("failed creating schema resources")
 	}
 
+	webhook.Config = &config
+	webhook.ClerkClient = clerkClient
+
 	go func() {
 		injectActiveSession := clerk.WithSessionV2(clerkClient)
 
@@ -79,6 +83,9 @@ func main() {
 		http.HandleFunc("/webhook", func(writer http.ResponseWriter, request *http.Request) {
 			srv.HandleSuccess(writer, request)
 		})
+
+		http.HandleFunc("/clerkwebhook", webhook.HandleClerkWebhook)
+
 		err := http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", config.SERVER_ADDRESS), srv.Router)
 
 		if err != nil {
