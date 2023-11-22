@@ -1,4 +1,4 @@
-import { Item } from "@/models/item"
+import { Item, ItemWithoutId } from "@/models/item"
 import {useFetch} from "../../../../lib/utils"
 import { auth } from "@clerk/nextjs"
 import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query"
@@ -43,7 +43,7 @@ export function useCreateItem(store: string){
 
     return useMutation(
         {
-            mutationFn: (newItem: Item) => authFetch(
+            mutationFn: (newItem: ItemWithoutId) => authFetch(
                       storeURL + store + "/inventory/create", 
                       {
                         method: 'POST',
@@ -53,15 +53,15 @@ export function useCreateItem(store: string){
                         'Content-Type': 'application/json'
                       }
                     ),
-            onMutate: (newItem: Item) => {
+            onMutate: (newItem: ItemWithoutId) => {
                 // await queryClient.cancelQueries({ queryKey: ['todos'] })
                 const prevItems = queryClient.getQueryData(["items", store]) as Item[];
                 queryClient.setQueryData(["items", store], (old: Item[]) => {
-                    return [...prevItems, newItem]
+                    return [...prevItems, {...newItem, id: prevItems.length + prevItems[0].id}]
                 })   
                 return {prevItems}
             },
-            onError: (err, newItem: Item, context) => {
+            onError: (err, newItem: ItemWithoutId, context) => {
                 console.log("Error while creating", newItem.name, ":", err)
                 queryClient.setQueryData(["items", store], context?.prevItems)
             },
