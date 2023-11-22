@@ -3,7 +3,7 @@ import {useFetch} from "../../../../lib/utils"
 import { auth } from "@clerk/nextjs"
 import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query"
 
-const serverURL = "http://localhost:8080"
+const serverURL = "https://retailgo-production.up.railway.app/:8080"
 
 const storeURL = serverURL + "/store/"
 
@@ -65,9 +65,41 @@ export function useCreateItem(store: string){
                 console.log("Error while creating", newItem.name, ":", err)
                 queryClient.setQueryData(["items", store], context?.prevItems)
             },
-            // onSettled: () => {
-            //     queryClient.invalidateQueries({ queryKey: ['todos'] })
-            //   }
+        }
+    )
+
+}
+
+export function useEditItem(store: string){
+
+    const authFetch = useFetch()
+
+    const queryClient = useQueryClient()
+
+    return useMutation(
+        {
+            mutationFn: (newItem: ItemWithoutId) => authFetch(
+                      storeURL + store + "/inventory/update", 
+                      {
+                        method: 'POST',
+                        body: JSON.stringify(newItem, (key, value) => key === "quantity" || key === "price" ? parseFloat(value) : value)
+                      },
+                      {
+                        'Content-Type': 'application/json'
+                      }
+                    ),
+            onMutate: (newItem: ItemWithoutId) => {
+                // await queryClient.cancelQueries({ queryKey: ['todos'] })
+                const prevItems = queryClient.getQueryData(["items", store]) as Item[];
+                queryClient.setQueryData(["items", store], (old: Item[]) => {
+                    return [...prevItems, {...newItem, id: prevItems.length + prevItems[0].id}]
+                })   
+                return {prevItems}
+            },
+            onError: (err, newItem: ItemWithoutId, context) => {
+                console.log("Error while creating", newItem.name, ":", err)
+                queryClient.setQueryData(["items", store], context?.prevItems)
+            },
         }
     )
 
