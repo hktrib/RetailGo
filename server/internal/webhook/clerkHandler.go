@@ -140,15 +140,15 @@ func HandleClerkWebhook(w http.ResponseWriter, r *http.Request) {
 		}
 		defer resp.Body.Close()
 
-		responseBody, err := io.ReadAll(resp.Body)
-		if err != nil {
+		responseBody, _ := io.ReadAll(resp.Body)
+		// if err != nil {
 
-			fmt.Println("Failed io.ReadAll")
-			log.Debug().Err(err)
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(err)
-			return
-		}
+		// 	fmt.Println("Failed io.ReadAll")
+		// 	log.Debug().Err(err)
+		// 	w.WriteHeader(http.StatusBadRequest)
+		// 	json.NewEncoder(w).Encode(err)
+		// 	return
+		// }
 
 		w.WriteHeader(resp.StatusCode)
 		w.Write(responseBody)
