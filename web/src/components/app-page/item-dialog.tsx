@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useFetch } from "../../lib/utils"
+import { useCreateItem } from "@/app/(app-page)/app/hooks/items";
 
 import * as z from "zod";
 
@@ -30,7 +31,7 @@ const formSchema = z.object({
   name: z.string(),
   price: z.coerce.number(),
   quantity: z.coerce.number(),
-  category: z.string()
+  category: z.string(),
 });
 
 export default function ItemDialog({ item, mode = 'add' }: { item: Item, mode?: string }) {
@@ -39,40 +40,8 @@ export default function ItemDialog({ item, mode = 'add' }: { item: Item, mode?: 
     resolver: zodResolver(formSchema),
   });;
 
-  let authFetch = useFetch()
-
-  useEffect(() => {
-
-    if (item != null) {
-      console.log('Item Data:', item);
-      form.reset(item);
-    }
-  }, [item, form]);
-
-  const onNewItem: SubmitHandler<z.infer<typeof formSchema>> = async (values: z.infer<typeof formSchema>) => {
-
-    // console.log("Submit Triggered:", values)
-
-    try {
-      const response = await authFetch("http://localhost:8080/store/1391/inventory/create", 
-        {
-          method: 'POST',
-          body: JSON.stringify(values, (key, value) => key === "quantity" || key === "price" ? parseFloat(value) : value)
-        },
-        {
-          'Content-Type': 'application/json'
-        }
-      )
-  
-      if (!response.id) {
-        throw new Error('Failed to save the item.');
-      }
-  
-    } catch (error) {
-      console.error("There was an error:", error);
-    }
-  };
-  
+  const createItemMutation = useCreateItem("1")
+  const editItemMutation = useCreateItem("1")
 
   return (
     <Dialog>
@@ -91,7 +60,7 @@ export default function ItemDialog({ item, mode = 'add' }: { item: Item, mode?: 
       <Form {...form}>
         <form>
           <DialogContent>
-            <form onSubmit = {form.handleSubmit(onNewItem, (data) => console.log("Error:", data))}>
+            <form onSubmit = {form.handleSubmit((data) => mode === "edit" ? editItemMutation.mutate(data) : createItemMutation.mutate(data), (data) => console.log("Error:", data))}>
             <DialogHeader>
               <DialogTitle>
               {mode === "edit" ? 'Edit' : 'Add'} Item

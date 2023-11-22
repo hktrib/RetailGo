@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -32,7 +31,7 @@ func LoadConfig() (config Config, err error) {
 	config.REDIS_PASSWORD = os.Getenv("REDIS_PASSWORD")
 	config.STRIPE_SK = os.Getenv("STRIPE_SK")
 
-	fmt.Println(config)
+	// fmt.Println(config)
 
 	return
 }
