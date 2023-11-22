@@ -3,7 +3,7 @@ import {useFetch} from "../../../../lib/utils"
 import { auth } from "@clerk/nextjs"
 import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query"
 
-const serverURL = "https://retailgo-production.up.railway.app/:8080"
+const serverURL = "https://retailgo-production.up.railway.app/"
 
 const storeURL = serverURL + "/store/"
 
