@@ -1,16 +1,11 @@
 import { Item } from "@/models/item"
 import {useFetch} from "../../../../lib/utils"
 import { auth } from "@clerk/nextjs"
-import {useQuery, QueryFunctionContext, useQueryClient, QueryClient} from "@tanstack/react-query"
-import queryClient from "../../app/inventory/page"
+import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query"
 
 const serverURL = "http://localhost:8080"
 
 const storeURL = serverURL + "/store/"
-
-// function readItems(store: string){
-//     return authFetch(inventoryURL + store + "/inventory/")
-// }
 
 // function createItem(store: string, item: JSON){
 //     return authFetch(inventoryURL + "create", 
@@ -27,12 +22,6 @@ const storeURL = serverURL + "/store/"
 
 // function updateItem(store: string, item: JSON)
 
-// const ITEMS: Item[] = [{name: "Apple", price: 10, quantity: 1000, category: "Fruits"}]
-
-function wait(duration: number){
-    return new Promise(resolve => setTimeout(resolve, duration))
-  }
-
 export function useItems(store: string){
 
     // const queryClient = useQueryClient()
@@ -44,4 +33,42 @@ export function useItems(store: string){
             queryFn: () => authFetch(storeURL + store + "/inventory/"),
         }
     )
+}
+
+export function useCreateItem(store: string){
+
+    const authFetch = useFetch()
+
+    const queryClient = useQueryClient()
+
+    return useMutation(
+        {
+            mutationFn: (newItem: Item) => authFetch(
+                      storeURL + store + "/inventory/create", 
+                      {
+                        method: 'POST',
+                        body: JSON.stringify(newItem, (key, value) => key === "quantity" || key === "price" ? parseFloat(value) : value)
+                      },
+                      {
+                        'Content-Type': 'application/json'
+                      }
+                    ),
+            onMutate: (newItem: Item) => {
+                // await queryClient.cancelQueries({ queryKey: ['todos'] })
+                const prevItems = queryClient.getQueryData(["items", store]) as Item[];
+                queryClient.setQueryData(["items", store], (old: Item[]) => {
+                    return [...prevItems, newItem]
+                })   
+                return {prevItems}
+            },
+            onError: (err, newItem: Item, context) => {
+                console.log("Error while creating", newItem.name, ":", err)
+                queryClient.setQueryData(["items", store], context?.prevItems)
+            },
+            // onSettled: () => {
+            //     queryClient.invalidateQueries({ queryKey: ['todos'] })
+            //   }
+        }
+    )
+
 }

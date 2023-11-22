@@ -42,7 +42,7 @@ const initialInventory = [
 export default function InventoryTable(){
   const itemQuery = useItems("1")
 
-  let data = initialInventory;
+  // let data = initialInventory;
 
   if (itemQuery.isLoading){
     return (<div>
@@ -54,14 +54,6 @@ export default function InventoryTable(){
       There was an error loading your items. Please try again!
     </div>)
   }
-
-  data = itemQuery.data
-
-  // try{
-  //   data = await authFetch("http://localhost:8080/store/1/inventory/");
-  // }
-  // catch{
-  // }
 
   return(
     <div>

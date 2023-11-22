@@ -3,4 +3,5 @@ export class Item{
     price!: number;
     quantity!: number;
     category!: string;
+    id!: number;
   };
