@@ -124,15 +124,17 @@ func HandleClerkWebhook(w http.ResponseWriter, r *http.Request) {
 			"last_name":     event.LastName,
 		}
 
-		/* 	Using Clerk's .Do which is a wrapper that adds the Authorization key
-		to the request on http.Client.Do and returns the response
-		*/
-		url := "http://localhost:" + Config.SERVER_ADDRESS + "/create/user"
+		// url := "http://localhost:" + Config.SERVER_ADDRESS + "/create/user"
 		// Use ngrok to create tempUrl for local testing purposes (io.ReadAll error handling sucks! with ngrok testing)
-		// tempURl := "http://2ac3-2600-1700-87f4-100-5125-57cc-354-6945.ngrok.io/create/user"
+		tempURl := "http://10a8-2600-1700-87f4-100-5125-57cc-354-6945.ngrok.io/create/user"
 		b, _ := json.Marshal(requestBody)
-		req, _ := http.NewRequest("POST", url, bytes.NewBuffer(b))
-		resp, err := ClerkClient.Do(req, nil)
+		req, _ := http.NewRequest("POST", tempURl, bytes.NewBuffer(b))
+
+		client := &http.Client{}
+
+		req.Header.Set("Authorization", "Bearer "+Config.CLERK_SK)
+
+		resp, err := client.Do(req)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(err)
@@ -141,14 +143,12 @@ func HandleClerkWebhook(w http.ResponseWriter, r *http.Request) {
 		defer resp.Body.Close()
 
 		responseBody, _ := io.ReadAll(resp.Body)
-		// if err != nil {
-
-		// 	fmt.Println("Failed io.ReadAll")
-		// 	log.Debug().Err(err)
-		// 	w.WriteHeader(http.StatusBadRequest)
-		// 	json.NewEncoder(w).Encode(err)
-		// 	return
-		// }
+		if err != nil {
+			log.Debug().Err(err).Msg("failed to read response body")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(err)
+			return
+		}
 
 		log.Debug().Msg(fmt.Sprintf("Response Code: %v, Response body: %v", resp.StatusCode, responseBody))
 		w.WriteHeader(resp.StatusCode)
