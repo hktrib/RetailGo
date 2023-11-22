@@ -5,7 +5,7 @@ import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query"
 
 const serverURL = "https://retailgo-production.up.railway.app/"
 
-const storeURL = serverURL + "/store/"
+const storeURL = serverURL + "store/"
 
 // function createItem(store: string, item: JSON){
 //     return authFetch(inventoryURL + "create", 
