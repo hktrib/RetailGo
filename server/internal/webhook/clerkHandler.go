@@ -124,11 +124,11 @@ func HandleClerkWebhook(w http.ResponseWriter, r *http.Request) {
 			"last_name":     event.LastName,
 		}
 
-		// url := "http://localhost:" + Config.SERVER_ADDRESS + "/create/user"
+		url := "http://localhost:" + Config.SERVER_ADDRESS + "/create/user"
 		// Use ngrok to create tempUrl for local testing purposes (io.ReadAll error handling sucks! with ngrok testing)
-		tempURl := "http://10a8-2600-1700-87f4-100-5125-57cc-354-6945.ngrok.io/create/user"
+		// tempURl := "http://10a8-2600-1700-87f4-100-5125-57cc-354-6945.ngrok.io/create/user"
 		b, _ := json.Marshal(requestBody)
-		req, _ := http.NewRequest("POST", tempURl, bytes.NewBuffer(b))
+		req, _ := http.NewRequest("POST", url, bytes.NewBuffer(b))
 
 		client := &http.Client{}
 
