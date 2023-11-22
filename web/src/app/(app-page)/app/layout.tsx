@@ -5,6 +5,7 @@ import { AppProps } from "next/app";
 import {useState} from "react"
 import {QueryClient} from "@tanstack/react-query"
 import Providers from "../../providers"
+import {ReactQueryDevtools} from "@tanstack/react-query-devtools"
 
 export default function AppLayout({ children, pageProps }: { children: React.ReactNode, pageProps: AppProps }) {
 
@@ -17,6 +18,7 @@ export default function AppLayout({ children, pageProps }: { children: React.Rea
           <Sidebar />
       <div className="xl:pl-64 h-full flex-grow flex flex-col">{children}</div>
     </div>
+    {/* <ReactQueryDevtools/> */}
     </Providers>
   );
 }
