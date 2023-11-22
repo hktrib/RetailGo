@@ -46,7 +46,9 @@ const (
 
 func findUser(event Event) (*EmailObject, error) {
 	for _, e := range event.Data.EmailObjects {
-		if e.ID == event.Data.ID {
+		fmt.Println("e.ID", e.ID)
+		fmt.Println("event.Data.ID", event.Data.ID)
+		if e.ID == event.Data.PrimaryEmailAddressID {
 			return &e, nil
 		}
 	}
@@ -54,20 +56,12 @@ func findUser(event Event) (*EmailObject, error) {
 }
 
 func HandleClerkWebhook(w http.ResponseWriter, r *http.Request) {
-	// var payload map[string]interface{}
-	// if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-	// 	http.Error(w, "Error decoding JSON", http.StatusBadRequest)
-	// 	return
-	// }
-
 	payload, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Err(err).Msg("Unable to read from JSON request body")
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-
-	// payloadStr := fmt.Sprintf("%v", payload)
 
 	svixID := r.Header.Get("svix-id")
 	svixTimestamp := r.Header.Get("svix-timestamp")
@@ -82,14 +76,13 @@ func HandleClerkWebhook(w http.ResponseWriter, r *http.Request) {
 	// Setting Svix Http Headers for Verification
 	svixHeaders := http.Header{}
 	svixHeaders.Set("svix-id", svixID)
-	svixHeaders.Set("svix-timestamp", svixSignature)
-	svixHeaders.Set("svix-signature", svixTimestamp)
-	// }
+	svixHeaders.Set("svix-timestamp", svixTimestamp)
+	svixHeaders.Set("svix-signature", svixSignature)
 
 	// Creating New Webhook from CLERK_WEBHOOK_SECRET
 	webhook, err := svix.NewWebhook(Config.CLERK_WEBHOOK_SECRET)
 	if err != nil {
-		fmt.Println("Error creating svix Webhook:", err)
+		log.Debug().Err(err).Msg("unable to create webhook")
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -97,7 +90,7 @@ func HandleClerkWebhook(w http.ResponseWriter, r *http.Request) {
 	// Verifying payload against svixHeaders
 	err = webhook.Verify([]byte(payload), svixHeaders)
 	if err != nil {
-		fmt.Println("Error verifying webhook:", err)
+		log.Debug().Err(err).Msg("webhook cannot be verified")
 		http.Error(w, "Error verifying webhook", http.StatusBadRequest)
 		return
 	}
@@ -105,8 +98,9 @@ func HandleClerkWebhook(w http.ResponseWriter, r *http.Request) {
 	// Process Event Data
 	var event Event
 	err = json.Unmarshal([]byte(payload), &event)
+	fmt.Println(event.Data)
 	if err != nil {
-		fmt.Println("Error unmarshalling JSON:", err)
+		log.Debug().Err(err).Msg("unable to martial json")
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -115,6 +109,7 @@ func HandleClerkWebhook(w http.ResponseWriter, r *http.Request) {
 	if event.Type == UserCreated {
 		emailObject, err := findUser(event)
 		if err != nil {
+			log.Debug().Err(err).Msg("failed finding user")
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(err)
 			return
@@ -132,8 +127,11 @@ func HandleClerkWebhook(w http.ResponseWriter, r *http.Request) {
 		/* 	Using Clerk's .Do which is a wrapper that adds the Authorization key
 		to the request on http.Client.Do and returns the response
 		*/
+		url := "http://localhost:" + Config.SERVER_ADDRESS + "/create/user"
+		// Use ngrok to create tempUrl for local testing purposes (io.ReadAll error handling sucks! with ngrok testing)
+		// tempURl := "http://2ac3-2600-1700-87f4-100-5125-57cc-354-6945.ngrok.io/create/user"
 		b, _ := json.Marshal(requestBody)
-		req, _ := http.NewRequest("PUT", "http://localhost:"+Config.SERVER_ADDRESS+"/create/user", bytes.NewBuffer(b))
+		req, _ := http.NewRequest("POST", url, bytes.NewBuffer(b))
 		resp, err := ClerkClient.Do(req, nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -144,6 +142,9 @@ func HandleClerkWebhook(w http.ResponseWriter, r *http.Request) {
 
 		responseBody, err := io.ReadAll(resp.Body)
 		if err != nil {
+
+			fmt.Println("Failed io.ReadAll")
+			log.Debug().Err(err)
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(err)
 			return
@@ -151,6 +152,7 @@ func HandleClerkWebhook(w http.ResponseWriter, r *http.Request) {
 
 		w.WriteHeader(resp.StatusCode)
 		w.Write(responseBody)
+		return
 	}
 
 	w.WriteHeader(http.StatusBadRequest)
