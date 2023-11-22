@@ -70,6 +70,7 @@ var (
 		{Name: "price", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "decimal(10,2)"}},
 		{Name: "stripe_price_id", Type: field.TypeString},
 		{Name: "stripe_product_id", Type: field.TypeString},
+		{Name: "category_name", Type: field.TypeString},
 		{Name: "store_id", Type: field.TypeInt},
 	}
 	// ItemsTable holds the schema information for the "items" table.
@@ -80,7 +81,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "items_stores_items",
-				Columns:    []*schema.Column{ItemsColumns[7]},
+				Columns:    []*schema.Column{ItemsColumns[8]},
 				RefColumns: []*schema.Column{StoresColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

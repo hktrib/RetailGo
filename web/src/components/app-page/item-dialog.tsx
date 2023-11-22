@@ -1,9 +1,10 @@
 "use client";
 
+import {useState} from "react"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useFetch } from "../../lib/utils"
-import { useCreateItem } from "@/app/(app-page)/app/hooks/items";
+import { useCreateItem, useEditItem } from "@/app/(app-page)/app/hooks/items";
 
 import * as z from "zod";
 
@@ -23,7 +24,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Item } from "@/models/item";
+import { Item, ItemWithoutId } from "@/models/item";
 import { useEffect } from "react";
 import { PencilIcon } from "lucide-react";
 
@@ -41,7 +42,12 @@ export default function ItemDialog({ item, mode = 'add' }: { item: Item, mode?: 
   });;
 
   const createItemMutation = useCreateItem("1")
-  const editItemMutation = useCreateItem("1")
+  const editItemMutation = useEditItem("1")
+
+  const [inputName, setInputName] = useState(item.name)
+  const [inputCategory, setInputCategory] = useState(item.category)
+  const [inputPrice, setInputPrice] = useState(item.price)
+  const [inputQuantity, setInputQuantity] = useState(item.quantity)
 
   return (
     <Dialog>
@@ -60,7 +66,11 @@ export default function ItemDialog({ item, mode = 'add' }: { item: Item, mode?: 
       <Form {...form}>
         <form>
           <DialogContent>
-            <form onSubmit = {form.handleSubmit((data) => mode === "edit" ? editItemMutation.mutate(data) : createItemMutation.mutate(data), (data) => console.log("Error:", data))}>
+            <form onSubmit = {form.handleSubmit((data) => {
+              console.log("Data:", data)
+              return mode === "edit" ? editItemMutation.mutate({...item, ...data}) : createItemMutation.mutate(data)
+            }
+              , (data) => console.log("Error:", data, "InputName:", inputName, "inputCategory:", inputCategory, "InputQuantity:", inputQuantity))}>
             <DialogHeader>
               <DialogTitle>
               {mode === "edit" ? 'Edit' : 'Add'} Item
@@ -74,7 +84,7 @@ export default function ItemDialog({ item, mode = 'add' }: { item: Item, mode?: 
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input {...field}/>
+                    <Input {...field} value = {inputName} onChange={(e) => setInputName(e.currentTarget.value)}/>
                   </FormControl>
                 </FormItem>
               )}
@@ -87,13 +97,12 @@ export default function ItemDialog({ item, mode = 'add' }: { item: Item, mode?: 
                 <FormItem>
                   <FormLabel>Category</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} value = {inputCategory} onChange={(e) => setInputCategory(e.currentTarget.value)}/>
                   </FormControl>
                 </FormItem>
               )}
             />
-
-
+  
             <FormField
               control={form.control}
               name="price"
@@ -101,7 +110,7 @@ export default function ItemDialog({ item, mode = 'add' }: { item: Item, mode?: 
                 <FormItem>
                   <FormLabel>Price</FormLabel>
                   <FormControl>
-                    <Input {...field} type = "number"/>
+                    <Input {...field} type = "number" value = {inputPrice} onChange={(e) => setInputPrice(parseFloat(e.currentTarget.value))}/>
                   </FormControl>
                 </FormItem>
               )}
@@ -114,7 +123,7 @@ export default function ItemDialog({ item, mode = 'add' }: { item: Item, mode?: 
                 <FormItem>
                   <FormLabel>Quantity</FormLabel>
                   <FormControl>
-                    <Input {...field} type = "number"/>
+                    <Input {...field} type = "number" value = {inputQuantity} onChange={(e) => setInputQuantity(parseInt(e.currentTarget.value))}/>
                   </FormControl>
                 </FormItem>
               )}

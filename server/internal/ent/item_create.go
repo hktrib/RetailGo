@@ -63,6 +63,12 @@ func (ic *ItemCreate) SetStripeProductID(s string) *ItemCreate {
 	return ic
 }
 
+// SetCategoryName sets the "category_name" field.
+func (ic *ItemCreate) SetCategoryName(s string) *ItemCreate {
+	ic.mutation.SetCategoryName(s)
+	return ic
+}
+
 // SetID sets the "id" field.
 func (ic *ItemCreate) SetID(i int) *ItemCreate {
 	ic.mutation.SetID(i)
@@ -144,6 +150,9 @@ func (ic *ItemCreate) check() error {
 	if _, ok := ic.mutation.StripeProductID(); !ok {
 		return &ValidationError{Name: "stripe_product_id", err: errors.New(`ent: missing required field "Item.stripe_product_id"`)}
 	}
+	if _, ok := ic.mutation.CategoryName(); !ok {
+		return &ValidationError{Name: "category_name", err: errors.New(`ent: missing required field "Item.category_name"`)}
+	}
 	if _, ok := ic.mutation.StoreID(); !ok {
 		return &ValidationError{Name: "store", err: errors.New(`ent: missing required edge "Item.store"`)}
 	}
@@ -202,6 +211,10 @@ func (ic *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 	if value, ok := ic.mutation.StripeProductID(); ok {
 		_spec.SetField(item.FieldStripeProductID, field.TypeString, value)
 		_node.StripeProductID = value
+	}
+	if value, ok := ic.mutation.CategoryName(); ok {
+		_spec.SetField(item.FieldCategoryName, field.TypeString, value)
+		_node.CategoryName = value
 	}
 	if nodes := ic.mutation.CategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

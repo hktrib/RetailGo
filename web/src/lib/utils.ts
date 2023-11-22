@@ -11,12 +11,32 @@ export function cn(...inputs: ClassValue[]) {
 export function useFetch() {
   const { getToken } = useAuth();
  
-  const authenticatedFetch = async (url: string | Request, init?: RequestInit, headers?: any) => {
-    return fetch(url, {
+  const authenticatedFetch = async (url: string | Request, init?: RequestInit, headers?: any, toJSON?: boolean) => {
+    const response = fetch(url, {
       ...init,
       headers: headers !== undefined? {...headers, ...{ Authorization: `Bearer ${await getToken()}` }} : {...headers, ...{ Authorization: `Bearer ${await getToken()}` }}}
-    ).then(res => res.json());
+    )
+    if (toJSON){
+      return response.then(res => res.json())
+    }
+    else{
+      return await response
+    }
   };
- 
+
+// const authenticatedFetch = async (url: string | Request, init?: RequestInit, headers?: any) => {
+//     const response = await fetch(url, {
+//       ...init,
+//       headers: headers !== undefined? {...headers, ...{ Authorization: `Bearer ${await getToken()}` }} : {...headers, ...{ Authorization: `Bearer ${await getToken()}` }}}
+//     );
+
+//     if (!response.ok){
+//       return Promise.reject()
+//     }else{
+//       return response
+//     }
+//   };
+  
+
   return authenticatedFetch;
 }

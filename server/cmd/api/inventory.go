@@ -133,9 +133,9 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req_item := ent.Item{}
+	reqItem := ent.Item{}
 
-	body_parse_err := json.Unmarshal(req_body, &req_item)
+	body_parse_err := json.Unmarshal(req_body, &reqItem)
 
 	// If any are not present or not do not meet requirements (type for example), BadRequest
 
@@ -147,15 +147,15 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 
 	// Create item in database with name, photo, quantity, store_id, category
 
-	ProductId, err := CreateStripeItem(&req_item)
+	ProductId, err := CreateStripeItem(&reqItem)
 	if err != nil {
 		fmt.Println("Stripe Create didn't work:", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 
-	fmt.Println("req_item:", req_item.Price, req_item.Name, ProductId.DefaultPrice.ID, req_item.Photo, req_item.Quantity, store_id)
+	fmt.Println("reqItem:", reqItem.Price, reqItem.Name, ProductId.DefaultPrice.ID, reqItem.Photo, reqItem.Quantity, store_id)
 
-	createdItem, create_err := srv.DBClient.Item.Create().SetPrice(float64(req_item.Price)).SetName(req_item.Name).SetStripePriceID(ProductId.DefaultPrice.ID).SetStripeProductID(ProductId.ID).SetPhoto([]byte(req_item.Photo)).SetQuantity(req_item.Quantity).SetStoreID(store_id).Save(ctx)
+	createdItem, create_err := srv.DBClient.Item.Create().SetPrice(float64(reqItem.Price)).SetName(reqItem.Name).SetStripePriceID(ProductId.DefaultPrice.ID).SetStripeProductID(ProductId.ID).SetPhoto([]byte(reqItem.Photo)).SetQuantity(reqItem.Quantity).SetStoreID(store_id).SetCategoryName(reqItem.CategoryName).Save(ctx)
 	// If this create doesn't work, InternalServerError
 	if create_err != nil {
 		fmt.Println("Create didn't work:", create_err)
@@ -176,23 +176,32 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 
 	// ctx := r.Context()
 
-	// store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
+	// Load the message parameters (Name, Photo, Quantity, Category)
+	req_body, err := io.ReadAll(r.Body)
 
-	itemId, err := strconv.Atoi(r.URL.Query().Get("item"))
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		fmt.Println("Server failed to read message body:", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	change, err := strconv.Atoi(r.URL.Query().Get("change"))
-	if err != nil {
+
+	reqItem := ent.Item{}
+
+	body_parse_err := json.Unmarshal(req_body, &reqItem)
+
+	// If any are not present or not do not meet requirements (type for example), BadRequest
+
+	if body_parse_err != nil {
+		fmt.Println("Unmarshalling failed:", body_parse_err)
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	targetItem, err := srv.DBClient.Item.
 		Query().
-		Where(item.ID(itemId)).
+		Where(item.ID(reqItem.ID)).
 		Only(r.Context())
+
 	if ent.IsNotFound(err) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
@@ -201,8 +210,7 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = targetItem.Update().SetQuantity(targetItem.Quantity - change).
-		Save(r.Context())
+	_, err = targetItem.Update().SetQuantity(reqItem.Quantity).SetName(reqItem.Name).SetPhoto(reqItem.Photo).SetPrice(reqItem.Price).SetCategoryName(reqItem.CategoryName).Save(r.Context())
 
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -218,17 +226,26 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 }
 func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 
-	store := r.Context().Value("store_var").(*ent.Store)
+	// store := r.Context().Value("store_var").(*ent.Store)
 
-	item_id, err := strconv.Atoi(r.URL.Query().Get("item"))
+	store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
+
 	if err != nil {
+		fmt.Println("Store Id parsing failed")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	item_id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		fmt.Println("Item id parsing failed")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	err = srv.DBClient.
 		Item.DeleteOneID(item_id).
-		Where(item.StoreID(store.ID)).
+		Where(item.StoreID(store_id)).
 		Exec(r.Context())
 
 	if ent.IsNotFound(err) {
