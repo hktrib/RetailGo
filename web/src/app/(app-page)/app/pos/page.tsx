@@ -48,7 +48,7 @@ export default function POSPage() {
   const [selectedCategory, setSelectedCategory] = useState(-1);
   const [cart, setCart] = useState<(Product & { quantity: number })[]>([]);
   const [visibleProducts, setVisibleProducts] = useState(products);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   const addItemToCart = (pid: number) => {
     console.log(pid, cart);
@@ -112,17 +112,16 @@ export default function POSPage() {
 
     if (searchTerm) {
       const query = searchTerm.toLowerCase();
-    
-      filteredProducts = filteredProducts.filter((product) =>
-        product.name.toLowerCase().includes(query) ||
-        product.id.toString().toLowerCase().includes(query)
+
+      filteredProducts = filteredProducts.filter(
+        (product) =>
+          product.name.toLowerCase().includes(query) ||
+          product.id.toString().toLowerCase().includes(query)
       );
     }
-    
 
     setVisibleProducts(filteredProducts);
   }, [selectedCategory, searchTerm]);
-
 
   const fetchCategoryById = (categoryId: number) => {
     return categories.filter((category) => category.id === categoryId)[0].name;
@@ -135,10 +134,11 @@ export default function POSPage() {
     return cart[i].quantity;
   };
 
-  const handleSearchChange = (e: { target: { value: SetStateAction<string>; }; }) => {
+  const handleSearchChange = (e: {
+    target: { value: SetStateAction<string> };
+  }) => {
     setSearchTerm(e.target.value);
   };
-
 
   return (
     <div className="py-5 px-8 h-full flex-grow flex flex-col w-full mx-auto max-w-7xl">
@@ -230,8 +230,9 @@ const CategoryCard = ({
 }) => {
   return (
     <article
-      className={`bg-gray-100 p-4 rounded-lg cursor-pointer ${selected && "ring ring-blue-200"
-        }`}
+      className={`bg-gray-100 p-4 rounded-lg cursor-pointer ${
+        selected && "ring ring-blue-200"
+      }`}
       onClick={() => setSelectedCategory(id)}
     >
       <div className="text-xl font-medium">{name}</div>
