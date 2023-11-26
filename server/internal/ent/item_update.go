@@ -91,6 +91,53 @@ func (iu *ItemUpdate) SetCategoryName(s string) *ItemUpdate {
 	return iu
 }
 
+// SetNumberSold sets the "number_sold" field.
+func (iu *ItemUpdate) SetNumberSold(i int) *ItemUpdate {
+	iu.mutation.ResetNumberSold()
+	iu.mutation.SetNumberSold(i)
+	return iu
+}
+
+// SetNillableNumberSold sets the "number_sold" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableNumberSold(i *int) *ItemUpdate {
+	if i != nil {
+		iu.SetNumberSold(*i)
+	}
+	return iu
+}
+
+// AddNumberSold adds i to the "number_sold" field.
+func (iu *ItemUpdate) AddNumberSold(i int) *ItemUpdate {
+	iu.mutation.AddNumberSold(i)
+	return iu
+}
+
+// ClearNumberSold clears the value of the "number_sold" field.
+func (iu *ItemUpdate) ClearNumberSold() *ItemUpdate {
+	iu.mutation.ClearNumberSold()
+	return iu
+}
+
+// SetDateLastSold sets the "date_last_sold" field.
+func (iu *ItemUpdate) SetDateLastSold(s string) *ItemUpdate {
+	iu.mutation.SetDateLastSold(s)
+	return iu
+}
+
+// SetNillableDateLastSold sets the "date_last_sold" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableDateLastSold(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetDateLastSold(*s)
+	}
+	return iu
+}
+
+// ClearDateLastSold clears the value of the "date_last_sold" field.
+func (iu *ItemUpdate) ClearDateLastSold() *ItemUpdate {
+	iu.mutation.ClearDateLastSold()
+	return iu
+}
+
 // AddCategoryIDs adds the "category" edge to the Category entity by IDs.
 func (iu *ItemUpdate) AddCategoryIDs(ids ...int) *ItemUpdate {
 	iu.mutation.AddCategoryIDs(ids...)
@@ -216,6 +263,21 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := iu.mutation.CategoryName(); ok {
 		_spec.SetField(item.FieldCategoryName, field.TypeString, value)
+	}
+	if value, ok := iu.mutation.NumberSold(); ok {
+		_spec.SetField(item.FieldNumberSold, field.TypeInt, value)
+	}
+	if value, ok := iu.mutation.AddedNumberSold(); ok {
+		_spec.AddField(item.FieldNumberSold, field.TypeInt, value)
+	}
+	if iu.mutation.NumberSoldCleared() {
+		_spec.ClearField(item.FieldNumberSold, field.TypeInt)
+	}
+	if value, ok := iu.mutation.DateLastSold(); ok {
+		_spec.SetField(item.FieldDateLastSold, field.TypeString, value)
+	}
+	if iu.mutation.DateLastSoldCleared() {
+		_spec.ClearField(item.FieldDateLastSold, field.TypeString)
 	}
 	if iu.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -370,6 +432,53 @@ func (iuo *ItemUpdateOne) SetStripeProductID(s string) *ItemUpdateOne {
 // SetCategoryName sets the "category_name" field.
 func (iuo *ItemUpdateOne) SetCategoryName(s string) *ItemUpdateOne {
 	iuo.mutation.SetCategoryName(s)
+	return iuo
+}
+
+// SetNumberSold sets the "number_sold" field.
+func (iuo *ItemUpdateOne) SetNumberSold(i int) *ItemUpdateOne {
+	iuo.mutation.ResetNumberSold()
+	iuo.mutation.SetNumberSold(i)
+	return iuo
+}
+
+// SetNillableNumberSold sets the "number_sold" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableNumberSold(i *int) *ItemUpdateOne {
+	if i != nil {
+		iuo.SetNumberSold(*i)
+	}
+	return iuo
+}
+
+// AddNumberSold adds i to the "number_sold" field.
+func (iuo *ItemUpdateOne) AddNumberSold(i int) *ItemUpdateOne {
+	iuo.mutation.AddNumberSold(i)
+	return iuo
+}
+
+// ClearNumberSold clears the value of the "number_sold" field.
+func (iuo *ItemUpdateOne) ClearNumberSold() *ItemUpdateOne {
+	iuo.mutation.ClearNumberSold()
+	return iuo
+}
+
+// SetDateLastSold sets the "date_last_sold" field.
+func (iuo *ItemUpdateOne) SetDateLastSold(s string) *ItemUpdateOne {
+	iuo.mutation.SetDateLastSold(s)
+	return iuo
+}
+
+// SetNillableDateLastSold sets the "date_last_sold" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableDateLastSold(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetDateLastSold(*s)
+	}
+	return iuo
+}
+
+// ClearDateLastSold clears the value of the "date_last_sold" field.
+func (iuo *ItemUpdateOne) ClearDateLastSold() *ItemUpdateOne {
+	iuo.mutation.ClearDateLastSold()
 	return iuo
 }
 
@@ -528,6 +637,21 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 	}
 	if value, ok := iuo.mutation.CategoryName(); ok {
 		_spec.SetField(item.FieldCategoryName, field.TypeString, value)
+	}
+	if value, ok := iuo.mutation.NumberSold(); ok {
+		_spec.SetField(item.FieldNumberSold, field.TypeInt, value)
+	}
+	if value, ok := iuo.mutation.AddedNumberSold(); ok {
+		_spec.AddField(item.FieldNumberSold, field.TypeInt, value)
+	}
+	if iuo.mutation.NumberSoldCleared() {
+		_spec.ClearField(item.FieldNumberSold, field.TypeInt)
+	}
+	if value, ok := iuo.mutation.DateLastSold(); ok {
+		_spec.SetField(item.FieldDateLastSold, field.TypeString, value)
+	}
+	if iuo.mutation.DateLastSoldCleared() {
+		_spec.ClearField(item.FieldDateLastSold, field.TypeString)
 	}
 	if iuo.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{

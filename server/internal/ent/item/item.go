@@ -28,6 +28,10 @@ const (
 	FieldStripeProductID = "stripe_product_id"
 	// FieldCategoryName holds the string denoting the category_name field in the database.
 	FieldCategoryName = "category_name"
+	// FieldNumberSold holds the string denoting the number_sold field in the database.
+	FieldNumberSold = "number_sold"
+	// FieldDateLastSold holds the string denoting the date_last_sold field in the database.
+	FieldDateLastSold = "date_last_sold"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
 	// EdgeStore holds the string denoting the store edge name in mutations.
@@ -68,6 +72,8 @@ var Columns = []string{
 	FieldStripePriceID,
 	FieldStripeProductID,
 	FieldCategoryName,
+	FieldNumberSold,
+	FieldDateLastSold,
 }
 
 var (
@@ -127,6 +133,16 @@ func ByStripeProductID(opts ...sql.OrderTermOption) OrderOption {
 // ByCategoryName orders the results by the category_name field.
 func ByCategoryName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCategoryName, opts...).ToFunc()
+}
+
+// ByNumberSold orders the results by the number_sold field.
+func ByNumberSold(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNumberSold, opts...).ToFunc()
+}
+
+// ByDateLastSold orders the results by the date_last_sold field.
+func ByDateLastSold(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDateLastSold, opts...).ToFunc()
 }
 
 // ByCategoryCount orders the results by category count.
