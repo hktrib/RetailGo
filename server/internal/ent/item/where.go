@@ -83,6 +83,16 @@ func StripePriceID(v string) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldStripePriceID, v))
 }
 
+// StripeProductID applies equality check predicate on the "stripe_product_id" field. It's identical to StripeProductIDEQ.
+func StripeProductID(v string) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldStripeProductID, v))
+}
+
+// CategoryName applies equality check predicate on the "category_name" field. It's identical to CategoryNameEQ.
+func CategoryName(v string) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldCategoryName, v))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldName, v))
@@ -351,6 +361,136 @@ func StripePriceIDEqualFold(v string) predicate.Item {
 // StripePriceIDContainsFold applies the ContainsFold predicate on the "stripe_price_id" field.
 func StripePriceIDContainsFold(v string) predicate.Item {
 	return predicate.Item(sql.FieldContainsFold(FieldStripePriceID, v))
+}
+
+// StripeProductIDEQ applies the EQ predicate on the "stripe_product_id" field.
+func StripeProductIDEQ(v string) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldStripeProductID, v))
+}
+
+// StripeProductIDNEQ applies the NEQ predicate on the "stripe_product_id" field.
+func StripeProductIDNEQ(v string) predicate.Item {
+	return predicate.Item(sql.FieldNEQ(FieldStripeProductID, v))
+}
+
+// StripeProductIDIn applies the In predicate on the "stripe_product_id" field.
+func StripeProductIDIn(vs ...string) predicate.Item {
+	return predicate.Item(sql.FieldIn(FieldStripeProductID, vs...))
+}
+
+// StripeProductIDNotIn applies the NotIn predicate on the "stripe_product_id" field.
+func StripeProductIDNotIn(vs ...string) predicate.Item {
+	return predicate.Item(sql.FieldNotIn(FieldStripeProductID, vs...))
+}
+
+// StripeProductIDGT applies the GT predicate on the "stripe_product_id" field.
+func StripeProductIDGT(v string) predicate.Item {
+	return predicate.Item(sql.FieldGT(FieldStripeProductID, v))
+}
+
+// StripeProductIDGTE applies the GTE predicate on the "stripe_product_id" field.
+func StripeProductIDGTE(v string) predicate.Item {
+	return predicate.Item(sql.FieldGTE(FieldStripeProductID, v))
+}
+
+// StripeProductIDLT applies the LT predicate on the "stripe_product_id" field.
+func StripeProductIDLT(v string) predicate.Item {
+	return predicate.Item(sql.FieldLT(FieldStripeProductID, v))
+}
+
+// StripeProductIDLTE applies the LTE predicate on the "stripe_product_id" field.
+func StripeProductIDLTE(v string) predicate.Item {
+	return predicate.Item(sql.FieldLTE(FieldStripeProductID, v))
+}
+
+// StripeProductIDContains applies the Contains predicate on the "stripe_product_id" field.
+func StripeProductIDContains(v string) predicate.Item {
+	return predicate.Item(sql.FieldContains(FieldStripeProductID, v))
+}
+
+// StripeProductIDHasPrefix applies the HasPrefix predicate on the "stripe_product_id" field.
+func StripeProductIDHasPrefix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasPrefix(FieldStripeProductID, v))
+}
+
+// StripeProductIDHasSuffix applies the HasSuffix predicate on the "stripe_product_id" field.
+func StripeProductIDHasSuffix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasSuffix(FieldStripeProductID, v))
+}
+
+// StripeProductIDEqualFold applies the EqualFold predicate on the "stripe_product_id" field.
+func StripeProductIDEqualFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldEqualFold(FieldStripeProductID, v))
+}
+
+// StripeProductIDContainsFold applies the ContainsFold predicate on the "stripe_product_id" field.
+func StripeProductIDContainsFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldContainsFold(FieldStripeProductID, v))
+}
+
+// CategoryNameEQ applies the EQ predicate on the "category_name" field.
+func CategoryNameEQ(v string) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldCategoryName, v))
+}
+
+// CategoryNameNEQ applies the NEQ predicate on the "category_name" field.
+func CategoryNameNEQ(v string) predicate.Item {
+	return predicate.Item(sql.FieldNEQ(FieldCategoryName, v))
+}
+
+// CategoryNameIn applies the In predicate on the "category_name" field.
+func CategoryNameIn(vs ...string) predicate.Item {
+	return predicate.Item(sql.FieldIn(FieldCategoryName, vs...))
+}
+
+// CategoryNameNotIn applies the NotIn predicate on the "category_name" field.
+func CategoryNameNotIn(vs ...string) predicate.Item {
+	return predicate.Item(sql.FieldNotIn(FieldCategoryName, vs...))
+}
+
+// CategoryNameGT applies the GT predicate on the "category_name" field.
+func CategoryNameGT(v string) predicate.Item {
+	return predicate.Item(sql.FieldGT(FieldCategoryName, v))
+}
+
+// CategoryNameGTE applies the GTE predicate on the "category_name" field.
+func CategoryNameGTE(v string) predicate.Item {
+	return predicate.Item(sql.FieldGTE(FieldCategoryName, v))
+}
+
+// CategoryNameLT applies the LT predicate on the "category_name" field.
+func CategoryNameLT(v string) predicate.Item {
+	return predicate.Item(sql.FieldLT(FieldCategoryName, v))
+}
+
+// CategoryNameLTE applies the LTE predicate on the "category_name" field.
+func CategoryNameLTE(v string) predicate.Item {
+	return predicate.Item(sql.FieldLTE(FieldCategoryName, v))
+}
+
+// CategoryNameContains applies the Contains predicate on the "category_name" field.
+func CategoryNameContains(v string) predicate.Item {
+	return predicate.Item(sql.FieldContains(FieldCategoryName, v))
+}
+
+// CategoryNameHasPrefix applies the HasPrefix predicate on the "category_name" field.
+func CategoryNameHasPrefix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasPrefix(FieldCategoryName, v))
+}
+
+// CategoryNameHasSuffix applies the HasSuffix predicate on the "category_name" field.
+func CategoryNameHasSuffix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasSuffix(FieldCategoryName, v))
+}
+
+// CategoryNameEqualFold applies the EqualFold predicate on the "category_name" field.
+func CategoryNameEqualFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldEqualFold(FieldCategoryName, v))
+}
+
+// CategoryNameContainsFold applies the ContainsFold predicate on the "category_name" field.
+func CategoryNameContainsFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldContainsFold(FieldCategoryName, v))
 }
 
 // HasCategory applies the HasEdge predicate on the "category" edge.

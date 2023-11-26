@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/clerkinc/clerk-sdk-go/clerk"
@@ -14,6 +13,7 @@ import (
 	kvRedis "github.com/hktrib/RetailGo/internal/redis"
 	worker "github.com/hktrib/RetailGo/internal/tasks"
 	"github.com/hktrib/RetailGo/internal/util"
+	"github.com/hktrib/RetailGo/internal/webhook"
 	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
@@ -32,23 +32,24 @@ func runTaskConsumer(redisOptions *asynq.RedisClientOpt, dbClient *ent.Client, c
 
 func main() {
 	config, err := util.LoadConfig()
-	stripe.Key = os.Getenv("STRIPE_SK")
+	stripe.Key = config.STRIPE_SK
 	if err != nil {
 		panic(err)
 	}
 
 	taskQueueOptions := asynq.RedisClientOpt{
-		Addr: config.RedisAddress,
-		DB:   1,
+		Addr:     fmt.Sprintf("%s:%s", config.REDIS_HOSTNAME, config.REDIS_PORT),
+		Password: config.REDIS_PASSWORD,
+		DB:       1,
 	}
 
 	cacheOptions := &redis.Options{
-		Addr:     config.RedisAddress,
-		Password: "",
+		Addr:     fmt.Sprintf("%s:%s", config.REDIS_HOSTNAME, config.REDIS_PORT),
+		Password: config.REDIS_PASSWORD,
 		DB:       0,
 	}
 
-	clerkClient, err := clerk.NewClient(config.ClerkSK)
+	clerkClient, err := clerk.NewClient(config.CLERK_SK)
 	if err != nil {
 		panic(err)
 	}
@@ -75,7 +76,12 @@ func main() {
 		srv.Router.Use(injectActiveSession)
 
 		srv.MountHandlers()
-		err := http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", config.ServerAddress), srv.Router)
+
+		webhook.Config = &config
+		webhook.ClerkClient = clerkClient
+
+		err := http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", config.SERVER_ADDRESS), srv.Router)
+
 		if err != nil {
 			log.Fatal().Err(err).Msg("failed in starting server")
 		}

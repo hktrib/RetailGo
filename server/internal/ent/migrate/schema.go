@@ -69,6 +69,8 @@ var (
 		{Name: "quantity", Type: field.TypeInt},
 		{Name: "price", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "decimal(10,2)"}},
 		{Name: "stripe_price_id", Type: field.TypeString},
+		{Name: "stripe_product_id", Type: field.TypeString},
+		{Name: "category_name", Type: field.TypeString},
 		{Name: "store_id", Type: field.TypeInt},
 	}
 	// ItemsTable holds the schema information for the "items" table.
@@ -79,9 +81,21 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "items_stores_items",
-				Columns:    []*schema.Column{ItemsColumns[6]},
+				Columns:    []*schema.Column{ItemsColumns[8]},
 				RefColumns: []*schema.Column{StoresColumns[0]},
 				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "item_id",
+				Unique:  false,
+				Columns: []*schema.Column{ItemsColumns[0]},
+			},
+			{
+				Name:    "item_stripe_product_id",
+				Unique:  false,
+				Columns: []*schema.Column{ItemsColumns[6]},
 			},
 		},
 	}
@@ -110,13 +124,13 @@ var (
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "first_name", Type: field.TypeString},
-		{Name: "last_name", Type: field.TypeString},
-		{Name: "username", Type: field.TypeString, Unique: true},
 		{Name: "email", Type: field.TypeString},
 		{Name: "is_owner", Type: field.TypeBool},
 		{Name: "store_id", Type: field.TypeInt},
 		{Name: "clerk_user_id", Type: field.TypeString, Nullable: true},
+		{Name: "first_name", Type: field.TypeString, Nullable: true},
+		{Name: "last_name", Type: field.TypeString, Nullable: true},
+		{Name: "username", Type: field.TypeString, Unique: true, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
@@ -127,14 +141,14 @@ var (
 			{
 				Name:    "user_username_email",
 				Unique:  false,
-				Columns: []*schema.Column{UsersColumns[3], UsersColumns[4]},
+				Columns: []*schema.Column{UsersColumns[7], UsersColumns[1]},
 			},
 		},
 	}
 	// UserToStoresColumns holds the columns for the "user_to_stores" table.
 	UserToStoresColumns = []*schema.Column{
-		{Name: "permission_level", Type: field.TypeInt},
-		{Name: "joined_at", Type: field.TypeInt},
+		{Name: "permission_level", Type: field.TypeInt, Nullable: true},
+		{Name: "joined_at", Type: field.TypeInt, Nullable: true},
 		{Name: "user_id", Type: field.TypeInt},
 		{Name: "store_id", Type: field.TypeInt},
 	}
@@ -145,15 +159,15 @@ var (
 		PrimaryKey: []*schema.Column{UserToStoresColumns[2], UserToStoresColumns[3]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "user_to_stores_categories_user",
+				Symbol:     "user_to_stores_users_user",
 				Columns:    []*schema.Column{UserToStoresColumns[2]},
-				RefColumns: []*schema.Column{CategoriesColumns[0]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "user_to_stores_items_store",
+				Symbol:     "user_to_stores_stores_store",
 				Columns:    []*schema.Column{UserToStoresColumns[3]},
-				RefColumns: []*schema.Column{ItemsColumns[0]},
+				RefColumns: []*schema.Column{StoresColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -174,6 +188,6 @@ func init() {
 	CategoryItemsTable.ForeignKeys[0].RefTable = CategoriesTable
 	CategoryItemsTable.ForeignKeys[1].RefTable = ItemsTable
 	ItemsTable.ForeignKeys[0].RefTable = StoresTable
-	UserToStoresTable.ForeignKeys[0].RefTable = CategoriesTable
-	UserToStoresTable.ForeignKeys[1].RefTable = ItemsTable
+	UserToStoresTable.ForeignKeys[0].RefTable = UsersTable
+	UserToStoresTable.ForeignKeys[1].RefTable = StoresTable
 }

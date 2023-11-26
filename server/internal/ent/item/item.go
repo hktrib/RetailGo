@@ -24,6 +24,10 @@ const (
 	FieldStoreID = "store_id"
 	// FieldStripePriceID holds the string denoting the stripe_price_id field in the database.
 	FieldStripePriceID = "stripe_price_id"
+	// FieldStripeProductID holds the string denoting the stripe_product_id field in the database.
+	FieldStripeProductID = "stripe_product_id"
+	// FieldCategoryName holds the string denoting the category_name field in the database.
+	FieldCategoryName = "category_name"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
 	// EdgeStore holds the string denoting the store edge name in mutations.
@@ -62,6 +66,8 @@ var Columns = []string{
 	FieldPrice,
 	FieldStoreID,
 	FieldStripePriceID,
+	FieldStripeProductID,
+	FieldCategoryName,
 }
 
 var (
@@ -111,6 +117,16 @@ func ByStoreID(opts ...sql.OrderTermOption) OrderOption {
 // ByStripePriceID orders the results by the stripe_price_id field.
 func ByStripePriceID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStripePriceID, opts...).ToFunc()
+}
+
+// ByStripeProductID orders the results by the stripe_product_id field.
+func ByStripeProductID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStripeProductID, opts...).ToFunc()
+}
+
+// ByCategoryName orders the results by the category_name field.
+func ByCategoryName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCategoryName, opts...).ToFunc()
 }
 
 // ByCategoryCount orders the results by category count.

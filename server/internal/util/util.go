@@ -11,7 +11,7 @@ import (
 )
 
 func Open(config *Config) *ent.Client {
-	db, err := sql.Open(config.DBDriver, config.DBSource)
+	db, err := sql.Open(config.DB_DRIVER, config.DB_SOURCE)
 	if err != nil {
 		log.Fatal(err)
 	}

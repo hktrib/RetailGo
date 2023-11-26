@@ -108,6 +108,16 @@ func PermissionLevelLTE(v int) predicate.UserToStore {
 	return predicate.UserToStore(sql.FieldLTE(FieldPermissionLevel, v))
 }
 
+// PermissionLevelIsNil applies the IsNil predicate on the "permission_level" field.
+func PermissionLevelIsNil() predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldIsNull(FieldPermissionLevel))
+}
+
+// PermissionLevelNotNil applies the NotNil predicate on the "permission_level" field.
+func PermissionLevelNotNil() predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldNotNull(FieldPermissionLevel))
+}
+
 // JoinedAtEQ applies the EQ predicate on the "joined_at" field.
 func JoinedAtEQ(v int) predicate.UserToStore {
 	return predicate.UserToStore(sql.FieldEQ(FieldJoinedAt, v))
@@ -148,6 +158,16 @@ func JoinedAtLTE(v int) predicate.UserToStore {
 	return predicate.UserToStore(sql.FieldLTE(FieldJoinedAt, v))
 }
 
+// JoinedAtIsNil applies the IsNil predicate on the "joined_at" field.
+func JoinedAtIsNil() predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldIsNull(FieldJoinedAt))
+}
+
+// JoinedAtNotNil applies the NotNil predicate on the "joined_at" field.
+func JoinedAtNotNil() predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldNotNull(FieldJoinedAt))
+}
+
 // HasUser applies the HasEdge predicate on the "user" edge.
 func HasUser() predicate.UserToStore {
 	return predicate.UserToStore(func(s *sql.Selector) {
@@ -160,7 +180,7 @@ func HasUser() predicate.UserToStore {
 }
 
 // HasUserWith applies the HasEdge predicate on the "user" edge with a given conditions (other predicates).
-func HasUserWith(preds ...predicate.Category) predicate.UserToStore {
+func HasUserWith(preds ...predicate.User) predicate.UserToStore {
 	return predicate.UserToStore(func(s *sql.Selector) {
 		step := newUserStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
@@ -183,7 +203,7 @@ func HasStore() predicate.UserToStore {
 }
 
 // HasStoreWith applies the HasEdge predicate on the "store" edge with a given conditions (other predicates).
-func HasStoreWith(preds ...predicate.Item) predicate.UserToStore {
+func HasStoreWith(preds ...predicate.Store) predicate.UserToStore {
 	return predicate.UserToStore(func(s *sql.Selector) {
 		step := newStoreStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

@@ -1,7 +1,7 @@
-'use client'
+"use client";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
-import { useFetch } from "../../../lib/utils"
+import { useFetch } from "../../../lib/utils";
 
 import { Client } from "@clerk/nextjs/server";
 
@@ -16,7 +16,7 @@ const employees = [
     position: "Software Engineer",
     department: "IT",
     hireDate: "2021-01-15",
-    location: "New York"
+    location: "New York",
   },
   {
     firstName: "Jane",
@@ -27,7 +27,7 @@ const employees = [
     position: "Graphic Designer",
     department: "Marketing",
     hireDate: "2019-08-23",
-    location: "Los Angeles"
+    location: "Los Angeles",
   },
   {
     firstName: "Emily",
@@ -38,7 +38,7 @@ const employees = [
     position: "Sales Manager",
     department: "Sales",
     hireDate: "2020-05-12",
-    location: "Chicago"
+    location: "Chicago",
   },
   {
     firstName: "Michael",
@@ -49,7 +49,7 @@ const employees = [
     position: "HR Coordinator",
     department: "Human Resources",
     hireDate: "2018-11-30",
-    location: "Miami"
+    location: "Miami",
   },
   {
     firstName: "David",
@@ -60,7 +60,7 @@ const employees = [
     position: "Product Manager",
     department: "Product",
     hireDate: "2022-02-14",
-    location: "Seattle"
+    location: "Seattle",
   },
   {
     firstName: "Linda",
@@ -71,7 +71,7 @@ const employees = [
     position: "Accountant",
     department: "Finance",
     hireDate: "2017-07-09",
-    location: "Boston"
+    location: "Boston",
   },
   {
     firstName: "Robert",
@@ -82,7 +82,7 @@ const employees = [
     position: "Network Administrator",
     department: "IT",
     hireDate: "2021-06-20",
-    location: "San Francisco"
+    location: "San Francisco",
   },
   {
     firstName: "Sarah",
@@ -93,7 +93,7 @@ const employees = [
     position: "Customer Service Rep",
     department: "Support",
     hireDate: "2019-03-18",
-    location: "Austin"
+    location: "Austin",
   },
   {
     firstName: "Thomas",
@@ -104,7 +104,7 @@ const employees = [
     position: "Quality Assurance",
     department: "Production",
     hireDate: "2022-07-22",
-    location: "Denver"
+    location: "Denver",
   },
   {
     firstName: "Nancy",
@@ -115,25 +115,17 @@ const employees = [
     position: "Research Analyst",
     department: "Research",
     hireDate: "2018-12-10",
-    location: "Atlanta"
-  }
+    location: "Atlanta",
+  },
 ];
 
-  
-
-export default  function EmployeeTable(){
+export default function EmployeeTable() {
   let data = employees;
-  let authFetch = useFetch()
-  try{
-    //data = await authFetch("http://localhost:8080/store/1391/inventory/");
-  }
-  catch{
+  let authFetch = useFetch();
 
-  }
-
-  return(
+  return (
     <div>
-      <DataTable columns = {columns} data = {data} />
+      <DataTable columns={columns} data={data} />
     </div>
   );
 }

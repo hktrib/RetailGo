@@ -29,6 +29,10 @@ type Item struct {
 	StoreID int `json:"store_id,omitempty"`
 	// StripePriceID holds the value of the "stripe_price_id" field.
 	StripePriceID string `json:"stripe_price_id,omitempty"`
+	// StripeProductID holds the value of the "stripe_product_id" field.
+	StripeProductID string `json:"stripe_product_id,omitempty"`
+	// CategoryName holds the value of the "category_name" field.
+	CategoryName string `json:"category_name,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ItemQuery when eager-loading is set.
 	Edges        ItemEdges `json:"edges"`
@@ -90,7 +94,7 @@ func (*Item) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case item.FieldID, item.FieldQuantity, item.FieldStoreID:
 			values[i] = new(sql.NullInt64)
-		case item.FieldName, item.FieldStripePriceID:
+		case item.FieldName, item.FieldStripePriceID, item.FieldStripeProductID, item.FieldCategoryName:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -148,6 +152,18 @@ func (i *Item) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field stripe_price_id", values[j])
 			} else if value.Valid {
 				i.StripePriceID = value.String
+			}
+		case item.FieldStripeProductID:
+			if value, ok := values[j].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field stripe_product_id", values[j])
+			} else if value.Valid {
+				i.StripeProductID = value.String
+			}
+		case item.FieldCategoryName:
+			if value, ok := values[j].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field category_name", values[j])
+			} else if value.Valid {
+				i.CategoryName = value.String
 			}
 		default:
 			i.selectValues.Set(columns[j], values[j])
@@ -217,6 +233,12 @@ func (i *Item) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("stripe_price_id=")
 	builder.WriteString(i.StripePriceID)
+	builder.WriteString(", ")
+	builder.WriteString("stripe_product_id=")
+	builder.WriteString(i.StripeProductID)
+	builder.WriteString(", ")
+	builder.WriteString("category_name=")
+	builder.WriteString(i.CategoryName)
 	builder.WriteByte(')')
 	return builder.String()
 }

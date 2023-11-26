@@ -22,24 +22,24 @@ const (
 	EdgeUser = "user"
 	// EdgeStore holds the string denoting the store edge name in mutations.
 	EdgeStore = "store"
-	// CategoryFieldID holds the string denoting the ID field of the Category.
-	CategoryFieldID = "id"
-	// ItemFieldID holds the string denoting the ID field of the Item.
-	ItemFieldID = "id"
+	// UserFieldID holds the string denoting the ID field of the User.
+	UserFieldID = "id"
+	// StoreFieldID holds the string denoting the ID field of the Store.
+	StoreFieldID = "id"
 	// Table holds the table name of the usertostore in the database.
 	Table = "user_to_stores"
 	// UserTable is the table that holds the user relation/edge.
 	UserTable = "user_to_stores"
-	// UserInverseTable is the table name for the Category entity.
-	// It exists in this package in order to avoid circular dependency with the "category" package.
-	UserInverseTable = "categories"
+	// UserInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	UserInverseTable = "users"
 	// UserColumn is the table column denoting the user relation/edge.
 	UserColumn = "user_id"
 	// StoreTable is the table that holds the store relation/edge.
 	StoreTable = "user_to_stores"
-	// StoreInverseTable is the table name for the Item entity.
-	// It exists in this package in order to avoid circular dependency with the "item" package.
-	StoreInverseTable = "items"
+	// StoreInverseTable is the table name for the Store entity.
+	// It exists in this package in order to avoid circular dependency with the "store" package.
+	StoreInverseTable = "stores"
 	// StoreColumn is the table column denoting the store relation/edge.
 	StoreColumn = "store_id"
 )
@@ -101,14 +101,14 @@ func ByStoreField(field string, opts ...sql.OrderTermOption) OrderOption {
 func newUserStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, UserColumn),
-		sqlgraph.To(UserInverseTable, CategoryFieldID),
+		sqlgraph.To(UserInverseTable, UserFieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, UserTable, UserColumn),
 	)
 }
 func newStoreStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, StoreColumn),
-		sqlgraph.To(StoreInverseTable, ItemFieldID),
+		sqlgraph.To(StoreInverseTable, StoreFieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, StoreTable, StoreColumn),
 	)
 }

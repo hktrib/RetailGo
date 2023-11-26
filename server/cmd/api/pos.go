@@ -1,12 +1,18 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
+	. "github.com/hktrib/RetailGo/cmd/api/stripe-components"
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/item"
-	. "github.com/hktrib/RetailGo/stripe-components"
+	"github.com/stripe/stripe-go/v76"
+	"github.com/stripe/stripe-go/v76/webhook"
 	"io"
+	"io/ioutil"
 	"net/http"
+	"os"
 )
 
 func (srv *Server) StoreCheckout(writer http.ResponseWriter, request *http.Request) {
@@ -38,4 +44,62 @@ func (srv *Server) StoreCheckout(writer http.ResponseWriter, request *http.Reque
 	// Create a new Stripe Checkout Session
 	CreateCheckoutSession(cart, writer, request)
 
+}
+func (srv *Server) HandleSuccess(w http.ResponseWriter, r *http.Request) {
+
+	http.HandleFunc("/webhook", func(w http.ResponseWriter, req *http.Request) {
+		const MaxBodyBytes = int64(65536)
+		req.Body = http.MaxBytesReader(w, req.Body, MaxBodyBytes)
+
+		body, err := ioutil.ReadAll(req.Body)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error reading request body: %v\n", err)
+			w.WriteHeader(http.StatusServiceUnavailable)
+			return
+		}
+
+		// Pass the request body and Stripe-Signature header to ConstructEvent, along with the webhook signing key
+		// You can find your endpoint's secret in your webhook settings
+		endpointSecret := "whsec_..."
+		event, err := webhook.ConstructEvent(body, req.Header.Get("Stripe-Signature"), endpointSecret)
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error verifying webhook signature: %v\n", err)
+			w.WriteHeader(http.StatusBadRequest) // Return a 400 error on a bad signature
+			return
+		}
+
+		// Handle the checkout.session.completed event
+		if event.Type == "checkout.session.completed" {
+			var session stripe.CheckoutSession
+			err := json.Unmarshal(event.Data.Raw, &session)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error parsing webhook JSON: %v\n", err)
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+
+			params := &stripe.CheckoutSessionParams{}
+			params.AddExpand("line_items")
+
+			// Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
+			lineItems := session.LineItems
+			// Fulfill the purchase...
+			srv.FulfillOrder(lineItems)
+		}
+
+		w.WriteHeader(http.StatusOK)
+	})
+}
+
+func (srv *Server) FulfillOrder(LineItemList *stripe.LineItemList) {
+	for i := range LineItemList.Data {
+		// update item quantity
+		LineItem, err := srv.DBClient.Item.Query().Where(item.StripeProductID(LineItemList.Data[i].ID)).Only(context.Background())
+		if err != nil {
+			panic(err)
+		}
+		_, err = srv.DBClient.Item.UpdateOne(LineItem).SetQuantity(LineItem.Quantity - int(LineItemList.Data[i].Quantity)).Save(context.Background())
+
+	}
 }

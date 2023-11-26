@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useDeleteItem } from "@/lib/hooks/items";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -39,6 +40,7 @@ export function DataTable<TData extends Item, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const deleteItemMutation = useDeleteItem("1");
 
   const table = useReactTable({
     data,
@@ -79,9 +81,9 @@ export function DataTable<TData extends Item, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
                   );
                 })}
@@ -109,14 +111,20 @@ export function DataTable<TData extends Item, TValue>({
                       <Eye style={{ color: "blue" }} className=" w-5 "></Eye>
                     </Link>
                       <ItemDialog item={row.original} mode="edit" />
-                      <button onClick={() => console.log("Delete button clicked")}>
-                        <Trash2 style={{ color: "red" }} className="h-5 w-5 p-0"></Trash2>
+                      <button
+                        onClick={() =>
+                          deleteItemMutation.mutate(row.original.id)
+                        }
+                      >
+                        <Trash2
+                          style={{ color: "red" }}
+                          className="h-5 w-5 p-0"
+                        ></Trash2>
                       </button>
                     </div>
                   </TableCell>
                 </TableRow>
               ))
-
             ) : (
               <TableRow>
                 <TableCell
@@ -127,7 +135,6 @@ export function DataTable<TData extends Item, TValue>({
                 </TableCell>
               </TableRow>
             )}
-
           </TableBody>
         </Table>
       </div>
