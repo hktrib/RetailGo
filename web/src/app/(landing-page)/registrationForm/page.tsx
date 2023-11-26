@@ -94,7 +94,7 @@ export default function RegistrationForm() {
     };
 
     try {
-      const response = await authFetch("http://localhost:8080/create/store", {
+      const response = await authFetch("https://retailgo-production.up.railway.app/create/store", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
