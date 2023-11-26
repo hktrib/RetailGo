@@ -87,14 +87,6 @@ func (srv *Server) ValidateStoreAccess(next http.Handler) http.Handler {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-
-		// Validating if the user who submitted the request has access to the store.
-		if user.StoreID != storeID {
-			log.Debug().Msg(fmt.Sprintf("%v: user doesnt have access to store!!!", user))
-			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-			return
-		}
-
 		ctx = context.WithValue(ctx, "store_var", storeID)
 		ctx = context.WithValue(ctx, "user", user)
 

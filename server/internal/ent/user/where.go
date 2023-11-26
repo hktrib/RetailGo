@@ -203,6 +203,16 @@ func StoreIDLTE(v int) predicate.User {
 	return predicate.User(sql.FieldLTE(FieldStoreID, v))
 }
 
+// StoreIDIsNil applies the IsNil predicate on the "store_id" field.
+func StoreIDIsNil() predicate.User {
+	return predicate.User(sql.FieldIsNull(FieldStoreID))
+}
+
+// StoreIDNotNil applies the NotNil predicate on the "store_id" field.
+func StoreIDNotNil() predicate.User {
+	return predicate.User(sql.FieldNotNull(FieldStoreID))
+}
+
 // ClerkUserIDEQ applies the EQ predicate on the "clerk_user_id" field.
 func ClerkUserIDEQ(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldClerkUserID, v))

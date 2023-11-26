@@ -102,7 +102,9 @@ var (
 	// StoresColumns holds the columns for the "stores" table.
 	StoresColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "uuid", Type: field.TypeString, Unique: true},
 		{Name: "store_name", Type: field.TypeString},
+		{Name: "created_by", Type: field.TypeString},
 		{Name: "owner_email", Type: field.TypeString, Nullable: true},
 		{Name: "store_address", Type: field.TypeString, Nullable: true},
 		{Name: "store_phone", Type: field.TypeString, Nullable: true},
@@ -126,7 +128,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "email", Type: field.TypeString},
 		{Name: "is_owner", Type: field.TypeBool},
-		{Name: "store_id", Type: field.TypeInt},
+		{Name: "store_id", Type: field.TypeInt, Nullable: true},
 		{Name: "clerk_user_id", Type: field.TypeString, Nullable: true},
 		{Name: "first_name", Type: field.TypeString, Nullable: true},
 		{Name: "last_name", Type: field.TypeString, Nullable: true},

@@ -38,6 +38,14 @@ func (uc *UserCreate) SetStoreID(i int) *UserCreate {
 	return uc
 }
 
+// SetNillableStoreID sets the "store_id" field if the given value is not nil.
+func (uc *UserCreate) SetNillableStoreID(i *int) *UserCreate {
+	if i != nil {
+		uc.SetStoreID(*i)
+	}
+	return uc
+}
+
 // SetClerkUserID sets the "clerk_user_id" field.
 func (uc *UserCreate) SetClerkUserID(s string) *UserCreate {
 	uc.mutation.SetClerkUserID(s)
@@ -154,9 +162,6 @@ func (uc *UserCreate) check() error {
 	}
 	if _, ok := uc.mutation.IsOwner(); !ok {
 		return &ValidationError{Name: "is_owner", err: errors.New(`ent: missing required field "User.is_owner"`)}
-	}
-	if _, ok := uc.mutation.StoreID(); !ok {
-		return &ValidationError{Name: "store_id", err: errors.New(`ent: missing required field "User.store_id"`)}
 	}
 	return nil
 }

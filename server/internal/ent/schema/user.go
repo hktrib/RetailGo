@@ -18,7 +18,7 @@ func (User) Fields() []ent.Field {
 		field.Int("id").Unique(),
 		field.String("email"),
 		field.Bool("is_owner"),
-		field.Int("store_id"),
+		field.Int("store_id").Optional(),
 		field.String("clerk_user_id").Optional(),
 		field.String("first_name").Optional(),
 		field.String("last_name").Optional(),

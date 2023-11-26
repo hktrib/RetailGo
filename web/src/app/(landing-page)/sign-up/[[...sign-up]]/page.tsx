@@ -4,7 +4,6 @@ const SignUpPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <SignUp
-      redirectUrl={"registrationForm"}
         appearance={{
           elements: {
             formButtonPrimary:
@@ -12,6 +11,7 @@ const SignUpPage = () => {
             footerActionLink: "text-amber-600",
           },
         }}
+        afterSignUpUrl="/registrationForm" // Redirect to the store registration page after sign up
       />
     </div>
   );

@@ -35,6 +35,14 @@ func (cu *CategoryUpdate) SetName(s string) *CategoryUpdate {
 	return cu
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cu *CategoryUpdate) SetNillableName(s *string) *CategoryUpdate {
+	if s != nil {
+		cu.SetName(*s)
+	}
+	return cu
+}
+
 // SetPhoto sets the "photo" field.
 func (cu *CategoryUpdate) SetPhoto(b []byte) *CategoryUpdate {
 	cu.mutation.SetPhoto(b)
@@ -44,6 +52,14 @@ func (cu *CategoryUpdate) SetPhoto(b []byte) *CategoryUpdate {
 // SetStoreID sets the "store_id" field.
 func (cu *CategoryUpdate) SetStoreID(i int) *CategoryUpdate {
 	cu.mutation.SetStoreID(i)
+	return cu
+}
+
+// SetNillableStoreID sets the "store_id" field if the given value is not nil.
+func (cu *CategoryUpdate) SetNillableStoreID(i *int) *CategoryUpdate {
+	if i != nil {
+		cu.SetStoreID(*i)
+	}
 	return cu
 }
 
@@ -252,6 +268,14 @@ func (cuo *CategoryUpdateOne) SetName(s string) *CategoryUpdateOne {
 	return cuo
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cuo *CategoryUpdateOne) SetNillableName(s *string) *CategoryUpdateOne {
+	if s != nil {
+		cuo.SetName(*s)
+	}
+	return cuo
+}
+
 // SetPhoto sets the "photo" field.
 func (cuo *CategoryUpdateOne) SetPhoto(b []byte) *CategoryUpdateOne {
 	cuo.mutation.SetPhoto(b)
@@ -261,6 +285,14 @@ func (cuo *CategoryUpdateOne) SetPhoto(b []byte) *CategoryUpdateOne {
 // SetStoreID sets the "store_id" field.
 func (cuo *CategoryUpdateOne) SetStoreID(i int) *CategoryUpdateOne {
 	cuo.mutation.SetStoreID(i)
+	return cuo
+}
+
+// SetNillableStoreID sets the "store_id" field if the given value is not nil.
+func (cuo *CategoryUpdateOne) SetNillableStoreID(i *int) *CategoryUpdateOne {
+	if i != nil {
+		cuo.SetStoreID(*i)
+	}
 	return cuo
 }
 
