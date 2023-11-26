@@ -4,9 +4,8 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, MoreHorizontal, PencilIcon, Trash2 } from "lucide-react";
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Employee } from "@/models/employee";
-
 
 export const columns: ColumnDef<Employee>[] = [
   {
@@ -42,4 +41,3 @@ export const columns: ColumnDef<Employee>[] = [
     header: () => <div className="text-xs">ID</div>,
   },
 ];
-

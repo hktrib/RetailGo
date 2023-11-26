@@ -26,6 +26,7 @@ func (Item) Fields() []ent.Field {
 		field.Int("store_id"),
 		field.String("stripe_price_id"),
 		field.String("stripe_product_id"),
+		field.String("category_name"),
 	}
 }
 

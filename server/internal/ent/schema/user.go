@@ -15,14 +15,14 @@ type User struct {
 // Fields of the User.
 func (User) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("first_name"),
-		field.String("last_name"),
 		field.Int("id").Unique(),
-		field.String("username").Unique(),
 		field.String("email"),
 		field.Bool("is_owner"),
 		field.Int("store_id"),
 		field.String("clerk_user_id").Optional(),
+		field.String("first_name").Optional(),
+		field.String("last_name").Optional(),
+		field.String("username").Unique().Optional(),
 	}
 }
 

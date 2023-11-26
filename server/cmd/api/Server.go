@@ -1,6 +1,8 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/clerkinc/clerk-sdk-go/clerk"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -10,6 +12,7 @@ import (
 	kv "github.com/hktrib/RetailGo/internal/redis"
 	worker "github.com/hktrib/RetailGo/internal/tasks"
 	"github.com/hktrib/RetailGo/internal/util"
+	"github.com/hktrib/RetailGo/internal/webhook"
 )
 
 /*
@@ -63,10 +66,15 @@ func (s *Server) MountHandlers() {
 		MaxAge:           299, // Maximum value not ignored by any of major browsers
 	}))
 
+	s.Router.Post("/webhook", func(writer http.ResponseWriter, request *http.Request) {
+		s.HandleSuccess(writer, request)
+	})
+	s.Router.Post("/clerkwebhook", webhook.HandleClerkWebhook)
+	s.Router.Get("/", s.HelloWorld)
+
 	s.Router.Group(func(r chi.Router) {
 
 		// Add necessary middleware for protecting owner and store create routes
-		r.Get("/", s.HelloWorld)
 		r.Route("/create", func(r chi.Router) {
 			// r.Use(s.ProtectStoreAndOwnerCreation)
 			r.Group(func(r chi.Router) {
