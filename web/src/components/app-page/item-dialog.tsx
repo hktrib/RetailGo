@@ -59,10 +59,7 @@ export default function ItemDialog({
       <DialogTrigger asChild>
         {mode === "edit" ? (
           <button className="icon-button">
-            <PencilIcon
-              style={{ color: "orange" }}
-              className="h-5 w-5 p-0"
-            ></PencilIcon>
+            <PencilIcon style={{ color: "orange" }} className="h-5 w-5 p-0" />
           </button>
         ) : (
           <button className="bg-amber-500 text-sm px-3 py-1.5 text-white font-medium rounded-md">

@@ -3,9 +3,8 @@ import { columns } from "./columns";
 import { DataTable } from "./data-table";
 import { useFetch } from "../../../lib/utils";
 import { useItems } from "@/lib/hooks/items";
-import { Client } from "@clerk/nextjs/server";
 
-// Dummy inventory data
+// dummy inventory data
 const initialInventory = [
   {
     name: "Item 1",
@@ -46,8 +45,10 @@ export default function InventoryTable() {
 
   if (itemQuery.isLoading) {
     return <div>LOADING...</div>;
-  } else if (!itemQuery.isSuccess) {
-    console.log("Error loading items:", itemQuery.error);
+  }
+
+  if (!itemQuery.isSuccess) {
+    console.error("Error loading items:", itemQuery.error);
     return <div>There was an error loading your items. Please try again!</div>;
   }
 
