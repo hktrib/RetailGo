@@ -52,16 +52,7 @@ export function DataTable<TData extends Employee, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
-  const [editingCell, setEditingCell] = useState<{
-    rowIndex: number;
-    columnId: string;
-  } | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
-    null
-  );
-  const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
-  let employeeObj = new Employee();
+
   const table = useReactTable({
     data,
     columns,

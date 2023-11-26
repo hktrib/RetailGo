@@ -2,10 +2,10 @@ import { Item, ItemWithoutId } from "@/models/item";
 import { useFetch } from "../utils";
 import { auth } from "@clerk/nextjs";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { config } from './config';
 
-const serverURL = "http://localhost:8080/"; // "https://retailgo-production.up.railway.app/"
 
-const storeURL = serverURL + "store/";
+const storeURL = config.serverURL + "store/";
 
 // function createItem(store: string, item: JSON){
 //     return authFetch(inventoryURL + "create",
