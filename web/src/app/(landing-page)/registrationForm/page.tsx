@@ -90,7 +90,7 @@ export default function RegistrationForm() {
       store_phone: phoneNumber,
       store_address: address1,
       store_type: businessType,
-      owner_email: user?.emailAddresses[0],
+      owner_email: user?.emailAddresses[0].emailAddress,
     };
 
     try {
