@@ -124,13 +124,12 @@ var (
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "first_name", Type: field.TypeString},
-		{Name: "last_name", Type: field.TypeString},
-		{Name: "username", Type: field.TypeString, Unique: true},
 		{Name: "email", Type: field.TypeString},
 		{Name: "is_owner", Type: field.TypeBool},
 		{Name: "store_id", Type: field.TypeInt},
 		{Name: "clerk_user_id", Type: field.TypeString, Nullable: true},
+		{Name: "first_name", Type: field.TypeString, Nullable: true},
+		{Name: "last_name", Type: field.TypeString, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
@@ -139,9 +138,9 @@ var (
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "user_username_email",
+				Name:    "user_email",
 				Unique:  false,
-				Columns: []*schema.Column{UsersColumns[3], UsersColumns[4]},
+				Columns: []*schema.Column{UsersColumns[1]},
 			},
 		},
 	}

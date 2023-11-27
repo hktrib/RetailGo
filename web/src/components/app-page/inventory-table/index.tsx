@@ -1,11 +1,10 @@
-'use client'
+"use client";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
-import { useFetch } from "../../../lib/utils"
-import { useItems } from "@/app/(app-page)/app/hooks/items";
-import { Client } from "@clerk/nextjs/server";
+import { useFetch } from "../../../lib/utils";
+import { useItems } from "@/lib/hooks/items";
 
-// Dummy inventory data
+// dummy inventory data
 const initialInventory = [
   {
     name: "Item 1",
@@ -39,25 +38,23 @@ const initialInventory = [
   },
 ];
 
-export default function InventoryTable(){
-  const itemQuery = useItems("1")
+export default function InventoryTable() {
+  const itemQuery = useItems("1");
 
   // let data = initialInventory;
 
-  if (itemQuery.isLoading){
-    return (<div>
-      LOADING...
-    </div>)
-  } else if (!itemQuery.isSuccess){
-    console.log("Error loading items:", itemQuery.error)
-    return (<div>
-      There was an error loading your items. Please try again!
-    </div>)
+  if (itemQuery.isLoading) {
+    return <div>LOADING...</div>;
   }
 
-  return(
+  if (!itemQuery.isSuccess) {
+    console.error("Error loading items:", itemQuery.error);
+    return <div>There was an error loading your items. Please try again!</div>;
+  }
+
+  return (
     <div>
-      <DataTable columns = {columns} data = {itemQuery.data} />
+      <DataTable columns={columns} data={itemQuery.data} />
     </div>
   );
 }

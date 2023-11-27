@@ -31,9 +31,9 @@ export default function Inventory() {
     },
   ];
 
-  const newItem = new Item()
+  const newItem = new Item();
 
-  const queryClient = new QueryClient()
+  const queryClient = new QueryClient();
 
   return (
     <main className="bg-gray-50 h-full flex-grow">
@@ -42,7 +42,7 @@ export default function Inventory() {
           <h1 className="text-2xl font-bold">Inventory</h1>
 
           <div>
-            <AddItemDialog item = {newItem}/>
+            <AddItemDialog item={newItem} />
           </div>
         </div>
         <hr className="my-4" />

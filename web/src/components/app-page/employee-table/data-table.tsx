@@ -7,6 +7,7 @@ import {
   ColumnDef,
   ColumnFiltersState,
   SortingState,
+  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -14,7 +15,6 @@ import {
   getSortedRowModel,
   getPaginationRowModel,
 } from "@tanstack/react-table";
-
 import {
   Table,
   TableBody,
@@ -25,21 +25,24 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown";
+import { Employee } from "@/models/employee";
+
 import InviteEmployee from "../invite-employee";
 import AddEmployee from "../employee-dialog";
-import { PencilIcon, Trash2 } from "lucide-react";
-import { Employee } from "@/models/employee";
 import AddItemDialog from "../item-dialog";
 import EmployeeDialog from "../employee-dialog";
-
-
+import { PencilIcon, Trash2 } from "lucide-react";
 
 interface DataTableProps<TData extends Employee, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
-
-
 
 export function DataTable<TData extends Employee, TValue>({
   columns,
@@ -47,9 +50,16 @@ export function DataTable<TData extends Employee, TValue>({
 }: DataTableProps<Employee, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [editingCell, setEditingCell] = useState<{ rowIndex: number; columnId: string } | null>(null);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+
+  const [editingCell, setEditingCell] = useState<{
+    rowIndex: number;
+    columnId: string;
+  } | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
+    null
+  );
   const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
   let employeeObj = new Employee();
   const table = useReactTable({
@@ -61,15 +71,17 @@ export function DataTable<TData extends Employee, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
       columnFilters,
+      columnVisibility,
     },
   });
 
   return (
     <div>
-      <div className="flex items-center  justify-between py-4">
+      <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Search employees..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -78,9 +90,36 @@ export function DataTable<TData extends Employee, TValue>({
           }
           className="max-w-sm"
         />
-        <div className="flex items-center space-x-5">
-          <AddEmployee employeeData={new Employee} mode="add" />
+        <div className="flex items-center space-x-2">
+          <AddEmployee employeeData={new Employee()} mode="add" />
           <InviteEmployee />
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Customize
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -95,9 +134,9 @@ export function DataTable<TData extends Employee, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
                   );
                 })}
@@ -122,8 +161,13 @@ export function DataTable<TData extends Employee, TValue>({
                   <TableCell>
                     <div className="text-right flex flex-row space-x-2 h-8 w-8 p-0">
                       <EmployeeDialog employeeData={row.original} mode="edit" />
-                      <button onClick={() => console.log("Delete button clicked")}>
-                        <Trash2 style={{ color: "red" }} className="h-5 w-5 p-0"></Trash2>
+                      <button
+                        onClick={() => console.log("Delete button clicked")}
+                      >
+                        <Trash2
+                          style={{ color: "red" }}
+                          className="h-5 w-5 p-0"
+                        ></Trash2>
                       </button>
                     </div>
                   </TableCell>
@@ -162,6 +206,5 @@ export function DataTable<TData extends Employee, TValue>({
         </Button>
       </div>
     </div>
-
   );
 }

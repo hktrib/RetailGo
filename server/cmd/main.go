@@ -13,6 +13,7 @@ import (
 	kvRedis "github.com/hktrib/RetailGo/internal/redis"
 	worker "github.com/hktrib/RetailGo/internal/tasks"
 	"github.com/hktrib/RetailGo/internal/util"
+	"github.com/hktrib/RetailGo/internal/webhook"
 	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
@@ -75,9 +76,10 @@ func main() {
 		srv.Router.Use(injectActiveSession)
 
 		srv.MountHandlers()
-		http.HandleFunc("/webhook", func(writer http.ResponseWriter, request *http.Request) {
-			srv.HandleSuccess(writer, request)
-		})
+
+		webhook.Config = &config
+		webhook.ClerkClient = clerkClient
+
 		err := http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", config.SERVER_ADDRESS), srv.Router)
 
 		if err != nil {
