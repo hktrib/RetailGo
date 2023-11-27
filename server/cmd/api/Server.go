@@ -23,6 +23,8 @@ import (
 
 */
 
+type Param string
+
 type Server struct {
 	Router          *chi.Mux
 	ClerkClient     clerk.Client

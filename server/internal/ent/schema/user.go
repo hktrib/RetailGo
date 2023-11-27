@@ -22,7 +22,6 @@ func (User) Fields() []ent.Field {
 		field.String("clerk_user_id").Optional(),
 		field.String("first_name").Optional(),
 		field.String("last_name").Optional(),
-		field.String("username").Unique().Optional(),
 	}
 }
 
@@ -35,6 +34,6 @@ func (User) Edges() []ent.Edge {
 
 func (User) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("username", "email"),
+		index.Fields("email"),
 	}
 }

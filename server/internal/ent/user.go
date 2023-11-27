@@ -28,8 +28,6 @@ type User struct {
 	FirstName string `json:"first_name,omitempty"`
 	// LastName holds the value of the "last_name" field.
 	LastName string `json:"last_name,omitempty"`
-	// Username holds the value of the "username" field.
-	Username string `json:"username,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges        UserEdges `json:"edges"`
@@ -74,7 +72,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case user.FieldID, user.FieldStoreID:
 			values[i] = new(sql.NullInt64)
-		case user.FieldEmail, user.FieldClerkUserID, user.FieldFirstName, user.FieldLastName, user.FieldUsername:
+		case user.FieldEmail, user.FieldClerkUserID, user.FieldFirstName, user.FieldLastName:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -132,12 +130,6 @@ func (u *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field last_name", values[i])
 			} else if value.Valid {
 				u.LastName = value.String
-			}
-		case user.FieldUsername:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field username", values[i])
-			} else if value.Valid {
-				u.Username = value.String
 			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
@@ -202,9 +194,6 @@ func (u *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("last_name=")
 	builder.WriteString(u.LastName)
-	builder.WriteString(", ")
-	builder.WriteString("username=")
-	builder.WriteString(u.Username)
 	builder.WriteByte(')')
 	return builder.String()
 }
