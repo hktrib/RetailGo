@@ -3,8 +3,9 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	. "github.com/hktrib/RetailGo/cmd/api/stripe-components"
 	"io"
+
+	. "github.com/hktrib/RetailGo/cmd/api/stripe-components"
 
 	"net/http"
 	"strconv"
@@ -29,7 +30,6 @@ func (srv *Server) HelloWorld(w http.ResponseWriter, r *http.Request) {
 
 	user, err := srv.DBClient.User.
 		Create().
-		SetUsername("gvadhul").
 		SetFirstName("Giridhar").
 		SetLastName("Vadhul").
 		SetEmail("gvadhul@ucsc.edu").
