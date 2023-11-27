@@ -38,7 +38,7 @@ func (srv *Server) ValidateStore(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), "store_var", store)
+		ctx := context.WithValue(r.Context(), Param("store_var"), store)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
@@ -68,7 +68,7 @@ func (srv *Server) ValidateStoreAccess(next http.Handler) http.Handler {
 		storeID, err := strconv.Atoi(param)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-			log.Debug().Err(err).Msg(fmt.Sprintf("requested store_id %v not a integer", param))
+			log.Debug().Err(err).Msg(fmt.Sprintf("requested store_id %v not a integer", storeID))
 			return
 		}
 
@@ -95,8 +95,8 @@ func (srv *Server) ValidateStoreAccess(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx = context.WithValue(ctx, "store_var", storeID)
-		ctx = context.WithValue(ctx, "user", user)
+		ctx = context.WithValue(ctx, Param("store_var"), storeID)
+		ctx = context.WithValue(ctx, Param("user"), user)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
@@ -186,8 +186,8 @@ func (srv *Server) StoreCreateHandle(next http.Handler) http.Handler {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		ctx = context.WithValue(ctx, "store", &store)
-		ctx = context.WithValue(ctx, "owner", owner)
+		ctx = context.WithValue(ctx, Param("store"), &store)
+		ctx = context.WithValue(ctx, Param("owner"), owner)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
