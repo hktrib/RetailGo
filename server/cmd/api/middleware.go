@@ -68,7 +68,7 @@ func (srv *Server) ValidateStoreAccess(next http.Handler) http.Handler {
 		storeID, err := strconv.Atoi(param)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-			log.Debug().Err(err).Msg(fmt.Sprintf("requested store_id %s not a integer", param))
+			log.Debug().Err(err).Msg(fmt.Sprintf("requested store_id %v not a integer", param))
 			return
 		}
 
@@ -166,7 +166,7 @@ func (srv *Server) StoreCreateHandle(next http.Handler) http.Handler {
 
 		reqBytes, err := io.ReadAll(r.Body)
 		if err != nil {
-			log.Debug().Err(err).Msg("Reading request body failed..")
+			log.Debug().Err(err).Msg("io.Readall: Reading request body failed..")
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
@@ -175,7 +175,7 @@ func (srv *Server) StoreCreateHandle(next http.Handler) http.Handler {
 
 		err = json.Unmarshal(reqBytes, &store)
 		if err != nil {
-			log.Debug().Err(err).Msg("Reading request body failed..")
+			log.Debug().Err(err).Msg("json.Unmarshal: Reading request body failed..")
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
