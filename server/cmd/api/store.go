@@ -12,7 +12,7 @@ func (srv *Server) CreateStore(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 
-	reqStore := ctx.Value(Param("store_var")).(*ent.Store)
+	reqStore := ctx.Value(Param("store")).(*ent.Store)
 	reqUser := ctx.Value(Param("owner")).(*ent.User)
 	err := transactions.StoreAndOwnerCreationTx(ctx, reqStore, reqUser, srv.DBClient)
 	if err != nil {
