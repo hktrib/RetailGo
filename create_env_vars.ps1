@@ -1,5 +1,8 @@
 # Setting environment variables for RetailGo for the current user
 # Created by Colby Frey
+#Script takes one command line arguement -env which has two options "local" and "pro"
+# Local points to a local version of the retailgo database running in docker
+# Pro points to the production database on our supabase website
 
 param (
     [string]$env = "pro"
