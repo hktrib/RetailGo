@@ -7,21 +7,6 @@ const serverURL = "https://retailgo-production.up.railway.app/"
 
 const storeURL = serverURL + "store/";
 
-// function createItem(store: string, item: JSON){
-//     return authFetch(inventoryURL + "create",
-//     {
-//         method: 'POST',
-//         body: JSON.stringify(item, (key, value) => key === "quantity" || key === "price" ? parseFloat(value) : value)
-//       },
-//       {
-//         'Content-Type': 'application/json'
-//       })
-// }
-
-// function deleteItem(store: string, item: JSON)
-
-// function updateItem(store: string, item: JSON)
-
 export function useItems(store: string) {
   // const queryClient = useQueryClient()
   const authFetch = useFetch();
