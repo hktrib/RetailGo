@@ -40,7 +40,7 @@ func (srv *Server) ValidateStore(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), "store_var", store)
+		ctx := context.WithValue(r.Context(), Param("store_var"), store)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
@@ -70,7 +70,7 @@ func (srv *Server) ValidateStoreAccess(next http.Handler) http.Handler {
 		storeID, err := strconv.Atoi(param)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-			log.Debug().Err(err).Msg(fmt.Sprintf("requested store_id %s not a integer", param))
+			log.Debug().Err(err).Msg(fmt.Sprintf("requested store_id %v not a integer", storeID))
 			return
 		}
 
@@ -89,8 +89,16 @@ func (srv *Server) ValidateStoreAccess(next http.Handler) http.Handler {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		ctx = context.WithValue(ctx, "store_var", storeID)
-		ctx = context.WithValue(ctx, "user", user)
+
+		// Validating if the user who submitted the request has access to the store.
+		if user.StoreID != storeID {
+			log.Debug().Msg(fmt.Sprintf("%v: user doesnt have access to store!!!", user))
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		ctx = context.WithValue(ctx, Param("store_var"), storeID)
+		ctx = context.WithValue(ctx, Param("user"), user)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
@@ -160,7 +168,7 @@ func (srv *Server) StoreCreateHandle(next http.Handler) http.Handler {
 
 		reqBytes, err := io.ReadAll(r.Body)
 		if err != nil {
-			log.Debug().Err(err).Msg("Reading request body failed..")
+			log.Debug().Err(err).Msg("io.Readall: Reading request body failed..")
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
@@ -169,7 +177,7 @@ func (srv *Server) StoreCreateHandle(next http.Handler) http.Handler {
 
 		err = json.Unmarshal(reqBytes, &store)
 		if err != nil {
-			log.Debug().Err(err).Msg("Reading request body failed..")
+			log.Debug().Err(err).Msg("json.Unmarshal: Reading request body failed..")
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
@@ -180,8 +188,8 @@ func (srv *Server) StoreCreateHandle(next http.Handler) http.Handler {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		ctx = context.WithValue(ctx, "store", &store)
-		ctx = context.WithValue(ctx, "owner", owner)
+		ctx = context.WithValue(ctx, Param("store"), &store)
+		ctx = context.WithValue(ctx, Param("owner"), owner)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

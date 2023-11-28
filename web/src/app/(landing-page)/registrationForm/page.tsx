@@ -90,10 +90,11 @@ export default function RegistrationForm() {
       store_phone: phoneNumber,
       store_address: address1,
       store_type: businessType,
-      owner_email: user?.emailAddresses[0],
+      owner_email: user?.emailAddresses[0].emailAddress,
     };
 
     try {
+      console.log("POST Data: ", JSON.stringify(postData));
       const response = await authFetch("https://retailgo-production.up.railway.app/create/store", {
         method: "POST",
         headers: {

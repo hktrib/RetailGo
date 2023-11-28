@@ -24,8 +24,6 @@ const (
 	FieldFirstName = "first_name"
 	// FieldLastName holds the string denoting the last_name field in the database.
 	FieldLastName = "last_name"
-	// FieldUsername holds the string denoting the username field in the database.
-	FieldUsername = "username"
 	// EdgeStore holds the string denoting the store edge name in mutations.
 	EdgeStore = "store"
 	// EdgeUserToStore holds the string denoting the usertostore edge name in mutations.
@@ -55,7 +53,6 @@ var Columns = []string{
 	FieldClerkUserID,
 	FieldFirstName,
 	FieldLastName,
-	FieldUsername,
 }
 
 var (
@@ -110,11 +107,6 @@ func ByFirstName(opts ...sql.OrderTermOption) OrderOption {
 // ByLastName orders the results by the last_name field.
 func ByLastName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLastName, opts...).ToFunc()
-}
-
-// ByUsername orders the results by the username field.
-func ByUsername(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUsername, opts...).ToFunc()
 }
 
 // ByStoreCount orders the results by store count.
