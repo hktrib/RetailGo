@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"os"
 )
 
@@ -25,6 +26,7 @@ func LoadConfig() (config Config, err error) {
 
 	config.DB_DRIVER = os.Getenv("DB_DRIVER")
 	config.DB_SOURCE = os.Getenv("DB_SOURCE")
+	fmt.Println(config.DB_SOURCE)
 	config.SERVER_ADDRESS = envPortOr("8080")
 	config.CLERK_SK = os.Getenv("CLERK_SK")
 	config.CLERK_WEBHOOK_SECRET = os.Getenv("CLERK_WEBHOOK_SECRET")

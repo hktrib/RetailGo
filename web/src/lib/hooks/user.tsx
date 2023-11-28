@@ -11,7 +11,6 @@ const storeURL = config.serverURL + "user/";
 export function HasStore() {
   // const queryClient = useQueryClient()
   const authFetch = useFetch();
-  console.log(storeURL + "store")
   return useQuery({
     queryKey: ["hasStore"],
     queryFn: () => authFetch(storeURL + "store", {}, {}, true),

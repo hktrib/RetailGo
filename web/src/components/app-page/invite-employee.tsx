@@ -33,7 +33,14 @@ export default function InviteEmployee() {
     resolver: zodResolver(formSchema),
   });
 
-  const inviteMutation = SendInvite("13");
+ // Assuming storeId is known or retrieved from somewhere
+ const storeId = "1";
+ const inviteMutation = SendInvite(storeId);
+
+ const onSubmit = form.handleSubmit((data) => {
+  console.log(JSON.stringify(data));
+  inviteMutation.mutate(data);
+});
 
   return (
     <Dialog>
@@ -46,11 +53,7 @@ export default function InviteEmployee() {
       <Form {...form}>
         <form>
           <DialogContent>
-            <form onSubmit={form.handleSubmit(
-                (data) => {
-                  console.log("Data:", data);
-                  return inviteMutation;
-                })}>
+            <form onSubmit={onSubmit} {...form}>
               <DialogHeader>
                 <DialogTitle>Invite employee</DialogTitle>
               </DialogHeader>
