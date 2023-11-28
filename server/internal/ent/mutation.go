@@ -1924,7 +1924,9 @@ type StoreMutation struct {
 	op                Op
 	typ               string
 	id                *int
+	uuid              *string
 	store_name        *string
+	created_by        *string
 	owner_email       *string
 	store_address     *string
 	store_phone       *string
@@ -2048,6 +2050,42 @@ func (m *StoreMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
+// SetUUID sets the "uuid" field.
+func (m *StoreMutation) SetUUID(s string) {
+	m.uuid = &s
+}
+
+// UUID returns the value of the "uuid" field in the mutation.
+func (m *StoreMutation) UUID() (r string, exists bool) {
+	v := m.uuid
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUUID returns the old "uuid" field's value of the Store entity.
+// If the Store object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StoreMutation) OldUUID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUUID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUUID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUUID: %w", err)
+	}
+	return oldValue.UUID, nil
+}
+
+// ResetUUID resets all changes to the "uuid" field.
+func (m *StoreMutation) ResetUUID() {
+	m.uuid = nil
+}
+
 // SetStoreName sets the "store_name" field.
 func (m *StoreMutation) SetStoreName(s string) {
 	m.store_name = &s
@@ -2082,6 +2120,42 @@ func (m *StoreMutation) OldStoreName(ctx context.Context) (v string, err error) 
 // ResetStoreName resets all changes to the "store_name" field.
 func (m *StoreMutation) ResetStoreName() {
 	m.store_name = nil
+}
+
+// SetCreatedBy sets the "created_by" field.
+func (m *StoreMutation) SetCreatedBy(s string) {
+	m.created_by = &s
+}
+
+// CreatedBy returns the value of the "created_by" field in the mutation.
+func (m *StoreMutation) CreatedBy() (r string, exists bool) {
+	v := m.created_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedBy returns the old "created_by" field's value of the Store entity.
+// If the Store object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StoreMutation) OldCreatedBy(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedBy: %w", err)
+	}
+	return oldValue.CreatedBy, nil
+}
+
+// ResetCreatedBy resets all changes to the "created_by" field.
+func (m *StoreMutation) ResetCreatedBy() {
+	m.created_by = nil
 }
 
 // SetOwnerEmail sets the "owner_email" field.
@@ -2476,9 +2550,15 @@ func (m *StoreMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *StoreMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 7)
+	if m.uuid != nil {
+		fields = append(fields, store.FieldUUID)
+	}
 	if m.store_name != nil {
 		fields = append(fields, store.FieldStoreName)
+	}
+	if m.created_by != nil {
+		fields = append(fields, store.FieldCreatedBy)
 	}
 	if m.owner_email != nil {
 		fields = append(fields, store.FieldOwnerEmail)
@@ -2500,8 +2580,12 @@ func (m *StoreMutation) Fields() []string {
 // schema.
 func (m *StoreMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case store.FieldUUID:
+		return m.UUID()
 	case store.FieldStoreName:
 		return m.StoreName()
+	case store.FieldCreatedBy:
+		return m.CreatedBy()
 	case store.FieldOwnerEmail:
 		return m.OwnerEmail()
 	case store.FieldStoreAddress:
@@ -2519,8 +2603,12 @@ func (m *StoreMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *StoreMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case store.FieldUUID:
+		return m.OldUUID(ctx)
 	case store.FieldStoreName:
 		return m.OldStoreName(ctx)
+	case store.FieldCreatedBy:
+		return m.OldCreatedBy(ctx)
 	case store.FieldOwnerEmail:
 		return m.OldOwnerEmail(ctx)
 	case store.FieldStoreAddress:
@@ -2538,12 +2626,26 @@ func (m *StoreMutation) OldField(ctx context.Context, name string) (ent.Value, e
 // type.
 func (m *StoreMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case store.FieldUUID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUUID(v)
+		return nil
 	case store.FieldStoreName:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStoreName(v)
+		return nil
+	case store.FieldCreatedBy:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedBy(v)
 		return nil
 	case store.FieldOwnerEmail:
 		v, ok := value.(string)
@@ -2649,8 +2751,14 @@ func (m *StoreMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *StoreMutation) ResetField(name string) error {
 	switch name {
+	case store.FieldUUID:
+		m.ResetUUID()
+		return nil
 	case store.FieldStoreName:
 		m.ResetStoreName()
+		return nil
+	case store.FieldCreatedBy:
+		m.ResetCreatedBy()
 		return nil
 	case store.FieldOwnerEmail:
 		m.ResetOwnerEmail()
@@ -3052,10 +3160,24 @@ func (m *UserMutation) AddedStoreID() (r int, exists bool) {
 	return *v, true
 }
 
+// ClearStoreID clears the value of the "store_id" field.
+func (m *UserMutation) ClearStoreID() {
+	m.store_id = nil
+	m.addstore_id = nil
+	m.clearedFields[user.FieldStoreID] = struct{}{}
+}
+
+// StoreIDCleared returns if the "store_id" field was cleared in this mutation.
+func (m *UserMutation) StoreIDCleared() bool {
+	_, ok := m.clearedFields[user.FieldStoreID]
+	return ok
+}
+
 // ResetStoreID resets all changes to the "store_id" field.
 func (m *UserMutation) ResetStoreID() {
 	m.store_id = nil
 	m.addstore_id = nil
+	delete(m.clearedFields, user.FieldStoreID)
 }
 
 // SetClerkUserID sets the "clerk_user_id" field.
@@ -3449,6 +3571,9 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *UserMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(user.FieldStoreID) {
+		fields = append(fields, user.FieldStoreID)
+	}
 	if m.FieldCleared(user.FieldClerkUserID) {
 		fields = append(fields, user.FieldClerkUserID)
 	}
@@ -3472,6 +3597,9 @@ func (m *UserMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *UserMutation) ClearField(name string) error {
 	switch name {
+	case user.FieldStoreID:
+		m.ClearStoreID()
+		return nil
 	case user.FieldClerkUserID:
 		m.ClearClerkUserID()
 		return nil

@@ -121,6 +121,12 @@ func (s *Server) MountHandlers() {
 				r.Post("/update", s.InvUpdate) //
 
 			})
+
+			r.Route("/staff", func(r chi.Router) {
+				r.Get("/", s.GetAllEmployees) //
+				r.Post("/invite", s.SendInviteEmail)
+			})
+
 			r.Route("/pos", func(r chi.Router) {
 				r.Get("/checkout", s.StoreCheckout)
 			})
@@ -130,11 +136,14 @@ func (s *Server) MountHandlers() {
 		})
 	})
 	s.Router.Route("/user", func(r chi.Router) {
-		r.Post("/", s.UserCreate)            // Create a new user
-		r.Delete("/{user_id}", s.UserDelete) // Delete a user by ID
-		r.Get("/{user_id}", s.UserQuery)     // Get a user by ID
-		r.Post("/add", s.userAdd)            // Additional user creation endpoint
-		r.Put("/{user_id}", s.userUpdate)    // Update a user by ID
+		r.Get("/store", s.UserHasStore) // Checks if a user has a store
+		r.Route("/{store_id}", func(r chi.Router) {
+			r.Delete("/", s.UserDelete) // Delete a user by ID
+			r.Put("/", s.userUpdate)    // Update a user by ID
+			r.Get("/", s.UserQuery)     // Get a user by ID
+		})
+		r.Post("/", s.UserCreate) // Create a new user
+		r.Post("/add", s.userAdd) // Additional user creation endpoint
 	})
 
 }

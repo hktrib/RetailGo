@@ -34,7 +34,6 @@ func (srv *Server) HelloWorld(w http.ResponseWriter, r *http.Request) {
 		SetLastName("Vadhul").
 		SetEmail("gvadhul@ucsc.edu").
 		SetIsOwner(true).
-		SetStoreID(1381).
 		Save(ctx)
 
 	if err != nil {

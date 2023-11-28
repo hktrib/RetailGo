@@ -30,9 +30,45 @@ func (su *StoreUpdate) Where(ps ...predicate.Store) *StoreUpdate {
 	return su
 }
 
+// SetUUID sets the "uuid" field.
+func (su *StoreUpdate) SetUUID(s string) *StoreUpdate {
+	su.mutation.SetUUID(s)
+	return su
+}
+
+// SetNillableUUID sets the "uuid" field if the given value is not nil.
+func (su *StoreUpdate) SetNillableUUID(s *string) *StoreUpdate {
+	if s != nil {
+		su.SetUUID(*s)
+	}
+	return su
+}
+
 // SetStoreName sets the "store_name" field.
 func (su *StoreUpdate) SetStoreName(s string) *StoreUpdate {
 	su.mutation.SetStoreName(s)
+	return su
+}
+
+// SetNillableStoreName sets the "store_name" field if the given value is not nil.
+func (su *StoreUpdate) SetNillableStoreName(s *string) *StoreUpdate {
+	if s != nil {
+		su.SetStoreName(*s)
+	}
+	return su
+}
+
+// SetCreatedBy sets the "created_by" field.
+func (su *StoreUpdate) SetCreatedBy(s string) *StoreUpdate {
+	su.mutation.SetCreatedBy(s)
+	return su
+}
+
+// SetNillableCreatedBy sets the "created_by" field if the given value is not nil.
+func (su *StoreUpdate) SetNillableCreatedBy(s *string) *StoreUpdate {
+	if s != nil {
+		su.SetCreatedBy(*s)
+	}
 	return su
 }
 
@@ -265,8 +301,14 @@ func (su *StoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := su.mutation.UUID(); ok {
+		_spec.SetField(store.FieldUUID, field.TypeString, value)
+	}
 	if value, ok := su.mutation.StoreName(); ok {
 		_spec.SetField(store.FieldStoreName, field.TypeString, value)
+	}
+	if value, ok := su.mutation.CreatedBy(); ok {
+		_spec.SetField(store.FieldCreatedBy, field.TypeString, value)
 	}
 	if value, ok := su.mutation.OwnerEmail(); ok {
 		_spec.SetField(store.FieldOwnerEmail, field.TypeString, value)
@@ -447,9 +489,45 @@ type StoreUpdateOne struct {
 	mutation *StoreMutation
 }
 
+// SetUUID sets the "uuid" field.
+func (suo *StoreUpdateOne) SetUUID(s string) *StoreUpdateOne {
+	suo.mutation.SetUUID(s)
+	return suo
+}
+
+// SetNillableUUID sets the "uuid" field if the given value is not nil.
+func (suo *StoreUpdateOne) SetNillableUUID(s *string) *StoreUpdateOne {
+	if s != nil {
+		suo.SetUUID(*s)
+	}
+	return suo
+}
+
 // SetStoreName sets the "store_name" field.
 func (suo *StoreUpdateOne) SetStoreName(s string) *StoreUpdateOne {
 	suo.mutation.SetStoreName(s)
+	return suo
+}
+
+// SetNillableStoreName sets the "store_name" field if the given value is not nil.
+func (suo *StoreUpdateOne) SetNillableStoreName(s *string) *StoreUpdateOne {
+	if s != nil {
+		suo.SetStoreName(*s)
+	}
+	return suo
+}
+
+// SetCreatedBy sets the "created_by" field.
+func (suo *StoreUpdateOne) SetCreatedBy(s string) *StoreUpdateOne {
+	suo.mutation.SetCreatedBy(s)
+	return suo
+}
+
+// SetNillableCreatedBy sets the "created_by" field if the given value is not nil.
+func (suo *StoreUpdateOne) SetNillableCreatedBy(s *string) *StoreUpdateOne {
+	if s != nil {
+		suo.SetCreatedBy(*s)
+	}
 	return suo
 }
 
@@ -712,8 +790,14 @@ func (suo *StoreUpdateOne) sqlSave(ctx context.Context) (_node *Store, err error
 			}
 		}
 	}
+	if value, ok := suo.mutation.UUID(); ok {
+		_spec.SetField(store.FieldUUID, field.TypeString, value)
+	}
 	if value, ok := suo.mutation.StoreName(); ok {
 		_spec.SetField(store.FieldStoreName, field.TypeString, value)
+	}
+	if value, ok := suo.mutation.CreatedBy(); ok {
+		_spec.SetField(store.FieldCreatedBy, field.TypeString, value)
 	}
 	if value, ok := suo.mutation.OwnerEmail(); ok {
 		_spec.SetField(store.FieldOwnerEmail, field.TypeString, value)

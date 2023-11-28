@@ -35,9 +35,25 @@ func (utsu *UserToStoreUpdate) SetUserID(i int) *UserToStoreUpdate {
 	return utsu
 }
 
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (utsu *UserToStoreUpdate) SetNillableUserID(i *int) *UserToStoreUpdate {
+	if i != nil {
+		utsu.SetUserID(*i)
+	}
+	return utsu
+}
+
 // SetStoreID sets the "store_id" field.
 func (utsu *UserToStoreUpdate) SetStoreID(i int) *UserToStoreUpdate {
 	utsu.mutation.SetStoreID(i)
+	return utsu
+}
+
+// SetNillableStoreID sets the "store_id" field if the given value is not nil.
+func (utsu *UserToStoreUpdate) SetNillableStoreID(i *int) *UserToStoreUpdate {
+	if i != nil {
+		utsu.SetStoreID(*i)
+	}
 	return utsu
 }
 
@@ -274,9 +290,25 @@ func (utsuo *UserToStoreUpdateOne) SetUserID(i int) *UserToStoreUpdateOne {
 	return utsuo
 }
 
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (utsuo *UserToStoreUpdateOne) SetNillableUserID(i *int) *UserToStoreUpdateOne {
+	if i != nil {
+		utsuo.SetUserID(*i)
+	}
+	return utsuo
+}
+
 // SetStoreID sets the "store_id" field.
 func (utsuo *UserToStoreUpdateOne) SetStoreID(i int) *UserToStoreUpdateOne {
 	utsuo.mutation.SetStoreID(i)
+	return utsuo
+}
+
+// SetNillableStoreID sets the "store_id" field if the given value is not nil.
+func (utsuo *UserToStoreUpdateOne) SetNillableStoreID(i *int) *UserToStoreUpdateOne {
+	if i != nil {
+		utsuo.SetStoreID(*i)
+	}
 	return utsuo
 }
 

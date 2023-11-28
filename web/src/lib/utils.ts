@@ -9,7 +9,6 @@ export function cn(...inputs: ClassValue[]) {
 // https://clerk.com/docs/backend-requests/making/cross-origin
 export function useFetch() {
   const { getToken } = useAuth();
-
   const authenticatedFetch = async (
     url: string | Request,
     init?: RequestInit,

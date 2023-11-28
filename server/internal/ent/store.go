@@ -16,8 +16,12 @@ type Store struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// UUID holds the value of the "uuid" field.
+	UUID string `json:"uuid,omitempty"`
 	// StoreName holds the value of the "store_name" field.
 	StoreName string `json:"store_name,omitempty"`
+	// CreatedBy holds the value of the "created_by" field.
+	CreatedBy string `json:"created_by,omitempty"`
 	// OwnerEmail holds the value of the "owner_email" field.
 	OwnerEmail string `json:"owner_email,omitempty"`
 	// StoreAddress holds the value of the "store_address" field.
@@ -90,7 +94,7 @@ func (*Store) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case store.FieldID:
 			values[i] = new(sql.NullInt64)
-		case store.FieldStoreName, store.FieldOwnerEmail, store.FieldStoreAddress, store.FieldStorePhone, store.FieldStoreType:
+		case store.FieldUUID, store.FieldStoreName, store.FieldCreatedBy, store.FieldOwnerEmail, store.FieldStoreAddress, store.FieldStorePhone, store.FieldStoreType:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -113,11 +117,23 @@ func (s *Store) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			s.ID = int(value.Int64)
+		case store.FieldUUID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field uuid", values[i])
+			} else if value.Valid {
+				s.UUID = value.String
+			}
 		case store.FieldStoreName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field store_name", values[i])
 			} else if value.Valid {
 				s.StoreName = value.String
+			}
+		case store.FieldCreatedBy:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field created_by", values[i])
+			} else if value.Valid {
+				s.CreatedBy = value.String
 			}
 		case store.FieldOwnerEmail:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -199,8 +215,14 @@ func (s *Store) String() string {
 	var builder strings.Builder
 	builder.WriteString("Store(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", s.ID))
+	builder.WriteString("uuid=")
+	builder.WriteString(s.UUID)
+	builder.WriteString(", ")
 	builder.WriteString("store_name=")
 	builder.WriteString(s.StoreName)
+	builder.WriteString(", ")
+	builder.WriteString("created_by=")
+	builder.WriteString(s.CreatedBy)
 	builder.WriteString(", ")
 	builder.WriteString("owner_email=")
 	builder.WriteString(s.OwnerEmail)

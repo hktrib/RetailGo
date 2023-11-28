@@ -22,9 +22,21 @@ type StoreCreate struct {
 	hooks    []Hook
 }
 
+// SetUUID sets the "uuid" field.
+func (sc *StoreCreate) SetUUID(s string) *StoreCreate {
+	sc.mutation.SetUUID(s)
+	return sc
+}
+
 // SetStoreName sets the "store_name" field.
 func (sc *StoreCreate) SetStoreName(s string) *StoreCreate {
 	sc.mutation.SetStoreName(s)
+	return sc
+}
+
+// SetCreatedBy sets the "created_by" field.
+func (sc *StoreCreate) SetCreatedBy(s string) *StoreCreate {
+	sc.mutation.SetCreatedBy(s)
 	return sc
 }
 
@@ -169,8 +181,14 @@ func (sc *StoreCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (sc *StoreCreate) check() error {
+	if _, ok := sc.mutation.UUID(); !ok {
+		return &ValidationError{Name: "uuid", err: errors.New(`ent: missing required field "Store.uuid"`)}
+	}
 	if _, ok := sc.mutation.StoreName(); !ok {
 		return &ValidationError{Name: "store_name", err: errors.New(`ent: missing required field "Store.store_name"`)}
+	}
+	if _, ok := sc.mutation.CreatedBy(); !ok {
+		return &ValidationError{Name: "created_by", err: errors.New(`ent: missing required field "Store.created_by"`)}
 	}
 	return nil
 }
@@ -204,9 +222,17 @@ func (sc *StoreCreate) createSpec() (*Store, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
+	if value, ok := sc.mutation.UUID(); ok {
+		_spec.SetField(store.FieldUUID, field.TypeString, value)
+		_node.UUID = value
+	}
 	if value, ok := sc.mutation.StoreName(); ok {
 		_spec.SetField(store.FieldStoreName, field.TypeString, value)
 		_node.StoreName = value
+	}
+	if value, ok := sc.mutation.CreatedBy(); ok {
+		_spec.SetField(store.FieldCreatedBy, field.TypeString, value)
+		_node.CreatedBy = value
 	}
 	if value, ok := sc.mutation.OwnerEmail(); ok {
 		_spec.SetField(store.FieldOwnerEmail, field.TypeString, value)

@@ -21,35 +21,19 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { SendInvite } from "@/lib/hooks/staff";
 
 export default function InviteEmployee() {
   const formSchema = z.object({
     email: z.string(),
+    name: z.string(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (data) => {
-    try {
-      const response = await fetch("/ai/send-invite", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (response.ok) {
-        // Handle success - maybe show a message to the user
-      } else {
-        // Handle error - maybe show an error message
-      }
-    } catch (error) {
-      // Handle error - maybe show an error message
-    }
-  };
+  const inviteMutation = SendInvite("13");
 
   return (
     <Dialog>
@@ -62,10 +46,27 @@ export default function InviteEmployee() {
       <Form {...form}>
         <form>
           <DialogContent>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
+            <form onSubmit={form.handleSubmit(
+                (data) => {
+                  console.log("Data:", data);
+                  return inviteMutation;
+                })}>
               <DialogHeader>
                 <DialogTitle>Invite employee</DialogTitle>
               </DialogHeader>
+
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Bob Jones" />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
 
               <FormField
                 control={form.control}

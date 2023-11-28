@@ -12,8 +12,12 @@ const (
 	Label = "store"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldUUID holds the string denoting the uuid field in the database.
+	FieldUUID = "uuid"
 	// FieldStoreName holds the string denoting the store_name field in the database.
 	FieldStoreName = "store_name"
+	// FieldCreatedBy holds the string denoting the created_by field in the database.
+	FieldCreatedBy = "created_by"
 	// FieldOwnerEmail holds the string denoting the owner_email field in the database.
 	FieldOwnerEmail = "owner_email"
 	// FieldStoreAddress holds the string denoting the store_address field in the database.
@@ -63,7 +67,9 @@ const (
 // Columns holds all SQL columns for store fields.
 var Columns = []string{
 	FieldID,
+	FieldUUID,
 	FieldStoreName,
+	FieldCreatedBy,
 	FieldOwnerEmail,
 	FieldStoreAddress,
 	FieldStorePhone,
@@ -94,9 +100,19 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
+// ByUUID orders the results by the uuid field.
+func ByUUID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUUID, opts...).ToFunc()
+}
+
 // ByStoreName orders the results by the store_name field.
 func ByStoreName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStoreName, opts...).ToFunc()
+}
+
+// ByCreatedBy orders the results by the created_by field.
+func ByCreatedBy(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedBy, opts...).ToFunc()
 }
 
 // ByOwnerEmail orders the results by the owner_email field.

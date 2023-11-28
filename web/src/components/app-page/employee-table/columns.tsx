@@ -9,12 +9,20 @@ import { Employee } from "@/models/employee";
 
 export const columns: ColumnDef<Employee>[] = [
   {
-    accessorKey: "employeeId",
+    accessorKey: "id",
     header: () => <div className="text-xs">ID</div>,
   },
   {
-    accessorKey: "name",
-    header: () => <div className="text-xs">Name</div>,
+    accessorKey: "first_name",
+    header: () => <div className="text-xs">First Name</div>,
+  },
+  {
+    accessorKey: "last_name",
+    header: () => <div className="text-xs">Last Name</div>,
+  },
+  {
+    accessorKey: "email",
+    header: () => <div className="text-xs">Email</div>,
   },
   {
     accessorKey: "position",
@@ -34,10 +42,6 @@ export const columns: ColumnDef<Employee>[] = [
   },
   {
     accessorKey: "department",
-    header: () => <div className="text-xs">ID</div>,
-  },
-  {
-    accessorKey: "hireDate",
     header: () => <div className="text-xs">ID</div>,
   },
 ];

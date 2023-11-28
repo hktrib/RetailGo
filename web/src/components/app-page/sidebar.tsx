@@ -18,7 +18,7 @@ const navigation = [
   { name: "POS", href: "/pos", icon: ShoppingBag },
 ];
 
-const fakeStores = [{ name: "RetailGo", id: "123" }];
+const fakeStores = [{ name: "RetailGo", id: "13" }];
 
 export default function Sidebar() {
   return (

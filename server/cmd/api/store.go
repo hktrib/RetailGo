@@ -3,10 +3,11 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-chi/chi/v5"
-	"github.com/hktrib/RetailGo/internal/ent/user"
 	"net/http"
 	"strconv"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/hktrib/RetailGo/internal/ent/user"
 
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/transactions"

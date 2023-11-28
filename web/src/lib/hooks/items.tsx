@@ -2,10 +2,25 @@ import { Item, ItemWithoutId } from "@/models/item";
 import { useFetch } from "../utils";
 import { auth } from "@clerk/nextjs";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { config } from './config';
 
-const serverURL = "https://retailgo-production.up.railway.app/"
 
-const storeURL = serverURL + "store/";
+const storeURL = config.serverURL + "store/";
+
+// function createItem(store: string, item: JSON){
+//     return authFetch(inventoryURL + "create",
+//     {
+//         method: 'POST',
+//         body: JSON.stringify(item, (key, value) => key === "quantity" || key === "price" ? parseFloat(value) : value)
+//       },
+//       {
+//         'Content-Type': 'application/json'
+//       })
+// }
+
+// function deleteItem(store: string, item: JSON)
+
+// function updateItem(store: string, item: JSON)
 
 export function useItems(store: string) {
   // const queryClient = useQueryClient()

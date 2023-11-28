@@ -35,6 +35,14 @@ func (iu *ItemUpdate) SetName(s string) *ItemUpdate {
 	return iu
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableName(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetName(*s)
+	}
+	return iu
+}
+
 // SetPhoto sets the "photo" field.
 func (iu *ItemUpdate) SetPhoto(b []byte) *ItemUpdate {
 	iu.mutation.SetPhoto(b)
@@ -45,6 +53,14 @@ func (iu *ItemUpdate) SetPhoto(b []byte) *ItemUpdate {
 func (iu *ItemUpdate) SetQuantity(i int) *ItemUpdate {
 	iu.mutation.ResetQuantity()
 	iu.mutation.SetQuantity(i)
+	return iu
+}
+
+// SetNillableQuantity sets the "quantity" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableQuantity(i *int) *ItemUpdate {
+	if i != nil {
+		iu.SetQuantity(*i)
+	}
 	return iu
 }
 
@@ -61,6 +77,14 @@ func (iu *ItemUpdate) SetPrice(f float64) *ItemUpdate {
 	return iu
 }
 
+// SetNillablePrice sets the "price" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillablePrice(f *float64) *ItemUpdate {
+	if f != nil {
+		iu.SetPrice(*f)
+	}
+	return iu
+}
+
 // AddPrice adds f to the "price" field.
 func (iu *ItemUpdate) AddPrice(f float64) *ItemUpdate {
 	iu.mutation.AddPrice(f)
@@ -73,9 +97,25 @@ func (iu *ItemUpdate) SetStoreID(i int) *ItemUpdate {
 	return iu
 }
 
+// SetNillableStoreID sets the "store_id" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableStoreID(i *int) *ItemUpdate {
+	if i != nil {
+		iu.SetStoreID(*i)
+	}
+	return iu
+}
+
 // SetStripePriceID sets the "stripe_price_id" field.
 func (iu *ItemUpdate) SetStripePriceID(s string) *ItemUpdate {
 	iu.mutation.SetStripePriceID(s)
+	return iu
+}
+
+// SetNillableStripePriceID sets the "stripe_price_id" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableStripePriceID(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetStripePriceID(*s)
+	}
 	return iu
 }
 
@@ -85,9 +125,25 @@ func (iu *ItemUpdate) SetStripeProductID(s string) *ItemUpdate {
 	return iu
 }
 
+// SetNillableStripeProductID sets the "stripe_product_id" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableStripeProductID(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetStripeProductID(*s)
+	}
+	return iu
+}
+
 // SetCategoryName sets the "category_name" field.
 func (iu *ItemUpdate) SetCategoryName(s string) *ItemUpdate {
 	iu.mutation.SetCategoryName(s)
+	return iu
+}
+
+// SetNillableCategoryName sets the "category_name" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableCategoryName(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetCategoryName(*s)
+	}
 	return iu
 }
 
@@ -317,6 +373,14 @@ func (iuo *ItemUpdateOne) SetName(s string) *ItemUpdateOne {
 	return iuo
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableName(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetName(*s)
+	}
+	return iuo
+}
+
 // SetPhoto sets the "photo" field.
 func (iuo *ItemUpdateOne) SetPhoto(b []byte) *ItemUpdateOne {
 	iuo.mutation.SetPhoto(b)
@@ -327,6 +391,14 @@ func (iuo *ItemUpdateOne) SetPhoto(b []byte) *ItemUpdateOne {
 func (iuo *ItemUpdateOne) SetQuantity(i int) *ItemUpdateOne {
 	iuo.mutation.ResetQuantity()
 	iuo.mutation.SetQuantity(i)
+	return iuo
+}
+
+// SetNillableQuantity sets the "quantity" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableQuantity(i *int) *ItemUpdateOne {
+	if i != nil {
+		iuo.SetQuantity(*i)
+	}
 	return iuo
 }
 
@@ -343,6 +415,14 @@ func (iuo *ItemUpdateOne) SetPrice(f float64) *ItemUpdateOne {
 	return iuo
 }
 
+// SetNillablePrice sets the "price" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillablePrice(f *float64) *ItemUpdateOne {
+	if f != nil {
+		iuo.SetPrice(*f)
+	}
+	return iuo
+}
+
 // AddPrice adds f to the "price" field.
 func (iuo *ItemUpdateOne) AddPrice(f float64) *ItemUpdateOne {
 	iuo.mutation.AddPrice(f)
@@ -355,9 +435,25 @@ func (iuo *ItemUpdateOne) SetStoreID(i int) *ItemUpdateOne {
 	return iuo
 }
 
+// SetNillableStoreID sets the "store_id" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableStoreID(i *int) *ItemUpdateOne {
+	if i != nil {
+		iuo.SetStoreID(*i)
+	}
+	return iuo
+}
+
 // SetStripePriceID sets the "stripe_price_id" field.
 func (iuo *ItemUpdateOne) SetStripePriceID(s string) *ItemUpdateOne {
 	iuo.mutation.SetStripePriceID(s)
+	return iuo
+}
+
+// SetNillableStripePriceID sets the "stripe_price_id" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableStripePriceID(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetStripePriceID(*s)
+	}
 	return iuo
 }
 
@@ -367,9 +463,25 @@ func (iuo *ItemUpdateOne) SetStripeProductID(s string) *ItemUpdateOne {
 	return iuo
 }
 
+// SetNillableStripeProductID sets the "stripe_product_id" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableStripeProductID(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetStripeProductID(*s)
+	}
+	return iuo
+}
+
 // SetCategoryName sets the "category_name" field.
 func (iuo *ItemUpdateOne) SetCategoryName(s string) *ItemUpdateOne {
 	iuo.mutation.SetCategoryName(s)
+	return iuo
+}
+
+// SetNillableCategoryName sets the "category_name" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableCategoryName(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetCategoryName(*s)
+	}
 	return iuo
 }
 

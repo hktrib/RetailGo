@@ -35,9 +35,25 @@ func (ciu *CategoryItemUpdate) SetCategoryID(i int) *CategoryItemUpdate {
 	return ciu
 }
 
+// SetNillableCategoryID sets the "category_id" field if the given value is not nil.
+func (ciu *CategoryItemUpdate) SetNillableCategoryID(i *int) *CategoryItemUpdate {
+	if i != nil {
+		ciu.SetCategoryID(*i)
+	}
+	return ciu
+}
+
 // SetItemID sets the "item_id" field.
 func (ciu *CategoryItemUpdate) SetItemID(i int) *CategoryItemUpdate {
 	ciu.mutation.SetItemID(i)
+	return ciu
+}
+
+// SetNillableItemID sets the "item_id" field if the given value is not nil.
+func (ciu *CategoryItemUpdate) SetNillableItemID(i *int) *CategoryItemUpdate {
+	if i != nil {
+		ciu.SetItemID(*i)
+	}
 	return ciu
 }
 
@@ -202,9 +218,25 @@ func (ciuo *CategoryItemUpdateOne) SetCategoryID(i int) *CategoryItemUpdateOne {
 	return ciuo
 }
 
+// SetNillableCategoryID sets the "category_id" field if the given value is not nil.
+func (ciuo *CategoryItemUpdateOne) SetNillableCategoryID(i *int) *CategoryItemUpdateOne {
+	if i != nil {
+		ciuo.SetCategoryID(*i)
+	}
+	return ciuo
+}
+
 // SetItemID sets the "item_id" field.
 func (ciuo *CategoryItemUpdateOne) SetItemID(i int) *CategoryItemUpdateOne {
 	ciuo.mutation.SetItemID(i)
+	return ciuo
+}
+
+// SetNillableItemID sets the "item_id" field if the given value is not nil.
+func (ciuo *CategoryItemUpdateOne) SetNillableItemID(i *int) *CategoryItemUpdateOne {
+	if i != nil {
+		ciuo.SetItemID(*i)
+	}
 	return ciuo
 }
 

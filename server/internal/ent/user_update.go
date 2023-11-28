@@ -34,9 +34,25 @@ func (uu *UserUpdate) SetEmail(s string) *UserUpdate {
 	return uu
 }
 
+// SetNillableEmail sets the "email" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableEmail(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetEmail(*s)
+	}
+	return uu
+}
+
 // SetIsOwner sets the "is_owner" field.
 func (uu *UserUpdate) SetIsOwner(b bool) *UserUpdate {
 	uu.mutation.SetIsOwner(b)
+	return uu
+}
+
+// SetNillableIsOwner sets the "is_owner" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableIsOwner(b *bool) *UserUpdate {
+	if b != nil {
+		uu.SetIsOwner(*b)
+	}
 	return uu
 }
 
@@ -47,9 +63,23 @@ func (uu *UserUpdate) SetStoreID(i int) *UserUpdate {
 	return uu
 }
 
+// SetNillableStoreID sets the "store_id" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableStoreID(i *int) *UserUpdate {
+	if i != nil {
+		uu.SetStoreID(*i)
+	}
+	return uu
+}
+
 // AddStoreID adds i to the "store_id" field.
 func (uu *UserUpdate) AddStoreID(i int) *UserUpdate {
 	uu.mutation.AddStoreID(i)
+	return uu
+}
+
+// ClearStoreID clears the value of the "store_id" field.
+func (uu *UserUpdate) ClearStoreID() *UserUpdate {
+	uu.mutation.ClearStoreID()
 	return uu
 }
 
@@ -202,6 +232,9 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.AddedStoreID(); ok {
 		_spec.AddField(user.FieldStoreID, field.TypeInt, value)
 	}
+	if uu.mutation.StoreIDCleared() {
+		_spec.ClearField(user.FieldStoreID, field.TypeInt)
+	}
 	if value, ok := uu.mutation.ClerkUserID(); ok {
 		_spec.SetField(user.FieldClerkUserID, field.TypeString, value)
 	}
@@ -291,9 +324,25 @@ func (uuo *UserUpdateOne) SetEmail(s string) *UserUpdateOne {
 	return uuo
 }
 
+// SetNillableEmail sets the "email" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableEmail(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetEmail(*s)
+	}
+	return uuo
+}
+
 // SetIsOwner sets the "is_owner" field.
 func (uuo *UserUpdateOne) SetIsOwner(b bool) *UserUpdateOne {
 	uuo.mutation.SetIsOwner(b)
+	return uuo
+}
+
+// SetNillableIsOwner sets the "is_owner" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableIsOwner(b *bool) *UserUpdateOne {
+	if b != nil {
+		uuo.SetIsOwner(*b)
+	}
 	return uuo
 }
 
@@ -304,9 +353,23 @@ func (uuo *UserUpdateOne) SetStoreID(i int) *UserUpdateOne {
 	return uuo
 }
 
+// SetNillableStoreID sets the "store_id" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableStoreID(i *int) *UserUpdateOne {
+	if i != nil {
+		uuo.SetStoreID(*i)
+	}
+	return uuo
+}
+
 // AddStoreID adds i to the "store_id" field.
 func (uuo *UserUpdateOne) AddStoreID(i int) *UserUpdateOne {
 	uuo.mutation.AddStoreID(i)
+	return uuo
+}
+
+// ClearStoreID clears the value of the "store_id" field.
+func (uuo *UserUpdateOne) ClearStoreID() *UserUpdateOne {
+	uuo.mutation.ClearStoreID()
 	return uuo
 }
 
@@ -488,6 +551,9 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.AddedStoreID(); ok {
 		_spec.AddField(user.FieldStoreID, field.TypeInt, value)
+	}
+	if uuo.mutation.StoreIDCleared() {
+		_spec.ClearField(user.FieldStoreID, field.TypeInt)
 	}
 	if value, ok := uuo.mutation.ClerkUserID(); ok {
 		_spec.SetField(user.FieldClerkUserID, field.TypeString, value)
