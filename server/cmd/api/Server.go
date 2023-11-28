@@ -122,7 +122,7 @@ func (s *Server) MountHandlers() {
 
 			r.Route("/staff", func(r chi.Router) {
 				r.Get("/", s.GetAllEmployees) //
-				r.Post("/email", s.TestEmailHandler)
+				r.Post("/invite", s.SendInviteEmail)
 			})
 
 			r.Route("/pos", func(r chi.Router) {

@@ -5,45 +5,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"strconv"
-	"strings"
 
-	"github.com/clerkinc/clerk-sdk-go/clerk"
 	"github.com/go-chi/chi/v5"
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/user"
 	"github.com/hktrib/RetailGo/internal/ent/usertostore"
 )
-
-// VerifyUserCredentials verifies the user's credentials and returns user data if valid.
-func VerifyUserCredentials(r *http.Request) (*clerk.User, error) {
-	client, err := clerk.NewClient(os.Getenv("CLERK_SK"))
-	if err != nil {
-		// Handle error in creating Clerk client
-		return nil, err
-	}
-
-	// Get the session token from the Authorization header
-	sessionToken := r.Header.Get("Authorization")
-	sessionToken = strings.TrimPrefix(sessionToken, "Bearer ")
-
-	// Verify the session
-	sessClaims, err := client.VerifyToken(sessionToken)
-	if err != nil {
-		// Handle error in verifying the token
-		return nil, err
-	}
-
-	// Get the user, and say welcome!
-	user, err := client.Users().Read(sessClaims.Claims.Subject)
-	if err != nil {
-		// Handle error in reading user data
-		return nil, err
-	}
-
-	return user, nil
-}
 
 func (srv *Server) UserCreate(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()

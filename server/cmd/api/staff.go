@@ -12,6 +12,7 @@ import (
 	"net/smtp"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/hktrib/RetailGo/internal/ent/store"
 	"github.com/hktrib/RetailGo/internal/ent/user"
 )
 
@@ -55,10 +56,8 @@ func (srv *Server) GetAllEmployees(w http.ResponseWriter, r *http.Request) {
 
 // EmailRequest represents the request body for email testing
 type EmailRequest struct {
-	Email       string `json:"email"`
-	Name        string `json:"name"`
-	Store_name  string `json:"store_name"`
-	Sender_name string `json:"sender_name"`
+	Email string `json:"email"`
+	Name  string `json:"name"`
 }
 
 type HtmlTemplate struct {
@@ -70,11 +69,36 @@ type HtmlTemplate struct {
 }
 
 // TestEmailHandler handles the email testing request
-func (srv *Server) TestEmailHandler(w http.ResponseWriter, r *http.Request) {
+func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	// Verify user credentials using clerk
+	clerk_user, clerk_err := VerifyUserCredentials(r)
+	if clerk_err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("Unauthorized"))
+		return
+	}
 
 	var req EmailRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Parse the store id
+	store_id, id_err := strconv.Atoi(chi.URLParam(r, "store_id"))
+
+	if id_err != nil {
+		fmt.Println("Error with Store Id")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	fmt.Println("Store ID: ", store_id)
+	storeObj, query_err := srv.DBClient.Store.Query().Where(store.ID(store_id)).Only(ctx)
+	if query_err != nil {
+		fmt.Println("Issue with querying the DB: " + query_err.Error())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 	// Set up authentication information.
@@ -107,18 +131,31 @@ func (srv *Server) TestEmailHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var firstName, lastName string
+	if clerk_user.FirstName != nil {
+		firstName = *clerk_user.FirstName
+	} else {
+		// Handle the nil case for FirstName
+	}
+
+	if clerk_user.LastName != nil {
+		lastName = *clerk_user.LastName
+	} else {
+		// Handle the nil case for LastName
+	}
+
 	// Read file content
 	htmlBody := new(bytes.Buffer)
-	Template := []HtmlTemplate{
-		{
-			Email:       req.Email,
-			Name:        req.Name,
-			Store_name:  req.Store_name,
-			Sender_name: req.Sender_name,
-			Action_url:  "http://localhost:300/sign-up?" + "1381",
-		},
+	templateData := HtmlTemplate{
+		Email:       req.Email,
+		Name:        req.Name,
+		Store_name:  storeObj.StoreName,
+		Sender_name: firstName + " " + lastName,
+		//Sender_name: "Billy Bob",
+		Action_url: "http://localhost:300/sign-up?" + storeObj.UUID,
 	}
-	err_io := tmpl.Execute(htmlBody, Template)
+	err_io := tmpl.Execute(htmlBody, templateData)
+
 	if err_io != nil {
 		// Handle error (e.g., error while reading)
 		http.Error(w, "Failed to read email template: "+err_io.Error(), http.StatusInternalServerError)
