@@ -50,7 +50,6 @@ const businessTypes = [
 
 export default function RegistrationForm() {
   const { user } = useUser();
-  const authFetch = useFetch();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -95,13 +94,15 @@ export default function RegistrationForm() {
 
     try {
       console.log("POST Data: ", JSON.stringify(postData));
-      const response = await authFetch("https://retailgo-production.up.railway.app/create/store", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // Any additional headers you need
+      const response = await useFetch({
+        url: "https://retailgo-production.up.railway.app/create/store",
+        init: {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(postData),
         },
-        body: JSON.stringify(postData),
       });
 
       console.log("Response:", response);

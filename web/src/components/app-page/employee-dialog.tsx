@@ -43,9 +43,6 @@ export default function EmployeeDialog({
     resolver: zodResolver(formSchema),
   });
 
-  // Set up your fetch utility
-  let authFetch = useFetch();
-
   // Pre-fill the form when editing an employee
   useEffect(() => {
     if (employeeData != null) {
@@ -64,16 +61,16 @@ export default function EmployeeDialog({
     const method = employeeData ? "PUT" : "POST";
 
     try {
-      const response = await authFetch(
-        url,
-        {
+      const response = await useFetch({
+        url: url,
+        init: {
           method: method,
           body: JSON.stringify(values),
         },
-        {
+        headers: {
           "Content-Type": "application/json",
-        }
-      );
+        },
+      });
 
       if (!response.id) {
         throw new Error(
