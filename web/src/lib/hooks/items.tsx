@@ -1,5 +1,5 @@
-import { Item, ItemWithoutId } from "@/models/item";
-import { useFetch } from "../utils";
+import { Item } from "@/models/item";
+import useFetch from "@/lib/useFetch";
 import { auth } from "@clerk/nextjs";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { config } from "./config";
@@ -23,20 +23,22 @@ const storeURL = config.serverURL + "store/";
 
 export function useItems(store: string) {
   // const queryClient = useQueryClient()
+  const authFetch = useFetch();
 
   return useQuery({
     queryKey: ["items", store],
     queryFn: () =>
-      useFetch({ url: storeURL + store + "/inventory/", toJSON: true }),
+      authFetch({ url: storeURL + store + "/inventory/", toJSON: true }),
   });
 }
 
 export function useCreateItem(store: string) {
   const queryClient = useQueryClient();
+  const authFetch = useFetch();
 
   return useMutation({
     mutationFn: (newItem: ItemWithoutId) =>
-      useFetch({
+      authFetch({
         url: storeURL + store + "/inventory/create",
         init: {
           method: "POST",
@@ -73,10 +75,11 @@ export function useCreateItem(store: string) {
 
 export function useEditItem(store: string) {
   const queryClient = useQueryClient();
+  const authFetch = useFetch();
 
   return useMutation({
     mutationFn: (newItem: Item) =>
-      useFetch({
+      authFetch({
         url: storeURL + store + "/inventory/update",
         init: {
           method: "POST",
@@ -105,10 +108,11 @@ export function useEditItem(store: string) {
 
 export function useDeleteItem(store: string) {
   const queryClient = useQueryClient();
+  const authFetch = useFetch();
 
   return useMutation({
     mutationFn: (id: number) =>
-      useFetch({
+      authFetch({
         url: storeURL + store + "/inventory/?id=" + id,
         init: {
           method: "DELETE",
