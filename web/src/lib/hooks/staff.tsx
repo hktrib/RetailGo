@@ -1,5 +1,5 @@
 import { Item, ItemWithoutId } from "@/models/item";
-import { useFetch } from "../utils";
+import useFetch from "@/lib/useFetch";
 import { auth } from "@clerk/nextjs";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { config } from "./config";
@@ -8,19 +8,22 @@ const storeURL = config.serverURL + "store/";
 
 export function GetStaffByStore(storeId: string) {
   // const queryClient = useQueryClient()
+  const authFetch = useFetch();
 
   console.log(storeURL + storeId + "/staff");
   return useQuery({
     queryKey: ["staff", storeId],
     queryFn: () =>
-      useFetch({ url: storeURL + storeId + "/staff", toJSON: true }),
+      authFetch({ url: storeURL + storeId + "/staff", toJSON: true }),
   });
 }
 
 export function SendInvite(storeId: string) {
+  const authFetch = useFetch();
+
   return useMutation({
     mutationFn: (email: string) =>
-      useFetch({
+      authFetch({
         url: `${storeURL}${storeId}/staff/invite`,
         init: {
           method: "POST",

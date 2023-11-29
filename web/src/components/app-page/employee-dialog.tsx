@@ -20,7 +20,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useFetch } from "@/lib/utils";
+import useFetch from "@/lib/useFetch";
 import { PencilIcon } from "lucide-react";
 import { Employee } from "@/models/employee";
 
@@ -31,7 +31,6 @@ const formSchema = z.object({
   email: z.string().email("Invalid email address"),
 });
 
-// The component definition
 export default function EmployeeDialog({
   employeeData,
   mode = "add",
@@ -39,6 +38,8 @@ export default function EmployeeDialog({
   employeeData: Employee;
   mode?: string;
 }) {
+  const authFetch = useFetch();
+
   const form = useForm({
     resolver: zodResolver(formSchema),
   });
@@ -61,7 +62,7 @@ export default function EmployeeDialog({
     const method = employeeData ? "PUT" : "POST";
 
     try {
-      const response = await useFetch({
+      const response = await authFetch({
         url: url,
         init: {
           method: method,
