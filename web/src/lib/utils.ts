@@ -7,29 +7,32 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // https://clerk.com/docs/backend-requests/making/cross-origin
-export function useFetch() {
+export async function useFetch({
+  url,
+  init,
+  headers,
+  toJSON,
+}: {
+  url: string | Request;
+  init?: RequestInit;
+  headers?: any;
+  toJSON?: boolean;
+}) {
   const { getToken } = useAuth();
-  const authenticatedFetch = async (
-    url: string | Request,
-    init?: RequestInit,
-    headers?: any,
-    toJSON?: boolean
-  ) => {
-    const fetchHeaders =
-      headers !== undefined
-        ? { ...headers, Authorization: `Bearer ${await getToken()}` }
-        : { Authorization: `Bearer ${await getToken()}` };
 
-    const response = fetch(url, {
-      ...init,
-      headers: fetchHeaders,
-    });
-    if (toJSON) {
-      return response.then((res) => res.json());
-    } else {
-      return await response;
-    }
-  };
+  const fetchHeaders =
+    headers !== undefined
+      ? { ...headers, Authorization: `Bearer ${await getToken()}` }
+      : { Authorization: `Bearer ${await getToken()}` };
 
-  return authenticatedFetch;
+  const response = fetch(url, {
+    ...init,
+    headers: fetchHeaders,
+  });
+
+  if (toJSON) {
+    return response.then((res) => res.json());
+  }
+
+  return await response;
 }
