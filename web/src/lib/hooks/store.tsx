@@ -1,5 +1,5 @@
 import { Item, ItemWithoutId } from "@/models/item";
-import { useFetch } from "../utils";
+import useFetch from "@/lib/useFetch";
 import { auth } from "@clerk/nextjs";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { config } from "./config";
@@ -8,10 +8,11 @@ const storeURL = config.serverURL + "store/";
 
 export function useCreateItem(store: string) {
   const queryClient = useQueryClient();
+  const authFetch = useFetch();
 
   return useMutation({
     mutationFn: (newItem: ItemWithoutId) =>
-      useFetch({
+      authFetch({
         url: config.serverURL + "create/store",
         init: {
           method: "POST",
