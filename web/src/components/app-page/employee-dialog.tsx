@@ -1,3 +1,4 @@
+"use client"
 // Import necessary libraries and components
 import { useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
