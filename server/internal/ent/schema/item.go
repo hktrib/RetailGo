@@ -27,6 +27,8 @@ func (Item) Fields() []ent.Field {
 		field.String("stripe_price_id"),
 		field.String("stripe_product_id"),
 		field.String("category_name"),
+		field.Int("number_sold").Optional(),
+		field.String("date_last_sold").Optional(),
 	}
 }
 

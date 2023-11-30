@@ -93,6 +93,16 @@ func CategoryName(v string) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldCategoryName, v))
 }
 
+// NumberSold applies equality check predicate on the "number_sold" field. It's identical to NumberSoldEQ.
+func NumberSold(v int) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldNumberSold, v))
+}
+
+// DateLastSold applies equality check predicate on the "date_last_sold" field. It's identical to DateLastSoldEQ.
+func DateLastSold(v string) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldDateLastSold, v))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldName, v))
@@ -491,6 +501,131 @@ func CategoryNameEqualFold(v string) predicate.Item {
 // CategoryNameContainsFold applies the ContainsFold predicate on the "category_name" field.
 func CategoryNameContainsFold(v string) predicate.Item {
 	return predicate.Item(sql.FieldContainsFold(FieldCategoryName, v))
+}
+
+// NumberSoldEQ applies the EQ predicate on the "number_sold" field.
+func NumberSoldEQ(v int) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldNumberSold, v))
+}
+
+// NumberSoldNEQ applies the NEQ predicate on the "number_sold" field.
+func NumberSoldNEQ(v int) predicate.Item {
+	return predicate.Item(sql.FieldNEQ(FieldNumberSold, v))
+}
+
+// NumberSoldIn applies the In predicate on the "number_sold" field.
+func NumberSoldIn(vs ...int) predicate.Item {
+	return predicate.Item(sql.FieldIn(FieldNumberSold, vs...))
+}
+
+// NumberSoldNotIn applies the NotIn predicate on the "number_sold" field.
+func NumberSoldNotIn(vs ...int) predicate.Item {
+	return predicate.Item(sql.FieldNotIn(FieldNumberSold, vs...))
+}
+
+// NumberSoldGT applies the GT predicate on the "number_sold" field.
+func NumberSoldGT(v int) predicate.Item {
+	return predicate.Item(sql.FieldGT(FieldNumberSold, v))
+}
+
+// NumberSoldGTE applies the GTE predicate on the "number_sold" field.
+func NumberSoldGTE(v int) predicate.Item {
+	return predicate.Item(sql.FieldGTE(FieldNumberSold, v))
+}
+
+// NumberSoldLT applies the LT predicate on the "number_sold" field.
+func NumberSoldLT(v int) predicate.Item {
+	return predicate.Item(sql.FieldLT(FieldNumberSold, v))
+}
+
+// NumberSoldLTE applies the LTE predicate on the "number_sold" field.
+func NumberSoldLTE(v int) predicate.Item {
+	return predicate.Item(sql.FieldLTE(FieldNumberSold, v))
+}
+
+// NumberSoldIsNil applies the IsNil predicate on the "number_sold" field.
+func NumberSoldIsNil() predicate.Item {
+	return predicate.Item(sql.FieldIsNull(FieldNumberSold))
+}
+
+// NumberSoldNotNil applies the NotNil predicate on the "number_sold" field.
+func NumberSoldNotNil() predicate.Item {
+	return predicate.Item(sql.FieldNotNull(FieldNumberSold))
+}
+
+// DateLastSoldEQ applies the EQ predicate on the "date_last_sold" field.
+func DateLastSoldEQ(v string) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldDateLastSold, v))
+}
+
+// DateLastSoldNEQ applies the NEQ predicate on the "date_last_sold" field.
+func DateLastSoldNEQ(v string) predicate.Item {
+	return predicate.Item(sql.FieldNEQ(FieldDateLastSold, v))
+}
+
+// DateLastSoldIn applies the In predicate on the "date_last_sold" field.
+func DateLastSoldIn(vs ...string) predicate.Item {
+	return predicate.Item(sql.FieldIn(FieldDateLastSold, vs...))
+}
+
+// DateLastSoldNotIn applies the NotIn predicate on the "date_last_sold" field.
+func DateLastSoldNotIn(vs ...string) predicate.Item {
+	return predicate.Item(sql.FieldNotIn(FieldDateLastSold, vs...))
+}
+
+// DateLastSoldGT applies the GT predicate on the "date_last_sold" field.
+func DateLastSoldGT(v string) predicate.Item {
+	return predicate.Item(sql.FieldGT(FieldDateLastSold, v))
+}
+
+// DateLastSoldGTE applies the GTE predicate on the "date_last_sold" field.
+func DateLastSoldGTE(v string) predicate.Item {
+	return predicate.Item(sql.FieldGTE(FieldDateLastSold, v))
+}
+
+// DateLastSoldLT applies the LT predicate on the "date_last_sold" field.
+func DateLastSoldLT(v string) predicate.Item {
+	return predicate.Item(sql.FieldLT(FieldDateLastSold, v))
+}
+
+// DateLastSoldLTE applies the LTE predicate on the "date_last_sold" field.
+func DateLastSoldLTE(v string) predicate.Item {
+	return predicate.Item(sql.FieldLTE(FieldDateLastSold, v))
+}
+
+// DateLastSoldContains applies the Contains predicate on the "date_last_sold" field.
+func DateLastSoldContains(v string) predicate.Item {
+	return predicate.Item(sql.FieldContains(FieldDateLastSold, v))
+}
+
+// DateLastSoldHasPrefix applies the HasPrefix predicate on the "date_last_sold" field.
+func DateLastSoldHasPrefix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasPrefix(FieldDateLastSold, v))
+}
+
+// DateLastSoldHasSuffix applies the HasSuffix predicate on the "date_last_sold" field.
+func DateLastSoldHasSuffix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasSuffix(FieldDateLastSold, v))
+}
+
+// DateLastSoldIsNil applies the IsNil predicate on the "date_last_sold" field.
+func DateLastSoldIsNil() predicate.Item {
+	return predicate.Item(sql.FieldIsNull(FieldDateLastSold))
+}
+
+// DateLastSoldNotNil applies the NotNil predicate on the "date_last_sold" field.
+func DateLastSoldNotNil() predicate.Item {
+	return predicate.Item(sql.FieldNotNull(FieldDateLastSold))
+}
+
+// DateLastSoldEqualFold applies the EqualFold predicate on the "date_last_sold" field.
+func DateLastSoldEqualFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldEqualFold(FieldDateLastSold, v))
+}
+
+// DateLastSoldContainsFold applies the ContainsFold predicate on the "date_last_sold" field.
+func DateLastSoldContainsFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldContainsFold(FieldDateLastSold, v))
 }
 
 // HasCategory applies the HasEdge predicate on the "category" edge.
