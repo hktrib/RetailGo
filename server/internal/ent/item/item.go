@@ -28,6 +28,8 @@ const (
 	FieldStripeProductID = "stripe_product_id"
 	// FieldCategoryName holds the string denoting the category_name field in the database.
 	FieldCategoryName = "category_name"
+	// FieldWeaviateID holds the string denoting the weaviate_id field in the database.
+	FieldWeaviateID = "weaviate_id"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
 	// EdgeStore holds the string denoting the store edge name in mutations.
@@ -68,6 +70,7 @@ var Columns = []string{
 	FieldStripePriceID,
 	FieldStripeProductID,
 	FieldCategoryName,
+	FieldWeaviateID,
 }
 
 var (
@@ -127,6 +130,11 @@ func ByStripeProductID(opts ...sql.OrderTermOption) OrderOption {
 // ByCategoryName orders the results by the category_name field.
 func ByCategoryName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCategoryName, opts...).ToFunc()
+}
+
+// ByWeaviateID orders the results by the weaviate_id field.
+func ByWeaviateID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldWeaviateID, opts...).ToFunc()
 }
 
 // ByCategoryCount orders the results by category count.

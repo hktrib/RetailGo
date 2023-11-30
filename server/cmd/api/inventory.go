@@ -15,14 +15,6 @@ import (
 	"github.com/hktrib/RetailGo/internal/ent/item"
 )
 
-type TempItem struct {
-	Name     string
-	Photo    string
-	Quantity int
-	Category string
-	Price    float64
-}
-
 func (srv *Server) HelloWorld(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello World -> RetailGo!!"))
 

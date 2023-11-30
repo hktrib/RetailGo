@@ -1015,6 +1015,7 @@ type ItemMutation struct {
 	stripe_price_id   *string
 	stripe_product_id *string
 	category_name     *string
+	weaviate_id       *string
 	clearedFields     map[string]struct{}
 	category          map[int]struct{}
 	removedcategory   map[int]struct{}
@@ -1458,6 +1459,42 @@ func (m *ItemMutation) ResetCategoryName() {
 	m.category_name = nil
 }
 
+// SetWeaviateID sets the "weaviate_id" field.
+func (m *ItemMutation) SetWeaviateID(s string) {
+	m.weaviate_id = &s
+}
+
+// WeaviateID returns the value of the "weaviate_id" field in the mutation.
+func (m *ItemMutation) WeaviateID() (r string, exists bool) {
+	v := m.weaviate_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWeaviateID returns the old "weaviate_id" field's value of the Item entity.
+// If the Item object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ItemMutation) OldWeaviateID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWeaviateID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWeaviateID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWeaviateID: %w", err)
+	}
+	return oldValue.WeaviateID, nil
+}
+
+// ResetWeaviateID resets all changes to the "weaviate_id" field.
+func (m *ItemMutation) ResetWeaviateID() {
+	m.weaviate_id = nil
+}
+
 // AddCategoryIDs adds the "category" edge to the Category entity by ids.
 func (m *ItemMutation) AddCategoryIDs(ids ...int) {
 	if m.category == nil {
@@ -1573,7 +1610,7 @@ func (m *ItemMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ItemMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.name != nil {
 		fields = append(fields, item.FieldName)
 	}
@@ -1597,6 +1634,9 @@ func (m *ItemMutation) Fields() []string {
 	}
 	if m.category_name != nil {
 		fields = append(fields, item.FieldCategoryName)
+	}
+	if m.weaviate_id != nil {
+		fields = append(fields, item.FieldWeaviateID)
 	}
 	return fields
 }
@@ -1622,6 +1662,8 @@ func (m *ItemMutation) Field(name string) (ent.Value, bool) {
 		return m.StripeProductID()
 	case item.FieldCategoryName:
 		return m.CategoryName()
+	case item.FieldWeaviateID:
+		return m.WeaviateID()
 	}
 	return nil, false
 }
@@ -1647,6 +1689,8 @@ func (m *ItemMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldStripeProductID(ctx)
 	case item.FieldCategoryName:
 		return m.OldCategoryName(ctx)
+	case item.FieldWeaviateID:
+		return m.OldWeaviateID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Item field %s", name)
 }
@@ -1711,6 +1755,13 @@ func (m *ItemMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCategoryName(v)
+		return nil
+	case item.FieldWeaviateID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWeaviateID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Item field %s", name)
@@ -1811,6 +1862,9 @@ func (m *ItemMutation) ResetField(name string) error {
 		return nil
 	case item.FieldCategoryName:
 		m.ResetCategoryName()
+		return nil
+	case item.FieldWeaviateID:
+		m.ResetWeaviateID()
 		return nil
 	}
 	return fmt.Errorf("unknown Item field %s", name)

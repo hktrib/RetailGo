@@ -93,6 +93,11 @@ func CategoryName(v string) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldCategoryName, v))
 }
 
+// WeaviateID applies equality check predicate on the "weaviate_id" field. It's identical to WeaviateIDEQ.
+func WeaviateID(v string) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldWeaviateID, v))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldName, v))
@@ -491,6 +496,71 @@ func CategoryNameEqualFold(v string) predicate.Item {
 // CategoryNameContainsFold applies the ContainsFold predicate on the "category_name" field.
 func CategoryNameContainsFold(v string) predicate.Item {
 	return predicate.Item(sql.FieldContainsFold(FieldCategoryName, v))
+}
+
+// WeaviateIDEQ applies the EQ predicate on the "weaviate_id" field.
+func WeaviateIDEQ(v string) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldWeaviateID, v))
+}
+
+// WeaviateIDNEQ applies the NEQ predicate on the "weaviate_id" field.
+func WeaviateIDNEQ(v string) predicate.Item {
+	return predicate.Item(sql.FieldNEQ(FieldWeaviateID, v))
+}
+
+// WeaviateIDIn applies the In predicate on the "weaviate_id" field.
+func WeaviateIDIn(vs ...string) predicate.Item {
+	return predicate.Item(sql.FieldIn(FieldWeaviateID, vs...))
+}
+
+// WeaviateIDNotIn applies the NotIn predicate on the "weaviate_id" field.
+func WeaviateIDNotIn(vs ...string) predicate.Item {
+	return predicate.Item(sql.FieldNotIn(FieldWeaviateID, vs...))
+}
+
+// WeaviateIDGT applies the GT predicate on the "weaviate_id" field.
+func WeaviateIDGT(v string) predicate.Item {
+	return predicate.Item(sql.FieldGT(FieldWeaviateID, v))
+}
+
+// WeaviateIDGTE applies the GTE predicate on the "weaviate_id" field.
+func WeaviateIDGTE(v string) predicate.Item {
+	return predicate.Item(sql.FieldGTE(FieldWeaviateID, v))
+}
+
+// WeaviateIDLT applies the LT predicate on the "weaviate_id" field.
+func WeaviateIDLT(v string) predicate.Item {
+	return predicate.Item(sql.FieldLT(FieldWeaviateID, v))
+}
+
+// WeaviateIDLTE applies the LTE predicate on the "weaviate_id" field.
+func WeaviateIDLTE(v string) predicate.Item {
+	return predicate.Item(sql.FieldLTE(FieldWeaviateID, v))
+}
+
+// WeaviateIDContains applies the Contains predicate on the "weaviate_id" field.
+func WeaviateIDContains(v string) predicate.Item {
+	return predicate.Item(sql.FieldContains(FieldWeaviateID, v))
+}
+
+// WeaviateIDHasPrefix applies the HasPrefix predicate on the "weaviate_id" field.
+func WeaviateIDHasPrefix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasPrefix(FieldWeaviateID, v))
+}
+
+// WeaviateIDHasSuffix applies the HasSuffix predicate on the "weaviate_id" field.
+func WeaviateIDHasSuffix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasSuffix(FieldWeaviateID, v))
+}
+
+// WeaviateIDEqualFold applies the EqualFold predicate on the "weaviate_id" field.
+func WeaviateIDEqualFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldEqualFold(FieldWeaviateID, v))
+}
+
+// WeaviateIDContainsFold applies the ContainsFold predicate on the "weaviate_id" field.
+func WeaviateIDContainsFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldContainsFold(FieldWeaviateID, v))
 }
 
 // HasCategory applies the HasEdge predicate on the "category" edge.

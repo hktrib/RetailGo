@@ -33,6 +33,8 @@ type Item struct {
 	StripeProductID string `json:"stripe_product_id,omitempty"`
 	// CategoryName holds the value of the "category_name" field.
 	CategoryName string `json:"category_name,omitempty"`
+	// WeaviateID holds the value of the "weaviate_id" field.
+	WeaviateID string `json:"weaviate_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ItemQuery when eager-loading is set.
 	Edges        ItemEdges `json:"edges"`
@@ -94,7 +96,7 @@ func (*Item) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case item.FieldID, item.FieldQuantity, item.FieldStoreID:
 			values[i] = new(sql.NullInt64)
-		case item.FieldName, item.FieldStripePriceID, item.FieldStripeProductID, item.FieldCategoryName:
+		case item.FieldName, item.FieldStripePriceID, item.FieldStripeProductID, item.FieldCategoryName, item.FieldWeaviateID:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -164,6 +166,12 @@ func (i *Item) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field category_name", values[j])
 			} else if value.Valid {
 				i.CategoryName = value.String
+			}
+		case item.FieldWeaviateID:
+			if value, ok := values[j].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field weaviate_id", values[j])
+			} else if value.Valid {
+				i.WeaviateID = value.String
 			}
 		default:
 			i.selectValues.Set(columns[j], values[j])
@@ -239,6 +247,9 @@ func (i *Item) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("category_name=")
 	builder.WriteString(i.CategoryName)
+	builder.WriteString(", ")
+	builder.WriteString("weaviate_id=")
+	builder.WriteString(i.WeaviateID)
 	builder.WriteByte(')')
 	return builder.String()
 }

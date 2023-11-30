@@ -13,6 +13,7 @@ import (
 	worker "github.com/hktrib/RetailGo/internal/tasks"
 	"github.com/hktrib/RetailGo/internal/util"
 	"github.com/hktrib/RetailGo/internal/webhook"
+	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 )
 
 /*
@@ -31,15 +32,17 @@ type Server struct {
 	DBClient        *ent.Client
 	TaskQueueClient *asynq.Client
 	Cache           *kv.Cache
-
-	TaskProducer worker.TaskProducer
-	Config       *util.Config
+	WeaviateClient  *weaviate.Client
+	TaskProducer    worker.TaskProducer
+	Config          *util.Config
 }
 
 func NewServer(
 	clerkClient clerk.Client,
 	entClient *ent.Client,
 	taskQueueClient *asynq.Client,
+	// Need to replace with actual Weaviate Client
+	weaviateClient *weaviate.Client,
 	cache *kv.Cache,
 	taskProducer worker.TaskProducer,
 	config *util.Config,
@@ -51,7 +54,7 @@ func NewServer(
 	srv.DBClient = entClient
 	srv.TaskQueueClient = taskQueueClient
 	srv.Cache = cache
-
+	srv.WeaviateClient = weaviateClient
 	srv.TaskProducer = taskProducer
 	srv.Config = config
 	return srv

@@ -18,6 +18,8 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 	"github.com/stripe/stripe-go/v76"
+	"github.com/weaviate/weaviate-go-client/v4/weaviate"
+	"github.com/weaviate/weaviate-go-client/v4/weaviate/auth"
 )
 
 // var log = util.NewLogger()
@@ -32,10 +34,11 @@ func runTaskConsumer(redisOptions *asynq.RedisClientOpt, dbClient *ent.Client, c
 
 func main() {
 	config, err := util.LoadConfig()
-	stripe.Key = config.STRIPE_SK
 	if err != nil {
 		panic(err)
 	}
+
+	stripe.Key = config.STRIPE_SK
 
 	taskQueueOptions := asynq.RedisClientOpt{
 		Addr:     fmt.Sprintf("%s:%s", config.REDIS_HOSTNAME, config.REDIS_PORT),
@@ -65,6 +68,19 @@ func main() {
 	entClient := util.Open(&config)
 	defer entClient.Close()
 
+	weaviateConfig := weaviate.Config{
+		Host:       config.WEAVIATE_HOSTNAME,
+		Scheme:     "https",
+		AuthConfig: auth.ApiKey{Value: config.WEAVIATE_SK},
+		Headers:    nil,
+	}
+
+	weaviateClient, err := weaviate.NewClient(weaviateConfig)
+
+	if err != nil {
+		panic(err)
+	}
+
 	if err := entClient.Schema.Create(context.Background()); err != nil {
 		log.Fatal().Err(err).Msg("failed creating schema resources")
 	}
@@ -72,7 +88,7 @@ func main() {
 	go func() {
 		injectActiveSession := clerk.WithSessionV2(clerkClient)
 
-		srv := server.NewServer(clerkClient, entClient, taskQueueClient, cache, taskProducer, &config)
+		srv := server.NewServer(clerkClient, entClient, taskQueueClient, weaviateClient, cache, taskProducer, &config)
 		srv.Router.Use(injectActiveSession)
 
 		srv.MountHandlers()

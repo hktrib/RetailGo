@@ -69,6 +69,12 @@ func (ic *ItemCreate) SetCategoryName(s string) *ItemCreate {
 	return ic
 }
 
+// SetWeaviateID sets the "weaviate_id" field.
+func (ic *ItemCreate) SetWeaviateID(s string) *ItemCreate {
+	ic.mutation.SetWeaviateID(s)
+	return ic
+}
+
 // SetID sets the "id" field.
 func (ic *ItemCreate) SetID(i int) *ItemCreate {
 	ic.mutation.SetID(i)
@@ -153,6 +159,9 @@ func (ic *ItemCreate) check() error {
 	if _, ok := ic.mutation.CategoryName(); !ok {
 		return &ValidationError{Name: "category_name", err: errors.New(`ent: missing required field "Item.category_name"`)}
 	}
+	if _, ok := ic.mutation.WeaviateID(); !ok {
+		return &ValidationError{Name: "weaviate_id", err: errors.New(`ent: missing required field "Item.weaviate_id"`)}
+	}
 	if _, ok := ic.mutation.StoreID(); !ok {
 		return &ValidationError{Name: "store", err: errors.New(`ent: missing required edge "Item.store"`)}
 	}
@@ -215,6 +224,10 @@ func (ic *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 	if value, ok := ic.mutation.CategoryName(); ok {
 		_spec.SetField(item.FieldCategoryName, field.TypeString, value)
 		_node.CategoryName = value
+	}
+	if value, ok := ic.mutation.WeaviateID(); ok {
+		_spec.SetField(item.FieldWeaviateID, field.TypeString, value)
+		_node.WeaviateID = value
 	}
 	if nodes := ic.mutation.CategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

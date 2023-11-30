@@ -147,6 +147,20 @@ func (iu *ItemUpdate) SetNillableCategoryName(s *string) *ItemUpdate {
 	return iu
 }
 
+// SetWeaviateID sets the "weaviate_id" field.
+func (iu *ItemUpdate) SetWeaviateID(s string) *ItemUpdate {
+	iu.mutation.SetWeaviateID(s)
+	return iu
+}
+
+// SetNillableWeaviateID sets the "weaviate_id" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableWeaviateID(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetWeaviateID(*s)
+	}
+	return iu
+}
+
 // AddCategoryIDs adds the "category" edge to the Category entity by IDs.
 func (iu *ItemUpdate) AddCategoryIDs(ids ...int) *ItemUpdate {
 	iu.mutation.AddCategoryIDs(ids...)
@@ -272,6 +286,9 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := iu.mutation.CategoryName(); ok {
 		_spec.SetField(item.FieldCategoryName, field.TypeString, value)
+	}
+	if value, ok := iu.mutation.WeaviateID(); ok {
+		_spec.SetField(item.FieldWeaviateID, field.TypeString, value)
 	}
 	if iu.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -485,6 +502,20 @@ func (iuo *ItemUpdateOne) SetNillableCategoryName(s *string) *ItemUpdateOne {
 	return iuo
 }
 
+// SetWeaviateID sets the "weaviate_id" field.
+func (iuo *ItemUpdateOne) SetWeaviateID(s string) *ItemUpdateOne {
+	iuo.mutation.SetWeaviateID(s)
+	return iuo
+}
+
+// SetNillableWeaviateID sets the "weaviate_id" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableWeaviateID(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetWeaviateID(*s)
+	}
+	return iuo
+}
+
 // AddCategoryIDs adds the "category" edge to the Category entity by IDs.
 func (iuo *ItemUpdateOne) AddCategoryIDs(ids ...int) *ItemUpdateOne {
 	iuo.mutation.AddCategoryIDs(ids...)
@@ -640,6 +671,9 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 	}
 	if value, ok := iuo.mutation.CategoryName(); ok {
 		_spec.SetField(item.FieldCategoryName, field.TypeString, value)
+	}
+	if value, ok := iuo.mutation.WeaviateID(); ok {
+		_spec.SetField(item.FieldWeaviateID, field.TypeString, value)
 	}
 	if iuo.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
