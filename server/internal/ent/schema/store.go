@@ -16,7 +16,9 @@ type Store struct {
 func (Store) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id").Unique(),
+		field.String("uuid").Unique(),
 		field.String("store_name"),
+		field.String("created_by"),
 		field.String("owner_email").Optional(),
 		field.String("store_address").Optional(),
 		field.String("store_phone").Optional(),

@@ -35,6 +35,14 @@ func (iu *ItemUpdate) SetName(s string) *ItemUpdate {
 	return iu
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableName(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetName(*s)
+	}
+	return iu
+}
+
 // SetPhoto sets the "photo" field.
 func (iu *ItemUpdate) SetPhoto(b []byte) *ItemUpdate {
 	iu.mutation.SetPhoto(b)
@@ -45,6 +53,14 @@ func (iu *ItemUpdate) SetPhoto(b []byte) *ItemUpdate {
 func (iu *ItemUpdate) SetQuantity(i int) *ItemUpdate {
 	iu.mutation.ResetQuantity()
 	iu.mutation.SetQuantity(i)
+	return iu
+}
+
+// SetNillableQuantity sets the "quantity" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableQuantity(i *int) *ItemUpdate {
+	if i != nil {
+		iu.SetQuantity(*i)
+	}
 	return iu
 }
 
@@ -61,6 +77,14 @@ func (iu *ItemUpdate) SetPrice(f float64) *ItemUpdate {
 	return iu
 }
 
+// SetNillablePrice sets the "price" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillablePrice(f *float64) *ItemUpdate {
+	if f != nil {
+		iu.SetPrice(*f)
+	}
+	return iu
+}
+
 // AddPrice adds f to the "price" field.
 func (iu *ItemUpdate) AddPrice(f float64) *ItemUpdate {
 	iu.mutation.AddPrice(f)
@@ -73,9 +97,25 @@ func (iu *ItemUpdate) SetStoreID(i int) *ItemUpdate {
 	return iu
 }
 
+// SetNillableStoreID sets the "store_id" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableStoreID(i *int) *ItemUpdate {
+	if i != nil {
+		iu.SetStoreID(*i)
+	}
+	return iu
+}
+
 // SetStripePriceID sets the "stripe_price_id" field.
 func (iu *ItemUpdate) SetStripePriceID(s string) *ItemUpdate {
 	iu.mutation.SetStripePriceID(s)
+	return iu
+}
+
+// SetNillableStripePriceID sets the "stripe_price_id" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableStripePriceID(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetStripePriceID(*s)
+	}
 	return iu
 }
 
@@ -85,56 +125,25 @@ func (iu *ItemUpdate) SetStripeProductID(s string) *ItemUpdate {
 	return iu
 }
 
+// SetNillableStripeProductID sets the "stripe_product_id" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableStripeProductID(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetStripeProductID(*s)
+	}
+	return iu
+}
+
 // SetCategoryName sets the "category_name" field.
 func (iu *ItemUpdate) SetCategoryName(s string) *ItemUpdate {
 	iu.mutation.SetCategoryName(s)
 	return iu
 }
 
-// SetNumberSold sets the "number_sold" field.
-func (iu *ItemUpdate) SetNumberSold(i int) *ItemUpdate {
-	iu.mutation.ResetNumberSold()
-	iu.mutation.SetNumberSold(i)
-	return iu
-}
-
-// SetNillableNumberSold sets the "number_sold" field if the given value is not nil.
-func (iu *ItemUpdate) SetNillableNumberSold(i *int) *ItemUpdate {
-	if i != nil {
-		iu.SetNumberSold(*i)
-	}
-	return iu
-}
-
-// AddNumberSold adds i to the "number_sold" field.
-func (iu *ItemUpdate) AddNumberSold(i int) *ItemUpdate {
-	iu.mutation.AddNumberSold(i)
-	return iu
-}
-
-// ClearNumberSold clears the value of the "number_sold" field.
-func (iu *ItemUpdate) ClearNumberSold() *ItemUpdate {
-	iu.mutation.ClearNumberSold()
-	return iu
-}
-
-// SetDateLastSold sets the "date_last_sold" field.
-func (iu *ItemUpdate) SetDateLastSold(s string) *ItemUpdate {
-	iu.mutation.SetDateLastSold(s)
-	return iu
-}
-
-// SetNillableDateLastSold sets the "date_last_sold" field if the given value is not nil.
-func (iu *ItemUpdate) SetNillableDateLastSold(s *string) *ItemUpdate {
+// SetNillableCategoryName sets the "category_name" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableCategoryName(s *string) *ItemUpdate {
 	if s != nil {
-		iu.SetDateLastSold(*s)
+		iu.SetCategoryName(*s)
 	}
-	return iu
-}
-
-// ClearDateLastSold clears the value of the "date_last_sold" field.
-func (iu *ItemUpdate) ClearDateLastSold() *ItemUpdate {
-	iu.mutation.ClearDateLastSold()
 	return iu
 }
 
@@ -264,21 +273,6 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := iu.mutation.CategoryName(); ok {
 		_spec.SetField(item.FieldCategoryName, field.TypeString, value)
 	}
-	if value, ok := iu.mutation.NumberSold(); ok {
-		_spec.SetField(item.FieldNumberSold, field.TypeInt, value)
-	}
-	if value, ok := iu.mutation.AddedNumberSold(); ok {
-		_spec.AddField(item.FieldNumberSold, field.TypeInt, value)
-	}
-	if iu.mutation.NumberSoldCleared() {
-		_spec.ClearField(item.FieldNumberSold, field.TypeInt)
-	}
-	if value, ok := iu.mutation.DateLastSold(); ok {
-		_spec.SetField(item.FieldDateLastSold, field.TypeString, value)
-	}
-	if iu.mutation.DateLastSoldCleared() {
-		_spec.ClearField(item.FieldDateLastSold, field.TypeString)
-	}
 	if iu.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -379,6 +373,14 @@ func (iuo *ItemUpdateOne) SetName(s string) *ItemUpdateOne {
 	return iuo
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableName(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetName(*s)
+	}
+	return iuo
+}
+
 // SetPhoto sets the "photo" field.
 func (iuo *ItemUpdateOne) SetPhoto(b []byte) *ItemUpdateOne {
 	iuo.mutation.SetPhoto(b)
@@ -389,6 +391,14 @@ func (iuo *ItemUpdateOne) SetPhoto(b []byte) *ItemUpdateOne {
 func (iuo *ItemUpdateOne) SetQuantity(i int) *ItemUpdateOne {
 	iuo.mutation.ResetQuantity()
 	iuo.mutation.SetQuantity(i)
+	return iuo
+}
+
+// SetNillableQuantity sets the "quantity" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableQuantity(i *int) *ItemUpdateOne {
+	if i != nil {
+		iuo.SetQuantity(*i)
+	}
 	return iuo
 }
 
@@ -405,6 +415,14 @@ func (iuo *ItemUpdateOne) SetPrice(f float64) *ItemUpdateOne {
 	return iuo
 }
 
+// SetNillablePrice sets the "price" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillablePrice(f *float64) *ItemUpdateOne {
+	if f != nil {
+		iuo.SetPrice(*f)
+	}
+	return iuo
+}
+
 // AddPrice adds f to the "price" field.
 func (iuo *ItemUpdateOne) AddPrice(f float64) *ItemUpdateOne {
 	iuo.mutation.AddPrice(f)
@@ -417,9 +435,25 @@ func (iuo *ItemUpdateOne) SetStoreID(i int) *ItemUpdateOne {
 	return iuo
 }
 
+// SetNillableStoreID sets the "store_id" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableStoreID(i *int) *ItemUpdateOne {
+	if i != nil {
+		iuo.SetStoreID(*i)
+	}
+	return iuo
+}
+
 // SetStripePriceID sets the "stripe_price_id" field.
 func (iuo *ItemUpdateOne) SetStripePriceID(s string) *ItemUpdateOne {
 	iuo.mutation.SetStripePriceID(s)
+	return iuo
+}
+
+// SetNillableStripePriceID sets the "stripe_price_id" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableStripePriceID(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetStripePriceID(*s)
+	}
 	return iuo
 }
 
@@ -429,56 +463,25 @@ func (iuo *ItemUpdateOne) SetStripeProductID(s string) *ItemUpdateOne {
 	return iuo
 }
 
+// SetNillableStripeProductID sets the "stripe_product_id" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableStripeProductID(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetStripeProductID(*s)
+	}
+	return iuo
+}
+
 // SetCategoryName sets the "category_name" field.
 func (iuo *ItemUpdateOne) SetCategoryName(s string) *ItemUpdateOne {
 	iuo.mutation.SetCategoryName(s)
 	return iuo
 }
 
-// SetNumberSold sets the "number_sold" field.
-func (iuo *ItemUpdateOne) SetNumberSold(i int) *ItemUpdateOne {
-	iuo.mutation.ResetNumberSold()
-	iuo.mutation.SetNumberSold(i)
-	return iuo
-}
-
-// SetNillableNumberSold sets the "number_sold" field if the given value is not nil.
-func (iuo *ItemUpdateOne) SetNillableNumberSold(i *int) *ItemUpdateOne {
-	if i != nil {
-		iuo.SetNumberSold(*i)
-	}
-	return iuo
-}
-
-// AddNumberSold adds i to the "number_sold" field.
-func (iuo *ItemUpdateOne) AddNumberSold(i int) *ItemUpdateOne {
-	iuo.mutation.AddNumberSold(i)
-	return iuo
-}
-
-// ClearNumberSold clears the value of the "number_sold" field.
-func (iuo *ItemUpdateOne) ClearNumberSold() *ItemUpdateOne {
-	iuo.mutation.ClearNumberSold()
-	return iuo
-}
-
-// SetDateLastSold sets the "date_last_sold" field.
-func (iuo *ItemUpdateOne) SetDateLastSold(s string) *ItemUpdateOne {
-	iuo.mutation.SetDateLastSold(s)
-	return iuo
-}
-
-// SetNillableDateLastSold sets the "date_last_sold" field if the given value is not nil.
-func (iuo *ItemUpdateOne) SetNillableDateLastSold(s *string) *ItemUpdateOne {
+// SetNillableCategoryName sets the "category_name" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableCategoryName(s *string) *ItemUpdateOne {
 	if s != nil {
-		iuo.SetDateLastSold(*s)
+		iuo.SetCategoryName(*s)
 	}
-	return iuo
-}
-
-// ClearDateLastSold clears the value of the "date_last_sold" field.
-func (iuo *ItemUpdateOne) ClearDateLastSold() *ItemUpdateOne {
-	iuo.mutation.ClearDateLastSold()
 	return iuo
 }
 
@@ -637,21 +640,6 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 	}
 	if value, ok := iuo.mutation.CategoryName(); ok {
 		_spec.SetField(item.FieldCategoryName, field.TypeString, value)
-	}
-	if value, ok := iuo.mutation.NumberSold(); ok {
-		_spec.SetField(item.FieldNumberSold, field.TypeInt, value)
-	}
-	if value, ok := iuo.mutation.AddedNumberSold(); ok {
-		_spec.AddField(item.FieldNumberSold, field.TypeInt, value)
-	}
-	if iuo.mutation.NumberSoldCleared() {
-		_spec.ClearField(item.FieldNumberSold, field.TypeInt)
-	}
-	if value, ok := iuo.mutation.DateLastSold(); ok {
-		_spec.SetField(item.FieldDateLastSold, field.TypeString, value)
-	}
-	if iuo.mutation.DateLastSoldCleared() {
-		_spec.ClearField(item.FieldDateLastSold, field.TypeString)
 	}
 	if iuo.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{

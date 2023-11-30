@@ -53,9 +53,19 @@ func IDLTE(id int) predicate.Store {
 	return predicate.Store(sql.FieldLTE(FieldID, id))
 }
 
+// UUID applies equality check predicate on the "uuid" field. It's identical to UUIDEQ.
+func UUID(v string) predicate.Store {
+	return predicate.Store(sql.FieldEQ(FieldUUID, v))
+}
+
 // StoreName applies equality check predicate on the "store_name" field. It's identical to StoreNameEQ.
 func StoreName(v string) predicate.Store {
 	return predicate.Store(sql.FieldEQ(FieldStoreName, v))
+}
+
+// CreatedBy applies equality check predicate on the "created_by" field. It's identical to CreatedByEQ.
+func CreatedBy(v string) predicate.Store {
+	return predicate.Store(sql.FieldEQ(FieldCreatedBy, v))
 }
 
 // OwnerEmail applies equality check predicate on the "owner_email" field. It's identical to OwnerEmailEQ.
@@ -76,6 +86,71 @@ func StorePhone(v string) predicate.Store {
 // StoreType applies equality check predicate on the "store_type" field. It's identical to StoreTypeEQ.
 func StoreType(v string) predicate.Store {
 	return predicate.Store(sql.FieldEQ(FieldStoreType, v))
+}
+
+// UUIDEQ applies the EQ predicate on the "uuid" field.
+func UUIDEQ(v string) predicate.Store {
+	return predicate.Store(sql.FieldEQ(FieldUUID, v))
+}
+
+// UUIDNEQ applies the NEQ predicate on the "uuid" field.
+func UUIDNEQ(v string) predicate.Store {
+	return predicate.Store(sql.FieldNEQ(FieldUUID, v))
+}
+
+// UUIDIn applies the In predicate on the "uuid" field.
+func UUIDIn(vs ...string) predicate.Store {
+	return predicate.Store(sql.FieldIn(FieldUUID, vs...))
+}
+
+// UUIDNotIn applies the NotIn predicate on the "uuid" field.
+func UUIDNotIn(vs ...string) predicate.Store {
+	return predicate.Store(sql.FieldNotIn(FieldUUID, vs...))
+}
+
+// UUIDGT applies the GT predicate on the "uuid" field.
+func UUIDGT(v string) predicate.Store {
+	return predicate.Store(sql.FieldGT(FieldUUID, v))
+}
+
+// UUIDGTE applies the GTE predicate on the "uuid" field.
+func UUIDGTE(v string) predicate.Store {
+	return predicate.Store(sql.FieldGTE(FieldUUID, v))
+}
+
+// UUIDLT applies the LT predicate on the "uuid" field.
+func UUIDLT(v string) predicate.Store {
+	return predicate.Store(sql.FieldLT(FieldUUID, v))
+}
+
+// UUIDLTE applies the LTE predicate on the "uuid" field.
+func UUIDLTE(v string) predicate.Store {
+	return predicate.Store(sql.FieldLTE(FieldUUID, v))
+}
+
+// UUIDContains applies the Contains predicate on the "uuid" field.
+func UUIDContains(v string) predicate.Store {
+	return predicate.Store(sql.FieldContains(FieldUUID, v))
+}
+
+// UUIDHasPrefix applies the HasPrefix predicate on the "uuid" field.
+func UUIDHasPrefix(v string) predicate.Store {
+	return predicate.Store(sql.FieldHasPrefix(FieldUUID, v))
+}
+
+// UUIDHasSuffix applies the HasSuffix predicate on the "uuid" field.
+func UUIDHasSuffix(v string) predicate.Store {
+	return predicate.Store(sql.FieldHasSuffix(FieldUUID, v))
+}
+
+// UUIDEqualFold applies the EqualFold predicate on the "uuid" field.
+func UUIDEqualFold(v string) predicate.Store {
+	return predicate.Store(sql.FieldEqualFold(FieldUUID, v))
+}
+
+// UUIDContainsFold applies the ContainsFold predicate on the "uuid" field.
+func UUIDContainsFold(v string) predicate.Store {
+	return predicate.Store(sql.FieldContainsFold(FieldUUID, v))
 }
 
 // StoreNameEQ applies the EQ predicate on the "store_name" field.
@@ -141,6 +216,71 @@ func StoreNameEqualFold(v string) predicate.Store {
 // StoreNameContainsFold applies the ContainsFold predicate on the "store_name" field.
 func StoreNameContainsFold(v string) predicate.Store {
 	return predicate.Store(sql.FieldContainsFold(FieldStoreName, v))
+}
+
+// CreatedByEQ applies the EQ predicate on the "created_by" field.
+func CreatedByEQ(v string) predicate.Store {
+	return predicate.Store(sql.FieldEQ(FieldCreatedBy, v))
+}
+
+// CreatedByNEQ applies the NEQ predicate on the "created_by" field.
+func CreatedByNEQ(v string) predicate.Store {
+	return predicate.Store(sql.FieldNEQ(FieldCreatedBy, v))
+}
+
+// CreatedByIn applies the In predicate on the "created_by" field.
+func CreatedByIn(vs ...string) predicate.Store {
+	return predicate.Store(sql.FieldIn(FieldCreatedBy, vs...))
+}
+
+// CreatedByNotIn applies the NotIn predicate on the "created_by" field.
+func CreatedByNotIn(vs ...string) predicate.Store {
+	return predicate.Store(sql.FieldNotIn(FieldCreatedBy, vs...))
+}
+
+// CreatedByGT applies the GT predicate on the "created_by" field.
+func CreatedByGT(v string) predicate.Store {
+	return predicate.Store(sql.FieldGT(FieldCreatedBy, v))
+}
+
+// CreatedByGTE applies the GTE predicate on the "created_by" field.
+func CreatedByGTE(v string) predicate.Store {
+	return predicate.Store(sql.FieldGTE(FieldCreatedBy, v))
+}
+
+// CreatedByLT applies the LT predicate on the "created_by" field.
+func CreatedByLT(v string) predicate.Store {
+	return predicate.Store(sql.FieldLT(FieldCreatedBy, v))
+}
+
+// CreatedByLTE applies the LTE predicate on the "created_by" field.
+func CreatedByLTE(v string) predicate.Store {
+	return predicate.Store(sql.FieldLTE(FieldCreatedBy, v))
+}
+
+// CreatedByContains applies the Contains predicate on the "created_by" field.
+func CreatedByContains(v string) predicate.Store {
+	return predicate.Store(sql.FieldContains(FieldCreatedBy, v))
+}
+
+// CreatedByHasPrefix applies the HasPrefix predicate on the "created_by" field.
+func CreatedByHasPrefix(v string) predicate.Store {
+	return predicate.Store(sql.FieldHasPrefix(FieldCreatedBy, v))
+}
+
+// CreatedByHasSuffix applies the HasSuffix predicate on the "created_by" field.
+func CreatedByHasSuffix(v string) predicate.Store {
+	return predicate.Store(sql.FieldHasSuffix(FieldCreatedBy, v))
+}
+
+// CreatedByEqualFold applies the EqualFold predicate on the "created_by" field.
+func CreatedByEqualFold(v string) predicate.Store {
+	return predicate.Store(sql.FieldEqualFold(FieldCreatedBy, v))
+}
+
+// CreatedByContainsFold applies the ContainsFold predicate on the "created_by" field.
+func CreatedByContainsFold(v string) predicate.Store {
+	return predicate.Store(sql.FieldContainsFold(FieldCreatedBy, v))
 }
 
 // OwnerEmailEQ applies the EQ predicate on the "owner_email" field.

@@ -11,6 +11,7 @@ const SignUpPage = () => {
             footerActionLink: "text-amber-600",
           },
         }}
+        afterSignUpUrl="/registrationForm" // Redirect to the store registration page after sign up
       />
     </div>
   );

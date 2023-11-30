@@ -406,12 +406,12 @@ func (sq *StoreQuery) WithUserToStore(opts ...func(*UserToStoreQuery)) *StoreQue
 // Example:
 //
 //	var v []struct {
-//		StoreName string `json:"store_name,omitempty"`
+//		UUID string `json:"uuid,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Store.Query().
-//		GroupBy(store.FieldStoreName).
+//		GroupBy(store.FieldUUID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (sq *StoreQuery) GroupBy(field string, fields ...string) *StoreGroupBy {
@@ -429,11 +429,11 @@ func (sq *StoreQuery) GroupBy(field string, fields ...string) *StoreGroupBy {
 // Example:
 //
 //	var v []struct {
-//		StoreName string `json:"store_name,omitempty"`
+//		UUID string `json:"uuid,omitempty"`
 //	}
 //
 //	client.Store.Query().
-//		Select(store.FieldStoreName).
+//		Select(store.FieldUUID).
 //		Scan(ctx, &v)
 func (sq *StoreQuery) Select(fields ...string) *StoreSelect {
 	sq.ctx.Fields = append(sq.ctx.Fields, fields...)

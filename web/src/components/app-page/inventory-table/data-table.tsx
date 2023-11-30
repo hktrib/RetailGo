@@ -13,6 +13,7 @@ import {
   getSortedRowModel,
   getPaginationRowModel,
 } from "@tanstack/react-table";
+import Link from 'next/link'
 
 import {
   Table,
@@ -24,7 +25,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Eye, Trash2 } from "lucide-react";
 import ItemDialog from "../item-dialog";
 import { Item } from "@/models/item";
 
@@ -106,6 +107,9 @@ export function DataTable<TData extends Item, TValue>({
                   ))}
                   <TableCell>
                     <div className="text-right flex flex-row space-x-2 h-8 w-8 p-0">
+                    <Link href={`/app/inventory/item/${row.id}`}>
+                      <Eye style={{ color: "blue" }} className=" w-5 "></Eye>
+                    </Link>
                       <ItemDialog item={row.original} mode="edit" />
                       <button
                         onClick={() =>

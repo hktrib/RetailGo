@@ -3,10 +3,11 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-chi/chi/v5"
-	"github.com/hktrib/RetailGo/internal/ent/user"
 	"net/http"
 	"strconv"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/hktrib/RetailGo/internal/ent/user"
 
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/transactions"
@@ -16,7 +17,7 @@ func (srv *Server) CreateStore(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 
-	reqStore := ctx.Value(Param("store_var")).(*ent.Store)
+	reqStore := ctx.Value(Param("store")).(*ent.Store)
 	reqUser := ctx.Value(Param("owner")).(*ent.User)
 	err := transactions.StoreAndOwnerCreationTx(ctx, reqStore, reqUser, srv.DBClient)
 	if err != nil {

@@ -1,7 +1,6 @@
 "use client";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
-import { useFetch } from "../../../lib/utils";
 import { useItems } from "@/lib/hooks/items";
 
 // dummy inventory data
@@ -39,7 +38,7 @@ const initialInventory = [
 ];
 
 export default function InventoryTable() {
-  const itemQuery = useItems("1");
+  const itemQuery = useItems("10");
 
   // let data = initialInventory;
 
