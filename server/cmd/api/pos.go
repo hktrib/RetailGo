@@ -45,51 +45,88 @@ func (srv *Server) StoreCheckout(writer http.ResponseWriter, request *http.Reque
 	CreateCheckoutSession(cart, writer, request)
 
 }
-func (srv *Server) HandleSuccess(w http.ResponseWriter, r *http.Request) {
+func (srv *Server) StripeWebhookRouter(w http.ResponseWriter, r *http.Request) {
 
 	const MaxBodyBytes = int64(65536)
 	r.Body = http.MaxBytesReader(w, r.Body, MaxBodyBytes)
-
-	body, err := ioutil.ReadAll(r.Body)
+	payload, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error reading request body: %v\n", err)
 		w.WriteHeader(http.StatusServiceUnavailable)
 		return
 	}
 
-	// Pass the request body and Stripe-Signature header to ConstructEvent, along with the webhook signing key
-	// You can find your endpoint's secret in your webhook settings
-	endpointSecret := "whsec_..."
-	event, err := webhook.ConstructEvent(body, r.Header.Get("Stripe-Signature"), endpointSecret)
+	// This is your Stripe CLI webhook secret for testing your endpoint locally.
+	endpointSecret := srv.Config.STRIPE_WEBHOOK_SECRET
+	// Pass the request body and Stripe-Signature header to ConstructEvent, along
+	// with the webhook signing key.
+	event, err := webhook.ConstructEvent(payload, r.Header.Get("Stripe-Signature"),
+		endpointSecret)
 
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error verifying webhook signature: %v\n", err)
 		w.WriteHeader(http.StatusBadRequest) // Return a 400 error on a bad signature
 		return
 	}
-	fmt.Println("Webhook received!")
-	fmt.Printf("%+v\n", event)
-	// Handle the checkout.session.completed event
-	if event.Type == "checkout.session.completed" {
-		var session stripe.CheckoutSession
-		err := json.Unmarshal(event.Data.Raw, &session)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error parsing webhook JSON: %v\n", err)
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
 
-		params := &stripe.CheckoutSessionParams{}
-		params.AddExpand("line_items")
+	// Unmarshal the event data into an appropriate struct depending on its Type
+	switch event.Type {
+	case "account.updated":
+		// Then define and call a function to handle the event account.updated
+	case "account.application.authorized":
+		// Then define and call a function to handle the event account.application.authorized
+	case "account.application.deauthorized":
+		// Then define and call a function to handle the event account.application.deauthorized
+	case "account.external_account.created":
+		// Then define and call a function to handle the event account.external_account.created
+	case "account.external_account.deleted":
+		// Then define and call a function to handle the event account.external_account.deleted
+	case "account.external_account.updated":
+		// Then define and call a function to handle the event account.external_account.updated
+	case "checkout.session.async_payment_failed":
+		// Then define and call a function to handle the event checkout.session.async_payment_failed
+	case "checkout.session.async_payment_succeeded":
+		// Then define and call a function to handle the event checkout.session.async_payment_succeeded
+		HandleTransSuccess(w, event, srv)
 
-		// Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
-		lineItems := session.LineItems
-		// Fulfill the purchase...
-		srv.FulfillOrder(lineItems)
+	case "checkout.session.completed":
+		HandleTransSuccess(w, event, srv)
+		// Then define and call a function to handle the event checkout.session.expired
+	case "product.created":
+		// Then define and call a function to handle the event product.created
+	case "product.deleted":
+		// Then define and call a function to handle the event product.deleted
+	case "product.updated":
+		// Then define and call a function to handle the event product.updated
+	// ... handle other event types
+	default:
+		fmt.Fprintf(os.Stderr, "Unhandled event type: %s\n", event.Type)
+		w.WriteHeader(http.StatusNotImplemented)
+		return
 	}
-
 	w.WriteHeader(http.StatusOK)
 
+}
+
+func HandleTransSuccess(w http.ResponseWriter, event stripe.Event, srv *Server) bool {
+
+	var session stripe.CheckoutSession
+	err := json.Unmarshal(event.Data.Raw, &session)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error parsing webhook JSON: %v\n", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return true
+	}
+
+	params := &stripe.CheckoutSessionParams{}
+	params.AddExpand("line_items")
+
+	// Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
+	lineItems := session.LineItems
+	// Fulfill the purchase...
+	srv.FulfillOrder(lineItems)
+
+	return false
 }
 
 func (srv *Server) FulfillOrder(LineItemList *stripe.LineItemList) {

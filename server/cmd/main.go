@@ -76,9 +76,7 @@ func main() {
 		srv.Router.Use(injectActiveSession)
 
 		srv.MountHandlers()
-		srv.Router.Post("/webhook", func(writer http.ResponseWriter, request *http.Request) {
-			srv.HandleSuccess(writer, request)
-		})
+
 		webhook.Config = &config
 		webhook.ClerkClient = clerkClient
 
