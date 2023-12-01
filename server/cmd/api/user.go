@@ -250,8 +250,8 @@ func (srv *Server) UserJoinStore(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = srv.DBClient.ClerkUser_Store.Create().
-		SetStoreID(reqUser.StoreID).
-		SetUserID(reqUser.IsOwner).Save(ctx)
+		SetClerkID(reqUser.ClerkUserID).
+		SetStoreID(reqUser.StoreID).Save(ctx)
 
 	if err != nil {
 		fmt.Println("User Creation didn't work:", err)

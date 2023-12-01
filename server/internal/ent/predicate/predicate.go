@@ -12,6 +12,9 @@ type Category func(*sql.Selector)
 // CategoryItem is the predicate function for categoryitem builders.
 type CategoryItem func(*sql.Selector)
 
+// ClerkUser_Store is the predicate function for clerkuser_store builders.
+type ClerkUser_Store func(*sql.Selector)
+
 // Item is the predicate function for item builders.
 type Item func(*sql.Selector)
 
