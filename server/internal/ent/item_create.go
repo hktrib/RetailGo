@@ -28,8 +28,8 @@ func (ic *ItemCreate) SetName(s string) *ItemCreate {
 }
 
 // SetPhoto sets the "photo" field.
-func (ic *ItemCreate) SetPhoto(b []byte) *ItemCreate {
-	ic.mutation.SetPhoto(b)
+func (ic *ItemCreate) SetPhoto(s string) *ItemCreate {
+	ic.mutation.SetPhoto(s)
 	return ic
 }
 
@@ -66,6 +66,18 @@ func (ic *ItemCreate) SetStripeProductID(s string) *ItemCreate {
 // SetCategoryName sets the "category_name" field.
 func (ic *ItemCreate) SetCategoryName(s string) *ItemCreate {
 	ic.mutation.SetCategoryName(s)
+	return ic
+}
+
+// SetWeaviateID sets the "weaviate_id" field.
+func (ic *ItemCreate) SetWeaviateID(s string) *ItemCreate {
+	ic.mutation.SetWeaviateID(s)
+	return ic
+}
+
+// SetVectorized sets the "vectorized" field.
+func (ic *ItemCreate) SetVectorized(b bool) *ItemCreate {
+	ic.mutation.SetVectorized(b)
 	return ic
 }
 
@@ -181,6 +193,12 @@ func (ic *ItemCreate) check() error {
 	if _, ok := ic.mutation.CategoryName(); !ok {
 		return &ValidationError{Name: "category_name", err: errors.New(`ent: missing required field "Item.category_name"`)}
 	}
+	if _, ok := ic.mutation.WeaviateID(); !ok {
+		return &ValidationError{Name: "weaviate_id", err: errors.New(`ent: missing required field "Item.weaviate_id"`)}
+	}
+	if _, ok := ic.mutation.Vectorized(); !ok {
+		return &ValidationError{Name: "vectorized", err: errors.New(`ent: missing required field "Item.vectorized"`)}
+	}
 	if _, ok := ic.mutation.StoreID(); !ok {
 		return &ValidationError{Name: "store", err: errors.New(`ent: missing required edge "Item.store"`)}
 	}
@@ -221,7 +239,7 @@ func (ic *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := ic.mutation.Photo(); ok {
-		_spec.SetField(item.FieldPhoto, field.TypeBytes, value)
+		_spec.SetField(item.FieldPhoto, field.TypeString, value)
 		_node.Photo = value
 	}
 	if value, ok := ic.mutation.Quantity(); ok {
@@ -243,6 +261,14 @@ func (ic *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 	if value, ok := ic.mutation.CategoryName(); ok {
 		_spec.SetField(item.FieldCategoryName, field.TypeString, value)
 		_node.CategoryName = value
+	}
+	if value, ok := ic.mutation.WeaviateID(); ok {
+		_spec.SetField(item.FieldWeaviateID, field.TypeString, value)
+		_node.WeaviateID = value
+	}
+	if value, ok := ic.mutation.Vectorized(); ok {
+		_spec.SetField(item.FieldVectorized, field.TypeBool, value)
+		_node.Vectorized = value
 	}
 	if value, ok := ic.mutation.NumberSold(); ok {
 		_spec.SetField(item.FieldNumberSold, field.TypeInt, value)

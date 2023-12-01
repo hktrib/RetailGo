@@ -44,6 +44,7 @@ func (rc *RedisConsumer) ConsumeTaskOwnerCreationCheck(ctx context.Context, task
 	if err != nil {
 		if _, isMyErrorType := err.(*ent.NotFoundError); isMyErrorType {
 
+			// TODO: Create a Store!
 			// TODO: handle user deletion from clerk
 			// TODO: handle user email sending -> using email from task.Payload
 

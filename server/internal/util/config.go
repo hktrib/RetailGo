@@ -15,7 +15,11 @@ type Config struct {
 	REDIS_PORT           string // `"REDIS_PORT"`
 	REDIS_PASSWORD       string // `"REDIS_PASSWORD"`
 	STRIPE_SK            string // `"STRIPE_SK"`
-	STRIPE_WEBHOOK_SECRET string // 
+	HOST                 string // `"HOST"`
+	WEAVIATE_HOSTNAME    string // `"WEAVIATE_HOSTNAME"`
+	WEAVIATE_SK          string // `"WEAVIATE_SK"`
+
+	STRIPE_WEBHOOK_SECRET string //
 }
 
 func LoadConfig() (config Config, err error) {
@@ -35,6 +39,8 @@ func LoadConfig() (config Config, err error) {
 	config.REDIS_PORT = os.Getenv("REDIS_PORT")
 	config.REDIS_PASSWORD = os.Getenv("REDIS_PASSWORD")
 	config.STRIPE_SK = os.Getenv("STRIPE_SK")
+	config.WEAVIATE_HOSTNAME = os.Getenv("WEAVIATE_HOSTNAME")
+	config.WEAVIATE_SK = os.Getenv("WEAVIATE_SK")
 	config.STRIPE_WEBHOOK_SECRET = os.Getenv("STRIPE_WEBHOOK_SECRET")
 
 	// fmt.Println(config)
