@@ -154,6 +154,7 @@ func ByWeaviateID(opts ...sql.OrderTermOption) OrderOption {
 // ByVectorized orders the results by the vectorized field.
 func ByVectorized(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldVectorized, opts...).ToFunc()
+}
 
 // ByNumberSold orders the results by the number_sold field.
 func ByNumberSold(opts ...sql.OrderTermOption) OrderOption {
@@ -163,7 +164,6 @@ func ByNumberSold(opts ...sql.OrderTermOption) OrderOption {
 // ByDateLastSold orders the results by the date_last_sold field.
 func ByDateLastSold(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDateLastSold, opts...).ToFunc()
-
 }
 
 // ByCategoryCount orders the results by category count.
