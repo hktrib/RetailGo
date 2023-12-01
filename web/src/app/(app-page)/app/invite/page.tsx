@@ -21,14 +21,13 @@ const InvitePage = () => {
     if (!user) return;
     joinMutation.mutate(user.id);
     router.push('/app');
-
   }
 
   return (
     <div className="relative isolate px-6 pt-14 lg:px-8 flex-1 flex flex-col justify-center items-center">
       <SignedIn>
         <h1 className="text-center text-2xl">
-          <span className="font-bold">"Stores are us"</span> has invited you to their business
+          <span className="font-bold">&quot;Stores are us&quot;</span> has invited you to their business
         </h1>
 
         <div className="py-10 flex items-center justify-center space-x-5">
