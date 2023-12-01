@@ -28,6 +28,10 @@ const (
 	FieldStripeProductID = "stripe_product_id"
 	// FieldCategoryName holds the string denoting the category_name field in the database.
 	FieldCategoryName = "category_name"
+	// FieldWeaviateID holds the string denoting the weaviate_id field in the database.
+	FieldWeaviateID = "weaviate_id"
+	// FieldVectorized holds the string denoting the vectorized field in the database.
+	FieldVectorized = "vectorized"
 	// FieldNumberSold holds the string denoting the number_sold field in the database.
 	FieldNumberSold = "number_sold"
 	// FieldDateLastSold holds the string denoting the date_last_sold field in the database.
@@ -72,6 +76,8 @@ var Columns = []string{
 	FieldStripePriceID,
 	FieldStripeProductID,
 	FieldCategoryName,
+	FieldWeaviateID,
+	FieldVectorized,
 	FieldNumberSold,
 	FieldDateLastSold,
 }
@@ -105,6 +111,11 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
+// ByPhoto orders the results by the photo field.
+func ByPhoto(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPhoto, opts...).ToFunc()
+}
+
 // ByQuantity orders the results by the quantity field.
 func ByQuantity(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldQuantity, opts...).ToFunc()
@@ -135,6 +146,15 @@ func ByCategoryName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCategoryName, opts...).ToFunc()
 }
 
+// ByWeaviateID orders the results by the weaviate_id field.
+func ByWeaviateID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldWeaviateID, opts...).ToFunc()
+}
+
+// ByVectorized orders the results by the vectorized field.
+func ByVectorized(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldVectorized, opts...).ToFunc()
+
 // ByNumberSold orders the results by the number_sold field.
 func ByNumberSold(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldNumberSold, opts...).ToFunc()
@@ -143,6 +163,7 @@ func ByNumberSold(opts ...sql.OrderTermOption) OrderOption {
 // ByDateLastSold orders the results by the date_last_sold field.
 func ByDateLastSold(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDateLastSold, opts...).ToFunc()
+
 }
 
 // ByCategoryCount orders the results by category count.

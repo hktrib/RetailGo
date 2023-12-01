@@ -17,7 +17,7 @@ func (Item) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id").Unique(),
 		field.String("name"),
-		field.Bytes("photo"),
+		field.String("photo"),
 		field.Int("quantity"),
 		field.Float("price").
 			SchemaType(map[string]string{
@@ -27,6 +27,8 @@ func (Item) Fields() []ent.Field {
 		field.String("stripe_price_id"),
 		field.String("stripe_product_id"),
 		field.String("category_name"),
+		field.String("weaviate_id"),
+		field.Bool("vectorized"),
 		field.Int("number_sold").Optional(),
 		field.String("date_last_sold").Optional(),
 	}

@@ -20,7 +20,7 @@ type Item struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Photo holds the value of the "photo" field.
-	Photo []byte `json:"photo,omitempty"`
+	Photo string `json:"photo,omitempty"`
 	// Quantity holds the value of the "quantity" field.
 	Quantity int `json:"quantity,omitempty"`
 	// Price holds the value of the "price" field.
@@ -33,6 +33,10 @@ type Item struct {
 	StripeProductID string `json:"stripe_product_id,omitempty"`
 	// CategoryName holds the value of the "category_name" field.
 	CategoryName string `json:"category_name,omitempty"`
+	// WeaviateID holds the value of the "weaviate_id" field.
+	WeaviateID string `json:"weaviate_id,omitempty"`
+	// Vectorized holds the value of the "vectorized" field.
+	Vectorized bool `json:"vectorized,omitempty"`
 	// NumberSold holds the value of the "number_sold" field.
 	NumberSold int `json:"number_sold,omitempty"`
 	// DateLastSold holds the value of the "date_last_sold" field.
@@ -92,13 +96,15 @@ func (*Item) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case item.FieldPhoto:
-			values[i] = new([]byte)
+		case item.FieldVectorized:
+			values[i] = new(sql.NullBool)
 		case item.FieldPrice:
 			values[i] = new(sql.NullFloat64)
 		case item.FieldID, item.FieldQuantity, item.FieldStoreID, item.FieldNumberSold:
 			values[i] = new(sql.NullInt64)
-		case item.FieldName, item.FieldStripePriceID, item.FieldStripeProductID, item.FieldCategoryName, item.FieldDateLastSold:
+
+		case item.FieldName, item.FieldPhoto, item.FieldStripePriceID, item.FieldStripeProductID, item.FieldCategoryName, item.FieldWeaviateID, item.FieldDateLastSold:
+		
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -128,10 +134,10 @@ func (i *Item) assignValues(columns []string, values []any) error {
 				i.Name = value.String
 			}
 		case item.FieldPhoto:
-			if value, ok := values[j].(*[]byte); !ok {
+			if value, ok := values[j].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field photo", values[j])
-			} else if value != nil {
-				i.Photo = *value
+			} else if value.Valid {
+				i.Photo = value.String
 			}
 		case item.FieldQuantity:
 			if value, ok := values[j].(*sql.NullInt64); !ok {
@@ -169,6 +175,18 @@ func (i *Item) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				i.CategoryName = value.String
 			}
+
+		case item.FieldWeaviateID:
+			if value, ok := values[j].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field weaviate_id", values[j])
+			} else if value.Valid {
+				i.WeaviateID = value.String
+			}
+		case item.FieldVectorized:
+			if value, ok := values[j].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field vectorized", values[j])
+			} else if value.Valid {
+				i.Vectorized = value.Bool
 		case item.FieldNumberSold:
 			if value, ok := values[j].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field number_sold", values[j])
@@ -236,7 +254,7 @@ func (i *Item) String() string {
 	builder.WriteString(i.Name)
 	builder.WriteString(", ")
 	builder.WriteString("photo=")
-	builder.WriteString(fmt.Sprintf("%v", i.Photo))
+	builder.WriteString(i.Photo)
 	builder.WriteString(", ")
 	builder.WriteString("quantity=")
 	builder.WriteString(fmt.Sprintf("%v", i.Quantity))
@@ -256,6 +274,11 @@ func (i *Item) String() string {
 	builder.WriteString("category_name=")
 	builder.WriteString(i.CategoryName)
 	builder.WriteString(", ")
+	builder.WriteString("weaviate_id=")
+	builder.WriteString(i.WeaviateID)
+	builder.WriteString(", ")
+	builder.WriteString("vectorized=")
+	builder.WriteString(fmt.Sprintf("%v", i.Vectorized))
 	builder.WriteString("number_sold=")
 	builder.WriteString(fmt.Sprintf("%v", i.NumberSold))
 	builder.WriteString(", ")

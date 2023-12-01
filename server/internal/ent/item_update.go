@@ -44,8 +44,16 @@ func (iu *ItemUpdate) SetNillableName(s *string) *ItemUpdate {
 }
 
 // SetPhoto sets the "photo" field.
-func (iu *ItemUpdate) SetPhoto(b []byte) *ItemUpdate {
-	iu.mutation.SetPhoto(b)
+func (iu *ItemUpdate) SetPhoto(s string) *ItemUpdate {
+	iu.mutation.SetPhoto(s)
+	return iu
+}
+
+// SetNillablePhoto sets the "photo" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillablePhoto(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetPhoto(*s)
+	}
 	return iu
 }
 
@@ -143,6 +151,34 @@ func (iu *ItemUpdate) SetCategoryName(s string) *ItemUpdate {
 func (iu *ItemUpdate) SetNillableCategoryName(s *string) *ItemUpdate {
 	if s != nil {
 		iu.SetCategoryName(*s)
+	}
+	return iu
+}
+
+// SetWeaviateID sets the "weaviate_id" field.
+func (iu *ItemUpdate) SetWeaviateID(s string) *ItemUpdate {
+	iu.mutation.SetWeaviateID(s)
+	return iu
+}
+
+// SetNillableWeaviateID sets the "weaviate_id" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableWeaviateID(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetWeaviateID(*s)
+	}
+	return iu
+}
+
+// SetVectorized sets the "vectorized" field.
+func (iu *ItemUpdate) SetVectorized(b bool) *ItemUpdate {
+	iu.mutation.SetVectorized(b)
+	return iu
+}
+
+// SetNillableVectorized sets the "vectorized" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableVectorized(b *bool) *ItemUpdate {
+	if b != nil {
+		iu.SetVectorized(*b)
 	}
 	return iu
 }
@@ -250,7 +286,7 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(item.FieldName, field.TypeString, value)
 	}
 	if value, ok := iu.mutation.Photo(); ok {
-		_spec.SetField(item.FieldPhoto, field.TypeBytes, value)
+		_spec.SetField(item.FieldPhoto, field.TypeString, value)
 	}
 	if value, ok := iu.mutation.Quantity(); ok {
 		_spec.SetField(item.FieldQuantity, field.TypeInt, value)
@@ -272,6 +308,12 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := iu.mutation.CategoryName(); ok {
 		_spec.SetField(item.FieldCategoryName, field.TypeString, value)
+	}
+	if value, ok := iu.mutation.WeaviateID(); ok {
+		_spec.SetField(item.FieldWeaviateID, field.TypeString, value)
+	}
+	if value, ok := iu.mutation.Vectorized(); ok {
+		_spec.SetField(item.FieldVectorized, field.TypeBool, value)
 	}
 	if iu.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -382,8 +424,16 @@ func (iuo *ItemUpdateOne) SetNillableName(s *string) *ItemUpdateOne {
 }
 
 // SetPhoto sets the "photo" field.
-func (iuo *ItemUpdateOne) SetPhoto(b []byte) *ItemUpdateOne {
-	iuo.mutation.SetPhoto(b)
+func (iuo *ItemUpdateOne) SetPhoto(s string) *ItemUpdateOne {
+	iuo.mutation.SetPhoto(s)
+	return iuo
+}
+
+// SetNillablePhoto sets the "photo" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillablePhoto(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetPhoto(*s)
+	}
 	return iuo
 }
 
@@ -481,6 +531,34 @@ func (iuo *ItemUpdateOne) SetCategoryName(s string) *ItemUpdateOne {
 func (iuo *ItemUpdateOne) SetNillableCategoryName(s *string) *ItemUpdateOne {
 	if s != nil {
 		iuo.SetCategoryName(*s)
+	}
+	return iuo
+}
+
+// SetWeaviateID sets the "weaviate_id" field.
+func (iuo *ItemUpdateOne) SetWeaviateID(s string) *ItemUpdateOne {
+	iuo.mutation.SetWeaviateID(s)
+	return iuo
+}
+
+// SetNillableWeaviateID sets the "weaviate_id" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableWeaviateID(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetWeaviateID(*s)
+	}
+	return iuo
+}
+
+// SetVectorized sets the "vectorized" field.
+func (iuo *ItemUpdateOne) SetVectorized(b bool) *ItemUpdateOne {
+	iuo.mutation.SetVectorized(b)
+	return iuo
+}
+
+// SetNillableVectorized sets the "vectorized" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableVectorized(b *bool) *ItemUpdateOne {
+	if b != nil {
+		iuo.SetVectorized(*b)
 	}
 	return iuo
 }
@@ -618,7 +696,7 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 		_spec.SetField(item.FieldName, field.TypeString, value)
 	}
 	if value, ok := iuo.mutation.Photo(); ok {
-		_spec.SetField(item.FieldPhoto, field.TypeBytes, value)
+		_spec.SetField(item.FieldPhoto, field.TypeString, value)
 	}
 	if value, ok := iuo.mutation.Quantity(); ok {
 		_spec.SetField(item.FieldQuantity, field.TypeInt, value)
@@ -640,6 +718,12 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 	}
 	if value, ok := iuo.mutation.CategoryName(); ok {
 		_spec.SetField(item.FieldCategoryName, field.TypeString, value)
+	}
+	if value, ok := iuo.mutation.WeaviateID(); ok {
+		_spec.SetField(item.FieldWeaviateID, field.TypeString, value)
+	}
+	if value, ok := iuo.mutation.Vectorized(); ok {
+		_spec.SetField(item.FieldVectorized, field.TypeBool, value)
 	}
 	if iuo.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
