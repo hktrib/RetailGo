@@ -38,12 +38,6 @@ type Server struct {
 
 // Define a type for Item-Change Requests (Create, Update, Delete)
 
-type ItemChange struct {
-	Item          ent.Item
-	Mode          string
-	UpdatedFields UpdatedFields
-}
-
 func NewServer(
 	clerkClient clerk.Client,
 	entClient *ent.Client,

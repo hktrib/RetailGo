@@ -1007,7 +1007,7 @@ type ItemMutation struct {
 	typ               string
 	id                *int
 	name              *string
-	photo             *[]byte
+	photo             *string
 	quantity          *int
 	addquantity       *int
 	price             *float64
@@ -1169,12 +1169,12 @@ func (m *ItemMutation) ResetName() {
 }
 
 // SetPhoto sets the "photo" field.
-func (m *ItemMutation) SetPhoto(b []byte) {
-	m.photo = &b
+func (m *ItemMutation) SetPhoto(s string) {
+	m.photo = &s
 }
 
 // Photo returns the value of the "photo" field in the mutation.
-func (m *ItemMutation) Photo() (r []byte, exists bool) {
+func (m *ItemMutation) Photo() (r string, exists bool) {
 	v := m.photo
 	if v == nil {
 		return
@@ -1185,7 +1185,7 @@ func (m *ItemMutation) Photo() (r []byte, exists bool) {
 // OldPhoto returns the old "photo" field's value of the Item entity.
 // If the Item object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ItemMutation) OldPhoto(ctx context.Context) (v []byte, err error) {
+func (m *ItemMutation) OldPhoto(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldPhoto is only allowed on UpdateOne operations")
 	}
@@ -1752,7 +1752,7 @@ func (m *ItemMutation) SetField(name string, value ent.Value) error {
 		m.SetName(v)
 		return nil
 	case item.FieldPhoto:
-		v, ok := value.([]byte)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

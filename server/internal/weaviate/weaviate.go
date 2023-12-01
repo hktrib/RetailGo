@@ -56,7 +56,7 @@ func (weaviate *Weaviate) Start() chan server.ItemChange {
 		ModuleConfig: map[string]interface{}{},
 	}
 
-	err = weaviate.Client.Schema().ClassCreator().WithClass(itemClassObj).Do(context.Background())
+	err = weaviate.Client.Schema().ClassCreator().WithClass(itemClassObj).Do(weaviate.ctx)
 
 	if err != nil {
 		panic(err)
@@ -68,7 +68,7 @@ func (weaviate *Weaviate) Start() chan server.ItemChange {
 		ModuleConfig: map[string]interface{}{},
 	}
 
-	err = weaviate.Client.Schema().ClassCreator().WithClass(userClassObj).Do(context.Background())
+	err = weaviate.Client.Schema().ClassCreator().WithClass(userClassObj).Do(weaviate.ctx)
 
 	if err != nil {
 		panic(err)
@@ -82,8 +82,8 @@ func (weaviate *Weaviate) Start() chan server.ItemChange {
 
 func (weaviate *Weaviate) DispatchChanges(itemChange server.ItemChange) {
 
-	if itemChange.Mode == "Create" {
-		// Update literal details on Weaviate.
+	if itemChange.Mode == "CREATE" {
+		// Create object with correct properties on Weaviate.
 		w, err := weaviate.Client.
 			Data().
 			Creator().
@@ -103,8 +103,8 @@ func (weaviate *Weaviate) DispatchChanges(itemChange server.ItemChange) {
 
 		itemChange.Item.WeaviateID = w.Object.ID.String()
 
-	} else if itemChange.Mode == "Update" {
-		// Update literal details on Weaviate.
+	} else if itemChange.Mode == "UPDATE" {
+		// Update properties on Weaviate.
 
 		itemUpdates := map[string]interface{}{}
 
@@ -132,13 +132,12 @@ func (weaviate *Weaviate) DispatchChanges(itemChange server.ItemChange) {
 			WithProperties(itemUpdates).
 			Do(weaviate.ctx)
 
-		// If only unvectorized fields are changed and if done so successfully, exit.
 		if err != nil {
 			panic(err)
 		}
 
-	} else if itemChange.Mode == "Delete" {
-		// Use the client to delete the item from Weaviate and exit if successful.
+	} else if itemChange.Mode == "DELETE" {
+		// Use the client to delete the item from Weaviate.
 		err := weaviate.Client.
 			Data().
 			Deleter().

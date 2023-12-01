@@ -17,7 +17,7 @@ func (Item) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id").Unique(),
 		field.String("name"),
-		field.Bytes("photo"),
+		field.String("photo"),
 		field.Int("quantity"),
 		field.Float("price").
 			SchemaType(map[string]string{

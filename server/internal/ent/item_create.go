@@ -28,8 +28,8 @@ func (ic *ItemCreate) SetName(s string) *ItemCreate {
 }
 
 // SetPhoto sets the "photo" field.
-func (ic *ItemCreate) SetPhoto(b []byte) *ItemCreate {
-	ic.mutation.SetPhoto(b)
+func (ic *ItemCreate) SetPhoto(s string) *ItemCreate {
+	ic.mutation.SetPhoto(s)
 	return ic
 }
 
@@ -211,7 +211,7 @@ func (ic *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := ic.mutation.Photo(); ok {
-		_spec.SetField(item.FieldPhoto, field.TypeBytes, value)
+		_spec.SetField(item.FieldPhoto, field.TypeString, value)
 		_node.Photo = value
 	}
 	if value, ok := ic.mutation.Quantity(); ok {

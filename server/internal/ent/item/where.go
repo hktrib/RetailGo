@@ -59,7 +59,7 @@ func Name(v string) predicate.Item {
 }
 
 // Photo applies equality check predicate on the "photo" field. It's identical to PhotoEQ.
-func Photo(v []byte) predicate.Item {
+func Photo(v string) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldPhoto, v))
 }
 
@@ -169,43 +169,68 @@ func NameContainsFold(v string) predicate.Item {
 }
 
 // PhotoEQ applies the EQ predicate on the "photo" field.
-func PhotoEQ(v []byte) predicate.Item {
+func PhotoEQ(v string) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldPhoto, v))
 }
 
 // PhotoNEQ applies the NEQ predicate on the "photo" field.
-func PhotoNEQ(v []byte) predicate.Item {
+func PhotoNEQ(v string) predicate.Item {
 	return predicate.Item(sql.FieldNEQ(FieldPhoto, v))
 }
 
 // PhotoIn applies the In predicate on the "photo" field.
-func PhotoIn(vs ...[]byte) predicate.Item {
+func PhotoIn(vs ...string) predicate.Item {
 	return predicate.Item(sql.FieldIn(FieldPhoto, vs...))
 }
 
 // PhotoNotIn applies the NotIn predicate on the "photo" field.
-func PhotoNotIn(vs ...[]byte) predicate.Item {
+func PhotoNotIn(vs ...string) predicate.Item {
 	return predicate.Item(sql.FieldNotIn(FieldPhoto, vs...))
 }
 
 // PhotoGT applies the GT predicate on the "photo" field.
-func PhotoGT(v []byte) predicate.Item {
+func PhotoGT(v string) predicate.Item {
 	return predicate.Item(sql.FieldGT(FieldPhoto, v))
 }
 
 // PhotoGTE applies the GTE predicate on the "photo" field.
-func PhotoGTE(v []byte) predicate.Item {
+func PhotoGTE(v string) predicate.Item {
 	return predicate.Item(sql.FieldGTE(FieldPhoto, v))
 }
 
 // PhotoLT applies the LT predicate on the "photo" field.
-func PhotoLT(v []byte) predicate.Item {
+func PhotoLT(v string) predicate.Item {
 	return predicate.Item(sql.FieldLT(FieldPhoto, v))
 }
 
 // PhotoLTE applies the LTE predicate on the "photo" field.
-func PhotoLTE(v []byte) predicate.Item {
+func PhotoLTE(v string) predicate.Item {
 	return predicate.Item(sql.FieldLTE(FieldPhoto, v))
+}
+
+// PhotoContains applies the Contains predicate on the "photo" field.
+func PhotoContains(v string) predicate.Item {
+	return predicate.Item(sql.FieldContains(FieldPhoto, v))
+}
+
+// PhotoHasPrefix applies the HasPrefix predicate on the "photo" field.
+func PhotoHasPrefix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasPrefix(FieldPhoto, v))
+}
+
+// PhotoHasSuffix applies the HasSuffix predicate on the "photo" field.
+func PhotoHasSuffix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasSuffix(FieldPhoto, v))
+}
+
+// PhotoEqualFold applies the EqualFold predicate on the "photo" field.
+func PhotoEqualFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldEqualFold(FieldPhoto, v))
+}
+
+// PhotoContainsFold applies the ContainsFold predicate on the "photo" field.
+func PhotoContainsFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldContainsFold(FieldPhoto, v))
 }
 
 // QuantityEQ applies the EQ predicate on the "quantity" field.

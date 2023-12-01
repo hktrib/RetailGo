@@ -20,7 +20,7 @@ type Item struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Photo holds the value of the "photo" field.
-	Photo []byte `json:"photo,omitempty"`
+	Photo string `json:"photo,omitempty"`
 	// Quantity holds the value of the "quantity" field.
 	Quantity int `json:"quantity,omitempty"`
 	// Price holds the value of the "price" field.
@@ -92,15 +92,13 @@ func (*Item) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case item.FieldPhoto:
-			values[i] = new([]byte)
 		case item.FieldVectorized:
 			values[i] = new(sql.NullBool)
 		case item.FieldPrice:
 			values[i] = new(sql.NullFloat64)
 		case item.FieldID, item.FieldQuantity, item.FieldStoreID:
 			values[i] = new(sql.NullInt64)
-		case item.FieldName, item.FieldStripePriceID, item.FieldStripeProductID, item.FieldCategoryName, item.FieldWeaviateID:
+		case item.FieldName, item.FieldPhoto, item.FieldStripePriceID, item.FieldStripeProductID, item.FieldCategoryName, item.FieldWeaviateID:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -130,10 +128,10 @@ func (i *Item) assignValues(columns []string, values []any) error {
 				i.Name = value.String
 			}
 		case item.FieldPhoto:
-			if value, ok := values[j].(*[]byte); !ok {
+			if value, ok := values[j].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field photo", values[j])
-			} else if value != nil {
-				i.Photo = *value
+			} else if value.Valid {
+				i.Photo = value.String
 			}
 		case item.FieldQuantity:
 			if value, ok := values[j].(*sql.NullInt64); !ok {
@@ -238,7 +236,7 @@ func (i *Item) String() string {
 	builder.WriteString(i.Name)
 	builder.WriteString(", ")
 	builder.WriteString("photo=")
-	builder.WriteString(fmt.Sprintf("%v", i.Photo))
+	builder.WriteString(i.Photo)
 	builder.WriteString(", ")
 	builder.WriteString("quantity=")
 	builder.WriteString(fmt.Sprintf("%v", i.Quantity))

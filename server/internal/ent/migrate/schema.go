@@ -65,7 +65,7 @@ var (
 	ItemsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "photo", Type: field.TypeBytes},
+		{Name: "photo", Type: field.TypeString},
 		{Name: "quantity", Type: field.TypeInt},
 		{Name: "price", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "decimal(10,2)"}},
 		{Name: "stripe_price_id", Type: field.TypeString},

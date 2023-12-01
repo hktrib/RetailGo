@@ -44,8 +44,16 @@ func (iu *ItemUpdate) SetNillableName(s *string) *ItemUpdate {
 }
 
 // SetPhoto sets the "photo" field.
-func (iu *ItemUpdate) SetPhoto(b []byte) *ItemUpdate {
-	iu.mutation.SetPhoto(b)
+func (iu *ItemUpdate) SetPhoto(s string) *ItemUpdate {
+	iu.mutation.SetPhoto(s)
+	return iu
+}
+
+// SetNillablePhoto sets the "photo" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillablePhoto(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetPhoto(*s)
+	}
 	return iu
 }
 
@@ -278,7 +286,7 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(item.FieldName, field.TypeString, value)
 	}
 	if value, ok := iu.mutation.Photo(); ok {
-		_spec.SetField(item.FieldPhoto, field.TypeBytes, value)
+		_spec.SetField(item.FieldPhoto, field.TypeString, value)
 	}
 	if value, ok := iu.mutation.Quantity(); ok {
 		_spec.SetField(item.FieldQuantity, field.TypeInt, value)
@@ -416,8 +424,16 @@ func (iuo *ItemUpdateOne) SetNillableName(s *string) *ItemUpdateOne {
 }
 
 // SetPhoto sets the "photo" field.
-func (iuo *ItemUpdateOne) SetPhoto(b []byte) *ItemUpdateOne {
-	iuo.mutation.SetPhoto(b)
+func (iuo *ItemUpdateOne) SetPhoto(s string) *ItemUpdateOne {
+	iuo.mutation.SetPhoto(s)
+	return iuo
+}
+
+// SetNillablePhoto sets the "photo" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillablePhoto(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetPhoto(*s)
+	}
 	return iuo
 }
 
@@ -680,7 +696,7 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 		_spec.SetField(item.FieldName, field.TypeString, value)
 	}
 	if value, ok := iuo.mutation.Photo(); ok {
-		_spec.SetField(item.FieldPhoto, field.TypeBytes, value)
+		_spec.SetField(item.FieldPhoto, field.TypeString, value)
 	}
 	if value, ok := iuo.mutation.Quantity(); ok {
 		_spec.SetField(item.FieldQuantity, field.TypeInt, value)
