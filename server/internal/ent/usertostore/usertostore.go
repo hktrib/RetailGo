@@ -14,6 +14,8 @@ const (
 	FieldUserID = "user_id"
 	// FieldStoreID holds the string denoting the store_id field in the database.
 	FieldStoreID = "store_id"
+	// FieldClerkUserID holds the string denoting the clerk_user_id field in the database.
+	FieldClerkUserID = "clerk_user_id"
 	// FieldPermissionLevel holds the string denoting the permission_level field in the database.
 	FieldPermissionLevel = "permission_level"
 	// FieldJoinedAt holds the string denoting the joined_at field in the database.
@@ -48,6 +50,7 @@ const (
 var Columns = []string{
 	FieldUserID,
 	FieldStoreID,
+	FieldClerkUserID,
 	FieldPermissionLevel,
 	FieldJoinedAt,
 }
@@ -73,6 +76,11 @@ func ByUserID(opts ...sql.OrderTermOption) OrderOption {
 // ByStoreID orders the results by the store_id field.
 func ByStoreID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStoreID, opts...).ToFunc()
+}
+
+// ByClerkUserID orders the results by the clerk_user_id field.
+func ByClerkUserID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldClerkUserID, opts...).ToFunc()
 }
 
 // ByPermissionLevel orders the results by the permission_level field.

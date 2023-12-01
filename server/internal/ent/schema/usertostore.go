@@ -22,6 +22,7 @@ func (UserToStore) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("user_id"),
 		field.Int("store_id"),
+		field.String("clerk_user_id"),
 		field.Int("permission_level").Optional(),
 		field.Int("joined_at").Optional(),
 	}
