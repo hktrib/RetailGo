@@ -31,11 +31,20 @@ func (srv *Server) UserCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = srv.DBClient.User.Create().
+		SetClerkUserID(reqUser.ClerkUserID).
 		SetEmail(reqUser.Email).
 		SetIsOwner(reqUser.IsOwner).
 		SetFirstName(reqUser.FirstName).
 		SetLastName(reqUser.LastName).
 		SetStoreID(reqUser.StoreID).Save(ctx)
+
+	// Add StoreID -> to "stores" list in private_metadata for clerk user
+	// clerkUser, err := srv.ClerkClient.Users().UpdateMetadata(reqUser.ClerkUserID, )
+	if err != nil {
+		fmt.Println("Reading Clerk data didn't work:", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 
 	if err != nil {
 		fmt.Println("User Creation didn't work:", err)
