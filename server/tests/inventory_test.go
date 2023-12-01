@@ -49,7 +49,7 @@ func TestInvCreate(tst *testing.T) {
 
 	invItem := ent.Item{
 		Name:     "Newest Gerber Grapes",
-		Photo:    []byte("uhsrgouhsrgouhsrgoushrg"),
+		Photo:    "uhsrgouhsrgouhsrgoushrg",
 		Quantity: 15,
 		Price:    120.9,
 		StoreID:  1391,

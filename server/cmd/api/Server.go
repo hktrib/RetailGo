@@ -26,20 +26,23 @@ import (
 type Param string
 
 type Server struct {
-	Router          *chi.Mux
-	ClerkClient     clerk.Client
-	DBClient        *ent.Client
-	TaskQueueClient *asynq.Client
-	Cache           *kv.Cache
-
-	TaskProducer worker.TaskProducer
-	Config       *util.Config
+	Router            *chi.Mux
+	ClerkClient       clerk.Client
+	DBClient          *ent.Client
+	TaskQueueClient   *asynq.Client
+	ItemChangeChannel chan ItemChange
+	Cache             *kv.Cache
+	TaskProducer      worker.TaskProducer
+	Config            *util.Config
 }
+
+// Define a type for Item-Change Requests (Create, Update, Delete)
 
 func NewServer(
 	clerkClient clerk.Client,
 	entClient *ent.Client,
 	taskQueueClient *asynq.Client,
+	itemChangeChannel chan ItemChange,
 	cache *kv.Cache,
 	taskProducer worker.TaskProducer,
 	config *util.Config,
@@ -50,8 +53,8 @@ func NewServer(
 	srv.ClerkClient = clerkClient
 	srv.DBClient = entClient
 	srv.TaskQueueClient = taskQueueClient
+	srv.ItemChangeChannel = itemChangeChannel
 	srv.Cache = cache
-
 	srv.TaskProducer = taskProducer
 	srv.Config = config
 	return srv
@@ -69,7 +72,7 @@ func (s *Server) MountHandlers() {
 	}))
 
 	s.Router.Post("/webhook", func(writer http.ResponseWriter, request *http.Request) {
-		s.HandleSuccess(writer, request)
+		s.StripeWebhookRouter(writer, request)
 	})
 	s.Router.Post("/clerkwebhook", webhook.HandleClerkWebhook)
 	s.Router.Get("/", s.HelloWorld)

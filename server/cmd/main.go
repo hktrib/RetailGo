@@ -13,6 +13,7 @@ import (
 	kvRedis "github.com/hktrib/RetailGo/internal/redis"
 	worker "github.com/hktrib/RetailGo/internal/tasks"
 	"github.com/hktrib/RetailGo/internal/util"
+	weaviate "github.com/hktrib/RetailGo/internal/weaviate"
 	"github.com/hktrib/RetailGo/internal/webhook"
 	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
@@ -32,10 +33,11 @@ func runTaskConsumer(redisOptions *asynq.RedisClientOpt, dbClient *ent.Client, c
 
 func main() {
 	config, err := util.LoadConfig()
-	stripe.Key = config.STRIPE_SK
 	if err != nil {
 		panic(err)
 	}
+
+	stripe.Key = config.STRIPE_SK
 
 	taskQueueOptions := asynq.RedisClientOpt{
 		Addr:     fmt.Sprintf("%s:%s", config.REDIS_HOSTNAME, config.REDIS_PORT),
@@ -65,6 +67,14 @@ func main() {
 	entClient := util.Open(&config)
 	defer entClient.Close()
 
+	// Make sure this is a correct use of context.Background()
+	weaviateClient := weaviate.NewWeaviate(context.Background())
+	itemChangeChannel := weaviateClient.Start()
+
+	if err != nil {
+		panic(err)
+	}
+
 	if err := entClient.Schema.Create(context.Background()); err != nil {
 		log.Fatal().Err(err).Msg("failed creating schema resources")
 	}
@@ -72,7 +82,7 @@ func main() {
 	go func() {
 		injectActiveSession := clerk.WithSessionV2(clerkClient)
 
-		srv := server.NewServer(clerkClient, entClient, taskQueueClient, cache, taskProducer, &config)
+		srv := server.NewServer(clerkClient, entClient, taskQueueClient, itemChangeChannel, cache, taskProducer, &config)
 		srv.Router.Use(injectActiveSession)
 
 		srv.MountHandlers()
@@ -80,7 +90,7 @@ func main() {
 		webhook.Config = &config
 		webhook.ClerkClient = clerkClient
 
-		err := http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", config.SERVER_ADDRESS), srv.Router)
+		err := http.ListenAndServe(fmt.Sprintf("127.0.0.1:%s", config.SERVER_ADDRESS), srv.Router)
 
 		if err != nil {
 			log.Fatal().Err(err).Msg("failed in starting server")
@@ -91,5 +101,6 @@ func main() {
 	}()
 
 	// Makes sure we wait for the go routine running
+	go weaviateClient.ItemChangeHandler(entClient)
 	select {}
 }

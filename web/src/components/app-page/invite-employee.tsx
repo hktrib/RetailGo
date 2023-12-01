@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 import * as z from "zod";
 
@@ -46,11 +46,12 @@ export default function InviteEmployee() {
       <Form {...form}>
         <form>
           <DialogContent>
-            <form onSubmit={form.handleSubmit(
-                (data) => {
-                  console.log("Data:", data);
-                  return inviteMutation;
-                })}>
+            <form
+              onSubmit={form.handleSubmit((data) => {
+                console.log("Data:", data);
+                return inviteMutation;
+              })}
+            >
               <DialogHeader>
                 <DialogTitle>Invite employee</DialogTitle>
               </DialogHeader>
