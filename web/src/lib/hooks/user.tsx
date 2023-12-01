@@ -21,23 +21,21 @@ export function HasStore() {
 export function PostJoinStore(storeId: string) {
   const authFetch = useFetch();
   return useMutation({
-    mutationFn: (body: PostJoinStoreModel) =>
+    mutationFn: (clerkId: string) =>
       authFetch(
         `${storeURL}/join/`,
         {
           method: "POST",
-          body: JSON.stringify(body),
+          body: JSON.stringify({"ClerkId": clerkId, "StoreId": storeId}),
         },
         {
           "Content-Type": "application/json",
         }
         
       ),
-    onError: (err, email, context) => {
-      console.log("Error while sending invite to", email, ":", err);
+    onError: (err, clerkId, context) => {
     },
-    onSuccess: (email) => {
-      console.log("Invite sent successfully to", email);
+    onSuccess: (clerkId) => {
       // You can add any additional logic you need on successful invite here
     },
   });

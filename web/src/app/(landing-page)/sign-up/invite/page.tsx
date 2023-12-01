@@ -1,22 +1,29 @@
 "use client"
-import { SignUp, SignedIn, SignedOut } from "@clerk/nextjs";
+import { PostJoinStore } from "@/lib/hooks/user";
+import { SignUp, SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { on } from "events";
 import Link from "next/link";
 import { useSearchParams } from 'next/navigation'
+import { currentUser } from '@clerk/nextjs';
 
 
-export function OnAccept() {
-  console.log("clicked")
+const searchParams = useSearchParams()
+const store_uuid = searchParams.get('code') || "";
+const postJoinStore = PostJoinStore(store_uuid);
+
+export async function OnAccept() {
+  const { user } = useUser();
+  if (!user) return null;
+  if(!user)
+    postJoinStore.mutate(user.id);
 }
+
 export function OnDecline() {
   console.log("clicked")
 }
 
-const InvitePage = () => {
-  const searchParams = useSearchParams()
-  const search = searchParams.get('code')
-  console.log(search)
 
+const InvitePage = () => {
   return (
     <div className=" relative isolate px-6 pt-14 lg:px-8 flex-1 flex flex-col justify-center items-center">
       <SignedIn>
