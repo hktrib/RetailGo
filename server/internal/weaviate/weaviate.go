@@ -38,7 +38,7 @@ func (weaviate *Weaviate) Start() chan server.ItemChange {
 	}
 
 	weaviateConfig := weaviateClient.Config{
-		Host:       "retailgo-recengine-eb6uzggu.weaviate.network", //config.WEAVIATE_HOSTNAME,
+		Host:       config.WEAVIATE_HOSTNAME,
 		Scheme:     "https",
 		AuthConfig: weaviateAuth.ApiKey{Value: config.WEAVIATE_SK},
 		Headers:    nil,
