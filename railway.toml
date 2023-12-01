@@ -1,8 +1,0 @@
-[build]
-builder = "DOCKERFILE"
-buildCommand = "echo building!"
-dockerfilePath = "/server/Dockerfile"
-
-[deploy]
-startCommand = "echo starting!"
-restartPolicyType = "never"
