@@ -16,18 +16,10 @@ import (
 type Weaviate struct {
 	Client            *weaviateClient.Client
 	ctx               context.Context
-	itemChangeChannel chan ItemChange
+	itemChangeChannel chan server.ItemChange
 }
 
-// Define a type for Item-Change Requests (Create, Update, Delete)
-
-type ItemChange struct {
-	Item          ent.Item
-	Mode          string
-	UpdatedFields server.UpdatedFields
-}
-
-func vectorUpdateNeeded(itemChange ItemChange) bool {
+func vectorUpdateNeeded(itemChange server.ItemChange) bool {
 	return itemChange.Mode == "CREATE" || (itemChange.Mode == "UPDATE" && !(itemChange.UpdatedFields.Name || itemChange.UpdatedFields.CategoryName || itemChange.UpdatedFields.Price))
 }
 
@@ -38,7 +30,7 @@ func NewWeaviate(ctx context.Context) *Weaviate {
 	return weaviateClient
 }
 
-func (weaviate *Weaviate) Start() chan ItemChange {
+func (weaviate *Weaviate) Start() chan server.ItemChange {
 	config, err := util.LoadConfig()
 
 	if err != nil {
@@ -82,12 +74,13 @@ func (weaviate *Weaviate) Start() chan ItemChange {
 		panic(err)
 	}
 
-	weaviate.itemChangeChannel = make(chan ItemChange)
+	weaviate.itemChangeChannel = make(chan server.ItemChange)
+	weaviate.ctx = context.Background()
 
 	return weaviate.itemChangeChannel
 }
 
-func (weaviate *Weaviate) DispatchChanges(itemChange ItemChange) {
+func (weaviate *Weaviate) DispatchChanges(itemChange server.ItemChange) {
 
 	if itemChange.Mode == "Create" {
 		// Update literal details on Weaviate.
@@ -105,8 +98,10 @@ func (weaviate *Weaviate) DispatchChanges(itemChange ItemChange) {
 			Do(weaviate.ctx)
 
 		if err != nil {
-			itemChange.Item.WeaviateID = w.Object.ID.String()
+			panic(err)
 		}
+
+		itemChange.Item.WeaviateID = w.Object.ID.String()
 
 	} else if itemChange.Mode == "Update" {
 		// Update literal details on Weaviate.
@@ -138,8 +133,8 @@ func (weaviate *Weaviate) DispatchChanges(itemChange ItemChange) {
 			Do(weaviate.ctx)
 
 		// If only unvectorized fields are changed and if done so successfully, exit.
-		if err == nil && !(itemChange.UpdatedFields.Name || itemChange.UpdatedFields.CategoryName || itemChange.UpdatedFields.Photo) {
-			return
+		if err != nil {
+			panic(err)
 		}
 
 	} else if itemChange.Mode == "Delete" {
@@ -151,8 +146,8 @@ func (weaviate *Weaviate) DispatchChanges(itemChange ItemChange) {
 			WithID(itemChange.Item.WeaviateID).
 			Do(weaviate.ctx)
 
-		if err == nil {
-			return
+		if err != nil {
+			panic(err)
 		}
 
 	} else {
@@ -162,7 +157,7 @@ func (weaviate *Weaviate) DispatchChanges(itemChange ItemChange) {
 
 }
 
-func (weaviate *Weaviate) DispatchVector(itemChange ItemChange, entClient *ent.Client) {
+func (weaviate *Weaviate) DispatchVector(itemChange server.ItemChange, entClient *ent.Client) {
 	// Mark the items in PG as dirty
 	targetItem, err := entClient.Item.Query().Where(item.ID(itemChange.Item.ID)).Only(weaviate.ctx)
 

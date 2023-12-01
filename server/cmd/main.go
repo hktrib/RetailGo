@@ -82,7 +82,7 @@ func main() {
 	go func() {
 		injectActiveSession := clerk.WithSessionV2(clerkClient)
 
-		srv := server.NewServer(clerkClient, entClient, taskQueueClient, cache, taskProducer, &config)
+		srv := server.NewServer(clerkClient, entClient, taskQueueClient, itemChangeChannel, cache, taskProducer, &config)
 		srv.Router.Use(injectActiveSession)
 
 		srv.MountHandlers()
