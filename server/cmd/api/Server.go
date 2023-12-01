@@ -41,8 +41,6 @@ func NewServer(
 	clerkClient clerk.Client,
 	entClient *ent.Client,
 	taskQueueClient *asynq.Client,
-	// Need to replace with actual Weaviate Client
-	weaviateClient *weaviate.Client,
 	cache *kv.Cache,
 	taskProducer worker.TaskProducer,
 	config *util.Config,
@@ -54,7 +52,6 @@ func NewServer(
 	srv.DBClient = entClient
 	srv.TaskQueueClient = taskQueueClient
 	srv.Cache = cache
-	srv.WeaviateClient = weaviateClient
 	srv.TaskProducer = taskProducer
 	srv.Config = config
 	return srv

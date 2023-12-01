@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Eye, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import ItemDialog from "../item-dialog";
 import { Item } from "@/models/item";
 
@@ -40,7 +40,7 @@ export function DataTable<TData extends Item, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const deleteItemMutation = useDeleteItem("1");
+  const deleteItemMutation = useDeleteItem("10");
 
   const table = useReactTable({
     data,
@@ -107,9 +107,6 @@ export function DataTable<TData extends Item, TValue>({
                   ))}
                   <TableCell>
                     <div className="text-right flex flex-row space-x-2 h-8 w-8 p-0">
-                    <Link href={`/app/inventory/item/${row.id}`}>
-                      <Eye style={{ color: "blue" }} className=" w-5 "></Eye>
-                    </Link>
                       <ItemDialog item={row.original} mode="edit" />
                       <button
                         onClick={() =>

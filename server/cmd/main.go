@@ -13,13 +13,12 @@ import (
 	kvRedis "github.com/hktrib/RetailGo/internal/redis"
 	worker "github.com/hktrib/RetailGo/internal/tasks"
 	"github.com/hktrib/RetailGo/internal/util"
+	weaviate "github.com/hktrib/RetailGo/internal/weaviate"
 	"github.com/hktrib/RetailGo/internal/webhook"
 	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 	"github.com/stripe/stripe-go/v76"
-	"github.com/weaviate/weaviate-go-client/v4/weaviate"
-	"github.com/weaviate/weaviate-go-client/v4/weaviate/auth"
 )
 
 // var log = util.NewLogger()
@@ -68,14 +67,9 @@ func main() {
 	entClient := util.Open(&config)
 	defer entClient.Close()
 
-	weaviateConfig := weaviate.Config{
-		Host:       config.WEAVIATE_HOSTNAME,
-		Scheme:     "https",
-		AuthConfig: auth.ApiKey{Value: config.WEAVIATE_SK},
-		Headers:    nil,
-	}
-
-	weaviateClient, err := weaviate.NewClient(weaviateConfig)
+	// Make sure this is a correct use of context.Background()
+	weaviateClient := weaviate.NewWeaviate(context.Background())
+	itemChangeChannel := weaviateClient.Start()
 
 	if err != nil {
 		panic(err)
@@ -88,7 +82,7 @@ func main() {
 	go func() {
 		injectActiveSession := clerk.WithSessionV2(clerkClient)
 
-		srv := server.NewServer(clerkClient, entClient, taskQueueClient, weaviateClient, cache, taskProducer, &config)
+		srv := server.NewServer(clerkClient, entClient, taskQueueClient, cache, taskProducer, &config)
 		srv.Router.Use(injectActiveSession)
 
 		srv.MountHandlers()
@@ -107,5 +101,6 @@ func main() {
 	}()
 
 	// Makes sure we wait for the go routine running
+	go weaviateClient.ItemChangeHandler(entClient)
 	select {}
 }

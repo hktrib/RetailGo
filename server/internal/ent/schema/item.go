@@ -28,6 +28,7 @@ func (Item) Fields() []ent.Field {
 		field.String("stripe_product_id"),
 		field.String("category_name"),
 		field.String("weaviate_id"),
+		field.Bool("vectorized"),
 	}
 }
 

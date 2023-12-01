@@ -98,6 +98,11 @@ func WeaviateID(v string) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldWeaviateID, v))
 }
 
+// Vectorized applies equality check predicate on the "vectorized" field. It's identical to VectorizedEQ.
+func Vectorized(v bool) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldVectorized, v))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldName, v))
@@ -561,6 +566,16 @@ func WeaviateIDEqualFold(v string) predicate.Item {
 // WeaviateIDContainsFold applies the ContainsFold predicate on the "weaviate_id" field.
 func WeaviateIDContainsFold(v string) predicate.Item {
 	return predicate.Item(sql.FieldContainsFold(FieldWeaviateID, v))
+}
+
+// VectorizedEQ applies the EQ predicate on the "vectorized" field.
+func VectorizedEQ(v bool) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldVectorized, v))
+}
+
+// VectorizedNEQ applies the NEQ predicate on the "vectorized" field.
+func VectorizedNEQ(v bool) predicate.Item {
+	return predicate.Item(sql.FieldNEQ(FieldVectorized, v))
 }
 
 // HasCategory applies the HasEdge predicate on the "category" edge.

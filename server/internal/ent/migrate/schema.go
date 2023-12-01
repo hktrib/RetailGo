@@ -72,6 +72,7 @@ var (
 		{Name: "stripe_product_id", Type: field.TypeString},
 		{Name: "category_name", Type: field.TypeString},
 		{Name: "weaviate_id", Type: field.TypeString},
+		{Name: "vectorized", Type: field.TypeBool},
 		{Name: "store_id", Type: field.TypeInt},
 	}
 	// ItemsTable holds the schema information for the "items" table.
@@ -82,7 +83,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "items_stores_items",
-				Columns:    []*schema.Column{ItemsColumns[9]},
+				Columns:    []*schema.Column{ItemsColumns[10]},
 				RefColumns: []*schema.Column{StoresColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

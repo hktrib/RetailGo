@@ -161,6 +161,20 @@ func (iu *ItemUpdate) SetNillableWeaviateID(s *string) *ItemUpdate {
 	return iu
 }
 
+// SetVectorized sets the "vectorized" field.
+func (iu *ItemUpdate) SetVectorized(b bool) *ItemUpdate {
+	iu.mutation.SetVectorized(b)
+	return iu
+}
+
+// SetNillableVectorized sets the "vectorized" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableVectorized(b *bool) *ItemUpdate {
+	if b != nil {
+		iu.SetVectorized(*b)
+	}
+	return iu
+}
+
 // AddCategoryIDs adds the "category" edge to the Category entity by IDs.
 func (iu *ItemUpdate) AddCategoryIDs(ids ...int) *ItemUpdate {
 	iu.mutation.AddCategoryIDs(ids...)
@@ -289,6 +303,9 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := iu.mutation.WeaviateID(); ok {
 		_spec.SetField(item.FieldWeaviateID, field.TypeString, value)
+	}
+	if value, ok := iu.mutation.Vectorized(); ok {
+		_spec.SetField(item.FieldVectorized, field.TypeBool, value)
 	}
 	if iu.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -516,6 +533,20 @@ func (iuo *ItemUpdateOne) SetNillableWeaviateID(s *string) *ItemUpdateOne {
 	return iuo
 }
 
+// SetVectorized sets the "vectorized" field.
+func (iuo *ItemUpdateOne) SetVectorized(b bool) *ItemUpdateOne {
+	iuo.mutation.SetVectorized(b)
+	return iuo
+}
+
+// SetNillableVectorized sets the "vectorized" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableVectorized(b *bool) *ItemUpdateOne {
+	if b != nil {
+		iuo.SetVectorized(*b)
+	}
+	return iuo
+}
+
 // AddCategoryIDs adds the "category" edge to the Category entity by IDs.
 func (iuo *ItemUpdateOne) AddCategoryIDs(ids ...int) *ItemUpdateOne {
 	iuo.mutation.AddCategoryIDs(ids...)
@@ -674,6 +705,9 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 	}
 	if value, ok := iuo.mutation.WeaviateID(); ok {
 		_spec.SetField(item.FieldWeaviateID, field.TypeString, value)
+	}
+	if value, ok := iuo.mutation.Vectorized(); ok {
+		_spec.SetField(item.FieldVectorized, field.TypeBool, value)
 	}
 	if iuo.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{

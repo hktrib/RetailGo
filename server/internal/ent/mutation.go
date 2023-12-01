@@ -1016,6 +1016,7 @@ type ItemMutation struct {
 	stripe_product_id *string
 	category_name     *string
 	weaviate_id       *string
+	vectorized        *bool
 	clearedFields     map[string]struct{}
 	category          map[int]struct{}
 	removedcategory   map[int]struct{}
@@ -1495,6 +1496,42 @@ func (m *ItemMutation) ResetWeaviateID() {
 	m.weaviate_id = nil
 }
 
+// SetVectorized sets the "vectorized" field.
+func (m *ItemMutation) SetVectorized(b bool) {
+	m.vectorized = &b
+}
+
+// Vectorized returns the value of the "vectorized" field in the mutation.
+func (m *ItemMutation) Vectorized() (r bool, exists bool) {
+	v := m.vectorized
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVectorized returns the old "vectorized" field's value of the Item entity.
+// If the Item object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ItemMutation) OldVectorized(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVectorized is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVectorized requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVectorized: %w", err)
+	}
+	return oldValue.Vectorized, nil
+}
+
+// ResetVectorized resets all changes to the "vectorized" field.
+func (m *ItemMutation) ResetVectorized() {
+	m.vectorized = nil
+}
+
 // AddCategoryIDs adds the "category" edge to the Category entity by ids.
 func (m *ItemMutation) AddCategoryIDs(ids ...int) {
 	if m.category == nil {
@@ -1610,7 +1647,7 @@ func (m *ItemMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ItemMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.name != nil {
 		fields = append(fields, item.FieldName)
 	}
@@ -1638,6 +1675,9 @@ func (m *ItemMutation) Fields() []string {
 	if m.weaviate_id != nil {
 		fields = append(fields, item.FieldWeaviateID)
 	}
+	if m.vectorized != nil {
+		fields = append(fields, item.FieldVectorized)
+	}
 	return fields
 }
 
@@ -1664,6 +1704,8 @@ func (m *ItemMutation) Field(name string) (ent.Value, bool) {
 		return m.CategoryName()
 	case item.FieldWeaviateID:
 		return m.WeaviateID()
+	case item.FieldVectorized:
+		return m.Vectorized()
 	}
 	return nil, false
 }
@@ -1691,6 +1733,8 @@ func (m *ItemMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldCategoryName(ctx)
 	case item.FieldWeaviateID:
 		return m.OldWeaviateID(ctx)
+	case item.FieldVectorized:
+		return m.OldVectorized(ctx)
 	}
 	return nil, fmt.Errorf("unknown Item field %s", name)
 }
@@ -1762,6 +1806,13 @@ func (m *ItemMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetWeaviateID(v)
+		return nil
+	case item.FieldVectorized:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVectorized(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Item field %s", name)
@@ -1865,6 +1916,9 @@ func (m *ItemMutation) ResetField(name string) error {
 		return nil
 	case item.FieldWeaviateID:
 		m.ResetWeaviateID()
+		return nil
+	case item.FieldVectorized:
+		m.ResetVectorized()
 		return nil
 	}
 	return fmt.Errorf("unknown Item field %s", name)

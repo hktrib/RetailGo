@@ -35,6 +35,8 @@ type Item struct {
 	CategoryName string `json:"category_name,omitempty"`
 	// WeaviateID holds the value of the "weaviate_id" field.
 	WeaviateID string `json:"weaviate_id,omitempty"`
+	// Vectorized holds the value of the "vectorized" field.
+	Vectorized bool `json:"vectorized,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ItemQuery when eager-loading is set.
 	Edges        ItemEdges `json:"edges"`
@@ -92,6 +94,8 @@ func (*Item) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case item.FieldPhoto:
 			values[i] = new([]byte)
+		case item.FieldVectorized:
+			values[i] = new(sql.NullBool)
 		case item.FieldPrice:
 			values[i] = new(sql.NullFloat64)
 		case item.FieldID, item.FieldQuantity, item.FieldStoreID:
@@ -173,6 +177,12 @@ func (i *Item) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				i.WeaviateID = value.String
 			}
+		case item.FieldVectorized:
+			if value, ok := values[j].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field vectorized", values[j])
+			} else if value.Valid {
+				i.Vectorized = value.Bool
+			}
 		default:
 			i.selectValues.Set(columns[j], values[j])
 		}
@@ -250,6 +260,9 @@ func (i *Item) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("weaviate_id=")
 	builder.WriteString(i.WeaviateID)
+	builder.WriteString(", ")
+	builder.WriteString("vectorized=")
+	builder.WriteString(fmt.Sprintf("%v", i.Vectorized))
 	builder.WriteByte(')')
 	return builder.String()
 }

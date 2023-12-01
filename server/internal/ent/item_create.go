@@ -75,6 +75,12 @@ func (ic *ItemCreate) SetWeaviateID(s string) *ItemCreate {
 	return ic
 }
 
+// SetVectorized sets the "vectorized" field.
+func (ic *ItemCreate) SetVectorized(b bool) *ItemCreate {
+	ic.mutation.SetVectorized(b)
+	return ic
+}
+
 // SetID sets the "id" field.
 func (ic *ItemCreate) SetID(i int) *ItemCreate {
 	ic.mutation.SetID(i)
@@ -162,6 +168,9 @@ func (ic *ItemCreate) check() error {
 	if _, ok := ic.mutation.WeaviateID(); !ok {
 		return &ValidationError{Name: "weaviate_id", err: errors.New(`ent: missing required field "Item.weaviate_id"`)}
 	}
+	if _, ok := ic.mutation.Vectorized(); !ok {
+		return &ValidationError{Name: "vectorized", err: errors.New(`ent: missing required field "Item.vectorized"`)}
+	}
 	if _, ok := ic.mutation.StoreID(); !ok {
 		return &ValidationError{Name: "store", err: errors.New(`ent: missing required edge "Item.store"`)}
 	}
@@ -228,6 +237,10 @@ func (ic *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 	if value, ok := ic.mutation.WeaviateID(); ok {
 		_spec.SetField(item.FieldWeaviateID, field.TypeString, value)
 		_node.WeaviateID = value
+	}
+	if value, ok := ic.mutation.Vectorized(); ok {
+		_spec.SetField(item.FieldVectorized, field.TypeBool, value)
+		_node.Vectorized = value
 	}
 	if nodes := ic.mutation.CategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
