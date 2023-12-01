@@ -78,6 +78,8 @@ func (ic *ItemCreate) SetWeaviateID(s string) *ItemCreate {
 // SetVectorized sets the "vectorized" field.
 func (ic *ItemCreate) SetVectorized(b bool) *ItemCreate {
 	ic.mutation.SetVectorized(b)
+	return ic
+}
 
 // SetNumberSold sets the "number_sold" field.
 func (ic *ItemCreate) SetNumberSold(i int) *ItemCreate {
@@ -267,8 +269,8 @@ func (ic *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 	if value, ok := ic.mutation.Vectorized(); ok {
 		_spec.SetField(item.FieldVectorized, field.TypeBool, value)
 		_node.Vectorized = value
-
-  if value, ok := ic.mutation.NumberSold(); ok {
+	}
+	if value, ok := ic.mutation.NumberSold(); ok {
 		_spec.SetField(item.FieldNumberSold, field.TypeInt, value)
 		_node.NumberSold = value
 	}

@@ -85,7 +85,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "items_stores_items",
-				Columns:    []*schema.Column{ItemsColumns[10]},
+				Columns:    []*schema.Column{ItemsColumns[12]},
 				RefColumns: []*schema.Column{StoresColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

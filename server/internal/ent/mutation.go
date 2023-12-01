@@ -1471,18 +1471,7 @@ func (m *ItemMutation) SetWeaviateID(s string) {
 // WeaviateID returns the value of the "weaviate_id" field in the mutation.
 func (m *ItemMutation) WeaviateID() (r string, exists bool) {
 	v := m.weaviate_id
-
-// SetNumberSold sets the "number_sold" field.
-func (m *ItemMutation) SetNumberSold(i int) {
-	m.number_sold = &i
-	m.addnumber_sold = nil
-}
-
-// NumberSold returns the value of the "number_sold" field in the mutation.
-func (m *ItemMutation) NumberSold() (r int, exists bool) {
-	v := m.number_sold
-
- if v == nil {
+	if v == nil {
 		return
 	}
 	return *v, true
@@ -1518,6 +1507,49 @@ func (m *ItemMutation) SetVectorized(b bool) {
 // Vectorized returns the value of the "vectorized" field in the mutation.
 func (m *ItemMutation) Vectorized() (r bool, exists bool) {
 	v := m.vectorized
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVectorized returns the old "vectorized" field's value of the Item entity.
+// If the Item object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ItemMutation) OldVectorized(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVectorized is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVectorized requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVectorized: %w", err)
+	}
+	return oldValue.Vectorized, nil
+}
+
+// ResetVectorized resets all changes to the "vectorized" field.
+func (m *ItemMutation) ResetVectorized() {
+	m.vectorized = nil
+}
+
+// SetNumberSold sets the "number_sold" field.
+func (m *ItemMutation) SetNumberSold(i int) {
+	m.number_sold = &i
+	m.addnumber_sold = nil
+}
+
+// NumberSold returns the value of the "number_sold" field in the mutation.
+func (m *ItemMutation) NumberSold() (r int, exists bool) {
+	v := m.number_sold
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
 // OldNumberSold returns the old "number_sold" field's value of the Item entity.
 // If the Item object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
@@ -1587,26 +1619,6 @@ func (m *ItemMutation) DateLastSold() (r string, exists bool) {
 	return *v, true
 }
 
-// OldVectorized returns the old "vectorized" field's value of the Item entity.
-// If the Item object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ItemMutation) OldVectorized(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldVectorized is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldVectorized requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldVectorized: %w", err)
-	}
-	return oldValue.Vectorized, nil
-}
-
-// ResetVectorized resets all changes to the "vectorized" field.
-func (m *ItemMutation) ResetVectorized() {
-	m.vectorized = nil
 // OldDateLastSold returns the old "date_last_sold" field's value of the Item entity.
 // If the Item object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
@@ -1757,7 +1769,7 @@ func (m *ItemMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ItemMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 12)
 	if m.name != nil {
 		fields = append(fields, item.FieldName)
 	}
@@ -1787,6 +1799,7 @@ func (m *ItemMutation) Fields() []string {
 	}
 	if m.vectorized != nil {
 		fields = append(fields, item.FieldVectorized)
+	}
 	if m.number_sold != nil {
 		fields = append(fields, item.FieldNumberSold)
 	}
@@ -1936,6 +1949,7 @@ func (m *ItemMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetVectorized(v)
+		return nil
 	case item.FieldNumberSold:
 		v, ok := value.(int)
 		if !ok {
@@ -2082,6 +2096,7 @@ func (m *ItemMutation) ResetField(name string) error {
 		return nil
 	case item.FieldVectorized:
 		m.ResetVectorized()
+		return nil
 	case item.FieldNumberSold:
 		m.ResetNumberSold()
 		return nil

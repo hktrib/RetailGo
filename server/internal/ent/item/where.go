@@ -101,6 +101,7 @@ func WeaviateID(v string) predicate.Item {
 // Vectorized applies equality check predicate on the "vectorized" field. It's identical to VectorizedEQ.
 func Vectorized(v bool) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldVectorized, v))
+}
 
 // NumberSold applies equality check predicate on the "number_sold" field. It's identical to NumberSoldEQ.
 func NumberSold(v int) predicate.Item {
@@ -610,6 +611,7 @@ func VectorizedEQ(v bool) predicate.Item {
 // VectorizedNEQ applies the NEQ predicate on the "vectorized" field.
 func VectorizedNEQ(v bool) predicate.Item {
 	return predicate.Item(sql.FieldNEQ(FieldVectorized, v))
+}
 
 // NumberSoldEQ applies the EQ predicate on the "number_sold" field.
 func NumberSoldEQ(v int) predicate.Item {
