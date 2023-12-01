@@ -75,7 +75,10 @@ func (s *Server) MountHandlers() {
 		s.StripeWebhookRouter(writer, request)
 	})
 	s.Router.Post("/clerkwebhook", webhook.HandleClerkWebhook)
-	s.Router.Get("/", s.HelloWorld)
+	s.Router.Get("/", func(w http.ResponseWriter, request *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write(([]byte)("OK"))
+	})
 
 	s.Router.Group(func(r chi.Router) {
 
