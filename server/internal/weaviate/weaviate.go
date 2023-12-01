@@ -10,7 +10,6 @@ import (
 	"github.com/hktrib/RetailGo/internal/util"
 	weaviateClient "github.com/weaviate/weaviate-go-client/v4/weaviate"
 	weaviateAuth "github.com/weaviate/weaviate-go-client/v4/weaviate/auth"
-	"github.com/weaviate/weaviate/entities/models"
 )
 
 type Weaviate struct {
@@ -45,30 +44,6 @@ func (weaviate *Weaviate) Start() chan server.ItemChange {
 	}
 
 	weaviate.Client, err = weaviateClient.NewClient(weaviateConfig)
-
-	if err != nil {
-		panic(err)
-	}
-
-	itemClassObj := &models.Class{
-		Class:        "Item",
-		Vectorizer:   "none",
-		ModuleConfig: map[string]interface{}{},
-	}
-
-	err = weaviate.Client.Schema().ClassCreator().WithClass(itemClassObj).Do(weaviate.ctx)
-
-	if err != nil {
-		panic(err)
-	}
-
-	userClassObj := &models.Class{
-		Class:        "User",
-		Vectorizer:   "none",
-		ModuleConfig: map[string]interface{}{},
-	}
-
-	err = weaviate.Client.Schema().ClassCreator().WithClass(userClassObj).Do(weaviate.ctx)
 
 	if err != nil {
 		panic(err)
