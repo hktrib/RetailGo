@@ -7,6 +7,7 @@ require (
 	github.com/clerkinc/clerk-sdk-go v1.48.4
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/go-chi/cors v1.2.1
+	github.com/google/uuid v1.4.0
 	github.com/hibiken/asynq v0.24.1
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/lib/pq v1.10.9
@@ -14,6 +15,7 @@ require (
 	github.com/rs/zerolog v1.31.0
 	github.com/stripe/stripe-go/v76 v76.5.0
 	github.com/svix/svix-webhooks v1.14.0
+	github.com/weaviate/weaviate v1.22.2
 	github.com/weaviate/weaviate-go-client/v4 v4.11.0
 )
 
@@ -40,7 +42,6 @@ require (
 	github.com/go-openapi/validate v0.21.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/uuid v1.4.0 // indirect
 	github.com/hashicorp/hcl/v2 v2.13.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
@@ -52,7 +53,6 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/spf13/cast v1.5.1 // indirect
-	github.com/weaviate/weaviate v1.22.2 // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect
 	go.mongodb.org/mongo-driver v1.11.3 // indirect
 	golang.org/x/crypto v0.14.0 // indirect

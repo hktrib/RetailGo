@@ -67,7 +67,6 @@ func main() {
 	entClient := util.Open(&config)
 	defer entClient.Close()
 
-	// Make sure this is a correct use of context.Background()
 	weaviateClient := weaviate.NewWeaviate(context.Background())
 	itemChangeChannel := weaviateClient.Start()
 
