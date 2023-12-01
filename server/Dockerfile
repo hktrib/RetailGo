@@ -5,7 +5,7 @@ FROM golang:latest
 WORKDIR /app
 
 # Copy the entire project into the container
-COPY ./server ./app
+COPY . .
 
 # Copy the .env file into the container only if it exists
 
