@@ -37,6 +37,10 @@ type Item struct {
 	WeaviateID string `json:"weaviate_id,omitempty"`
 	// Vectorized holds the value of the "vectorized" field.
 	Vectorized bool `json:"vectorized,omitempty"`
+	// NumberSold holds the value of the "number_sold" field.
+	NumberSold int `json:"number_sold,omitempty"`
+	// DateLastSold holds the value of the "date_last_sold" field.
+	DateLastSold string `json:"date_last_sold,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ItemQuery when eager-loading is set.
 	Edges        ItemEdges `json:"edges"`
@@ -96,9 +100,11 @@ func (*Item) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case item.FieldPrice:
 			values[i] = new(sql.NullFloat64)
-		case item.FieldID, item.FieldQuantity, item.FieldStoreID:
+		case item.FieldID, item.FieldQuantity, item.FieldStoreID, item.FieldNumberSold:
 			values[i] = new(sql.NullInt64)
-		case item.FieldName, item.FieldPhoto, item.FieldStripePriceID, item.FieldStripeProductID, item.FieldCategoryName, item.FieldWeaviateID:
+
+		case item.FieldName, item.FieldPhoto, item.FieldStripePriceID, item.FieldStripeProductID, item.FieldCategoryName, item.FieldWeaviateID, item.FieldDateLastSold:
+		
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -169,6 +175,7 @@ func (i *Item) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				i.CategoryName = value.String
 			}
+
 		case item.FieldWeaviateID:
 			if value, ok := values[j].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field weaviate_id", values[j])
@@ -180,6 +187,17 @@ func (i *Item) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field vectorized", values[j])
 			} else if value.Valid {
 				i.Vectorized = value.Bool
+		case item.FieldNumberSold:
+			if value, ok := values[j].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field number_sold", values[j])
+			} else if value.Valid {
+				i.NumberSold = int(value.Int64)
+			}
+		case item.FieldDateLastSold:
+			if value, ok := values[j].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field date_last_sold", values[j])
+			} else if value.Valid {
+				i.DateLastSold = value.String
 			}
 		default:
 			i.selectValues.Set(columns[j], values[j])
@@ -261,6 +279,11 @@ func (i *Item) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("vectorized=")
 	builder.WriteString(fmt.Sprintf("%v", i.Vectorized))
+	builder.WriteString("number_sold=")
+	builder.WriteString(fmt.Sprintf("%v", i.NumberSold))
+	builder.WriteString(", ")
+	builder.WriteString("date_last_sold=")
+	builder.WriteString(i.DateLastSold)
 	builder.WriteByte(')')
 	return builder.String()
 }

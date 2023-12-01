@@ -29,6 +29,8 @@ func (Item) Fields() []ent.Field {
 		field.String("category_name"),
 		field.String("weaviate_id"),
 		field.Bool("vectorized"),
+		field.Int("number_sold").Optional(),
+		field.String("date_last_sold").Optional(),
 	}
 }
 

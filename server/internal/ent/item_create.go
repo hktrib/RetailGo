@@ -78,6 +78,32 @@ func (ic *ItemCreate) SetWeaviateID(s string) *ItemCreate {
 // SetVectorized sets the "vectorized" field.
 func (ic *ItemCreate) SetVectorized(b bool) *ItemCreate {
 	ic.mutation.SetVectorized(b)
+
+// SetNumberSold sets the "number_sold" field.
+func (ic *ItemCreate) SetNumberSold(i int) *ItemCreate {
+	ic.mutation.SetNumberSold(i)
+	return ic
+}
+
+// SetNillableNumberSold sets the "number_sold" field if the given value is not nil.
+func (ic *ItemCreate) SetNillableNumberSold(i *int) *ItemCreate {
+	if i != nil {
+		ic.SetNumberSold(*i)
+	}
+	return ic
+}
+
+// SetDateLastSold sets the "date_last_sold" field.
+func (ic *ItemCreate) SetDateLastSold(s string) *ItemCreate {
+	ic.mutation.SetDateLastSold(s)
+	return ic
+}
+
+// SetNillableDateLastSold sets the "date_last_sold" field if the given value is not nil.
+func (ic *ItemCreate) SetNillableDateLastSold(s *string) *ItemCreate {
+	if s != nil {
+		ic.SetDateLastSold(*s)
+	}
 	return ic
 }
 
@@ -241,6 +267,14 @@ func (ic *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 	if value, ok := ic.mutation.Vectorized(); ok {
 		_spec.SetField(item.FieldVectorized, field.TypeBool, value)
 		_node.Vectorized = value
+
+  if value, ok := ic.mutation.NumberSold(); ok {
+		_spec.SetField(item.FieldNumberSold, field.TypeInt, value)
+		_node.NumberSold = value
+	}
+	if value, ok := ic.mutation.DateLastSold(); ok {
+		_spec.SetField(item.FieldDateLastSold, field.TypeString, value)
+		_node.DateLastSold = value
 	}
 	if nodes := ic.mutation.CategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

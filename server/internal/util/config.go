@@ -17,6 +17,8 @@ type Config struct {
 	HOST                 string // `"HOST"`
 	WEAVIATE_HOSTNAME    string // `"WEAVIATE_HOSTNAME"`
 	WEAVIATE_SK          string // `"WEAVIATE_SK"`
+
+	STRIPE_WEBHOOK_SECRET string // 
 }
 
 func LoadConfig() (config Config, err error) {
@@ -38,6 +40,7 @@ func LoadConfig() (config Config, err error) {
 	config.HOST = "localhost:8080"
 	config.WEAVIATE_HOSTNAME = os.Getenv("WEAVIATE_HOSTNAME")
 	config.WEAVIATE_SK = os.Getenv("WEAVIATE_SK")
+	config.STRIPE_WEBHOOK_SECRET = os.Getenv("STRIPE_WEBHOOK_SECRET")
 
 	// fmt.Println(config)
 

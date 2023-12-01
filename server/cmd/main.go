@@ -90,7 +90,7 @@ func main() {
 		webhook.Config = &config
 		webhook.ClerkClient = clerkClient
 
-		err := http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", config.SERVER_ADDRESS), srv.Router)
+		err := http.ListenAndServe(fmt.Sprintf("127.0.0.1:%s", config.SERVER_ADDRESS), srv.Router)
 
 		if err != nil {
 			log.Fatal().Err(err).Msg("failed in starting server")

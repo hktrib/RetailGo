@@ -73,6 +73,8 @@ var (
 		{Name: "category_name", Type: field.TypeString},
 		{Name: "weaviate_id", Type: field.TypeString},
 		{Name: "vectorized", Type: field.TypeBool},
+		{Name: "number_sold", Type: field.TypeInt, Nullable: true},
+		{Name: "date_last_sold", Type: field.TypeString, Nullable: true},
 		{Name: "store_id", Type: field.TypeInt},
 	}
 	// ItemsTable holds the schema information for the "items" table.
