@@ -65,12 +65,12 @@ func (weaviate *Weaviate) DispatchChanges(itemChange server.ItemChange) {
 			WithClassName("item").
 			WithProperties(
 				map[string]interface{}{
-					"name":         itemChange.Item.Name,
-					"categoryName": itemChange.Item.CategoryName,
-					"imageURL":     itemChange.Item.Photo,
-					"price":        itemChange.Item.Price,
-					"numberSold":   itemChange.Item.NumberSold,
-					"dateLastSold": itemChange.Item.DateLastSold,
+					"name":                  itemChange.Item.Name,
+					"categoryName":          itemChange.Item.CategoryName,
+					"imageURL":              itemChange.Item.Photo,
+					"price":                 itemChange.Item.Price,
+					"numberSoldSinceUpdate": itemChange.Item.NumberSoldSinceUpdate,
+					"dateLastSold":          itemChange.Item.DateLastSold,
 				}).
 			Do(weaviate.ctx)
 
@@ -101,8 +101,8 @@ func (weaviate *Weaviate) DispatchChanges(itemChange server.ItemChange) {
 			itemUpdates["price"] = itemChange.Item.Price
 		}
 
-		if itemChange.UpdatedFields.NumberSold {
-			itemUpdates["numberSold"] = itemChange.Item.NumberSold
+		if itemChange.UpdatedFields.NumberSoldSinceUpdate {
+			itemUpdates["numberSoldSinceUpdate"] = itemChange.Item.NumberSoldSinceUpdate
 		}
 
 		if itemChange.UpdatedFields.DateLastSold {
