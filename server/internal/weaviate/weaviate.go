@@ -103,10 +103,14 @@ func (weaviate *Weaviate) EditItem(item *ent.Item, updatedFields UpdatedFields) 
 	err := weaviate.Client.
 		Data().
 		Updater().
-		WithMerge().
+		WithID(item.WeaviateID).
 		WithClassName("item").
 		WithProperties(itemUpdates).
-		Do(weaviate.ctx)
+		Do(context.Background())
+
+	if err != nil {
+		panic(err)
+	}
 
 	return err
 }

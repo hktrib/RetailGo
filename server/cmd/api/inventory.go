@@ -159,11 +159,13 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 
 	weaviateID, weaviateErr := srv.WeaviateClient.CreateItem(createdItem)
 
+	fmt.Println("Weaviate ID on create:", weaviateID)
+
 	// Currently raises 500 if creation of weaviate copy or storing the weaviate id fails. Attempts to roll back the database in response to this so that there are no ghost items for Weaviate.
 
 	if weaviateErr != nil {
 		fmt.Println("Weaviate Create didn't work")
-		err = srv.DBClient.
+		_ = srv.DBClient.
 			Item.DeleteOneID(createdItem.ID).
 			Where(item.StoreID(store_id)).
 			Exec(r.Context())
@@ -176,7 +178,7 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 
 	if setWeaviateIDErr != nil {
 		fmt.Println("Failed to set Weaviate ID")
-		err = srv.DBClient.
+		_ = srv.DBClient.
 			Item.DeleteOneID(createdItem.ID).
 			Where(item.StoreID(store_id)).
 			Exec(r.Context())
@@ -234,6 +236,8 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		Vectorized:   targetItem.Vectorized,
 	}
 
+	fmt.Println("original item:", targetItem, "requested item:", reqItem)
+
 	fieldsUpdated := weaviate.UpdatedFields{
 		Name:                  targetItem.Name != reqItem.Name,
 		Photo:                 targetItem.Photo != reqItem.Photo,
@@ -251,7 +255,7 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	weaviateUpdateErr := srv.WeaviateClient.EditItem(&reqItem, fieldsUpdated)
+	weaviateUpdateErr := srv.WeaviateClient.EditItem(targetItem, fieldsUpdated)
 
 	if weaviateUpdateErr != nil {
 		// Rolls back Database update if Weaviate update fails, but no guarantee of rollback working..
