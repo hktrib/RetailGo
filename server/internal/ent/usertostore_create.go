@@ -33,6 +33,12 @@ func (utsc *UserToStoreCreate) SetStoreID(i int) *UserToStoreCreate {
 	return utsc
 }
 
+// SetClerkUserID sets the "clerk_user_id" field.
+func (utsc *UserToStoreCreate) SetClerkUserID(s string) *UserToStoreCreate {
+	utsc.mutation.SetClerkUserID(s)
+	return utsc
+}
+
 // SetPermissionLevel sets the "permission_level" field.
 func (utsc *UserToStoreCreate) SetPermissionLevel(i int) *UserToStoreCreate {
 	utsc.mutation.SetPermissionLevel(i)
@@ -111,6 +117,9 @@ func (utsc *UserToStoreCreate) check() error {
 	if _, ok := utsc.mutation.StoreID(); !ok {
 		return &ValidationError{Name: "store_id", err: errors.New(`ent: missing required field "UserToStore.store_id"`)}
 	}
+	if _, ok := utsc.mutation.ClerkUserID(); !ok {
+		return &ValidationError{Name: "clerk_user_id", err: errors.New(`ent: missing required field "UserToStore.clerk_user_id"`)}
+	}
 	if _, ok := utsc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "UserToStore.user"`)}
 	}
@@ -139,6 +148,10 @@ func (utsc *UserToStoreCreate) createSpec() (*UserToStore, *sqlgraph.CreateSpec)
 		_node = &UserToStore{config: utsc.config}
 		_spec = sqlgraph.NewCreateSpec(usertostore.Table, nil)
 	)
+	if value, ok := utsc.mutation.ClerkUserID(); ok {
+		_spec.SetField(usertostore.FieldClerkUserID, field.TypeString, value)
+		_node.ClerkUserID = value
+	}
 	if value, ok := utsc.mutation.PermissionLevel(); ok {
 		_spec.SetField(usertostore.FieldPermissionLevel, field.TypeInt, value)
 		_node.PermissionLevel = value
