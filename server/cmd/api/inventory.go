@@ -157,21 +157,33 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		"id": createdItem.ID,
 	})
 
-	itemChange := weaviate.ItemChange{
-		Item: *createdItem,
-		Mode: "CREATE",
-		UpdatedFields: weaviate.UpdatedFields{
-			Name:                  true,
-			Photo:                 true,
-			Quantity:              true,
-			Price:                 true,
-			CategoryName:          true,
-			NumberSoldSinceUpdate: true,
-			DateLastSold:          true,
-		},
+	weaviateID, weaviateErr := srv.WeaviateClient.CreateItem(createdItem)
+
+	// Currently raises 500 if creation of weaviate copy or storing the weaviate id fails. Attempts to roll back the database in response to this so that there are no ghost items for Weaviate.
+
+	if weaviateErr != nil {
+		fmt.Println("Weaviate Create didn't work")
+		err = srv.DBClient.
+			Item.DeleteOneID(createdItem.ID).
+			Where(item.StoreID(store_id)).
+			Exec(r.Context())
+
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 
-	srv.WeaviateClient.DispatchChanges(itemChange)
+	_, setWeaviateIDErr := createdItem.Update().SetWeaviateID(weaviateID).Save(r.Context())
+
+	if setWeaviateIDErr != nil {
+		fmt.Println("Failed to set Weaviate ID")
+		err = srv.DBClient.
+			Item.DeleteOneID(createdItem.ID).
+			Where(item.StoreID(store_id)).
+			Exec(r.Context())
+
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write(responseBody)
@@ -180,8 +192,6 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 
 func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 	// get item id from url query string
-
-	// ctx := r.Context()
 
 	// Load the message parameters (Name, Photo, Quantity, Category)
 	req_body, err := io.ReadAll(r.Body)
@@ -209,6 +219,15 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		Where(item.ID(reqItem.ID)).
 		Only(r.Context())
 
+	originalItem := ent.Item{
+		Name:         targetItem.Name,
+		Photo:        targetItem.Photo,
+		Quantity:     targetItem.Quantity,
+		Price:        targetItem.Price,
+		CategoryName: targetItem.CategoryName,
+		Vectorized:   targetItem.Vectorized,
+	}
+
 	if ent.IsNotFound(err) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
@@ -227,20 +246,22 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		DateLastSold:          false, // Assume that sales is taken care of elsewhere. If not, this is subject to change.
 	}
 
-	itemChange := weaviate.ItemChange{
-		Item:          *targetItem,
-		Mode:          "UPDATE",
-		UpdatedFields: fieldsUpdated,
-	}
-
-	_, err = targetItem.Update().SetQuantity(reqItem.Quantity).SetName(reqItem.Name).SetPhoto(reqItem.Photo).SetPrice(reqItem.Price).SetCategoryName(reqItem.CategoryName).SetVectorized(targetItem.Vectorized && !(weaviate.ChangesVectorizedProperties(itemChange))).Save(r.Context())
+	_, err = targetItem.Update().SetQuantity(reqItem.Quantity).SetName(reqItem.Name).SetPhoto(reqItem.Photo).SetPrice(reqItem.Price).SetCategoryName(reqItem.CategoryName).SetVectorized(originalItem.Vectorized && !(weaviate.ChangesVectorizedProperties(fieldsUpdated))).Save(r.Context())
 
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	srv.WeaviateClient.DispatchChanges(itemChange)
+	weaviateUpdateErr := srv.WeaviateClient.EditItem(&reqItem, fieldsUpdated)
+
+	if weaviateUpdateErr != nil {
+		// Rolls back Database update if Weaviate update fails, but no guarantee of rollback working..
+		fmt.Println("Failed to edit item in Weaviate")
+		_, _ = targetItem.Update().SetQuantity(originalItem.Quantity).SetPhoto(originalItem.Photo).SetName(originalItem.Name).SetPrice(originalItem.Price).SetCategoryName(originalItem.CategoryName).SetVectorized(originalItem.Vectorized).Save(r.Context())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write([]byte("OK"))
@@ -275,10 +296,21 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 		Where(item.ID(itemId)).
 		Only(r.Context())
 
+	// originalItem := ent.Item{
+	// 	Name:         targetItem.Name,
+	// 	Photo:        targetItem.Photo,
+	// 	Quantity:     targetItem.Quantity,
+	// 	Price:        targetItem.Price,
+	// 	CategoryName: targetItem.CategoryName,
+	// 	Vectorized:   targetItem.Vectorized,
+	// }
+
 	if ent.IsNotFound(err) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
+
+	weaviateID := targetItem.WeaviateID
 
 	err = srv.DBClient.
 		Item.DeleteOneID(itemId).
@@ -293,21 +325,15 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	itemChange := weaviate.ItemChange{
-		Item: *targetItem,
-		Mode: "DELETE",
-		UpdatedFields: weaviate.UpdatedFields{
-			Name:                  true,
-			Photo:                 true,
-			Quantity:              true,
-			Price:                 true,
-			CategoryName:          true,
-			NumberSoldSinceUpdate: true,
-			DateLastSold:          true,
-		},
-	}
+	err = srv.WeaviateClient.DeleteItem(weaviateID)
 
-	srv.WeaviateClient.DispatchChanges(itemChange)
+	if err != nil {
+		fmt.Println("Delete in Weaviate Failed")
+		// Should Roll back delete - for now, naively, by just creating a new item -, but doesn't do this yet.
+		// _, _ = srv.DBClient.Item.Create().SetQuantity(originalItem.Quantity).SetPhoto(originalItem.Photo).SetName(originalItem.Name).SetPrice(originalItem.Price).SetCategoryName(originalItem.CategoryName).SetVectorized(originalItem.Vectorized).SetNumberSoldSinceUpdate(originalItem.NumberSoldSinceUpdate).SetDateLastSold(originalItem.DateLastSold).SetStore(originalItem.Edges.Store).Set.Save(r.Context())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
