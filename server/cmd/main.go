@@ -89,15 +89,16 @@ func main() {
 
 		webhook.Config = &config
 		webhook.ClerkClient = clerkClient
+		println("checkpoint 4")
 
+		go runTaskConsumer(&taskQueueOptions, entClient, clerkClient, &config)
 		err := http.ListenAndServe(fmt.Sprintf("127.0.0.1:%s", config.SERVER_ADDRESS), srv.Router)
+		println("checkpoint 5")
+
 		log.Debug().Msg("Deploy Msg: starting server!")
 		if err != nil {
 			log.Fatal().Err(err).Msg("failed in starting server")
 		}
-
-		go runTaskConsumer(&taskQueueOptions, entClient, clerkClient, &config)
-
 	}()
 
 	// Makes sure we wait for the go routine running
