@@ -32,6 +32,7 @@ func runTaskConsumer(redisOptions *asynq.RedisClientOpt, dbClient *ent.Client, c
 }
 
 func main() {
+	fmt.Println("Starting server...")
 	config, err := util.LoadConfig()
 	if err != nil {
 		panic(err)
@@ -57,7 +58,7 @@ func main() {
 	}
 
 	taskProducer := worker.NewRedisTaskProducer(taskQueueOptions)
-
+	fmt.Printf("checkpoint 1")
 	cache := kvRedis.NewCache(context.Background(), cacheOptions, 1*time.Minute)
 	defer cache.Client.Close()
 
@@ -66,7 +67,7 @@ func main() {
 
 	entClient := util.Open(&config)
 	defer entClient.Close()
-
+	fmt.Printf("checkpoint 2")
 	weaviateClient := weaviate.NewWeaviate(context.Background())
 	itemChangeChannel := weaviateClient.Start()
 
@@ -77,7 +78,7 @@ func main() {
 	if err := entClient.Schema.Create(context.Background()); err != nil {
 		log.Fatal().Err(err).Msg("failed creating schema resources")
 	}
-
+	println("checkpoint 3")
 	go func() {
 		injectActiveSession := clerk.WithSessionV2(clerkClient)
 
