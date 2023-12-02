@@ -1,7 +1,5 @@
 package weaviate
 
-import "github.com/hktrib/RetailGo/internal/ent"
-
 type UpdatedFields struct {
 	Name                  bool
 	Photo                 bool
@@ -10,10 +8,4 @@ type UpdatedFields struct {
 	CategoryName          bool
 	NumberSoldSinceUpdate bool
 	DateLastSold          bool
-}
-
-type ItemChange struct {
-	Item          ent.Item
-	Mode          string
-	UpdatedFields UpdatedFields
 }
