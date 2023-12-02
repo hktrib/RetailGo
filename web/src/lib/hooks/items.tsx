@@ -1,8 +1,9 @@
-import { Item } from "@/models/item";
-import useFetch from "@/lib/useFetch";
+import { Item, ItemWithoutId } from "@/models/item";
+import { useFetch } from "../utils";
 import { auth } from "@clerk/nextjs";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { config } from "./config";
+import { config } from './config';
+
 
 const storeURL = config.serverURL + "store/";
 
@@ -27,29 +28,29 @@ export function useItems(store: string) {
 
   return useQuery({
     queryKey: ["items", store],
-    queryFn: () =>
-      authFetch({ url: storeURL + store + "/inventory/", toJSON: true }),
+    queryFn: () => authFetch(storeURL + store + "/inventory/", {}, {}, true),
   });
 }
 
 export function useCreateItem(store: string) {
-  const queryClient = useQueryClient();
   const authFetch = useFetch();
+
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (newItem: ItemWithoutId) =>
-      authFetch({
-        url: storeURL + store + "/inventory/create",
-        init: {
+      authFetch(
+        storeURL + store + "/inventory/create",
+        {
           method: "POST",
           body: JSON.stringify(newItem, (key, value) =>
             key === "quantity" || key === "price" ? parseFloat(value) : value
           ),
         },
-        headers: {
+        {
           "Content-Type": "application/json",
-        },
-      }),
+        }
+      ),
     onMutate: (newItem: ItemWithoutId) => {
       // await queryClient.cancelQueries({ queryKey: ['todos'] })
       const prevItems = queryClient.getQueryData(["items", store]) as Item[];
@@ -74,19 +75,17 @@ export function useCreateItem(store: string) {
 }
 
 export function useEditItem(store: string) {
-  const queryClient = useQueryClient();
   const authFetch = useFetch();
+
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (newItem: Item) =>
-      authFetch({
-        url: storeURL + store + "/inventory/update",
-        init: {
-          method: "POST",
-          body: JSON.stringify(newItem, (key, value) =>
-            key === "quantity" || key === "price" ? parseFloat(value) : value
-          ),
-        },
+      authFetch(storeURL + store + "/inventory/update", {
+        method: "POST",
+        body: JSON.stringify(newItem, (key, value) =>
+          key === "quantity" || key === "price" ? parseFloat(value) : value
+        ),
       }),
     onMutate: (newItem: Item) => {
       console.log("EDIT");
@@ -107,17 +106,15 @@ export function useEditItem(store: string) {
 }
 
 export function useDeleteItem(store: string) {
-  const queryClient = useQueryClient();
   const authFetch = useFetch();
+
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (id: number) =>
-      authFetch({
-        url: storeURL + store + "/inventory/?id=" + id,
-        init: {
-          method: "DELETE",
-          body: JSON.stringify({ id: id }),
-        },
+      authFetch(storeURL + store + "/inventory/?id=" + id, {
+        method: "DELETE",
+        body: JSON.stringify({ id: id }),
       }),
     onMutate: (id: number) => {
       // await queryClient.cancelQueries({ queryKey: ['todos'] })

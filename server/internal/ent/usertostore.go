@@ -20,6 +20,8 @@ type UserToStore struct {
 	UserID int `json:"user_id,omitempty"`
 	// StoreID holds the value of the "store_id" field.
 	StoreID int `json:"store_id,omitempty"`
+	// ClerkUserID holds the value of the "clerk_user_id" field.
+	ClerkUserID string `json:"clerk_user_id,omitempty"`
 	// PermissionLevel holds the value of the "permission_level" field.
 	PermissionLevel int `json:"permission_level,omitempty"`
 	// JoinedAt holds the value of the "joined_at" field.
@@ -74,6 +76,8 @@ func (*UserToStore) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case usertostore.FieldUserID, usertostore.FieldStoreID, usertostore.FieldPermissionLevel, usertostore.FieldJoinedAt:
 			values[i] = new(sql.NullInt64)
+		case usertostore.FieldClerkUserID:
+			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -100,6 +104,12 @@ func (uts *UserToStore) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field store_id", values[i])
 			} else if value.Valid {
 				uts.StoreID = int(value.Int64)
+			}
+		case usertostore.FieldClerkUserID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field clerk_user_id", values[i])
+			} else if value.Valid {
+				uts.ClerkUserID = value.String
 			}
 		case usertostore.FieldPermissionLevel:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -163,6 +173,9 @@ func (uts *UserToStore) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("store_id=")
 	builder.WriteString(fmt.Sprintf("%v", uts.StoreID))
+	builder.WriteString(", ")
+	builder.WriteString("clerk_user_id=")
+	builder.WriteString(uts.ClerkUserID)
 	builder.WriteString(", ")
 	builder.WriteString("permission_level=")
 	builder.WriteString(fmt.Sprintf("%v", uts.PermissionLevel))

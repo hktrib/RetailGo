@@ -1,38 +1,41 @@
 import { Item, ItemWithoutId } from "@/models/item";
-import useFetch from "@/lib/useFetch";
+import { useFetch } from "../utils";
 import { auth } from "@clerk/nextjs";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { config } from "./config";
+import { config } from './config';
+import { PostEmailInviteModel } from "@/models/staff";
+
 
 const storeURL = config.serverURL + "store/";
+
 
 export function GetStaffByStore(storeId: string) {
   // const queryClient = useQueryClient()
   const authFetch = useFetch();
-
-  console.log(storeURL + storeId + "/staff");
+  console.log(storeURL + storeId + "/staff")
   return useQuery({
     queryKey: ["staff", storeId],
-    queryFn: () =>
-      authFetch({ url: storeURL + storeId + "/staff", toJSON: true }),
+    queryFn: () => authFetch(storeURL + storeId + "/staff", {}, {}, true),
   });
 }
 
+
+
 export function SendInvite(storeId: string) {
   const authFetch = useFetch();
-
   return useMutation({
-    mutationFn: (email: string) =>
-      authFetch({
-        url: `${storeURL}${storeId}/staff/invite`,
-        init: {
+    mutationFn: (body: PostEmailInviteModel) =>
+      authFetch(
+        `${storeURL}${storeId}/staff/invite`,
+        {
           method: "POST",
-          body: JSON.stringify({ email: email }),
+          body: JSON.stringify(body),
         },
-        headers: {
+        {
           "Content-Type": "application/json",
-        },
-      }),
+        }
+        
+      ),
     onError: (err, email, context) => {
       console.log("Error while sending invite to", email, ":", err);
     },

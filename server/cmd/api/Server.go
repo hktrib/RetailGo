@@ -148,8 +148,9 @@ func (s *Server) MountHandlers() {
 			r.Put("/", s.userUpdate)    // Update a user by ID
 			r.Get("/", s.UserQuery)     // Get a user by ID
 		})
-		r.Post("/", s.UserCreate) // Create a new user
-		r.Post("/add", s.userAdd) // Additional user creation endpoint
+		r.Post("/join", s.UserJoinStore) // Join a store for a user
+		r.Post("/", s.UserCreate)        // Create a new user
+		r.Post("/add", s.userAdd)        // Additional user creation endpoint
 	})
 
 }
