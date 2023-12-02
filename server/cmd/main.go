@@ -92,7 +92,7 @@ func main() {
 		println("checkpoint 4")
 
 		go runTaskConsumer(&taskQueueOptions, entClient, clerkClient, &config)
-		err := http.ListenAndServe(fmt.Sprintf("127.0.0.1:%s", config.SERVER_ADDRESS), srv.Router)
+		err := http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", config.SERVER_ADDRESS), srv.Router)
 		println("checkpoint 5")
 
 		log.Debug().Msg("Deploy Msg: starting server!")
