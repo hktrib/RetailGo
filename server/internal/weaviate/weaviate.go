@@ -116,7 +116,7 @@ func (weaviate *Weaviate) DispatchChanges(itemChange server.ItemChange) {
 		err := weaviate.Client.
 			Data().
 			Deleter().
-			WithClassName("Item").
+			WithClassName("item").
 			WithID(itemChange.Item.WeaviateID).
 			Do(weaviate.ctx)
 

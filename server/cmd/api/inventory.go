@@ -141,9 +141,8 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("Stripe Create didn't work:", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
-
-	fmt.Println("reqItem:", reqItem.Price, reqItem.Name, ProductId.DefaultPrice.ID, reqItem.Photo, reqItem.Quantity, store_id)
 
 	createdItem, create_err := srv.DBClient.Item.Create().SetPrice(float64(reqItem.Price)).SetName(reqItem.Name).SetStripePriceID(ProductId.DefaultPrice.ID).SetStripeProductID(ProductId.ID).SetPhoto(reqItem.Photo).SetQuantity(reqItem.Quantity).SetStoreID(store_id).SetCategoryName(reqItem.CategoryName).SetWeaviateID("").SetVectorized(false).Save(ctx)
 	// If this create doesn't work, InternalServerError
@@ -156,9 +155,6 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 	responseBody, _ := json.Marshal(map[string]interface{}{
 		"id": createdItem.ID,
 	})
-
-	w.WriteHeader(http.StatusCreated)
-	w.Write(responseBody)
 
 	itemChange := ItemChange{
 		Item: *createdItem,
@@ -173,6 +169,10 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	srv.ItemChangeChannel <- itemChange
+
+	w.WriteHeader(http.StatusCreated)
+	w.Write(responseBody)
+
 }
 
 func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
@@ -228,12 +228,6 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
-	_, err = w.Write([]byte("OK"))
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
 
 	itemChange := ItemChange{
 		Item:          *targetItem,
@@ -242,6 +236,14 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	srv.ItemChangeChannel <- itemChange
+
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write([]byte("OK"))
+
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 
 }
 func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
@@ -285,8 +287,6 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("OK"))
 
 	itemChange := ItemChange{
 		Item: *targetItem,
@@ -302,4 +302,6 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 
 	srv.ItemChangeChannel <- itemChange
 
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
 }

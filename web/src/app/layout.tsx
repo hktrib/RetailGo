@@ -7,7 +7,7 @@ import { HydrationBoundary, QueryClient, QueryClientProvider } from "@tanstack/r
 import {useState} from "react"
 import { AppProps } from "next/app";
 
-export const fontSans = FontSans({
+const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
 });
