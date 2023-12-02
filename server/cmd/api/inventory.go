@@ -191,8 +191,6 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
-	// get item id from url query string
-
 	// Load the message parameters (Name, Photo, Quantity, Category)
 	req_body, err := io.ReadAll(r.Body)
 
@@ -219,6 +217,14 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		Where(item.ID(reqItem.ID)).
 		Only(r.Context())
 
+	if ent.IsNotFound(err) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	} else if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
 	originalItem := ent.Item{
 		Name:         targetItem.Name,
 		Photo:        targetItem.Photo,
@@ -226,14 +232,6 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		Price:        targetItem.Price,
 		CategoryName: targetItem.CategoryName,
 		Vectorized:   targetItem.Vectorized,
-	}
-
-	if ent.IsNotFound(err) {
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	} else if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
 	}
 
 	fieldsUpdated := weaviate.UpdatedFields{
@@ -257,7 +255,7 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 
 	if weaviateUpdateErr != nil {
 		// Rolls back Database update if Weaviate update fails, but no guarantee of rollback working..
-		fmt.Println("Failed to edit item in Weaviate")
+		fmt.Println("Failed to edit item in Weaviate, err:", weaviateUpdateErr)
 		_, _ = targetItem.Update().SetQuantity(originalItem.Quantity).SetPhoto(originalItem.Photo).SetName(originalItem.Name).SetPrice(originalItem.Price).SetCategoryName(originalItem.CategoryName).SetVectorized(originalItem.Vectorized).Save(r.Context())
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
