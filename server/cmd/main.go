@@ -69,7 +69,6 @@ func main() {
 	defer entClient.Close()
 	fmt.Printf("checkpoint 2")
 	weaviateClient := weaviate.NewWeaviate(context.Background())
-	itemChangeChannel := weaviateClient.Start()
 
 	if err != nil {
 		panic(err)
@@ -82,7 +81,7 @@ func main() {
 	go func() {
 		injectActiveSession := clerk.WithSessionV2(clerkClient)
 
-		srv := server.NewServer(clerkClient, entClient, taskQueueClient, itemChangeChannel, cache, taskProducer, &config)
+		srv := server.NewServer(clerkClient, entClient, taskQueueClient, weaviateClient, cache, taskProducer, &config)
 		srv.Router.Use(injectActiveSession)
 
 		srv.MountHandlers()
@@ -102,6 +101,5 @@ func main() {
 	}()
 
 	// Makes sure we wait for the go routine running
-	go weaviateClient.ItemChangeHandler(entClient)
 	select {}
 }

@@ -32,8 +32,8 @@ const (
 	FieldWeaviateID = "weaviate_id"
 	// FieldVectorized holds the string denoting the vectorized field in the database.
 	FieldVectorized = "vectorized"
-	// FieldNumberSold holds the string denoting the number_sold field in the database.
-	FieldNumberSold = "number_sold"
+	// FieldNumberSoldSinceUpdate holds the string denoting the number_sold_since_update field in the database.
+	FieldNumberSoldSinceUpdate = "number_sold_since_update"
 	// FieldDateLastSold holds the string denoting the date_last_sold field in the database.
 	FieldDateLastSold = "date_last_sold"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
@@ -78,7 +78,7 @@ var Columns = []string{
 	FieldCategoryName,
 	FieldWeaviateID,
 	FieldVectorized,
-	FieldNumberSold,
+	FieldNumberSoldSinceUpdate,
 	FieldDateLastSold,
 }
 
@@ -156,9 +156,9 @@ func ByVectorized(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldVectorized, opts...).ToFunc()
 }
 
-// ByNumberSold orders the results by the number_sold field.
-func ByNumberSold(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldNumberSold, opts...).ToFunc()
+// ByNumberSoldSinceUpdate orders the results by the number_sold_since_update field.
+func ByNumberSoldSinceUpdate(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNumberSoldSinceUpdate, opts...).ToFunc()
 }
 
 // ByDateLastSold orders the results by the date_last_sold field.

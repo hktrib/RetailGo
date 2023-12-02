@@ -13,6 +13,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/item"
+	"github.com/hktrib/RetailGo/internal/weaviate"
 )
 
 func (srv *Server) HelloWorld(w http.ResponseWriter, r *http.Request) {
@@ -144,7 +145,7 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	createdItem, create_err := srv.DBClient.Item.Create().SetPrice(float64(reqItem.Price)).SetName(reqItem.Name).SetStripePriceID(ProductId.DefaultPrice.ID).SetStripeProductID(ProductId.ID).SetPhoto(reqItem.Photo).SetQuantity(reqItem.Quantity).SetStoreID(store_id).SetCategoryName(reqItem.CategoryName).SetWeaviateID("").SetVectorized(false).Save(ctx)
+	createdItem, create_err := srv.DBClient.Item.Create().SetPrice(float64(reqItem.Price)).SetName(reqItem.Name).SetStripePriceID(ProductId.DefaultPrice.ID).SetStripeProductID(ProductId.ID).SetPhoto(reqItem.Photo).SetQuantity(reqItem.Quantity).SetStoreID(store_id).SetCategoryName(reqItem.CategoryName).SetWeaviateID("").SetVectorized(false).SetNumberSoldSinceUpdate(0).SetDateLastSold("").Save(ctx)
 	// If this create doesn't work, InternalServerError
 	if create_err != nil {
 		fmt.Println("Create didn't work:", create_err)
@@ -156,19 +157,35 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		"id": createdItem.ID,
 	})
 
-	itemChange := ItemChange{
-		Item: *createdItem,
-		Mode: "CREATE",
-		UpdatedFields: UpdatedFields{
-			Name:         true,
-			Photo:        true,
-			Quantity:     true,
-			Price:        true,
-			CategoryName: true,
-		},
+	weaviateID, weaviateErr := srv.WeaviateClient.CreateItem(createdItem)
+
+	fmt.Println("Weaviate ID on create:", weaviateID)
+
+	// Currently raises 500 if creation of weaviate copy or storing the weaviate id fails. Attempts to roll back the database in response to this so that there are no ghost items for Weaviate.
+
+	if weaviateErr != nil {
+		fmt.Println("Weaviate Create didn't work")
+		_ = srv.DBClient.
+			Item.DeleteOneID(createdItem.ID).
+			Where(item.StoreID(store_id)).
+			Exec(r.Context())
+
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 
-	srv.ItemChangeChannel <- itemChange
+	_, setWeaviateIDErr := createdItem.Update().SetWeaviateID(weaviateID).Save(r.Context())
+
+	if setWeaviateIDErr != nil {
+		fmt.Println("Failed to set Weaviate ID")
+		_ = srv.DBClient.
+			Item.DeleteOneID(createdItem.ID).
+			Where(item.StoreID(store_id)).
+			Exec(r.Context())
+
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write(responseBody)
@@ -176,10 +193,6 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
-	// get item id from url query string
-
-	// ctx := r.Context()
-
 	// Load the message parameters (Name, Photo, Quantity, Category)
 	req_body, err := io.ReadAll(r.Body)
 
@@ -214,28 +227,43 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fieldsUpdated := UpdatedFields{
-		Name:         targetItem.Name != reqItem.Name,
-		Photo:        targetItem.Photo != reqItem.Photo,
-		Quantity:     targetItem.Quantity != reqItem.Quantity,
-		Price:        targetItem.Price != reqItem.Price,
-		CategoryName: targetItem.CategoryName != reqItem.CategoryName,
+	originalItem := ent.Item{
+		Name:         targetItem.Name,
+		Photo:        targetItem.Photo,
+		Quantity:     targetItem.Quantity,
+		Price:        targetItem.Price,
+		CategoryName: targetItem.CategoryName,
+		Vectorized:   targetItem.Vectorized,
 	}
 
-	_, err = targetItem.Update().SetQuantity(reqItem.Quantity).SetName(reqItem.Name).SetPhoto(reqItem.Photo).SetPrice(reqItem.Price).SetCategoryName(reqItem.CategoryName).SetVectorized(targetItem.Vectorized && true).Save(r.Context())
+	fmt.Println("original item:", targetItem, "requested item:", reqItem)
+
+	fieldsUpdated := weaviate.UpdatedFields{
+		Name:                  targetItem.Name != reqItem.Name,
+		Photo:                 targetItem.Photo != reqItem.Photo,
+		Quantity:              targetItem.Quantity != reqItem.Quantity,
+		Price:                 targetItem.Price != reqItem.Price,
+		CategoryName:          targetItem.CategoryName != reqItem.CategoryName,
+		NumberSoldSinceUpdate: false, // Assume that sales is taken care of elsewhere. If not, this is subject to change.
+		DateLastSold:          false, // Assume that sales is taken care of elsewhere. If not, this is subject to change.
+	}
+
+	_, err = targetItem.Update().SetQuantity(reqItem.Quantity).SetName(reqItem.Name).SetPhoto(reqItem.Photo).SetPrice(reqItem.Price).SetCategoryName(reqItem.CategoryName).SetVectorized(originalItem.Vectorized && !(weaviate.ChangesVectorizedProperties(fieldsUpdated))).Save(r.Context())
 
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	itemChange := ItemChange{
-		Item:          *targetItem,
-		Mode:          "UPDATE",
-		UpdatedFields: fieldsUpdated,
-	}
+	weaviateUpdateErr := srv.WeaviateClient.EditItem(targetItem, fieldsUpdated)
 
-	srv.ItemChangeChannel <- itemChange
+	if weaviateUpdateErr != nil {
+		// Rolls back Database update if Weaviate update fails, but no guarantee of rollback working..
+		fmt.Println("Failed to edit item in Weaviate, err:", weaviateUpdateErr)
+		_, _ = targetItem.Update().SetQuantity(originalItem.Quantity).SetPhoto(originalItem.Photo).SetName(originalItem.Name).SetPrice(originalItem.Price).SetCategoryName(originalItem.CategoryName).SetVectorized(originalItem.Vectorized).Save(r.Context())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write([]byte("OK"))
@@ -270,10 +298,21 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 		Where(item.ID(itemId)).
 		Only(r.Context())
 
+	// originalItem := ent.Item{
+	// 	Name:         targetItem.Name,
+	// 	Photo:        targetItem.Photo,
+	// 	Quantity:     targetItem.Quantity,
+	// 	Price:        targetItem.Price,
+	// 	CategoryName: targetItem.CategoryName,
+	// 	Vectorized:   targetItem.Vectorized,
+	// }
+
 	if ent.IsNotFound(err) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
+
+	weaviateID := targetItem.WeaviateID
 
 	err = srv.DBClient.
 		Item.DeleteOneID(itemId).
@@ -288,19 +327,15 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	itemChange := ItemChange{
-		Item: *targetItem,
-		Mode: "DELETE",
-		UpdatedFields: UpdatedFields{
-			Name:         true,
-			Photo:        true,
-			Quantity:     true,
-			Price:        true,
-			CategoryName: true,
-		},
-	}
+	err = srv.WeaviateClient.DeleteItem(weaviateID)
 
-	srv.ItemChangeChannel <- itemChange
+	if err != nil {
+		fmt.Println("Delete in Weaviate Failed")
+		// Should Roll back delete - for now, naively, by just creating a new item -, but doesn't do this yet.
+		// _, _ = srv.DBClient.Item.Create().SetQuantity(originalItem.Quantity).SetPhoto(originalItem.Photo).SetName(originalItem.Name).SetPrice(originalItem.Price).SetCategoryName(originalItem.CategoryName).SetVectorized(originalItem.Vectorized).SetNumberSoldSinceUpdate(originalItem.NumberSoldSinceUpdate).SetDateLastSold(originalItem.DateLastSold).SetStore(originalItem.Edges.Store).Set.Save(r.Context())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))

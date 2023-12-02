@@ -85,7 +85,7 @@ var (
 		{Name: "category_name", Type: field.TypeString},
 		{Name: "weaviate_id", Type: field.TypeString},
 		{Name: "vectorized", Type: field.TypeBool},
-		{Name: "number_sold", Type: field.TypeInt, Nullable: true},
+		{Name: "number_sold_since_update", Type: field.TypeInt, Nullable: true},
 		{Name: "date_last_sold", Type: field.TypeString, Nullable: true},
 		{Name: "store_id", Type: field.TypeInt},
 	}

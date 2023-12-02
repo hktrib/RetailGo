@@ -1421,32 +1421,32 @@ func (m *ClerkUserStoreMutation) ResetEdge(name string) error {
 // ItemMutation represents an operation that mutates the Item nodes in the graph.
 type ItemMutation struct {
 	config
-	op                Op
-	typ               string
-	id                *int
-	name              *string
-	photo             *string
-	quantity          *int
-	addquantity       *int
-	price             *float64
-	addprice          *float64
-	stripe_price_id   *string
-	stripe_product_id *string
-	category_name     *string
-	weaviate_id       *string
-	vectorized        *bool
-	number_sold       *int
-	addnumber_sold    *int
-	date_last_sold    *string
-	clearedFields     map[string]struct{}
-	category          map[int]struct{}
-	removedcategory   map[int]struct{}
-	clearedcategory   bool
-	store             *int
-	clearedstore      bool
-	done              bool
-	oldValue          func(context.Context) (*Item, error)
-	predicates        []predicate.Item
+	op                          Op
+	typ                         string
+	id                          *int
+	name                        *string
+	photo                       *string
+	quantity                    *int
+	addquantity                 *int
+	price                       *float64
+	addprice                    *float64
+	stripe_price_id             *string
+	stripe_product_id           *string
+	category_name               *string
+	weaviate_id                 *string
+	vectorized                  *bool
+	number_sold_since_update    *int
+	addnumber_sold_since_update *int
+	date_last_sold              *string
+	clearedFields               map[string]struct{}
+	category                    map[int]struct{}
+	removedcategory             map[int]struct{}
+	clearedcategory             bool
+	store                       *int
+	clearedstore                bool
+	done                        bool
+	oldValue                    func(context.Context) (*Item, error)
+	predicates                  []predicate.Item
 }
 
 var _ ent.Mutation = (*ItemMutation)(nil)
@@ -1953,74 +1953,74 @@ func (m *ItemMutation) ResetVectorized() {
 	m.vectorized = nil
 }
 
-// SetNumberSold sets the "number_sold" field.
-func (m *ItemMutation) SetNumberSold(i int) {
-	m.number_sold = &i
-	m.addnumber_sold = nil
+// SetNumberSoldSinceUpdate sets the "number_sold_since_update" field.
+func (m *ItemMutation) SetNumberSoldSinceUpdate(i int) {
+	m.number_sold_since_update = &i
+	m.addnumber_sold_since_update = nil
 }
 
-// NumberSold returns the value of the "number_sold" field in the mutation.
-func (m *ItemMutation) NumberSold() (r int, exists bool) {
-	v := m.number_sold
+// NumberSoldSinceUpdate returns the value of the "number_sold_since_update" field in the mutation.
+func (m *ItemMutation) NumberSoldSinceUpdate() (r int, exists bool) {
+	v := m.number_sold_since_update
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldNumberSold returns the old "number_sold" field's value of the Item entity.
+// OldNumberSoldSinceUpdate returns the old "number_sold_since_update" field's value of the Item entity.
 // If the Item object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ItemMutation) OldNumberSold(ctx context.Context) (v int, err error) {
+func (m *ItemMutation) OldNumberSoldSinceUpdate(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldNumberSold is only allowed on UpdateOne operations")
+		return v, errors.New("OldNumberSoldSinceUpdate is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldNumberSold requires an ID field in the mutation")
+		return v, errors.New("OldNumberSoldSinceUpdate requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldNumberSold: %w", err)
+		return v, fmt.Errorf("querying old value for OldNumberSoldSinceUpdate: %w", err)
 	}
-	return oldValue.NumberSold, nil
+	return oldValue.NumberSoldSinceUpdate, nil
 }
 
-// AddNumberSold adds i to the "number_sold" field.
-func (m *ItemMutation) AddNumberSold(i int) {
-	if m.addnumber_sold != nil {
-		*m.addnumber_sold += i
+// AddNumberSoldSinceUpdate adds i to the "number_sold_since_update" field.
+func (m *ItemMutation) AddNumberSoldSinceUpdate(i int) {
+	if m.addnumber_sold_since_update != nil {
+		*m.addnumber_sold_since_update += i
 	} else {
-		m.addnumber_sold = &i
+		m.addnumber_sold_since_update = &i
 	}
 }
 
-// AddedNumberSold returns the value that was added to the "number_sold" field in this mutation.
-func (m *ItemMutation) AddedNumberSold() (r int, exists bool) {
-	v := m.addnumber_sold
+// AddedNumberSoldSinceUpdate returns the value that was added to the "number_sold_since_update" field in this mutation.
+func (m *ItemMutation) AddedNumberSoldSinceUpdate() (r int, exists bool) {
+	v := m.addnumber_sold_since_update
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ClearNumberSold clears the value of the "number_sold" field.
-func (m *ItemMutation) ClearNumberSold() {
-	m.number_sold = nil
-	m.addnumber_sold = nil
-	m.clearedFields[item.FieldNumberSold] = struct{}{}
+// ClearNumberSoldSinceUpdate clears the value of the "number_sold_since_update" field.
+func (m *ItemMutation) ClearNumberSoldSinceUpdate() {
+	m.number_sold_since_update = nil
+	m.addnumber_sold_since_update = nil
+	m.clearedFields[item.FieldNumberSoldSinceUpdate] = struct{}{}
 }
 
-// NumberSoldCleared returns if the "number_sold" field was cleared in this mutation.
-func (m *ItemMutation) NumberSoldCleared() bool {
-	_, ok := m.clearedFields[item.FieldNumberSold]
+// NumberSoldSinceUpdateCleared returns if the "number_sold_since_update" field was cleared in this mutation.
+func (m *ItemMutation) NumberSoldSinceUpdateCleared() bool {
+	_, ok := m.clearedFields[item.FieldNumberSoldSinceUpdate]
 	return ok
 }
 
-// ResetNumberSold resets all changes to the "number_sold" field.
-func (m *ItemMutation) ResetNumberSold() {
-	m.number_sold = nil
-	m.addnumber_sold = nil
-	delete(m.clearedFields, item.FieldNumberSold)
+// ResetNumberSoldSinceUpdate resets all changes to the "number_sold_since_update" field.
+func (m *ItemMutation) ResetNumberSoldSinceUpdate() {
+	m.number_sold_since_update = nil
+	m.addnumber_sold_since_update = nil
+	delete(m.clearedFields, item.FieldNumberSoldSinceUpdate)
 }
 
 // SetDateLastSold sets the "date_last_sold" field.
@@ -2218,8 +2218,8 @@ func (m *ItemMutation) Fields() []string {
 	if m.vectorized != nil {
 		fields = append(fields, item.FieldVectorized)
 	}
-	if m.number_sold != nil {
-		fields = append(fields, item.FieldNumberSold)
+	if m.number_sold_since_update != nil {
+		fields = append(fields, item.FieldNumberSoldSinceUpdate)
 	}
 	if m.date_last_sold != nil {
 		fields = append(fields, item.FieldDateLastSold)
@@ -2252,8 +2252,8 @@ func (m *ItemMutation) Field(name string) (ent.Value, bool) {
 		return m.WeaviateID()
 	case item.FieldVectorized:
 		return m.Vectorized()
-	case item.FieldNumberSold:
-		return m.NumberSold()
+	case item.FieldNumberSoldSinceUpdate:
+		return m.NumberSoldSinceUpdate()
 	case item.FieldDateLastSold:
 		return m.DateLastSold()
 	}
@@ -2285,8 +2285,8 @@ func (m *ItemMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldWeaviateID(ctx)
 	case item.FieldVectorized:
 		return m.OldVectorized(ctx)
-	case item.FieldNumberSold:
-		return m.OldNumberSold(ctx)
+	case item.FieldNumberSoldSinceUpdate:
+		return m.OldNumberSoldSinceUpdate(ctx)
 	case item.FieldDateLastSold:
 		return m.OldDateLastSold(ctx)
 	}
@@ -2368,12 +2368,12 @@ func (m *ItemMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetVectorized(v)
 		return nil
-	case item.FieldNumberSold:
+	case item.FieldNumberSoldSinceUpdate:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetNumberSold(v)
+		m.SetNumberSoldSinceUpdate(v)
 		return nil
 	case item.FieldDateLastSold:
 		v, ok := value.(string)
@@ -2396,8 +2396,8 @@ func (m *ItemMutation) AddedFields() []string {
 	if m.addprice != nil {
 		fields = append(fields, item.FieldPrice)
 	}
-	if m.addnumber_sold != nil {
-		fields = append(fields, item.FieldNumberSold)
+	if m.addnumber_sold_since_update != nil {
+		fields = append(fields, item.FieldNumberSoldSinceUpdate)
 	}
 	return fields
 }
@@ -2411,8 +2411,8 @@ func (m *ItemMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedQuantity()
 	case item.FieldPrice:
 		return m.AddedPrice()
-	case item.FieldNumberSold:
-		return m.AddedNumberSold()
+	case item.FieldNumberSoldSinceUpdate:
+		return m.AddedNumberSoldSinceUpdate()
 	}
 	return nil, false
 }
@@ -2436,12 +2436,12 @@ func (m *ItemMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddPrice(v)
 		return nil
-	case item.FieldNumberSold:
+	case item.FieldNumberSoldSinceUpdate:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddNumberSold(v)
+		m.AddNumberSoldSinceUpdate(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Item numeric field %s", name)
@@ -2451,8 +2451,8 @@ func (m *ItemMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *ItemMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(item.FieldNumberSold) {
-		fields = append(fields, item.FieldNumberSold)
+	if m.FieldCleared(item.FieldNumberSoldSinceUpdate) {
+		fields = append(fields, item.FieldNumberSoldSinceUpdate)
 	}
 	if m.FieldCleared(item.FieldDateLastSold) {
 		fields = append(fields, item.FieldDateLastSold)
@@ -2471,8 +2471,8 @@ func (m *ItemMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *ItemMutation) ClearField(name string) error {
 	switch name {
-	case item.FieldNumberSold:
-		m.ClearNumberSold()
+	case item.FieldNumberSoldSinceUpdate:
+		m.ClearNumberSoldSinceUpdate()
 		return nil
 	case item.FieldDateLastSold:
 		m.ClearDateLastSold()
@@ -2515,8 +2515,8 @@ func (m *ItemMutation) ResetField(name string) error {
 	case item.FieldVectorized:
 		m.ResetVectorized()
 		return nil
-	case item.FieldNumberSold:
-		m.ResetNumberSold()
+	case item.FieldNumberSoldSinceUpdate:
+		m.ResetNumberSoldSinceUpdate()
 		return nil
 	case item.FieldDateLastSold:
 		m.ResetDateLastSold()
