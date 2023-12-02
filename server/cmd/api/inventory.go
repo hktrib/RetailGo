@@ -160,11 +160,13 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		Item: *createdItem,
 		Mode: "CREATE",
 		UpdatedFields: UpdatedFields{
-			Name:         true,
-			Photo:        true,
-			Quantity:     true,
-			Price:        true,
-			CategoryName: true,
+			Name:                  true,
+			Photo:                 true,
+			Quantity:              true,
+			Price:                 true,
+			CategoryName:          true,
+			NumberSoldSinceUpdate: true,
+			DateLastSold:          true,
 		},
 	}
 
@@ -215,11 +217,13 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fieldsUpdated := UpdatedFields{
-		Name:         targetItem.Name != reqItem.Name,
-		Photo:        targetItem.Photo != reqItem.Photo,
-		Quantity:     targetItem.Quantity != reqItem.Quantity,
-		Price:        targetItem.Price != reqItem.Price,
-		CategoryName: targetItem.CategoryName != reqItem.CategoryName,
+		Name:                  targetItem.Name != reqItem.Name,
+		Photo:                 targetItem.Photo != reqItem.Photo,
+		Quantity:              targetItem.Quantity != reqItem.Quantity,
+		Price:                 targetItem.Price != reqItem.Price,
+		CategoryName:          targetItem.CategoryName != reqItem.CategoryName,
+		NumberSoldSinceUpdate: targetItem.NumberSoldSinceUpdate != reqItem.NumberSoldSinceUpdate,
+		DateLastSold:          targetItem.DateLastSold != reqItem.DateLastSold,
 	}
 
 	_, err = targetItem.Update().SetQuantity(reqItem.Quantity).SetName(reqItem.Name).SetPhoto(reqItem.Photo).SetPrice(reqItem.Price).SetCategoryName(reqItem.CategoryName).SetVectorized(targetItem.Vectorized && true).Save(r.Context())
@@ -292,11 +296,13 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 		Item: *targetItem,
 		Mode: "DELETE",
 		UpdatedFields: UpdatedFields{
-			Name:         true,
-			Photo:        true,
-			Quantity:     true,
-			Price:        true,
-			CategoryName: true,
+			Name:                  true,
+			Photo:                 true,
+			Quantity:              true,
+			Price:                 true,
+			CategoryName:          true,
+			NumberSoldSinceUpdate: true,
+			DateLastSold:          true,
 		},
 	}
 

@@ -103,9 +103,9 @@ func Vectorized(v bool) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldVectorized, v))
 }
 
-// NumberSold applies equality check predicate on the "number_sold" field. It's identical to NumberSoldEQ.
-func NumberSold(v int) predicate.Item {
-	return predicate.Item(sql.FieldEQ(FieldNumberSold, v))
+// NumberSoldSinceUpdate applies equality check predicate on the "number_sold_since_update" field. It's identical to NumberSoldSinceUpdateEQ.
+func NumberSoldSinceUpdate(v int) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldNumberSoldSinceUpdate, v))
 }
 
 // DateLastSold applies equality check predicate on the "date_last_sold" field. It's identical to DateLastSoldEQ.
@@ -613,54 +613,54 @@ func VectorizedNEQ(v bool) predicate.Item {
 	return predicate.Item(sql.FieldNEQ(FieldVectorized, v))
 }
 
-// NumberSoldEQ applies the EQ predicate on the "number_sold" field.
-func NumberSoldEQ(v int) predicate.Item {
-	return predicate.Item(sql.FieldEQ(FieldNumberSold, v))
+// NumberSoldSinceUpdateEQ applies the EQ predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateEQ(v int) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldNumberSoldSinceUpdate, v))
 }
 
-// NumberSoldNEQ applies the NEQ predicate on the "number_sold" field.
-func NumberSoldNEQ(v int) predicate.Item {
-	return predicate.Item(sql.FieldNEQ(FieldNumberSold, v))
+// NumberSoldSinceUpdateNEQ applies the NEQ predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateNEQ(v int) predicate.Item {
+	return predicate.Item(sql.FieldNEQ(FieldNumberSoldSinceUpdate, v))
 }
 
-// NumberSoldIn applies the In predicate on the "number_sold" field.
-func NumberSoldIn(vs ...int) predicate.Item {
-	return predicate.Item(sql.FieldIn(FieldNumberSold, vs...))
+// NumberSoldSinceUpdateIn applies the In predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateIn(vs ...int) predicate.Item {
+	return predicate.Item(sql.FieldIn(FieldNumberSoldSinceUpdate, vs...))
 }
 
-// NumberSoldNotIn applies the NotIn predicate on the "number_sold" field.
-func NumberSoldNotIn(vs ...int) predicate.Item {
-	return predicate.Item(sql.FieldNotIn(FieldNumberSold, vs...))
+// NumberSoldSinceUpdateNotIn applies the NotIn predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateNotIn(vs ...int) predicate.Item {
+	return predicate.Item(sql.FieldNotIn(FieldNumberSoldSinceUpdate, vs...))
 }
 
-// NumberSoldGT applies the GT predicate on the "number_sold" field.
-func NumberSoldGT(v int) predicate.Item {
-	return predicate.Item(sql.FieldGT(FieldNumberSold, v))
+// NumberSoldSinceUpdateGT applies the GT predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateGT(v int) predicate.Item {
+	return predicate.Item(sql.FieldGT(FieldNumberSoldSinceUpdate, v))
 }
 
-// NumberSoldGTE applies the GTE predicate on the "number_sold" field.
-func NumberSoldGTE(v int) predicate.Item {
-	return predicate.Item(sql.FieldGTE(FieldNumberSold, v))
+// NumberSoldSinceUpdateGTE applies the GTE predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateGTE(v int) predicate.Item {
+	return predicate.Item(sql.FieldGTE(FieldNumberSoldSinceUpdate, v))
 }
 
-// NumberSoldLT applies the LT predicate on the "number_sold" field.
-func NumberSoldLT(v int) predicate.Item {
-	return predicate.Item(sql.FieldLT(FieldNumberSold, v))
+// NumberSoldSinceUpdateLT applies the LT predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateLT(v int) predicate.Item {
+	return predicate.Item(sql.FieldLT(FieldNumberSoldSinceUpdate, v))
 }
 
-// NumberSoldLTE applies the LTE predicate on the "number_sold" field.
-func NumberSoldLTE(v int) predicate.Item {
-	return predicate.Item(sql.FieldLTE(FieldNumberSold, v))
+// NumberSoldSinceUpdateLTE applies the LTE predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateLTE(v int) predicate.Item {
+	return predicate.Item(sql.FieldLTE(FieldNumberSoldSinceUpdate, v))
 }
 
-// NumberSoldIsNil applies the IsNil predicate on the "number_sold" field.
-func NumberSoldIsNil() predicate.Item {
-	return predicate.Item(sql.FieldIsNull(FieldNumberSold))
+// NumberSoldSinceUpdateIsNil applies the IsNil predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateIsNil() predicate.Item {
+	return predicate.Item(sql.FieldIsNull(FieldNumberSoldSinceUpdate))
 }
 
-// NumberSoldNotNil applies the NotNil predicate on the "number_sold" field.
-func NumberSoldNotNil() predicate.Item {
-	return predicate.Item(sql.FieldNotNull(FieldNumberSold))
+// NumberSoldSinceUpdateNotNil applies the NotNil predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateNotNil() predicate.Item {
+	return predicate.Item(sql.FieldNotNull(FieldNumberSoldSinceUpdate))
 }
 
 // DateLastSoldEQ applies the EQ predicate on the "date_last_sold" field.

@@ -69,6 +69,8 @@ func (weaviate *Weaviate) DispatchChanges(itemChange server.ItemChange) {
 					"categoryName": itemChange.Item.CategoryName,
 					"imageURL":     itemChange.Item.Photo,
 					"price":        itemChange.Item.Price,
+					"numberSold":   itemChange.Item.NumberSold,
+					"dateLastSold": itemChange.Item.DateLastSold,
 				}).
 			Do(weaviate.ctx)
 
@@ -97,6 +99,14 @@ func (weaviate *Weaviate) DispatchChanges(itemChange server.ItemChange) {
 
 		if itemChange.UpdatedFields.Price {
 			itemUpdates["price"] = itemChange.Item.Price
+		}
+
+		if itemChange.UpdatedFields.NumberSold {
+			itemUpdates["numberSold"] = itemChange.Item.NumberSold
+		}
+
+		if itemChange.UpdatedFields.DateLastSold {
+			itemUpdates["dateLastSold"] = itemChange.Item.DateLastSold
 		}
 
 		err := weaviate.Client.

@@ -81,16 +81,16 @@ func (ic *ItemCreate) SetVectorized(b bool) *ItemCreate {
 	return ic
 }
 
-// SetNumberSold sets the "number_sold" field.
-func (ic *ItemCreate) SetNumberSold(i int) *ItemCreate {
-	ic.mutation.SetNumberSold(i)
+// SetNumberSoldSinceUpdate sets the "number_sold_since_update" field.
+func (ic *ItemCreate) SetNumberSoldSinceUpdate(i int) *ItemCreate {
+	ic.mutation.SetNumberSoldSinceUpdate(i)
 	return ic
 }
 
-// SetNillableNumberSold sets the "number_sold" field if the given value is not nil.
-func (ic *ItemCreate) SetNillableNumberSold(i *int) *ItemCreate {
+// SetNillableNumberSoldSinceUpdate sets the "number_sold_since_update" field if the given value is not nil.
+func (ic *ItemCreate) SetNillableNumberSoldSinceUpdate(i *int) *ItemCreate {
 	if i != nil {
-		ic.SetNumberSold(*i)
+		ic.SetNumberSoldSinceUpdate(*i)
 	}
 	return ic
 }
@@ -270,9 +270,9 @@ func (ic *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 		_spec.SetField(item.FieldVectorized, field.TypeBool, value)
 		_node.Vectorized = value
 	}
-	if value, ok := ic.mutation.NumberSold(); ok {
-		_spec.SetField(item.FieldNumberSold, field.TypeInt, value)
-		_node.NumberSold = value
+	if value, ok := ic.mutation.NumberSoldSinceUpdate(); ok {
+		_spec.SetField(item.FieldNumberSoldSinceUpdate, field.TypeInt, value)
+		_node.NumberSoldSinceUpdate = value
 	}
 	if value, ok := ic.mutation.DateLastSold(); ok {
 		_spec.SetField(item.FieldDateLastSold, field.TypeString, value)

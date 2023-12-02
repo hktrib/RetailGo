@@ -183,30 +183,30 @@ func (iu *ItemUpdate) SetNillableVectorized(b *bool) *ItemUpdate {
 	return iu
 }
 
-// SetNumberSold sets the "number_sold" field.
-func (iu *ItemUpdate) SetNumberSold(i int) *ItemUpdate {
-	iu.mutation.ResetNumberSold()
-	iu.mutation.SetNumberSold(i)
+// SetNumberSoldSinceUpdate sets the "number_sold_since_update" field.
+func (iu *ItemUpdate) SetNumberSoldSinceUpdate(i int) *ItemUpdate {
+	iu.mutation.ResetNumberSoldSinceUpdate()
+	iu.mutation.SetNumberSoldSinceUpdate(i)
 	return iu
 }
 
-// SetNillableNumberSold sets the "number_sold" field if the given value is not nil.
-func (iu *ItemUpdate) SetNillableNumberSold(i *int) *ItemUpdate {
+// SetNillableNumberSoldSinceUpdate sets the "number_sold_since_update" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableNumberSoldSinceUpdate(i *int) *ItemUpdate {
 	if i != nil {
-		iu.SetNumberSold(*i)
+		iu.SetNumberSoldSinceUpdate(*i)
 	}
 	return iu
 }
 
-// AddNumberSold adds i to the "number_sold" field.
-func (iu *ItemUpdate) AddNumberSold(i int) *ItemUpdate {
-	iu.mutation.AddNumberSold(i)
+// AddNumberSoldSinceUpdate adds i to the "number_sold_since_update" field.
+func (iu *ItemUpdate) AddNumberSoldSinceUpdate(i int) *ItemUpdate {
+	iu.mutation.AddNumberSoldSinceUpdate(i)
 	return iu
 }
 
-// ClearNumberSold clears the value of the "number_sold" field.
-func (iu *ItemUpdate) ClearNumberSold() *ItemUpdate {
-	iu.mutation.ClearNumberSold()
+// ClearNumberSoldSinceUpdate clears the value of the "number_sold_since_update" field.
+func (iu *ItemUpdate) ClearNumberSoldSinceUpdate() *ItemUpdate {
+	iu.mutation.ClearNumberSoldSinceUpdate()
 	return iu
 }
 
@@ -362,14 +362,14 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := iu.mutation.Vectorized(); ok {
 		_spec.SetField(item.FieldVectorized, field.TypeBool, value)
 	}
-	if value, ok := iu.mutation.NumberSold(); ok {
-		_spec.SetField(item.FieldNumberSold, field.TypeInt, value)
+	if value, ok := iu.mutation.NumberSoldSinceUpdate(); ok {
+		_spec.SetField(item.FieldNumberSoldSinceUpdate, field.TypeInt, value)
 	}
-	if value, ok := iu.mutation.AddedNumberSold(); ok {
-		_spec.AddField(item.FieldNumberSold, field.TypeInt, value)
+	if value, ok := iu.mutation.AddedNumberSoldSinceUpdate(); ok {
+		_spec.AddField(item.FieldNumberSoldSinceUpdate, field.TypeInt, value)
 	}
-	if iu.mutation.NumberSoldCleared() {
-		_spec.ClearField(item.FieldNumberSold, field.TypeInt)
+	if iu.mutation.NumberSoldSinceUpdateCleared() {
+		_spec.ClearField(item.FieldNumberSoldSinceUpdate, field.TypeInt)
 	}
 	if value, ok := iu.mutation.DateLastSold(); ok {
 		_spec.SetField(item.FieldDateLastSold, field.TypeString, value)
@@ -625,30 +625,30 @@ func (iuo *ItemUpdateOne) SetNillableVectorized(b *bool) *ItemUpdateOne {
 	return iuo
 }
 
-// SetNumberSold sets the "number_sold" field.
-func (iuo *ItemUpdateOne) SetNumberSold(i int) *ItemUpdateOne {
-	iuo.mutation.ResetNumberSold()
-	iuo.mutation.SetNumberSold(i)
+// SetNumberSoldSinceUpdate sets the "number_sold_since_update" field.
+func (iuo *ItemUpdateOne) SetNumberSoldSinceUpdate(i int) *ItemUpdateOne {
+	iuo.mutation.ResetNumberSoldSinceUpdate()
+	iuo.mutation.SetNumberSoldSinceUpdate(i)
 	return iuo
 }
 
-// SetNillableNumberSold sets the "number_sold" field if the given value is not nil.
-func (iuo *ItemUpdateOne) SetNillableNumberSold(i *int) *ItemUpdateOne {
+// SetNillableNumberSoldSinceUpdate sets the "number_sold_since_update" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableNumberSoldSinceUpdate(i *int) *ItemUpdateOne {
 	if i != nil {
-		iuo.SetNumberSold(*i)
+		iuo.SetNumberSoldSinceUpdate(*i)
 	}
 	return iuo
 }
 
-// AddNumberSold adds i to the "number_sold" field.
-func (iuo *ItemUpdateOne) AddNumberSold(i int) *ItemUpdateOne {
-	iuo.mutation.AddNumberSold(i)
+// AddNumberSoldSinceUpdate adds i to the "number_sold_since_update" field.
+func (iuo *ItemUpdateOne) AddNumberSoldSinceUpdate(i int) *ItemUpdateOne {
+	iuo.mutation.AddNumberSoldSinceUpdate(i)
 	return iuo
 }
 
-// ClearNumberSold clears the value of the "number_sold" field.
-func (iuo *ItemUpdateOne) ClearNumberSold() *ItemUpdateOne {
-	iuo.mutation.ClearNumberSold()
+// ClearNumberSoldSinceUpdate clears the value of the "number_sold_since_update" field.
+func (iuo *ItemUpdateOne) ClearNumberSoldSinceUpdate() *ItemUpdateOne {
+	iuo.mutation.ClearNumberSoldSinceUpdate()
 	return iuo
 }
 
@@ -834,14 +834,14 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 	if value, ok := iuo.mutation.Vectorized(); ok {
 		_spec.SetField(item.FieldVectorized, field.TypeBool, value)
 	}
-	if value, ok := iuo.mutation.NumberSold(); ok {
-		_spec.SetField(item.FieldNumberSold, field.TypeInt, value)
+	if value, ok := iuo.mutation.NumberSoldSinceUpdate(); ok {
+		_spec.SetField(item.FieldNumberSoldSinceUpdate, field.TypeInt, value)
 	}
-	if value, ok := iuo.mutation.AddedNumberSold(); ok {
-		_spec.AddField(item.FieldNumberSold, field.TypeInt, value)
+	if value, ok := iuo.mutation.AddedNumberSoldSinceUpdate(); ok {
+		_spec.AddField(item.FieldNumberSoldSinceUpdate, field.TypeInt, value)
 	}
-	if iuo.mutation.NumberSoldCleared() {
-		_spec.ClearField(item.FieldNumberSold, field.TypeInt)
+	if iuo.mutation.NumberSoldSinceUpdateCleared() {
+		_spec.ClearField(item.FieldNumberSoldSinceUpdate, field.TypeInt)
 	}
 	if value, ok := iuo.mutation.DateLastSold(); ok {
 		_spec.SetField(item.FieldDateLastSold, field.TypeString, value)
