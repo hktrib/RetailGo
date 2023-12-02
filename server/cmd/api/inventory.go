@@ -13,6 +13,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/item"
+	"github.com/hktrib/RetailGo/internal/weaviate"
 )
 
 func (srv *Server) HelloWorld(w http.ResponseWriter, r *http.Request) {
@@ -144,7 +145,7 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	createdItem, create_err := srv.DBClient.Item.Create().SetPrice(float64(reqItem.Price)).SetName(reqItem.Name).SetStripePriceID(ProductId.DefaultPrice.ID).SetStripeProductID(ProductId.ID).SetPhoto(reqItem.Photo).SetQuantity(reqItem.Quantity).SetStoreID(store_id).SetCategoryName(reqItem.CategoryName).SetWeaviateID("").SetVectorized(false).Save(ctx)
+	createdItem, create_err := srv.DBClient.Item.Create().SetPrice(float64(reqItem.Price)).SetName(reqItem.Name).SetStripePriceID(ProductId.DefaultPrice.ID).SetStripeProductID(ProductId.ID).SetPhoto(reqItem.Photo).SetQuantity(reqItem.Quantity).SetStoreID(store_id).SetCategoryName(reqItem.CategoryName).SetWeaviateID("").SetVectorized(false).SetNumberSoldSinceUpdate(0).SetDateLastSold("").Save(ctx)
 	// If this create doesn't work, InternalServerError
 	if create_err != nil {
 		fmt.Println("Create didn't work:", create_err)
@@ -156,10 +157,10 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		"id": createdItem.ID,
 	})
 
-	itemChange := ItemChange{
+	itemChange := weaviate.ItemChange{
 		Item: *createdItem,
 		Mode: "CREATE",
-		UpdatedFields: UpdatedFields{
+		UpdatedFields: weaviate.UpdatedFields{
 			Name:                  true,
 			Photo:                 true,
 			Quantity:              true,
@@ -170,7 +171,7 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	srv.ItemChangeChannel <- itemChange
+	srv.WeaviateClient.DispatchChanges(itemChange)
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write(responseBody)
@@ -216,30 +217,30 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fieldsUpdated := UpdatedFields{
+	fieldsUpdated := weaviate.UpdatedFields{
 		Name:                  targetItem.Name != reqItem.Name,
 		Photo:                 targetItem.Photo != reqItem.Photo,
 		Quantity:              targetItem.Quantity != reqItem.Quantity,
 		Price:                 targetItem.Price != reqItem.Price,
 		CategoryName:          targetItem.CategoryName != reqItem.CategoryName,
-		NumberSoldSinceUpdate: targetItem.NumberSoldSinceUpdate != reqItem.NumberSoldSinceUpdate,
-		DateLastSold:          targetItem.DateLastSold != reqItem.DateLastSold,
+		NumberSoldSinceUpdate: false, // Assume that sales is taken care of elsewhere. If not, this is subject to change.
+		DateLastSold:          false, // Assume that sales is taken care of elsewhere. If not, this is subject to change.
 	}
 
-	_, err = targetItem.Update().SetQuantity(reqItem.Quantity).SetName(reqItem.Name).SetPhoto(reqItem.Photo).SetPrice(reqItem.Price).SetCategoryName(reqItem.CategoryName).SetVectorized(targetItem.Vectorized && true).Save(r.Context())
+	itemChange := weaviate.ItemChange{
+		Item:          *targetItem,
+		Mode:          "UPDATE",
+		UpdatedFields: fieldsUpdated,
+	}
+
+	_, err = targetItem.Update().SetQuantity(reqItem.Quantity).SetName(reqItem.Name).SetPhoto(reqItem.Photo).SetPrice(reqItem.Price).SetCategoryName(reqItem.CategoryName).SetVectorized(targetItem.Vectorized && !(weaviate.ChangesVectorizedProperties(itemChange))).Save(r.Context())
 
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	itemChange := ItemChange{
-		Item:          *targetItem,
-		Mode:          "UPDATE",
-		UpdatedFields: fieldsUpdated,
-	}
-
-	srv.ItemChangeChannel <- itemChange
+	srv.WeaviateClient.DispatchChanges(itemChange)
 
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write([]byte("OK"))
@@ -292,10 +293,10 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	itemChange := ItemChange{
+	itemChange := weaviate.ItemChange{
 		Item: *targetItem,
 		Mode: "DELETE",
-		UpdatedFields: UpdatedFields{
+		UpdatedFields: weaviate.UpdatedFields{
 			Name:                  true,
 			Photo:                 true,
 			Quantity:              true,
@@ -306,7 +307,7 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	srv.ItemChangeChannel <- itemChange
+	srv.WeaviateClient.DispatchChanges(itemChange)
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))

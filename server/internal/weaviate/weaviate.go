@@ -4,9 +4,7 @@ import (
 	"context"
 	"log"
 
-	server "github.com/hktrib/RetailGo/cmd/api"
 	"github.com/hktrib/RetailGo/internal/ent"
-	"github.com/hktrib/RetailGo/internal/ent/item"
 	"github.com/hktrib/RetailGo/internal/util"
 	weaviateClient "github.com/weaviate/weaviate-go-client/v4/weaviate"
 	weaviateAuth "github.com/weaviate/weaviate-go-client/v4/weaviate/auth"
@@ -15,11 +13,11 @@ import (
 type Weaviate struct {
 	Client            *weaviateClient.Client
 	ctx               context.Context
-	itemChangeChannel chan server.ItemChange
+	itemChangeChannel chan ItemChange
 }
 
-func vectorUpdateNeeded(itemChange server.ItemChange) bool {
-	return itemChange.Mode == "CREATE" || (itemChange.Mode == "UPDATE" && !(itemChange.UpdatedFields.Name || itemChange.UpdatedFields.CategoryName || itemChange.UpdatedFields.Price))
+func ChangesVectorizedProperties(itemChange ItemChange) bool {
+	return (itemChange.UpdatedFields.Name || itemChange.UpdatedFields.CategoryName || itemChange.UpdatedFields.Price || itemChange.UpdatedFields.Photo || itemChange.UpdatedFields.DateLastSold || itemChange.UpdatedFields.NumberSoldSinceUpdate)
 }
 
 func NewWeaviate(ctx context.Context) *Weaviate {
@@ -29,7 +27,7 @@ func NewWeaviate(ctx context.Context) *Weaviate {
 	return weaviateClient
 }
 
-func (weaviate *Weaviate) Start() chan server.ItemChange {
+func (weaviate *Weaviate) Start() chan ItemChange {
 	config, err := util.LoadConfig()
 
 	if err != nil {
@@ -49,13 +47,13 @@ func (weaviate *Weaviate) Start() chan server.ItemChange {
 		panic(err)
 	}
 
-	weaviate.itemChangeChannel = make(chan server.ItemChange)
+	weaviate.itemChangeChannel = make(chan ItemChange)
 	weaviate.ctx = context.Background()
 
 	return weaviate.itemChangeChannel
 }
 
-func (weaviate *Weaviate) DispatchChanges(itemChange server.ItemChange) {
+func (weaviate *Weaviate) DispatchChanges(itemChange ItemChange) {
 
 	if itemChange.Mode == "CREATE" {
 		// Create object with correct properties on Weaviate.
@@ -141,24 +139,9 @@ func (weaviate *Weaviate) DispatchChanges(itemChange server.ItemChange) {
 
 }
 
-func (weaviate *Weaviate) DispatchVector(itemChange server.ItemChange, entClient *ent.Client) {
-	// Mark the items in PG as dirty
-	targetItem, err := entClient.Item.Query().Where(item.ID(itemChange.Item.ID)).Only(weaviate.ctx)
-
-	if err != nil || !targetItem.Vectorized {
-		return
-	}
-
-	targetItem.Update().SetVectorized(false)
-}
-
 func (weaviate *Weaviate) ItemChangeHandler(entClient *ent.Client) {
 
 	for itemChange := range weaviate.itemChangeChannel {
-		if vectorUpdateNeeded(itemChange) {
-			go weaviate.DispatchVector(itemChange, entClient)
-		}
-
 		go weaviate.DispatchChanges(itemChange)
 	}
 }
