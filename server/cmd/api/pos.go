@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/go-chi/chi/v5"
 	. "github.com/hktrib/RetailGo/cmd/api/stripe-components"
 	"github.com/hktrib/RetailGo/internal/ent"
+	"github.com/hktrib/RetailGo/internal/ent/category"
 	"github.com/hktrib/RetailGo/internal/ent/item"
 	"github.com/stripe/stripe-go/v76"
 	"github.com/stripe/stripe-go/v76/webhook"
@@ -13,6 +15,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 func (srv *Server) StoreCheckout(writer http.ResponseWriter, request *http.Request) {
@@ -138,5 +141,41 @@ func (srv *Server) FulfillOrder(LineItemList *stripe.LineItemList) {
 		}
 		_, err = srv.DBClient.Item.UpdateOne(LineItem).SetQuantity(LineItem.Quantity - int(LineItemList.Data[i].Quantity)).Save(context.Background())
 
+	}
+}
+
+func (srv *Server) GetPosInfo(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+	store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
+	if err != nil {
+		fmt.Println("Invalid store id:", err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	categories, err := srv.DBClient.Category.Query().Where(category.StoreID(store_id)).All(ctx)
+	response := make(map[string][]interface{}, 1)
+
+	for i, cat := range categories {
+		// get items for each category
+		c, _ := json.Marshal(cat) // marshal the category into a map
+		catInfo := make(map[string]interface{})
+		_ = json.Unmarshal(c, &catInfo) // unmarshal the map into the response map
+		response["categories"] = append(response["categories"], catInfo)
+		delete(response["categories"][i].(map[string]interface{}), "edges") // the edges field is not needed in the response
+		items, _ := srv.DBClient.Item.Query().Where(item.HasCategoryWith(category.ID(cat.ID))).All(ctx)
+		for j, item2 := range items {
+			it, _ := json.Marshal(item2)
+			itemInfo := make(map[string]interface{})
+			_ = json.Unmarshal(it, &itemInfo) // unmarshal the map into the respons
+			response["items"] = append(response["items"], itemInfo)
+			delete(response["items"][j].(map[string]interface{}), "edges")
+			response["items"][j].(map[string]interface{})["category_id"] = cat.ID // these typecasts are necessary go  doesn't allow you to add or remove fields to the struct
+			response["items"][j].(map[string]interface{})["category"] = cat.Name
+
+		}
+		responseBody, _ := json.Marshal(response)
+		w.WriteHeader(http.StatusOK)
+		w.Write(responseBody)
 	}
 }
