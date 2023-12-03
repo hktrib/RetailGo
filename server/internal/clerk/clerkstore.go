@@ -89,6 +89,8 @@ func (ch ClerkStorage) AddStore(storeID int) error {
 		log.Debug().Err(err).Msg("Unable to Add Store to Public Metadata")
 		return err
 	}
+
+	fmt.Printf("User ID: %v | public metadata: %v\n", ch.userID, publicMetadata)
 	user, err := ch.client.Users().UpdateMetadata(ch.userID, publicMetadata)
 	if err != nil {
 		log.Debug().Err(err).Msg("Unable to update metadata")
