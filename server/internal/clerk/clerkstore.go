@@ -2,7 +2,6 @@ package clerkstorage
 
 import (
 	"encoding/json"
-	"errors"
 
 	"github.com/clerkinc/clerk-sdk-go/clerk"
 	"github.com/rs/zerolog/log"
@@ -45,13 +44,24 @@ func addStoreToPublicMetadata(user *clerk.User, storeID int) (*clerk.UpdateUserM
 					return nil, err
 				}
 
-				return &clerk.UpdateUserMetadata{
-					PublicMetadata: bytes,
-				}, nil
+				return &clerk.UpdateUserMetadata{PublicMetadata: bytes}, nil
 			}
+
+		case any:
+			stores := map[string][]int{
+				"stores": {storeID},
+			}
+
+			bytes, err := json.Marshal(stores)
+			if err != nil {
+				return nil, err
+			}
+
+			log.Debug().Msg("No Previous data in PublicMetadata")
+
+			return &clerk.UpdateUserMetadata{PublicMetadata: bytes}, nil
 		default:
 			log.Debug().Msg("Public Metadata diff type not supported")
-			return nil, errors.New("unknown case type")
 	}
 	return nil, nil
 }
