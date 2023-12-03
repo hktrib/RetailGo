@@ -137,6 +137,7 @@ func (s *Server) MountHandlers() {
 
 			r.Route("/pos", func(r chi.Router) {
 				r.Get("/checkout", s.StoreCheckout)
+				r.Get("/info", s.GetPosInfo)
 			})
 			r.Route("/users", func(r chi.Router) {
 				r.Get("/", s.GetStoreUsers)
