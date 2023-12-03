@@ -47,9 +47,11 @@ func addStoreToPublicMetadata(user *clerk.User, storeID int) (*clerk.UpdateUserM
 			}
 
 		case any:
-			stores := map[string][]int{
-				"stores": {storeID},
+			stores := map[string]any{
+				"stores": []int{storeID},
 			}
+
+			fmt.Printf("Stores: %v\n", stores)
 
 			bytes, err := json.Marshal(stores)
 			if err != nil {
