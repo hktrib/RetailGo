@@ -50,6 +50,7 @@ func addStoreToPublicMetadata(user *clerk.User, storeID int) (*clerk.UpdateUserM
 				}, nil
 			}
 		default:
+			log.Debug().Msg("Unable to Add Store to Public Metadata")
 			return nil, errors.New("unknown case type")
 	}
 	return nil, nil
@@ -72,10 +73,12 @@ External Package Calls:
 func (ch ClerkStorage) AddStore(storeID int) error {
 	publicMetadata, err := addStoreToPublicMetadata(ch.user, storeID)
 	if err != nil {
+		log.Debug().Err(err).Msg("Unable to Add Store to Public Metadata")
 		return err
 	}
 	_, err = ch.client.Users().UpdateMetadata(ch.userID, publicMetadata)
 	if err != nil {
+		log.Debug().Err(err).Msg("Unable to update metadata")
 		return err
 	}
 	return nil
