@@ -7,7 +7,9 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	clerkHelpers "github.com/hktrib/RetailGo/internal/clerk"
 	"github.com/hktrib/RetailGo/internal/ent/user"
+	"github.com/rs/zerolog/log"
 
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/transactions"
@@ -24,6 +26,21 @@ func (srv *Server) CreateStore(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Could not executed Store|Owner Transaction:", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
+	}
+
+	// Adding storeid to clerk store
+	clerkStore, err := clerkHelpers.NewClerkStore(srv.ClerkClient, reqUser.ClerkUserID)
+	if err != nil {
+		log.Debug().Err(err).Msg("NewClerkStore failed: Unable to create ClerkStore instance using clerk user id:")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return	
+	}
+
+	err = clerkStore.AddStore(reqUser.StoreID)
+	if err != nil {
+		log.Debug().Err(err).Msg("AddStore failed: ")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return	
 	}
 
 	w.WriteHeader(http.StatusCreated)

@@ -8,10 +8,12 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	clerkHelpers "github.com/hktrib/RetailGo/internal/clerk"
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/store"
 	"github.com/hktrib/RetailGo/internal/ent/user"
 	"github.com/hktrib/RetailGo/internal/ent/usertostore"
+	"github.com/rs/zerolog/log"
 )
 
 func (srv *Server) UserCreate(w http.ResponseWriter, r *http.Request) {
@@ -38,20 +40,28 @@ func (srv *Server) UserCreate(w http.ResponseWriter, r *http.Request) {
 		SetFirstName(reqUser.FirstName).
 		SetLastName(reqUser.LastName).
 		SetStoreID(reqUser.StoreID).Save(ctx)
-
+	
+	if err != nil {
+		log.Debug().Err(err).Msg("User Creation didn't work:")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 	// Add StoreID -> to "stores" list in private_metadata for clerk user
-	// clerkUser, err := srv.ClerkClient.Users().UpdateMetadata(reqUser.ClerkUserID, )
+
+	clerkStore, err := clerkHelpers.NewClerkStore(srv.ClerkClient, reqUser.ClerkUserID)
 	if err != nil {
-		fmt.Println("Reading Clerk data didn't work:", err)
+		log.Debug().Err(err).Msg("NewClerkStore failed: Unable to create ClerkStore instance using clerk user id:")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
+		return	
 	}
 
+	err = clerkStore.AddStore(reqUser.StoreID)
 	if err != nil {
-		fmt.Println("User Creation didn't work:", err)
+		log.Debug().Err(err).Msg("AddStore failed: ")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
+		return	
 	}
+	
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("OK\n"))
 }
