@@ -82,9 +82,6 @@ export function DataTable<TData extends Employee, TValue>({
           className="max-w-sm"
         />
         <div className="flex items-center space-x-2">
-          <AddEmployee employeeData={new Employee()} mode="add" />
-          <InviteEmployee />
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto">

@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import useFetch from "@/lib/useFetch";
+import { useFetch } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
 
 // type Member = {
@@ -95,15 +95,13 @@ export default function RegistrationForm() {
 
     try {
       console.log("POST Data: ", JSON.stringify(postData));
-      const response = await authFetch({
-        url: "https://retailgo-production.up.railway.app/create/store",
-        init: {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(postData),
+      const response = await authFetch("https://retailgo-production.up.railway.app/create/store", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // Any additional headers you need
         },
+        body: JSON.stringify(postData),
       });
 
       console.log("Response:", response);

@@ -1,3 +1,4 @@
+"use client"
 // Import necessary libraries and components
 import { useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -20,7 +21,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import useFetch from "@/lib/useFetch";
+import { useFetch } from "@/lib/utils";
 import { PencilIcon } from "lucide-react";
 import { Employee } from "@/models/employee";
 
@@ -31,6 +32,7 @@ const formSchema = z.object({
   email: z.string().email("Invalid email address"),
 });
 
+// The component definition
 export default function EmployeeDialog({
   employeeData,
   mode = "add",
@@ -38,11 +40,12 @@ export default function EmployeeDialog({
   employeeData: Employee;
   mode?: string;
 }) {
-  const authFetch = useFetch();
-
   const form = useForm({
     resolver: zodResolver(formSchema),
   });
+
+  // Set up your fetch utility
+  let authFetch = useFetch();
 
   // Pre-fill the form when editing an employee
   useEffect(() => {
@@ -62,16 +65,16 @@ export default function EmployeeDialog({
     const method = employeeData ? "PUT" : "POST";
 
     try {
-      const response = await authFetch({
-        url: url,
-        init: {
+      const response = await authFetch(
+        url,
+        {
           method: method,
           body: JSON.stringify(values),
         },
-        headers: {
+        {
           "Content-Type": "application/json",
-        },
-      });
+        }
+      );
 
       if (!response.id) {
         throw new Error(

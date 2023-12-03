@@ -12,6 +12,7 @@ import (
 	kv "github.com/hktrib/RetailGo/internal/redis"
 	worker "github.com/hktrib/RetailGo/internal/tasks"
 	"github.com/hktrib/RetailGo/internal/util"
+	"github.com/hktrib/RetailGo/internal/weaviate"
 	"github.com/hktrib/RetailGo/internal/webhook"
 )
 
@@ -30,16 +31,19 @@ type Server struct {
 	ClerkClient     clerk.Client
 	DBClient        *ent.Client
 	TaskQueueClient *asynq.Client
+	WeaviateClient  *weaviate.Weaviate
 	Cache           *kv.Cache
-
-	TaskProducer worker.TaskProducer
-	Config       *util.Config
+	TaskProducer    worker.TaskProducer
+	Config          *util.Config
 }
+
+// Define a type for Item-Change Requests (Create, Update, Delete)
 
 func NewServer(
 	clerkClient clerk.Client,
 	entClient *ent.Client,
 	taskQueueClient *asynq.Client,
+	weaviateClient *weaviate.Weaviate,
 	cache *kv.Cache,
 	taskProducer worker.TaskProducer,
 	config *util.Config,
@@ -50,8 +54,9 @@ func NewServer(
 	srv.ClerkClient = clerkClient
 	srv.DBClient = entClient
 	srv.TaskQueueClient = taskQueueClient
+	srv.WeaviateClient = weaviateClient
+	srv.WeaviateClient.Start()
 	srv.Cache = cache
-
 	srv.TaskProducer = taskProducer
 	srv.Config = config
 	return srv
@@ -69,10 +74,13 @@ func (s *Server) MountHandlers() {
 	}))
 
 	s.Router.Post("/webhook", func(writer http.ResponseWriter, request *http.Request) {
-		s.HandleSuccess(writer, request)
+		s.StripeWebhookRouter(writer, request)
 	})
 	s.Router.Post("/clerkwebhook", webhook.HandleClerkWebhook)
-	s.Router.Get("/", s.HelloWorld)
+	s.Router.Get("/", func(w http.ResponseWriter, request *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write(([]byte)("OK"))
+	})
 
 	s.Router.Group(func(r chi.Router) {
 
@@ -142,8 +150,9 @@ func (s *Server) MountHandlers() {
 			r.Put("/", s.userUpdate)    // Update a user by ID
 			r.Get("/", s.UserQuery)     // Get a user by ID
 		})
-		r.Post("/", s.UserCreate) // Create a new user
-		r.Post("/add", s.userAdd) // Additional user creation endpoint
+		r.Post("/join", s.UserJoinStore) // Join a store for a user
+		r.Post("/", s.UserCreate)        // Create a new user
+		r.Post("/add", s.userAdd)        // Additional user creation endpoint
 	})
 
 }

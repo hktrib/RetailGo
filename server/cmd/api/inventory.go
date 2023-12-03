@@ -13,15 +13,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/item"
+	"github.com/hktrib/RetailGo/internal/weaviate"
 )
-
-type TempItem struct {
-	Name     string
-	Photo    string
-	Quantity int
-	Category string
-	Price    float64
-}
 
 func (srv *Server) HelloWorld(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello World -> RetailGo!!"))
@@ -52,12 +45,12 @@ func (srv *Server) HelloWorld(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
-	item1, err := srv.DBClient.Item.Create().SetName("Giridhar Food 1").SetStoreID(1391).SetPhoto([]byte("myimage")).SetQuantity(1).Save(ctx)
+	item1, err := srv.DBClient.Item.Create().SetName("Giridhar Food 1").SetStoreID(1391).SetPhoto("myimage").SetQuantity(1).Save(ctx)
 	if err != nil {
 
 		fmt.Println(err)
 	}
-	item2, err := srv.DBClient.Item.Create().SetName("Giridhar Food 2").SetStoreID(1391).SetPhoto([]byte("anotherimage")).SetQuantity(2).Save(ctx)
+	item2, err := srv.DBClient.Item.Create().SetName("Giridhar Food 2").SetStoreID(1391).SetPhoto("anotherimage").SetQuantity(2).Save(ctx)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -149,11 +142,10 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("Stripe Create didn't work:", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 
-	fmt.Println("reqItem:", reqItem.Price, reqItem.Name, ProductId.DefaultPrice.ID, reqItem.Photo, reqItem.Quantity, store_id)
-
-	createdItem, create_err := srv.DBClient.Item.Create().SetPrice(float64(reqItem.Price)).SetName(reqItem.Name).SetStripePriceID(ProductId.DefaultPrice.ID).SetStripeProductID(ProductId.ID).SetPhoto([]byte(reqItem.Photo)).SetQuantity(reqItem.Quantity).SetStoreID(store_id).SetCategoryName(reqItem.CategoryName).Save(ctx)
+	createdItem, create_err := srv.DBClient.Item.Create().SetPrice(float64(reqItem.Price)).SetName(reqItem.Name).SetStripePriceID(ProductId.DefaultPrice.ID).SetStripeProductID(ProductId.ID).SetPhoto(reqItem.Photo).SetQuantity(reqItem.Quantity).SetStoreID(store_id).SetCategoryName(reqItem.CategoryName).SetWeaviateID("").SetVectorized(false).SetNumberSoldSinceUpdate(0).SetDateLastSold("").Save(ctx)
 	// If this create doesn't work, InternalServerError
 	if create_err != nil {
 		fmt.Println("Create didn't work:", create_err)
@@ -165,15 +157,42 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		"id": createdItem.ID,
 	})
 
+	weaviateID, weaviateErr := srv.WeaviateClient.CreateItem(createdItem)
+
+	fmt.Println("Weaviate ID on create:", weaviateID)
+
+	// Currently raises 500 if creation of weaviate copy or storing the weaviate id fails. Attempts to roll back the database in response to this so that there are no ghost items for Weaviate.
+
+	if weaviateErr != nil {
+		fmt.Println("Weaviate Create didn't work")
+		_ = srv.DBClient.
+			Item.DeleteOneID(createdItem.ID).
+			Where(item.StoreID(store_id)).
+			Exec(r.Context())
+
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	_, setWeaviateIDErr := createdItem.Update().SetWeaviateID(weaviateID).Save(r.Context())
+
+	if setWeaviateIDErr != nil {
+		fmt.Println("Failed to set Weaviate ID")
+		_ = srv.DBClient.
+			Item.DeleteOneID(createdItem.ID).
+			Where(item.StoreID(store_id)).
+			Exec(r.Context())
+
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusCreated)
 	w.Write(responseBody)
+
 }
 
 func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
-	// get item id from url query string
-
-	// ctx := r.Context()
-
 	// Load the message parameters (Name, Photo, Quantity, Category)
 	req_body, err := io.ReadAll(r.Body)
 
@@ -208,14 +227,47 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = targetItem.Update().SetQuantity(reqItem.Quantity).SetName(reqItem.Name).SetPhoto(reqItem.Photo).SetPrice(reqItem.Price).SetCategoryName(reqItem.CategoryName).Save(r.Context())
+	originalItem := ent.Item{
+		Name:         targetItem.Name,
+		Photo:        targetItem.Photo,
+		Quantity:     targetItem.Quantity,
+		Price:        targetItem.Price,
+		CategoryName: targetItem.CategoryName,
+		Vectorized:   targetItem.Vectorized,
+	}
+
+	fmt.Println("original item:", targetItem, "requested item:", reqItem)
+
+	fieldsUpdated := weaviate.UpdatedFields{
+		Name:                  targetItem.Name != reqItem.Name,
+		Photo:                 targetItem.Photo != reqItem.Photo,
+		Quantity:              targetItem.Quantity != reqItem.Quantity,
+		Price:                 targetItem.Price != reqItem.Price,
+		CategoryName:          targetItem.CategoryName != reqItem.CategoryName,
+		NumberSoldSinceUpdate: false, // Assume that sales is taken care of elsewhere. If not, this is subject to change.
+		DateLastSold:          false, // Assume that sales is taken care of elsewhere. If not, this is subject to change.
+	}
+
+	_, err = targetItem.Update().SetQuantity(reqItem.Quantity).SetName(reqItem.Name).SetPhoto(reqItem.Photo).SetPrice(reqItem.Price).SetCategoryName(reqItem.CategoryName).SetVectorized(originalItem.Vectorized && !(weaviate.ChangesVectorizedProperties(fieldsUpdated))).Save(r.Context())
 
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+
+	weaviateUpdateErr := srv.WeaviateClient.EditItem(targetItem, fieldsUpdated)
+
+	if weaviateUpdateErr != nil {
+		// Rolls back Database update if Weaviate update fails, but no guarantee of rollback working..
+		fmt.Println("Failed to edit item in Weaviate, err:", weaviateUpdateErr)
+		_, _ = targetItem.Update().SetQuantity(originalItem.Quantity).SetPhoto(originalItem.Photo).SetName(originalItem.Name).SetPrice(originalItem.Price).SetCategoryName(originalItem.CategoryName).SetVectorized(originalItem.Vectorized).Save(r.Context())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write([]byte("OK"))
+
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
@@ -234,15 +286,36 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	item_id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	itemId, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
 		fmt.Println("Item id parsing failed")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
+	targetItem, err := srv.DBClient.Item.
+		Query().
+		Where(item.ID(itemId)).
+		Only(r.Context())
+
+	// originalItem := ent.Item{
+	// 	Name:         targetItem.Name,
+	// 	Photo:        targetItem.Photo,
+	// 	Quantity:     targetItem.Quantity,
+	// 	Price:        targetItem.Price,
+	// 	CategoryName: targetItem.CategoryName,
+	// 	Vectorized:   targetItem.Vectorized,
+	// }
+
+	if ent.IsNotFound(err) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	weaviateID := targetItem.WeaviateID
+
 	err = srv.DBClient.
-		Item.DeleteOneID(item_id).
+		Item.DeleteOneID(itemId).
 		Where(item.StoreID(store_id)).
 		Exec(r.Context())
 
@@ -253,6 +326,17 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+
+	err = srv.WeaviateClient.DeleteItem(weaviateID)
+
+	if err != nil {
+		fmt.Println("Delete in Weaviate Failed")
+		// Should Roll back delete - for now, naively, by just creating a new item -, but doesn't do this yet.
+		// _, _ = srv.DBClient.Item.Create().SetQuantity(originalItem.Quantity).SetPhoto(originalItem.Photo).SetName(originalItem.Name).SetPrice(originalItem.Price).SetCategoryName(originalItem.CategoryName).SetVectorized(originalItem.Vectorized).SetNumberSoldSinceUpdate(originalItem.NumberSoldSinceUpdate).SetDateLastSold(originalItem.DateLastSold).SetStore(originalItem.Edges.Store).Set.Save(r.Context())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
 }

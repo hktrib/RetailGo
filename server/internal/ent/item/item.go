@@ -28,6 +28,14 @@ const (
 	FieldStripeProductID = "stripe_product_id"
 	// FieldCategoryName holds the string denoting the category_name field in the database.
 	FieldCategoryName = "category_name"
+	// FieldWeaviateID holds the string denoting the weaviate_id field in the database.
+	FieldWeaviateID = "weaviate_id"
+	// FieldVectorized holds the string denoting the vectorized field in the database.
+	FieldVectorized = "vectorized"
+	// FieldNumberSoldSinceUpdate holds the string denoting the number_sold_since_update field in the database.
+	FieldNumberSoldSinceUpdate = "number_sold_since_update"
+	// FieldDateLastSold holds the string denoting the date_last_sold field in the database.
+	FieldDateLastSold = "date_last_sold"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
 	// EdgeStore holds the string denoting the store edge name in mutations.
@@ -68,6 +76,10 @@ var Columns = []string{
 	FieldStripePriceID,
 	FieldStripeProductID,
 	FieldCategoryName,
+	FieldWeaviateID,
+	FieldVectorized,
+	FieldNumberSoldSinceUpdate,
+	FieldDateLastSold,
 }
 
 var (
@@ -99,6 +111,11 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
+// ByPhoto orders the results by the photo field.
+func ByPhoto(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPhoto, opts...).ToFunc()
+}
+
 // ByQuantity orders the results by the quantity field.
 func ByQuantity(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldQuantity, opts...).ToFunc()
@@ -127,6 +144,26 @@ func ByStripeProductID(opts ...sql.OrderTermOption) OrderOption {
 // ByCategoryName orders the results by the category_name field.
 func ByCategoryName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCategoryName, opts...).ToFunc()
+}
+
+// ByWeaviateID orders the results by the weaviate_id field.
+func ByWeaviateID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldWeaviateID, opts...).ToFunc()
+}
+
+// ByVectorized orders the results by the vectorized field.
+func ByVectorized(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldVectorized, opts...).ToFunc()
+}
+
+// ByNumberSoldSinceUpdate orders the results by the number_sold_since_update field.
+func ByNumberSoldSinceUpdate(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNumberSoldSinceUpdate, opts...).ToFunc()
+}
+
+// ByDateLastSold orders the results by the date_last_sold field.
+func ByDateLastSold(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDateLastSold, opts...).ToFunc()
 }
 
 // ByCategoryCount orders the results by category count.

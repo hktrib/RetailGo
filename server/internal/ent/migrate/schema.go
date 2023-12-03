@@ -61,16 +61,32 @@ var (
 			},
 		},
 	}
+	// ClerkUserStoresColumns holds the columns for the "clerk_user_stores" table.
+	ClerkUserStoresColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "clerk_id", Type: field.TypeString},
+		{Name: "store_id", Type: field.TypeInt},
+	}
+	// ClerkUserStoresTable holds the schema information for the "clerk_user_stores" table.
+	ClerkUserStoresTable = &schema.Table{
+		Name:       "clerk_user_stores",
+		Columns:    ClerkUserStoresColumns,
+		PrimaryKey: []*schema.Column{ClerkUserStoresColumns[0]},
+	}
 	// ItemsColumns holds the columns for the "items" table.
 	ItemsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "photo", Type: field.TypeBytes},
+		{Name: "photo", Type: field.TypeString},
 		{Name: "quantity", Type: field.TypeInt},
 		{Name: "price", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "decimal(10,2)"}},
 		{Name: "stripe_price_id", Type: field.TypeString},
 		{Name: "stripe_product_id", Type: field.TypeString},
 		{Name: "category_name", Type: field.TypeString},
+		{Name: "weaviate_id", Type: field.TypeString},
+		{Name: "vectorized", Type: field.TypeBool},
+		{Name: "number_sold_since_update", Type: field.TypeInt, Nullable: true},
+		{Name: "date_last_sold", Type: field.TypeString, Nullable: true},
 		{Name: "store_id", Type: field.TypeInt},
 	}
 	// ItemsTable holds the schema information for the "items" table.
@@ -81,7 +97,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "items_stores_items",
-				Columns:    []*schema.Column{ItemsColumns[8]},
+				Columns:    []*schema.Column{ItemsColumns[12]},
 				RefColumns: []*schema.Column{StoresColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -148,6 +164,7 @@ var (
 	}
 	// UserToStoresColumns holds the columns for the "user_to_stores" table.
 	UserToStoresColumns = []*schema.Column{
+		{Name: "clerk_user_id", Type: field.TypeString},
 		{Name: "permission_level", Type: field.TypeInt, Nullable: true},
 		{Name: "joined_at", Type: field.TypeInt, Nullable: true},
 		{Name: "user_id", Type: field.TypeInt},
@@ -157,17 +174,17 @@ var (
 	UserToStoresTable = &schema.Table{
 		Name:       "user_to_stores",
 		Columns:    UserToStoresColumns,
-		PrimaryKey: []*schema.Column{UserToStoresColumns[2], UserToStoresColumns[3]},
+		PrimaryKey: []*schema.Column{UserToStoresColumns[3], UserToStoresColumns[4]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "user_to_stores_users_user",
-				Columns:    []*schema.Column{UserToStoresColumns[2]},
+				Columns:    []*schema.Column{UserToStoresColumns[3]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "user_to_stores_stores_store",
-				Columns:    []*schema.Column{UserToStoresColumns[3]},
+				Columns:    []*schema.Column{UserToStoresColumns[4]},
 				RefColumns: []*schema.Column{StoresColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -177,6 +194,7 @@ var (
 	Tables = []*schema.Table{
 		CategoriesTable,
 		CategoryItemsTable,
+		ClerkUserStoresTable,
 		ItemsTable,
 		StoresTable,
 		UsersTable,

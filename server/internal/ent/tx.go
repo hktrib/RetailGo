@@ -16,6 +16,8 @@ type Tx struct {
 	Category *CategoryClient
 	// CategoryItem is the client for interacting with the CategoryItem builders.
 	CategoryItem *CategoryItemClient
+	// ClerkUser_Store is the client for interacting with the ClerkUser_Store builders.
+	ClerkUser_Store *ClerkUserStoreClient
 	// Item is the client for interacting with the Item builders.
 	Item *ItemClient
 	// Store is the client for interacting with the Store builders.
@@ -157,6 +159,7 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.Category = NewCategoryClient(tx.config)
 	tx.CategoryItem = NewCategoryItemClient(tx.config)
+	tx.ClerkUser_Store = NewClerkUserStoreClient(tx.config)
 	tx.Item = NewItemClient(tx.config)
 	tx.Store = NewStoreClient(tx.config)
 	tx.User = NewUserClient(tx.config)

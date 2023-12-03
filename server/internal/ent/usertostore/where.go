@@ -18,6 +18,11 @@ func StoreID(v int) predicate.UserToStore {
 	return predicate.UserToStore(sql.FieldEQ(FieldStoreID, v))
 }
 
+// ClerkUserID applies equality check predicate on the "clerk_user_id" field. It's identical to ClerkUserIDEQ.
+func ClerkUserID(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldEQ(FieldClerkUserID, v))
+}
+
 // PermissionLevel applies equality check predicate on the "permission_level" field. It's identical to PermissionLevelEQ.
 func PermissionLevel(v int) predicate.UserToStore {
 	return predicate.UserToStore(sql.FieldEQ(FieldPermissionLevel, v))
@@ -66,6 +71,71 @@ func StoreIDIn(vs ...int) predicate.UserToStore {
 // StoreIDNotIn applies the NotIn predicate on the "store_id" field.
 func StoreIDNotIn(vs ...int) predicate.UserToStore {
 	return predicate.UserToStore(sql.FieldNotIn(FieldStoreID, vs...))
+}
+
+// ClerkUserIDEQ applies the EQ predicate on the "clerk_user_id" field.
+func ClerkUserIDEQ(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldEQ(FieldClerkUserID, v))
+}
+
+// ClerkUserIDNEQ applies the NEQ predicate on the "clerk_user_id" field.
+func ClerkUserIDNEQ(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldNEQ(FieldClerkUserID, v))
+}
+
+// ClerkUserIDIn applies the In predicate on the "clerk_user_id" field.
+func ClerkUserIDIn(vs ...string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldIn(FieldClerkUserID, vs...))
+}
+
+// ClerkUserIDNotIn applies the NotIn predicate on the "clerk_user_id" field.
+func ClerkUserIDNotIn(vs ...string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldNotIn(FieldClerkUserID, vs...))
+}
+
+// ClerkUserIDGT applies the GT predicate on the "clerk_user_id" field.
+func ClerkUserIDGT(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldGT(FieldClerkUserID, v))
+}
+
+// ClerkUserIDGTE applies the GTE predicate on the "clerk_user_id" field.
+func ClerkUserIDGTE(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldGTE(FieldClerkUserID, v))
+}
+
+// ClerkUserIDLT applies the LT predicate on the "clerk_user_id" field.
+func ClerkUserIDLT(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldLT(FieldClerkUserID, v))
+}
+
+// ClerkUserIDLTE applies the LTE predicate on the "clerk_user_id" field.
+func ClerkUserIDLTE(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldLTE(FieldClerkUserID, v))
+}
+
+// ClerkUserIDContains applies the Contains predicate on the "clerk_user_id" field.
+func ClerkUserIDContains(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldContains(FieldClerkUserID, v))
+}
+
+// ClerkUserIDHasPrefix applies the HasPrefix predicate on the "clerk_user_id" field.
+func ClerkUserIDHasPrefix(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldHasPrefix(FieldClerkUserID, v))
+}
+
+// ClerkUserIDHasSuffix applies the HasSuffix predicate on the "clerk_user_id" field.
+func ClerkUserIDHasSuffix(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldHasSuffix(FieldClerkUserID, v))
+}
+
+// ClerkUserIDEqualFold applies the EqualFold predicate on the "clerk_user_id" field.
+func ClerkUserIDEqualFold(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldEqualFold(FieldClerkUserID, v))
+}
+
+// ClerkUserIDContainsFold applies the ContainsFold predicate on the "clerk_user_id" field.
+func ClerkUserIDContainsFold(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldContainsFold(FieldClerkUserID, v))
 }
 
 // PermissionLevelEQ applies the EQ predicate on the "permission_level" field.

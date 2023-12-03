@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/hktrib/RetailGo/internal/ent"
+	"github.com/hktrib/RetailGo/internal/ent/store"
 	"github.com/hktrib/RetailGo/internal/ent/user"
 	"github.com/hktrib/RetailGo/internal/ent/usertostore"
 )
@@ -31,11 +32,20 @@ func (srv *Server) UserCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = srv.DBClient.User.Create().
+		SetClerkUserID(reqUser.ClerkUserID).
 		SetEmail(reqUser.Email).
 		SetIsOwner(reqUser.IsOwner).
 		SetFirstName(reqUser.FirstName).
 		SetLastName(reqUser.LastName).
 		SetStoreID(reqUser.StoreID).Save(ctx)
+
+	// Add StoreID -> to "stores" list in private_metadata for clerk user
+	// clerkUser, err := srv.ClerkClient.Users().UpdateMetadata(reqUser.ClerkUserID, )
+	if err != nil {
+		fmt.Println("Reading Clerk data didn't work:", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 
 	if err != nil {
 		fmt.Println("User Creation didn't work:", err)
@@ -195,8 +205,8 @@ func (srv *Server) UserHasStore(w http.ResponseWriter, r *http.Request) {
 	// Verify user credentials using clerk
 	clerk_user, err := VerifyUserCredentials(r)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("Unauthorized"))
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+
 		return
 	}
 	ctx := r.Context()
@@ -230,4 +240,80 @@ func (srv *Server) UserHasStore(w http.ResponseWriter, r *http.Request) {
 	// If no error, it means a record was found
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("true"))
+}
+func (srv *Server) UserJoinStore(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	// Verify user credentials using clerk
+	clerkUser, clerkErr := VerifyUserCredentials(r)
+	if clerkErr != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("Unauthorized"))
+		return
+	}
+
+	reqBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	var reqData struct {
+		ClerkID string `json:"ClerkUserID"`
+		StoreId string `json:"StoreId"`
+	}
+	err = json.Unmarshal(reqBody, &reqData)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	if reqData.ClerkID != clerkUser.ID {
+		http.Error(w, "You can only accept the invite on your behalf.\nclerkId = "+clerkUser.ID+"\n reqId: "+reqData.ClerkID, http.StatusBadRequest)
+		return
+	}
+
+	var firstName, lastName, email string
+	if clerkUser.FirstName != nil {
+		firstName = *clerkUser.FirstName
+	} else {
+		// Handle the nil case for FirstName
+	}
+
+	if clerkUser.LastName != nil {
+		lastName = *clerkUser.LastName
+	} else {
+		// Handle the nil case for LastName
+	}
+
+	if clerkUser.EmailAddresses != nil {
+		email = clerkUser.EmailAddresses[0].EmailAddress
+	}
+
+	store, err := srv.DBClient.Store.Query().Where(store.UUID(reqData.StoreId)).Only(ctx)
+	if ent.IsNotFound(err) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	} else if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	} // Create a new User entity
+
+	_, create_err := srv.DBClient.User.Create().
+		SetEmail(email).
+		SetIsOwner(false).
+		SetStoreID(store.ID).
+		SetClerkUserID(clerkUser.ID).
+		SetFirstName(firstName).
+		SetLastName(lastName).
+		Save(ctx)
+
+	if create_err != nil {
+		fmt.Println("User Creation didn't work:", create_err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte("User created successfully\n"))
 }

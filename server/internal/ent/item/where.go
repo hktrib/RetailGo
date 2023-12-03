@@ -59,7 +59,7 @@ func Name(v string) predicate.Item {
 }
 
 // Photo applies equality check predicate on the "photo" field. It's identical to PhotoEQ.
-func Photo(v []byte) predicate.Item {
+func Photo(v string) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldPhoto, v))
 }
 
@@ -91,6 +91,26 @@ func StripeProductID(v string) predicate.Item {
 // CategoryName applies equality check predicate on the "category_name" field. It's identical to CategoryNameEQ.
 func CategoryName(v string) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldCategoryName, v))
+}
+
+// WeaviateID applies equality check predicate on the "weaviate_id" field. It's identical to WeaviateIDEQ.
+func WeaviateID(v string) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldWeaviateID, v))
+}
+
+// Vectorized applies equality check predicate on the "vectorized" field. It's identical to VectorizedEQ.
+func Vectorized(v bool) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldVectorized, v))
+}
+
+// NumberSoldSinceUpdate applies equality check predicate on the "number_sold_since_update" field. It's identical to NumberSoldSinceUpdateEQ.
+func NumberSoldSinceUpdate(v int) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldNumberSoldSinceUpdate, v))
+}
+
+// DateLastSold applies equality check predicate on the "date_last_sold" field. It's identical to DateLastSoldEQ.
+func DateLastSold(v string) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldDateLastSold, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -159,43 +179,68 @@ func NameContainsFold(v string) predicate.Item {
 }
 
 // PhotoEQ applies the EQ predicate on the "photo" field.
-func PhotoEQ(v []byte) predicate.Item {
+func PhotoEQ(v string) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldPhoto, v))
 }
 
 // PhotoNEQ applies the NEQ predicate on the "photo" field.
-func PhotoNEQ(v []byte) predicate.Item {
+func PhotoNEQ(v string) predicate.Item {
 	return predicate.Item(sql.FieldNEQ(FieldPhoto, v))
 }
 
 // PhotoIn applies the In predicate on the "photo" field.
-func PhotoIn(vs ...[]byte) predicate.Item {
+func PhotoIn(vs ...string) predicate.Item {
 	return predicate.Item(sql.FieldIn(FieldPhoto, vs...))
 }
 
 // PhotoNotIn applies the NotIn predicate on the "photo" field.
-func PhotoNotIn(vs ...[]byte) predicate.Item {
+func PhotoNotIn(vs ...string) predicate.Item {
 	return predicate.Item(sql.FieldNotIn(FieldPhoto, vs...))
 }
 
 // PhotoGT applies the GT predicate on the "photo" field.
-func PhotoGT(v []byte) predicate.Item {
+func PhotoGT(v string) predicate.Item {
 	return predicate.Item(sql.FieldGT(FieldPhoto, v))
 }
 
 // PhotoGTE applies the GTE predicate on the "photo" field.
-func PhotoGTE(v []byte) predicate.Item {
+func PhotoGTE(v string) predicate.Item {
 	return predicate.Item(sql.FieldGTE(FieldPhoto, v))
 }
 
 // PhotoLT applies the LT predicate on the "photo" field.
-func PhotoLT(v []byte) predicate.Item {
+func PhotoLT(v string) predicate.Item {
 	return predicate.Item(sql.FieldLT(FieldPhoto, v))
 }
 
 // PhotoLTE applies the LTE predicate on the "photo" field.
-func PhotoLTE(v []byte) predicate.Item {
+func PhotoLTE(v string) predicate.Item {
 	return predicate.Item(sql.FieldLTE(FieldPhoto, v))
+}
+
+// PhotoContains applies the Contains predicate on the "photo" field.
+func PhotoContains(v string) predicate.Item {
+	return predicate.Item(sql.FieldContains(FieldPhoto, v))
+}
+
+// PhotoHasPrefix applies the HasPrefix predicate on the "photo" field.
+func PhotoHasPrefix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasPrefix(FieldPhoto, v))
+}
+
+// PhotoHasSuffix applies the HasSuffix predicate on the "photo" field.
+func PhotoHasSuffix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasSuffix(FieldPhoto, v))
+}
+
+// PhotoEqualFold applies the EqualFold predicate on the "photo" field.
+func PhotoEqualFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldEqualFold(FieldPhoto, v))
+}
+
+// PhotoContainsFold applies the ContainsFold predicate on the "photo" field.
+func PhotoContainsFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldContainsFold(FieldPhoto, v))
 }
 
 // QuantityEQ applies the EQ predicate on the "quantity" field.
@@ -491,6 +536,206 @@ func CategoryNameEqualFold(v string) predicate.Item {
 // CategoryNameContainsFold applies the ContainsFold predicate on the "category_name" field.
 func CategoryNameContainsFold(v string) predicate.Item {
 	return predicate.Item(sql.FieldContainsFold(FieldCategoryName, v))
+}
+
+// WeaviateIDEQ applies the EQ predicate on the "weaviate_id" field.
+func WeaviateIDEQ(v string) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldWeaviateID, v))
+}
+
+// WeaviateIDNEQ applies the NEQ predicate on the "weaviate_id" field.
+func WeaviateIDNEQ(v string) predicate.Item {
+	return predicate.Item(sql.FieldNEQ(FieldWeaviateID, v))
+}
+
+// WeaviateIDIn applies the In predicate on the "weaviate_id" field.
+func WeaviateIDIn(vs ...string) predicate.Item {
+	return predicate.Item(sql.FieldIn(FieldWeaviateID, vs...))
+}
+
+// WeaviateIDNotIn applies the NotIn predicate on the "weaviate_id" field.
+func WeaviateIDNotIn(vs ...string) predicate.Item {
+	return predicate.Item(sql.FieldNotIn(FieldWeaviateID, vs...))
+}
+
+// WeaviateIDGT applies the GT predicate on the "weaviate_id" field.
+func WeaviateIDGT(v string) predicate.Item {
+	return predicate.Item(sql.FieldGT(FieldWeaviateID, v))
+}
+
+// WeaviateIDGTE applies the GTE predicate on the "weaviate_id" field.
+func WeaviateIDGTE(v string) predicate.Item {
+	return predicate.Item(sql.FieldGTE(FieldWeaviateID, v))
+}
+
+// WeaviateIDLT applies the LT predicate on the "weaviate_id" field.
+func WeaviateIDLT(v string) predicate.Item {
+	return predicate.Item(sql.FieldLT(FieldWeaviateID, v))
+}
+
+// WeaviateIDLTE applies the LTE predicate on the "weaviate_id" field.
+func WeaviateIDLTE(v string) predicate.Item {
+	return predicate.Item(sql.FieldLTE(FieldWeaviateID, v))
+}
+
+// WeaviateIDContains applies the Contains predicate on the "weaviate_id" field.
+func WeaviateIDContains(v string) predicate.Item {
+	return predicate.Item(sql.FieldContains(FieldWeaviateID, v))
+}
+
+// WeaviateIDHasPrefix applies the HasPrefix predicate on the "weaviate_id" field.
+func WeaviateIDHasPrefix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasPrefix(FieldWeaviateID, v))
+}
+
+// WeaviateIDHasSuffix applies the HasSuffix predicate on the "weaviate_id" field.
+func WeaviateIDHasSuffix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasSuffix(FieldWeaviateID, v))
+}
+
+// WeaviateIDEqualFold applies the EqualFold predicate on the "weaviate_id" field.
+func WeaviateIDEqualFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldEqualFold(FieldWeaviateID, v))
+}
+
+// WeaviateIDContainsFold applies the ContainsFold predicate on the "weaviate_id" field.
+func WeaviateIDContainsFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldContainsFold(FieldWeaviateID, v))
+}
+
+// VectorizedEQ applies the EQ predicate on the "vectorized" field.
+func VectorizedEQ(v bool) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldVectorized, v))
+}
+
+// VectorizedNEQ applies the NEQ predicate on the "vectorized" field.
+func VectorizedNEQ(v bool) predicate.Item {
+	return predicate.Item(sql.FieldNEQ(FieldVectorized, v))
+}
+
+// NumberSoldSinceUpdateEQ applies the EQ predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateEQ(v int) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldNumberSoldSinceUpdate, v))
+}
+
+// NumberSoldSinceUpdateNEQ applies the NEQ predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateNEQ(v int) predicate.Item {
+	return predicate.Item(sql.FieldNEQ(FieldNumberSoldSinceUpdate, v))
+}
+
+// NumberSoldSinceUpdateIn applies the In predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateIn(vs ...int) predicate.Item {
+	return predicate.Item(sql.FieldIn(FieldNumberSoldSinceUpdate, vs...))
+}
+
+// NumberSoldSinceUpdateNotIn applies the NotIn predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateNotIn(vs ...int) predicate.Item {
+	return predicate.Item(sql.FieldNotIn(FieldNumberSoldSinceUpdate, vs...))
+}
+
+// NumberSoldSinceUpdateGT applies the GT predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateGT(v int) predicate.Item {
+	return predicate.Item(sql.FieldGT(FieldNumberSoldSinceUpdate, v))
+}
+
+// NumberSoldSinceUpdateGTE applies the GTE predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateGTE(v int) predicate.Item {
+	return predicate.Item(sql.FieldGTE(FieldNumberSoldSinceUpdate, v))
+}
+
+// NumberSoldSinceUpdateLT applies the LT predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateLT(v int) predicate.Item {
+	return predicate.Item(sql.FieldLT(FieldNumberSoldSinceUpdate, v))
+}
+
+// NumberSoldSinceUpdateLTE applies the LTE predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateLTE(v int) predicate.Item {
+	return predicate.Item(sql.FieldLTE(FieldNumberSoldSinceUpdate, v))
+}
+
+// NumberSoldSinceUpdateIsNil applies the IsNil predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateIsNil() predicate.Item {
+	return predicate.Item(sql.FieldIsNull(FieldNumberSoldSinceUpdate))
+}
+
+// NumberSoldSinceUpdateNotNil applies the NotNil predicate on the "number_sold_since_update" field.
+func NumberSoldSinceUpdateNotNil() predicate.Item {
+	return predicate.Item(sql.FieldNotNull(FieldNumberSoldSinceUpdate))
+}
+
+// DateLastSoldEQ applies the EQ predicate on the "date_last_sold" field.
+func DateLastSoldEQ(v string) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldDateLastSold, v))
+}
+
+// DateLastSoldNEQ applies the NEQ predicate on the "date_last_sold" field.
+func DateLastSoldNEQ(v string) predicate.Item {
+	return predicate.Item(sql.FieldNEQ(FieldDateLastSold, v))
+}
+
+// DateLastSoldIn applies the In predicate on the "date_last_sold" field.
+func DateLastSoldIn(vs ...string) predicate.Item {
+	return predicate.Item(sql.FieldIn(FieldDateLastSold, vs...))
+}
+
+// DateLastSoldNotIn applies the NotIn predicate on the "date_last_sold" field.
+func DateLastSoldNotIn(vs ...string) predicate.Item {
+	return predicate.Item(sql.FieldNotIn(FieldDateLastSold, vs...))
+}
+
+// DateLastSoldGT applies the GT predicate on the "date_last_sold" field.
+func DateLastSoldGT(v string) predicate.Item {
+	return predicate.Item(sql.FieldGT(FieldDateLastSold, v))
+}
+
+// DateLastSoldGTE applies the GTE predicate on the "date_last_sold" field.
+func DateLastSoldGTE(v string) predicate.Item {
+	return predicate.Item(sql.FieldGTE(FieldDateLastSold, v))
+}
+
+// DateLastSoldLT applies the LT predicate on the "date_last_sold" field.
+func DateLastSoldLT(v string) predicate.Item {
+	return predicate.Item(sql.FieldLT(FieldDateLastSold, v))
+}
+
+// DateLastSoldLTE applies the LTE predicate on the "date_last_sold" field.
+func DateLastSoldLTE(v string) predicate.Item {
+	return predicate.Item(sql.FieldLTE(FieldDateLastSold, v))
+}
+
+// DateLastSoldContains applies the Contains predicate on the "date_last_sold" field.
+func DateLastSoldContains(v string) predicate.Item {
+	return predicate.Item(sql.FieldContains(FieldDateLastSold, v))
+}
+
+// DateLastSoldHasPrefix applies the HasPrefix predicate on the "date_last_sold" field.
+func DateLastSoldHasPrefix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasPrefix(FieldDateLastSold, v))
+}
+
+// DateLastSoldHasSuffix applies the HasSuffix predicate on the "date_last_sold" field.
+func DateLastSoldHasSuffix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasSuffix(FieldDateLastSold, v))
+}
+
+// DateLastSoldIsNil applies the IsNil predicate on the "date_last_sold" field.
+func DateLastSoldIsNil() predicate.Item {
+	return predicate.Item(sql.FieldIsNull(FieldDateLastSold))
+}
+
+// DateLastSoldNotNil applies the NotNil predicate on the "date_last_sold" field.
+func DateLastSoldNotNil() predicate.Item {
+	return predicate.Item(sql.FieldNotNull(FieldDateLastSold))
+}
+
+// DateLastSoldEqualFold applies the EqualFold predicate on the "date_last_sold" field.
+func DateLastSoldEqualFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldEqualFold(FieldDateLastSold, v))
+}
+
+// DateLastSoldContainsFold applies the ContainsFold predicate on the "date_last_sold" field.
+func DateLastSoldContainsFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldContainsFold(FieldDateLastSold, v))
 }
 
 // HasCategory applies the HasEdge predicate on the "category" edge.

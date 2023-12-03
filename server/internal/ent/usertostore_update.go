@@ -57,6 +57,20 @@ func (utsu *UserToStoreUpdate) SetNillableStoreID(i *int) *UserToStoreUpdate {
 	return utsu
 }
 
+// SetClerkUserID sets the "clerk_user_id" field.
+func (utsu *UserToStoreUpdate) SetClerkUserID(s string) *UserToStoreUpdate {
+	utsu.mutation.SetClerkUserID(s)
+	return utsu
+}
+
+// SetNillableClerkUserID sets the "clerk_user_id" field if the given value is not nil.
+func (utsu *UserToStoreUpdate) SetNillableClerkUserID(s *string) *UserToStoreUpdate {
+	if s != nil {
+		utsu.SetClerkUserID(*s)
+	}
+	return utsu
+}
+
 // SetPermissionLevel sets the "permission_level" field.
 func (utsu *UserToStoreUpdate) SetPermissionLevel(i int) *UserToStoreUpdate {
 	utsu.mutation.ResetPermissionLevel()
@@ -188,6 +202,9 @@ func (utsu *UserToStoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := utsu.mutation.ClerkUserID(); ok {
+		_spec.SetField(usertostore.FieldClerkUserID, field.TypeString, value)
+	}
 	if value, ok := utsu.mutation.PermissionLevel(); ok {
 		_spec.SetField(usertostore.FieldPermissionLevel, field.TypeInt, value)
 	}
@@ -308,6 +325,20 @@ func (utsuo *UserToStoreUpdateOne) SetStoreID(i int) *UserToStoreUpdateOne {
 func (utsuo *UserToStoreUpdateOne) SetNillableStoreID(i *int) *UserToStoreUpdateOne {
 	if i != nil {
 		utsuo.SetStoreID(*i)
+	}
+	return utsuo
+}
+
+// SetClerkUserID sets the "clerk_user_id" field.
+func (utsuo *UserToStoreUpdateOne) SetClerkUserID(s string) *UserToStoreUpdateOne {
+	utsuo.mutation.SetClerkUserID(s)
+	return utsuo
+}
+
+// SetNillableClerkUserID sets the "clerk_user_id" field if the given value is not nil.
+func (utsuo *UserToStoreUpdateOne) SetNillableClerkUserID(s *string) *UserToStoreUpdateOne {
+	if s != nil {
+		utsuo.SetClerkUserID(*s)
 	}
 	return utsuo
 }
@@ -474,6 +505,9 @@ func (utsuo *UserToStoreUpdateOne) sqlSave(ctx context.Context) (_node *UserToSt
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := utsuo.mutation.ClerkUserID(); ok {
+		_spec.SetField(usertostore.FieldClerkUserID, field.TypeString, value)
 	}
 	if value, ok := utsuo.mutation.PermissionLevel(); ok {
 		_spec.SetField(usertostore.FieldPermissionLevel, field.TypeInt, value)

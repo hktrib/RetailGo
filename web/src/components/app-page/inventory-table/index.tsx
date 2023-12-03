@@ -1,6 +1,7 @@
 "use client";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
+import { useFetch } from "../../../lib/utils";
 import { useItems } from "@/lib/hooks/items";
 
 // dummy inventory data
