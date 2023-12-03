@@ -50,7 +50,7 @@ func addStoreToPublicMetadata(user *clerk.User, storeID int) (*clerk.UpdateUserM
 				}, nil
 			}
 		default:
-			log.Debug().Msg("Unable to Add Store to Public Metadata")
+			log.Debug().Msg("Public Metadata diff type not supported")
 			return nil, errors.New("unknown case type")
 	}
 	return nil, nil
