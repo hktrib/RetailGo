@@ -2,6 +2,7 @@ package clerkstorage
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/clerkinc/clerk-sdk-go/clerk"
 	"github.com/rs/zerolog/log"
@@ -15,14 +16,12 @@ type ClerkStorage struct {
 
 
 /*
-addStoreToPublicMetadata:
+Accepts (clerk.User, int (store id))
+________________________________________
 
-		Accepts (clerk.User, int (store id))
-        ________________________________________
-	
-		-> It adds storeID to "stores" field of PublicMetadata
+-> It adds storeID to "stores" field of PublicMetadata
 
-		-> Creates the "stores" field if it does not exist it 
+-> Creates the "stores" field if it does not exist it 
 
 External Package Calls:
 	json.Marshal
@@ -86,11 +85,13 @@ func (ch ClerkStorage) AddStore(storeID int) error {
 		log.Debug().Err(err).Msg("Unable to Add Store to Public Metadata")
 		return err
 	}
-	_, err = ch.client.Users().UpdateMetadata(ch.userID, publicMetadata)
+	user, err := ch.client.Users().UpdateMetadata(ch.userID, publicMetadata)
 	if err != nil {
 		log.Debug().Err(err).Msg("Unable to update metadata")
 		return err
 	}
+	
+	fmt.Printf("User PublicMetadata: %v\n", user.PublicMetadata)
 	return nil
 }
 
@@ -99,7 +100,7 @@ func (ch ClerkStorage) AddStore(storeID int) error {
 
 NewClerkStore 
 
-	-> Accepts clerk.Client and a string representing the clerks user id
+-> Accepts clerk.Client and a string representing the clerks user id
 // It returns a new ClerkStore instance
 
 */
