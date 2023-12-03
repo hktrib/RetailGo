@@ -61,18 +61,6 @@ var (
 			},
 		},
 	}
-	// ClerkUserStoresColumns holds the columns for the "clerk_user_stores" table.
-	ClerkUserStoresColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "clerk_id", Type: field.TypeString},
-		{Name: "store_id", Type: field.TypeInt},
-	}
-	// ClerkUserStoresTable holds the schema information for the "clerk_user_stores" table.
-	ClerkUserStoresTable = &schema.Table{
-		Name:       "clerk_user_stores",
-		Columns:    ClerkUserStoresColumns,
-		PrimaryKey: []*schema.Column{ClerkUserStoresColumns[0]},
-	}
 	// ItemsColumns holds the columns for the "items" table.
 	ItemsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -164,7 +152,7 @@ var (
 	}
 	// UserToStoresColumns holds the columns for the "user_to_stores" table.
 	UserToStoresColumns = []*schema.Column{
-		{Name: "clerk_user_id", Type: field.TypeString},
+		{Name: "clerk_user_id", Type: field.TypeString, Nullable: true},
 		{Name: "permission_level", Type: field.TypeInt, Nullable: true},
 		{Name: "joined_at", Type: field.TypeInt, Nullable: true},
 		{Name: "user_id", Type: field.TypeInt},
@@ -194,7 +182,6 @@ var (
 	Tables = []*schema.Table{
 		CategoriesTable,
 		CategoryItemsTable,
-		ClerkUserStoresTable,
 		ItemsTable,
 		StoresTable,
 		UsersTable,

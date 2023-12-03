@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/hktrib/RetailGo/internal/ent/category"
 	"github.com/hktrib/RetailGo/internal/ent/categoryitem"
-	"github.com/hktrib/RetailGo/internal/ent/clerkuser_store"
 	"github.com/hktrib/RetailGo/internal/ent/item"
 	"github.com/hktrib/RetailGo/internal/ent/predicate"
 	"github.com/hktrib/RetailGo/internal/ent/store"
@@ -29,13 +28,12 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeCategory       = "Category"
-	TypeCategoryItem   = "CategoryItem"
-	TypeClerkUserStore = "ClerkUser_Store"
-	TypeItem           = "Item"
-	TypeStore          = "Store"
-	TypeUser           = "User"
-	TypeUserToStore    = "UserToStore"
+	TypeCategory     = "Category"
+	TypeCategoryItem = "CategoryItem"
+	TypeItem         = "Item"
+	TypeStore        = "Store"
+	TypeUser         = "User"
+	TypeUserToStore  = "UserToStore"
 )
 
 // CategoryMutation represents an operation that mutates the Category nodes in the graph.
@@ -1000,422 +998,6 @@ func (m *CategoryItemMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown CategoryItem edge %s", name)
-}
-
-// ClerkUserStoreMutation represents an operation that mutates the ClerkUser_Store nodes in the graph.
-type ClerkUserStoreMutation struct {
-	config
-	op            Op
-	typ           string
-	id            *int
-	clerk_id      *string
-	store_id      *int
-	addstore_id   *int
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*ClerkUser_Store, error)
-	predicates    []predicate.ClerkUser_Store
-}
-
-var _ ent.Mutation = (*ClerkUserStoreMutation)(nil)
-
-// clerkuserStoreOption allows management of the mutation configuration using functional options.
-type clerkuserStoreOption func(*ClerkUserStoreMutation)
-
-// newClerkUserStoreMutation creates new mutation for the ClerkUser_Store entity.
-func newClerkUserStoreMutation(c config, op Op, opts ...clerkuserStoreOption) *ClerkUserStoreMutation {
-	m := &ClerkUserStoreMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeClerkUserStore,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withClerkUser_StoreID sets the ID field of the mutation.
-func withClerkUser_StoreID(id int) clerkuserStoreOption {
-	return func(m *ClerkUserStoreMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *ClerkUser_Store
-		)
-		m.oldValue = func(ctx context.Context) (*ClerkUser_Store, error) {
-			once.Do(func() {
-				if m.done {
-					err = errors.New("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().ClerkUser_Store.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withClerkUser_Store sets the old ClerkUser_Store of the mutation.
-func withClerkUser_Store(node *ClerkUser_Store) clerkuserStoreOption {
-	return func(m *ClerkUserStoreMutation) {
-		m.oldValue = func(context.Context) (*ClerkUser_Store, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m ClerkUserStoreMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m ClerkUserStoreMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *ClerkUserStoreMutation) ID() (id int, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
-// That means, if the mutation is applied within a transaction with an isolation level such
-// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
-// or updated by the mutation.
-func (m *ClerkUserStoreMutation) IDs(ctx context.Context) ([]int, error) {
-	switch {
-	case m.op.Is(OpUpdateOne | OpDeleteOne):
-		id, exists := m.ID()
-		if exists {
-			return []int{id}, nil
-		}
-		fallthrough
-	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().ClerkUser_Store.Query().Where(m.predicates...).IDs(ctx)
-	default:
-		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
-	}
-}
-
-// SetClerkID sets the "clerk_id" field.
-func (m *ClerkUserStoreMutation) SetClerkID(s string) {
-	m.clerk_id = &s
-}
-
-// ClerkID returns the value of the "clerk_id" field in the mutation.
-func (m *ClerkUserStoreMutation) ClerkID() (r string, exists bool) {
-	v := m.clerk_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldClerkID returns the old "clerk_id" field's value of the ClerkUser_Store entity.
-// If the ClerkUser_Store object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ClerkUserStoreMutation) OldClerkID(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldClerkID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldClerkID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldClerkID: %w", err)
-	}
-	return oldValue.ClerkID, nil
-}
-
-// ResetClerkID resets all changes to the "clerk_id" field.
-func (m *ClerkUserStoreMutation) ResetClerkID() {
-	m.clerk_id = nil
-}
-
-// SetStoreID sets the "store_id" field.
-func (m *ClerkUserStoreMutation) SetStoreID(i int) {
-	m.store_id = &i
-	m.addstore_id = nil
-}
-
-// StoreID returns the value of the "store_id" field in the mutation.
-func (m *ClerkUserStoreMutation) StoreID() (r int, exists bool) {
-	v := m.store_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldStoreID returns the old "store_id" field's value of the ClerkUser_Store entity.
-// If the ClerkUser_Store object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ClerkUserStoreMutation) OldStoreID(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldStoreID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldStoreID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStoreID: %w", err)
-	}
-	return oldValue.StoreID, nil
-}
-
-// AddStoreID adds i to the "store_id" field.
-func (m *ClerkUserStoreMutation) AddStoreID(i int) {
-	if m.addstore_id != nil {
-		*m.addstore_id += i
-	} else {
-		m.addstore_id = &i
-	}
-}
-
-// AddedStoreID returns the value that was added to the "store_id" field in this mutation.
-func (m *ClerkUserStoreMutation) AddedStoreID() (r int, exists bool) {
-	v := m.addstore_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetStoreID resets all changes to the "store_id" field.
-func (m *ClerkUserStoreMutation) ResetStoreID() {
-	m.store_id = nil
-	m.addstore_id = nil
-}
-
-// Where appends a list predicates to the ClerkUserStoreMutation builder.
-func (m *ClerkUserStoreMutation) Where(ps ...predicate.ClerkUser_Store) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// WhereP appends storage-level predicates to the ClerkUserStoreMutation builder. Using this method,
-// users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *ClerkUserStoreMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.ClerkUser_Store, len(ps))
-	for i := range ps {
-		p[i] = ps[i]
-	}
-	m.Where(p...)
-}
-
-// Op returns the operation name.
-func (m *ClerkUserStoreMutation) Op() Op {
-	return m.op
-}
-
-// SetOp allows setting the mutation operation.
-func (m *ClerkUserStoreMutation) SetOp(op Op) {
-	m.op = op
-}
-
-// Type returns the node type of this mutation (ClerkUser_Store).
-func (m *ClerkUserStoreMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *ClerkUserStoreMutation) Fields() []string {
-	fields := make([]string, 0, 2)
-	if m.clerk_id != nil {
-		fields = append(fields, clerkuser_store.FieldClerkID)
-	}
-	if m.store_id != nil {
-		fields = append(fields, clerkuser_store.FieldStoreID)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *ClerkUserStoreMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case clerkuser_store.FieldClerkID:
-		return m.ClerkID()
-	case clerkuser_store.FieldStoreID:
-		return m.StoreID()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *ClerkUserStoreMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case clerkuser_store.FieldClerkID:
-		return m.OldClerkID(ctx)
-	case clerkuser_store.FieldStoreID:
-		return m.OldStoreID(ctx)
-	}
-	return nil, fmt.Errorf("unknown ClerkUser_Store field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *ClerkUserStoreMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case clerkuser_store.FieldClerkID:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetClerkID(v)
-		return nil
-	case clerkuser_store.FieldStoreID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetStoreID(v)
-		return nil
-	}
-	return fmt.Errorf("unknown ClerkUser_Store field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *ClerkUserStoreMutation) AddedFields() []string {
-	var fields []string
-	if m.addstore_id != nil {
-		fields = append(fields, clerkuser_store.FieldStoreID)
-	}
-	return fields
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *ClerkUserStoreMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case clerkuser_store.FieldStoreID:
-		return m.AddedStoreID()
-	}
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *ClerkUserStoreMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	case clerkuser_store.FieldStoreID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddStoreID(v)
-		return nil
-	}
-	return fmt.Errorf("unknown ClerkUser_Store numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *ClerkUserStoreMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *ClerkUserStoreMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *ClerkUserStoreMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown ClerkUser_Store nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *ClerkUserStoreMutation) ResetField(name string) error {
-	switch name {
-	case clerkuser_store.FieldClerkID:
-		m.ResetClerkID()
-		return nil
-	case clerkuser_store.FieldStoreID:
-		m.ResetStoreID()
-		return nil
-	}
-	return fmt.Errorf("unknown ClerkUser_Store field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *ClerkUserStoreMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *ClerkUserStoreMutation) AddedIDs(name string) []ent.Value {
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *ClerkUserStoreMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *ClerkUserStoreMutation) RemovedIDs(name string) []ent.Value {
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *ClerkUserStoreMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *ClerkUserStoreMutation) EdgeCleared(name string) bool {
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *ClerkUserStoreMutation) ClearEdge(name string) error {
-	return fmt.Errorf("unknown ClerkUser_Store unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *ClerkUserStoreMutation) ResetEdge(name string) error {
-	return fmt.Errorf("unknown ClerkUser_Store edge %s", name)
 }
 
 // ItemMutation represents an operation that mutates the Item nodes in the graph.
@@ -4542,9 +4124,22 @@ func (m *UserToStoreMutation) ClerkUserID() (r string, exists bool) {
 	return *v, true
 }
 
+// ClearClerkUserID clears the value of the "clerk_user_id" field.
+func (m *UserToStoreMutation) ClearClerkUserID() {
+	m.clerk_user_id = nil
+	m.clearedFields[usertostore.FieldClerkUserID] = struct{}{}
+}
+
+// ClerkUserIDCleared returns if the "clerk_user_id" field was cleared in this mutation.
+func (m *UserToStoreMutation) ClerkUserIDCleared() bool {
+	_, ok := m.clearedFields[usertostore.FieldClerkUserID]
+	return ok
+}
+
 // ResetClerkUserID resets all changes to the "clerk_user_id" field.
 func (m *UserToStoreMutation) ResetClerkUserID() {
 	m.clerk_user_id = nil
+	delete(m.clearedFields, usertostore.FieldClerkUserID)
 }
 
 // SetPermissionLevel sets the "permission_level" field.
@@ -4883,6 +4478,9 @@ func (m *UserToStoreMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *UserToStoreMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(usertostore.FieldClerkUserID) {
+		fields = append(fields, usertostore.FieldClerkUserID)
+	}
 	if m.FieldCleared(usertostore.FieldPermissionLevel) {
 		fields = append(fields, usertostore.FieldPermissionLevel)
 	}
@@ -4903,6 +4501,9 @@ func (m *UserToStoreMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *UserToStoreMutation) ClearField(name string) error {
 	switch name {
+	case usertostore.FieldClerkUserID:
+		m.ClearClerkUserID()
+		return nil
 	case usertostore.FieldPermissionLevel:
 		m.ClearPermissionLevel()
 		return nil
