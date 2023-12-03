@@ -36,7 +36,7 @@ func (srv *Server) CreateStore(w http.ResponseWriter, r *http.Request) {
 		return	
 	}
 
-	err = clerkStore.AddStore(reqUser.StoreID)
+	err = clerkStore.AddStore(reqStore.ID)
 	if err != nil {
 		log.Debug().Err(err).Msg("AddStore failed: ")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

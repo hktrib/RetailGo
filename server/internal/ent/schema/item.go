@@ -23,12 +23,11 @@ func (Item) Fields() []ent.Field {
 			SchemaType(map[string]string{
 				dialect.Postgres: "decimal(10,2)",
 			}),
-		field.Int("store_id"),
-		field.String("stripe_price_id"),
-		field.String("stripe_product_id"),
-		field.String("category_name"),
-		field.String("weaviate_id"),
-		field.Bool("vectorized"),
+		field.Int("store_id").Optional(),
+		field.String("stripe_price_id").Optional(),
+		field.String("stripe_product_id").Optional(),
+		field.String("weaviate_id").Optional(),
+		field.Bool("vectorized").Optional(),
 		field.Int("number_sold_since_update").Optional(),
 		field.String("date_last_sold").Optional(),
 	}
