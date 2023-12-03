@@ -16,12 +16,17 @@ type ClerkStorage struct {
 
 
 /*
+addStoreToPublicMetadata:
 
-	addStoreToPublicMetadata accepts (clerk.User, int (store id))
+		Accepts (clerk.User, int (store id))
+        ________________________________________
+	
+		-> It adds storeID to "stores" field of PublicMetadata
 
-	It adds the storeID to the "stores" field of PublicMetadata
-	If the "stores" field doesn't exist it creates it
+		-> Creates the "stores" field if it does not exist it 
 
+External Package Calls:
+	json.Marshal
 */
 func addStoreToPublicMetadata(user *clerk.User, storeID int) (*clerk.UpdateUserMetadata, error) {
 	switch user.PublicMetadata.(type){
@@ -51,8 +56,19 @@ func addStoreToPublicMetadata(user *clerk.User, storeID int) (*clerk.UpdateUserM
 }
 
 
-// AddStore accepts a storeID and Updates the Clerk User's Metadata via Clerk's UpdataMetadata Function.
-// It returns an error if it fails and nil otherwise.
+/*
+Accepts (int (denoting store id))
+
+-----------------------------------------
+		
+	Updates the Clerk User Metadata
+	
+	It returns an error if it fails and nil otherwise.
+
+External Package Calls:
+	
+	-> clerk.UsersService.UpdateUserMetadata
+*/
 func (ch ClerkStorage) AddStore(storeID int) error {
 	publicMetadata, err := addStoreToPublicMetadata(ch.user, storeID)
 	if err != nil {
@@ -65,8 +81,15 @@ func (ch ClerkStorage) AddStore(storeID int) error {
 	return nil
 }
 
-// NewClerkStore accepts clerk.Client and a string representing the clerks user id
+
+/*
+
+NewClerkStore 
+
+	-> Accepts clerk.Client and a string representing the clerks user id
 // It returns a new ClerkStore instance
+
+*/
 func NewClerkStore(client clerk.Client, clerkUserID string) (*ClerkStorage, error) {
 	cus := &ClerkStorage{}
 	cus.client = client
