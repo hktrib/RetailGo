@@ -122,7 +122,7 @@ const employees = [
 
 export default function EmployeeTable() {
   let data = employees;
-  const itemQuery = GetStaffByStore("1381");
+  const itemQuery = GetStaffByStore("1");
   console.log("ItemQuery is : " + itemQuery);
   // let data = initialInventory;
 
