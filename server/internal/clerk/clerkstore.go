@@ -43,7 +43,7 @@ func addStoreToPublicMetadata(user *clerk.User, storeID int) (*clerk.UpdateUserM
 					return nil, err
 				}
 
-				return &clerk.UpdateUserMetadata{PublicMetadata: bytes}, nil
+				return &clerk.UpdateUserMetadata{PublicMetadata: json.RawMessage(bytes)}, nil
 			}
 
 		case any:
@@ -53,6 +53,8 @@ func addStoreToPublicMetadata(user *clerk.User, storeID int) (*clerk.UpdateUserM
 
 			fmt.Printf("Stores: %v\n", stores)
 
+			
+
 			bytes, err := json.Marshal(stores)
 			if err != nil {
 				return nil, err
@@ -60,7 +62,7 @@ func addStoreToPublicMetadata(user *clerk.User, storeID int) (*clerk.UpdateUserM
 
 			log.Debug().Msg("No Previous data in PublicMetadata")
 
-			return &clerk.UpdateUserMetadata{PublicMetadata: bytes}, nil
+			return &clerk.UpdateUserMetadata{PublicMetadata: json.RawMessage(bytes)}, nil
 		default:
 			log.Debug().Msg("Public Metadata diff type not supported")
 	}
