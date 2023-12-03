@@ -31,7 +31,7 @@ func StoreAndOwnerCreationTx(ctx context.Context, reqStore *ent.Store, reqUser *
 	}
 
 	_, err = tx.User.Create().
-		SetClerkUserID(reqStore.UUID).
+		SetClerkUserID(reqUser.ClerkUserID).
 		SetEmail(reqUser.Email).
 		SetIsOwner(true).
 		SetFirstName(reqUser.FirstName).
