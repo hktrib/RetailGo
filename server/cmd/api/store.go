@@ -7,11 +7,11 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	clerkHelpers "github.com/hktrib/RetailGo/internal/clerk"
-	"github.com/hktrib/RetailGo/internal/ent/user"
 	"github.com/rs/zerolog/log"
 
+	clerkHelpers "github.com/hktrib/RetailGo/internal/clerk"
 	"github.com/hktrib/RetailGo/internal/ent"
+	"github.com/hktrib/RetailGo/internal/ent/user"
 	"github.com/hktrib/RetailGo/internal/transactions"
 )
 
@@ -29,7 +29,7 @@ func (srv *Server) CreateStore(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Adding storeid to clerk store
-	clerkStore, err := clerkHelpers.NewClerkStore(srv.ClerkClient, reqUser.ClerkUserID)
+	clerkStore, err := clerkHelpers.NewClerkStore(srv.ClerkClient, reqUser.ClerkUserID, srv.Config)
 	if err != nil {
 		log.Debug().Err(err).Msg("NewClerkStore failed: Unable to create ClerkStore instance using clerk user id:")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
