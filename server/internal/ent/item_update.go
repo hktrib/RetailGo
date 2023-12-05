@@ -133,6 +133,26 @@ func (iu *ItemUpdate) ClearStripePriceID() *ItemUpdate {
 	return iu
 }
 
+// SetCategoryName sets the "category_name" field.
+func (iu *ItemUpdate) SetCategoryName(s string) *ItemUpdate {
+	iu.mutation.SetCategoryName(s)
+	return iu
+}
+
+// SetNillableCategoryName sets the "category_name" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableCategoryName(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetCategoryName(*s)
+	}
+	return iu
+}
+
+// ClearCategoryName clears the value of the "category_name" field.
+func (iu *ItemUpdate) ClearCategoryName() *ItemUpdate {
+	iu.mutation.ClearCategoryName()
+	return iu
+}
+
 // SetStripeProductID sets the "stripe_product_id" field.
 func (iu *ItemUpdate) SetStripeProductID(s string) *ItemUpdate {
 	iu.mutation.SetStripeProductID(s)
@@ -363,6 +383,12 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if iu.mutation.StripePriceIDCleared() {
 		_spec.ClearField(item.FieldStripePriceID, field.TypeString)
 	}
+	if value, ok := iu.mutation.CategoryName(); ok {
+		_spec.SetField(item.FieldCategoryName, field.TypeString, value)
+	}
+	if iu.mutation.CategoryNameCleared() {
+		_spec.ClearField(item.FieldCategoryName, field.TypeString)
+	}
 	if value, ok := iu.mutation.StripeProductID(); ok {
 		_spec.SetField(item.FieldStripeProductID, field.TypeString, value)
 	}
@@ -591,6 +617,26 @@ func (iuo *ItemUpdateOne) SetNillableStripePriceID(s *string) *ItemUpdateOne {
 // ClearStripePriceID clears the value of the "stripe_price_id" field.
 func (iuo *ItemUpdateOne) ClearStripePriceID() *ItemUpdateOne {
 	iuo.mutation.ClearStripePriceID()
+	return iuo
+}
+
+// SetCategoryName sets the "category_name" field.
+func (iuo *ItemUpdateOne) SetCategoryName(s string) *ItemUpdateOne {
+	iuo.mutation.SetCategoryName(s)
+	return iuo
+}
+
+// SetNillableCategoryName sets the "category_name" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableCategoryName(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetCategoryName(*s)
+	}
+	return iuo
+}
+
+// ClearCategoryName clears the value of the "category_name" field.
+func (iuo *ItemUpdateOne) ClearCategoryName() *ItemUpdateOne {
+	iuo.mutation.ClearCategoryName()
 	return iuo
 }
 
@@ -853,6 +899,12 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 	}
 	if iuo.mutation.StripePriceIDCleared() {
 		_spec.ClearField(item.FieldStripePriceID, field.TypeString)
+	}
+	if value, ok := iuo.mutation.CategoryName(); ok {
+		_spec.SetField(item.FieldCategoryName, field.TypeString, value)
+	}
+	if iuo.mutation.CategoryNameCleared() {
+		_spec.ClearField(item.FieldCategoryName, field.TypeString)
 	}
 	if value, ok := iuo.mutation.StripeProductID(); ok {
 		_spec.SetField(item.FieldStripeProductID, field.TypeString, value)

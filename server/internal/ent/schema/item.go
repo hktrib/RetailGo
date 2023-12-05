@@ -25,6 +25,7 @@ func (Item) Fields() []ent.Field {
 			}),
 		field.Int("store_id"),
 		field.String("stripe_price_id").Optional(),
+		field.String("category_name").Optional(),
 		field.String("stripe_product_id").Optional(),
 		field.String("weaviate_id").Optional(),
 		field.Bool("vectorized").Optional(),
