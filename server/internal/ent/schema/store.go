@@ -38,9 +38,8 @@ func (Store) Edges() []ent.Edge {
 
 func (Store) Indexes() []ent.Index {
 	return []ent.Index{
-		// index.Fields("item_name").
-		// 	Edges("store_name").
-		// 	Unique(),
 		index.Fields("id"),
+		index.Fields("store_name"),
+		index.Fields("uuid"),
 	}
 }

@@ -124,6 +124,16 @@ var (
 				Unique:  false,
 				Columns: []*schema.Column{StoresColumns[0]},
 			},
+			{
+				Name:    "store_store_name",
+				Unique:  false,
+				Columns: []*schema.Column{StoresColumns[2]},
+			},
+			{
+				Name:    "store_uuid",
+				Unique:  false,
+				Columns: []*schema.Column{StoresColumns[1]},
+			},
 		},
 	}
 	// UsersColumns holds the columns for the "users" table.
