@@ -57,15 +57,25 @@ func (ic *ItemCreate) SetStripePriceID(s string) *ItemCreate {
 	return ic
 }
 
+// SetNillableStripePriceID sets the "stripe_price_id" field if the given value is not nil.
+func (ic *ItemCreate) SetNillableStripePriceID(s *string) *ItemCreate {
+	if s != nil {
+		ic.SetStripePriceID(*s)
+	}
+	return ic
+}
+
 // SetStripeProductID sets the "stripe_product_id" field.
 func (ic *ItemCreate) SetStripeProductID(s string) *ItemCreate {
 	ic.mutation.SetStripeProductID(s)
 	return ic
 }
 
-// SetCategoryName sets the "category_name" field.
-func (ic *ItemCreate) SetCategoryName(s string) *ItemCreate {
-	ic.mutation.SetCategoryName(s)
+// SetNillableStripeProductID sets the "stripe_product_id" field if the given value is not nil.
+func (ic *ItemCreate) SetNillableStripeProductID(s *string) *ItemCreate {
+	if s != nil {
+		ic.SetStripeProductID(*s)
+	}
 	return ic
 }
 
@@ -75,9 +85,25 @@ func (ic *ItemCreate) SetWeaviateID(s string) *ItemCreate {
 	return ic
 }
 
+// SetNillableWeaviateID sets the "weaviate_id" field if the given value is not nil.
+func (ic *ItemCreate) SetNillableWeaviateID(s *string) *ItemCreate {
+	if s != nil {
+		ic.SetWeaviateID(*s)
+	}
+	return ic
+}
+
 // SetVectorized sets the "vectorized" field.
 func (ic *ItemCreate) SetVectorized(b bool) *ItemCreate {
 	ic.mutation.SetVectorized(b)
+	return ic
+}
+
+// SetNillableVectorized sets the "vectorized" field if the given value is not nil.
+func (ic *ItemCreate) SetNillableVectorized(b *bool) *ItemCreate {
+	if b != nil {
+		ic.SetVectorized(*b)
+	}
 	return ic
 }
 
@@ -184,21 +210,6 @@ func (ic *ItemCreate) check() error {
 	if _, ok := ic.mutation.StoreID(); !ok {
 		return &ValidationError{Name: "store_id", err: errors.New(`ent: missing required field "Item.store_id"`)}
 	}
-	if _, ok := ic.mutation.StripePriceID(); !ok {
-		return &ValidationError{Name: "stripe_price_id", err: errors.New(`ent: missing required field "Item.stripe_price_id"`)}
-	}
-	if _, ok := ic.mutation.StripeProductID(); !ok {
-		return &ValidationError{Name: "stripe_product_id", err: errors.New(`ent: missing required field "Item.stripe_product_id"`)}
-	}
-	if _, ok := ic.mutation.CategoryName(); !ok {
-		return &ValidationError{Name: "category_name", err: errors.New(`ent: missing required field "Item.category_name"`)}
-	}
-	if _, ok := ic.mutation.WeaviateID(); !ok {
-		return &ValidationError{Name: "weaviate_id", err: errors.New(`ent: missing required field "Item.weaviate_id"`)}
-	}
-	if _, ok := ic.mutation.Vectorized(); !ok {
-		return &ValidationError{Name: "vectorized", err: errors.New(`ent: missing required field "Item.vectorized"`)}
-	}
 	if _, ok := ic.mutation.StoreID(); !ok {
 		return &ValidationError{Name: "store", err: errors.New(`ent: missing required edge "Item.store"`)}
 	}
@@ -257,10 +268,6 @@ func (ic *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 	if value, ok := ic.mutation.StripeProductID(); ok {
 		_spec.SetField(item.FieldStripeProductID, field.TypeString, value)
 		_node.StripeProductID = value
-	}
-	if value, ok := ic.mutation.CategoryName(); ok {
-		_spec.SetField(item.FieldCategoryName, field.TypeString, value)
-		_node.CategoryName = value
 	}
 	if value, ok := ic.mutation.WeaviateID(); ok {
 		_spec.SetField(item.FieldWeaviateID, field.TypeString, value)

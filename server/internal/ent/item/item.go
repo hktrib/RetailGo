@@ -26,8 +26,6 @@ const (
 	FieldStripePriceID = "stripe_price_id"
 	// FieldStripeProductID holds the string denoting the stripe_product_id field in the database.
 	FieldStripeProductID = "stripe_product_id"
-	// FieldCategoryName holds the string denoting the category_name field in the database.
-	FieldCategoryName = "category_name"
 	// FieldWeaviateID holds the string denoting the weaviate_id field in the database.
 	FieldWeaviateID = "weaviate_id"
 	// FieldVectorized holds the string denoting the vectorized field in the database.
@@ -75,7 +73,6 @@ var Columns = []string{
 	FieldStoreID,
 	FieldStripePriceID,
 	FieldStripeProductID,
-	FieldCategoryName,
 	FieldWeaviateID,
 	FieldVectorized,
 	FieldNumberSoldSinceUpdate,
@@ -139,11 +136,6 @@ func ByStripePriceID(opts ...sql.OrderTermOption) OrderOption {
 // ByStripeProductID orders the results by the stripe_product_id field.
 func ByStripeProductID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStripeProductID, opts...).ToFunc()
-}
-
-// ByCategoryName orders the results by the category_name field.
-func ByCategoryName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCategoryName, opts...).ToFunc()
 }
 
 // ByWeaviateID orders the results by the weaviate_id field.

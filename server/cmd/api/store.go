@@ -28,6 +28,10 @@ func (srv *Server) CreateStore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Geting newly created store
+
+	// store, err := srv.DBClient.Store.Query().Where(store.ByStoreName())
+
 	// Adding storeid to clerk store
 	clerkStore, err := clerkHelpers.NewClerkStore(srv.ClerkClient, reqUser.ClerkUserID, srv.Config)
 	if err != nil {

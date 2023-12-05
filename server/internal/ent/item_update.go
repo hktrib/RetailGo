@@ -127,6 +127,12 @@ func (iu *ItemUpdate) SetNillableStripePriceID(s *string) *ItemUpdate {
 	return iu
 }
 
+// ClearStripePriceID clears the value of the "stripe_price_id" field.
+func (iu *ItemUpdate) ClearStripePriceID() *ItemUpdate {
+	iu.mutation.ClearStripePriceID()
+	return iu
+}
+
 // SetStripeProductID sets the "stripe_product_id" field.
 func (iu *ItemUpdate) SetStripeProductID(s string) *ItemUpdate {
 	iu.mutation.SetStripeProductID(s)
@@ -141,17 +147,9 @@ func (iu *ItemUpdate) SetNillableStripeProductID(s *string) *ItemUpdate {
 	return iu
 }
 
-// SetCategoryName sets the "category_name" field.
-func (iu *ItemUpdate) SetCategoryName(s string) *ItemUpdate {
-	iu.mutation.SetCategoryName(s)
-	return iu
-}
-
-// SetNillableCategoryName sets the "category_name" field if the given value is not nil.
-func (iu *ItemUpdate) SetNillableCategoryName(s *string) *ItemUpdate {
-	if s != nil {
-		iu.SetCategoryName(*s)
-	}
+// ClearStripeProductID clears the value of the "stripe_product_id" field.
+func (iu *ItemUpdate) ClearStripeProductID() *ItemUpdate {
+	iu.mutation.ClearStripeProductID()
 	return iu
 }
 
@@ -169,6 +167,12 @@ func (iu *ItemUpdate) SetNillableWeaviateID(s *string) *ItemUpdate {
 	return iu
 }
 
+// ClearWeaviateID clears the value of the "weaviate_id" field.
+func (iu *ItemUpdate) ClearWeaviateID() *ItemUpdate {
+	iu.mutation.ClearWeaviateID()
+	return iu
+}
+
 // SetVectorized sets the "vectorized" field.
 func (iu *ItemUpdate) SetVectorized(b bool) *ItemUpdate {
 	iu.mutation.SetVectorized(b)
@@ -180,6 +184,12 @@ func (iu *ItemUpdate) SetNillableVectorized(b *bool) *ItemUpdate {
 	if b != nil {
 		iu.SetVectorized(*b)
 	}
+	return iu
+}
+
+// ClearVectorized clears the value of the "vectorized" field.
+func (iu *ItemUpdate) ClearVectorized() *ItemUpdate {
+	iu.mutation.ClearVectorized()
 	return iu
 }
 
@@ -350,17 +360,26 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := iu.mutation.StripePriceID(); ok {
 		_spec.SetField(item.FieldStripePriceID, field.TypeString, value)
 	}
+	if iu.mutation.StripePriceIDCleared() {
+		_spec.ClearField(item.FieldStripePriceID, field.TypeString)
+	}
 	if value, ok := iu.mutation.StripeProductID(); ok {
 		_spec.SetField(item.FieldStripeProductID, field.TypeString, value)
 	}
-	if value, ok := iu.mutation.CategoryName(); ok {
-		_spec.SetField(item.FieldCategoryName, field.TypeString, value)
+	if iu.mutation.StripeProductIDCleared() {
+		_spec.ClearField(item.FieldStripeProductID, field.TypeString)
 	}
 	if value, ok := iu.mutation.WeaviateID(); ok {
 		_spec.SetField(item.FieldWeaviateID, field.TypeString, value)
 	}
+	if iu.mutation.WeaviateIDCleared() {
+		_spec.ClearField(item.FieldWeaviateID, field.TypeString)
+	}
 	if value, ok := iu.mutation.Vectorized(); ok {
 		_spec.SetField(item.FieldVectorized, field.TypeBool, value)
+	}
+	if iu.mutation.VectorizedCleared() {
+		_spec.ClearField(item.FieldVectorized, field.TypeBool)
 	}
 	if value, ok := iu.mutation.NumberSoldSinceUpdate(); ok {
 		_spec.SetField(item.FieldNumberSoldSinceUpdate, field.TypeInt, value)
@@ -569,6 +588,12 @@ func (iuo *ItemUpdateOne) SetNillableStripePriceID(s *string) *ItemUpdateOne {
 	return iuo
 }
 
+// ClearStripePriceID clears the value of the "stripe_price_id" field.
+func (iuo *ItemUpdateOne) ClearStripePriceID() *ItemUpdateOne {
+	iuo.mutation.ClearStripePriceID()
+	return iuo
+}
+
 // SetStripeProductID sets the "stripe_product_id" field.
 func (iuo *ItemUpdateOne) SetStripeProductID(s string) *ItemUpdateOne {
 	iuo.mutation.SetStripeProductID(s)
@@ -583,17 +608,9 @@ func (iuo *ItemUpdateOne) SetNillableStripeProductID(s *string) *ItemUpdateOne {
 	return iuo
 }
 
-// SetCategoryName sets the "category_name" field.
-func (iuo *ItemUpdateOne) SetCategoryName(s string) *ItemUpdateOne {
-	iuo.mutation.SetCategoryName(s)
-	return iuo
-}
-
-// SetNillableCategoryName sets the "category_name" field if the given value is not nil.
-func (iuo *ItemUpdateOne) SetNillableCategoryName(s *string) *ItemUpdateOne {
-	if s != nil {
-		iuo.SetCategoryName(*s)
-	}
+// ClearStripeProductID clears the value of the "stripe_product_id" field.
+func (iuo *ItemUpdateOne) ClearStripeProductID() *ItemUpdateOne {
+	iuo.mutation.ClearStripeProductID()
 	return iuo
 }
 
@@ -611,6 +628,12 @@ func (iuo *ItemUpdateOne) SetNillableWeaviateID(s *string) *ItemUpdateOne {
 	return iuo
 }
 
+// ClearWeaviateID clears the value of the "weaviate_id" field.
+func (iuo *ItemUpdateOne) ClearWeaviateID() *ItemUpdateOne {
+	iuo.mutation.ClearWeaviateID()
+	return iuo
+}
+
 // SetVectorized sets the "vectorized" field.
 func (iuo *ItemUpdateOne) SetVectorized(b bool) *ItemUpdateOne {
 	iuo.mutation.SetVectorized(b)
@@ -622,6 +645,12 @@ func (iuo *ItemUpdateOne) SetNillableVectorized(b *bool) *ItemUpdateOne {
 	if b != nil {
 		iuo.SetVectorized(*b)
 	}
+	return iuo
+}
+
+// ClearVectorized clears the value of the "vectorized" field.
+func (iuo *ItemUpdateOne) ClearVectorized() *ItemUpdateOne {
+	iuo.mutation.ClearVectorized()
 	return iuo
 }
 
@@ -822,17 +851,26 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 	if value, ok := iuo.mutation.StripePriceID(); ok {
 		_spec.SetField(item.FieldStripePriceID, field.TypeString, value)
 	}
+	if iuo.mutation.StripePriceIDCleared() {
+		_spec.ClearField(item.FieldStripePriceID, field.TypeString)
+	}
 	if value, ok := iuo.mutation.StripeProductID(); ok {
 		_spec.SetField(item.FieldStripeProductID, field.TypeString, value)
 	}
-	if value, ok := iuo.mutation.CategoryName(); ok {
-		_spec.SetField(item.FieldCategoryName, field.TypeString, value)
+	if iuo.mutation.StripeProductIDCleared() {
+		_spec.ClearField(item.FieldStripeProductID, field.TypeString)
 	}
 	if value, ok := iuo.mutation.WeaviateID(); ok {
 		_spec.SetField(item.FieldWeaviateID, field.TypeString, value)
 	}
+	if iuo.mutation.WeaviateIDCleared() {
+		_spec.ClearField(item.FieldWeaviateID, field.TypeString)
+	}
 	if value, ok := iuo.mutation.Vectorized(); ok {
 		_spec.SetField(item.FieldVectorized, field.TypeBool, value)
+	}
+	if iuo.mutation.VectorizedCleared() {
+		_spec.ClearField(item.FieldVectorized, field.TypeBool)
 	}
 	if value, ok := iuo.mutation.NumberSoldSinceUpdate(); ok {
 		_spec.SetField(item.FieldNumberSoldSinceUpdate, field.TypeInt, value)

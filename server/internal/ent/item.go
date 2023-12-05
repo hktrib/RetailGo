@@ -31,8 +31,6 @@ type Item struct {
 	StripePriceID string `json:"stripe_price_id,omitempty"`
 	// StripeProductID holds the value of the "stripe_product_id" field.
 	StripeProductID string `json:"stripe_product_id,omitempty"`
-	// CategoryName holds the value of the "category_name" field.
-	CategoryName string `json:"category_name,omitempty"`
 	// WeaviateID holds the value of the "weaviate_id" field.
 	WeaviateID string `json:"weaviate_id,omitempty"`
 	// Vectorized holds the value of the "vectorized" field.
@@ -102,7 +100,7 @@ func (*Item) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case item.FieldID, item.FieldQuantity, item.FieldStoreID, item.FieldNumberSoldSinceUpdate:
 			values[i] = new(sql.NullInt64)
-		case item.FieldName, item.FieldPhoto, item.FieldStripePriceID, item.FieldStripeProductID, item.FieldCategoryName, item.FieldWeaviateID, item.FieldDateLastSold:
+		case item.FieldName, item.FieldPhoto, item.FieldStripePriceID, item.FieldStripeProductID, item.FieldWeaviateID, item.FieldDateLastSold:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -166,12 +164,6 @@ func (i *Item) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field stripe_product_id", values[j])
 			} else if value.Valid {
 				i.StripeProductID = value.String
-			}
-		case item.FieldCategoryName:
-			if value, ok := values[j].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field category_name", values[j])
-			} else if value.Valid {
-				i.CategoryName = value.String
 			}
 		case item.FieldWeaviateID:
 			if value, ok := values[j].(*sql.NullString); !ok {
@@ -268,9 +260,6 @@ func (i *Item) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("stripe_product_id=")
 	builder.WriteString(i.StripeProductID)
-	builder.WriteString(", ")
-	builder.WriteString("category_name=")
-	builder.WriteString(i.CategoryName)
 	builder.WriteString(", ")
 	builder.WriteString("weaviate_id=")
 	builder.WriteString(i.WeaviateID)

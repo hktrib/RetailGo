@@ -1014,7 +1014,6 @@ type ItemMutation struct {
 	addprice                    *float64
 	stripe_price_id             *string
 	stripe_product_id           *string
-	category_name               *string
 	weaviate_id                 *string
 	vectorized                  *bool
 	number_sold_since_update    *int
@@ -1386,9 +1385,22 @@ func (m *ItemMutation) OldStripePriceID(ctx context.Context) (v string, err erro
 	return oldValue.StripePriceID, nil
 }
 
+// ClearStripePriceID clears the value of the "stripe_price_id" field.
+func (m *ItemMutation) ClearStripePriceID() {
+	m.stripe_price_id = nil
+	m.clearedFields[item.FieldStripePriceID] = struct{}{}
+}
+
+// StripePriceIDCleared returns if the "stripe_price_id" field was cleared in this mutation.
+func (m *ItemMutation) StripePriceIDCleared() bool {
+	_, ok := m.clearedFields[item.FieldStripePriceID]
+	return ok
+}
+
 // ResetStripePriceID resets all changes to the "stripe_price_id" field.
 func (m *ItemMutation) ResetStripePriceID() {
 	m.stripe_price_id = nil
+	delete(m.clearedFields, item.FieldStripePriceID)
 }
 
 // SetStripeProductID sets the "stripe_product_id" field.
@@ -1422,45 +1434,22 @@ func (m *ItemMutation) OldStripeProductID(ctx context.Context) (v string, err er
 	return oldValue.StripeProductID, nil
 }
 
+// ClearStripeProductID clears the value of the "stripe_product_id" field.
+func (m *ItemMutation) ClearStripeProductID() {
+	m.stripe_product_id = nil
+	m.clearedFields[item.FieldStripeProductID] = struct{}{}
+}
+
+// StripeProductIDCleared returns if the "stripe_product_id" field was cleared in this mutation.
+func (m *ItemMutation) StripeProductIDCleared() bool {
+	_, ok := m.clearedFields[item.FieldStripeProductID]
+	return ok
+}
+
 // ResetStripeProductID resets all changes to the "stripe_product_id" field.
 func (m *ItemMutation) ResetStripeProductID() {
 	m.stripe_product_id = nil
-}
-
-// SetCategoryName sets the "category_name" field.
-func (m *ItemMutation) SetCategoryName(s string) {
-	m.category_name = &s
-}
-
-// CategoryName returns the value of the "category_name" field in the mutation.
-func (m *ItemMutation) CategoryName() (r string, exists bool) {
-	v := m.category_name
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCategoryName returns the old "category_name" field's value of the Item entity.
-// If the Item object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ItemMutation) OldCategoryName(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCategoryName is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCategoryName requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCategoryName: %w", err)
-	}
-	return oldValue.CategoryName, nil
-}
-
-// ResetCategoryName resets all changes to the "category_name" field.
-func (m *ItemMutation) ResetCategoryName() {
-	m.category_name = nil
+	delete(m.clearedFields, item.FieldStripeProductID)
 }
 
 // SetWeaviateID sets the "weaviate_id" field.
@@ -1494,9 +1483,22 @@ func (m *ItemMutation) OldWeaviateID(ctx context.Context) (v string, err error) 
 	return oldValue.WeaviateID, nil
 }
 
+// ClearWeaviateID clears the value of the "weaviate_id" field.
+func (m *ItemMutation) ClearWeaviateID() {
+	m.weaviate_id = nil
+	m.clearedFields[item.FieldWeaviateID] = struct{}{}
+}
+
+// WeaviateIDCleared returns if the "weaviate_id" field was cleared in this mutation.
+func (m *ItemMutation) WeaviateIDCleared() bool {
+	_, ok := m.clearedFields[item.FieldWeaviateID]
+	return ok
+}
+
 // ResetWeaviateID resets all changes to the "weaviate_id" field.
 func (m *ItemMutation) ResetWeaviateID() {
 	m.weaviate_id = nil
+	delete(m.clearedFields, item.FieldWeaviateID)
 }
 
 // SetVectorized sets the "vectorized" field.
@@ -1530,9 +1532,22 @@ func (m *ItemMutation) OldVectorized(ctx context.Context) (v bool, err error) {
 	return oldValue.Vectorized, nil
 }
 
+// ClearVectorized clears the value of the "vectorized" field.
+func (m *ItemMutation) ClearVectorized() {
+	m.vectorized = nil
+	m.clearedFields[item.FieldVectorized] = struct{}{}
+}
+
+// VectorizedCleared returns if the "vectorized" field was cleared in this mutation.
+func (m *ItemMutation) VectorizedCleared() bool {
+	_, ok := m.clearedFields[item.FieldVectorized]
+	return ok
+}
+
 // ResetVectorized resets all changes to the "vectorized" field.
 func (m *ItemMutation) ResetVectorized() {
 	m.vectorized = nil
+	delete(m.clearedFields, item.FieldVectorized)
 }
 
 // SetNumberSoldSinceUpdate sets the "number_sold_since_update" field.
@@ -1769,7 +1784,7 @@ func (m *ItemMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ItemMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 11)
 	if m.name != nil {
 		fields = append(fields, item.FieldName)
 	}
@@ -1790,9 +1805,6 @@ func (m *ItemMutation) Fields() []string {
 	}
 	if m.stripe_product_id != nil {
 		fields = append(fields, item.FieldStripeProductID)
-	}
-	if m.category_name != nil {
-		fields = append(fields, item.FieldCategoryName)
 	}
 	if m.weaviate_id != nil {
 		fields = append(fields, item.FieldWeaviateID)
@@ -1828,8 +1840,6 @@ func (m *ItemMutation) Field(name string) (ent.Value, bool) {
 		return m.StripePriceID()
 	case item.FieldStripeProductID:
 		return m.StripeProductID()
-	case item.FieldCategoryName:
-		return m.CategoryName()
 	case item.FieldWeaviateID:
 		return m.WeaviateID()
 	case item.FieldVectorized:
@@ -1861,8 +1871,6 @@ func (m *ItemMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldStripePriceID(ctx)
 	case item.FieldStripeProductID:
 		return m.OldStripeProductID(ctx)
-	case item.FieldCategoryName:
-		return m.OldCategoryName(ctx)
 	case item.FieldWeaviateID:
 		return m.OldWeaviateID(ctx)
 	case item.FieldVectorized:
@@ -1928,13 +1936,6 @@ func (m *ItemMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStripeProductID(v)
-		return nil
-	case item.FieldCategoryName:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCategoryName(v)
 		return nil
 	case item.FieldWeaviateID:
 		v, ok := value.(string)
@@ -2033,6 +2034,18 @@ func (m *ItemMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *ItemMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(item.FieldStripePriceID) {
+		fields = append(fields, item.FieldStripePriceID)
+	}
+	if m.FieldCleared(item.FieldStripeProductID) {
+		fields = append(fields, item.FieldStripeProductID)
+	}
+	if m.FieldCleared(item.FieldWeaviateID) {
+		fields = append(fields, item.FieldWeaviateID)
+	}
+	if m.FieldCleared(item.FieldVectorized) {
+		fields = append(fields, item.FieldVectorized)
+	}
 	if m.FieldCleared(item.FieldNumberSoldSinceUpdate) {
 		fields = append(fields, item.FieldNumberSoldSinceUpdate)
 	}
@@ -2053,6 +2066,18 @@ func (m *ItemMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *ItemMutation) ClearField(name string) error {
 	switch name {
+	case item.FieldStripePriceID:
+		m.ClearStripePriceID()
+		return nil
+	case item.FieldStripeProductID:
+		m.ClearStripeProductID()
+		return nil
+	case item.FieldWeaviateID:
+		m.ClearWeaviateID()
+		return nil
+	case item.FieldVectorized:
+		m.ClearVectorized()
+		return nil
 	case item.FieldNumberSoldSinceUpdate:
 		m.ClearNumberSoldSinceUpdate()
 		return nil
@@ -2087,9 +2112,6 @@ func (m *ItemMutation) ResetField(name string) error {
 		return nil
 	case item.FieldStripeProductID:
 		m.ResetStripeProductID()
-		return nil
-	case item.FieldCategoryName:
-		m.ResetCategoryName()
 		return nil
 	case item.FieldWeaviateID:
 		m.ResetWeaviateID()
