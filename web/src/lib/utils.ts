@@ -34,7 +34,7 @@ export function useFetch() {
   return authenticatedFetch;
 }
 
-export function isAuthenticated() : boolean{
+export function useAuthenticated() : boolean{
   const {isSignedIn} = useAuth()
   if (!isSignedIn) {
     return false
