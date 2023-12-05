@@ -8,6 +8,8 @@ import Providers from "../../providers";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useUser } from "@clerk/nextjs";
+import { useSelectedStore } from "@/components/storeprovider";
 
 export default function AppLayout({
   children,
@@ -18,6 +20,8 @@ export default function AppLayout({
 }) {
   const [queryClient] = useState(() => new QueryClient());
   const [infoMessage, setInfoMessage] = useState(null);
+  const { user } = useUser();
+
   return (
     <Providers>
       <div className="min-h-screen h-full flex flex-col">

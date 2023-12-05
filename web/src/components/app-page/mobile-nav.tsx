@@ -1,4 +1,4 @@
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import {
   HelpCircle,
   HomeIcon,
@@ -20,6 +20,9 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useSelectedStore } from "../storeprovider";
+import { useEffect, useState } from "react";
+import { IStore } from "@/models/store";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon },
@@ -48,6 +51,28 @@ export default function MobileNav() {
 }
 
 const SidebarNav = () => {
+  const { user } = useUser();
+  const { selectedStore, selectStore } = useSelectedStore();
+  const [stores, setStores] = useState<IStore[]>([]);
+
+  const mapMetadataStores = (storesData: any[]) =>
+  storesData.map((store) => ({
+    id: store.id,
+    storename: store.storename,
+    Permission_level: store.Permission_level,
+  }));
+  
+  useEffect(() => {
+    async function fetchStores() {
+      if (user && user.publicMetadata.stores) {
+        const metadataStores = mapMetadataStores(user.publicMetadata.stores as any[]);
+        setStores(metadataStores);
+      }
+    }
+    if(user && stores){
+      fetchStores();
+    }
+  }, [user, selectStore]);
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -59,9 +84,9 @@ const SidebarNav = () => {
         <SheetHeader className="border-b pb-5">
           <div className="px-3 py-1.5 flex items-center gap-x-3 bg-gray-100 rounded-md shadow">
             <div className="h-4 w-4 bg-white flex items-center justify-center rounded-md">
-              <span className="text-xs">R</span>
+              <span className="text-xs">{selectedStore?.storename.charAt(0)}</span>
             </div>
-            <SheetTitle className="text-sm">Current store name</SheetTitle>
+            <SheetTitle className="text-sm"> {selectedStore?.storename} </SheetTitle>
           </div>
         </SheetHeader>
 
@@ -90,13 +115,13 @@ const SidebarNav = () => {
                 Your stores
               </div>
               <ul role="list" className="space-y-1.5">
-                {fakeStores.map((store) => (
-                  <li key={store.name}>
+                {stores.map((store) => (
+                  <li key={store.storename}>
                     <div className="group text-gray-900 hover:text-black flex items-center gap-x-3 px-3 hover:bg-gray-100 py-1.5 rounded-md">
                       <div className="bg-gray-100 group-hover:bg-white h-4 w-4 flex items-center justify-center rounded-md">
-                        <span className="text-xs">{store.name.charAt(0)}</span>
+                        <span className="text-xs">{store.storename.charAt(0)}</span>
                       </div>
-                      <span className="text-sm">{store.name}</span>
+                      <span className="text-sm">{store.storename}</span>
                     </div>
                   </li>
                 ))}

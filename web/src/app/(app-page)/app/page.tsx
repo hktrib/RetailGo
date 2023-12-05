@@ -1,6 +1,9 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+"use client"
 
-export default function DashboardPage() {
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import isAuth from "@/components/isAuth";
+
+function DashboardPage() {
   return (
     <main className="bg-gray-50 h-full flex-grow flex">
       <div className="py-6 px-6 md:px-8 max-w-6xl mx-auto lg:ml-0 flex-grow">
@@ -33,3 +36,5 @@ export default function DashboardPage() {
     </main>
   );
 }
+
+export default isAuth(DashboardPage);
