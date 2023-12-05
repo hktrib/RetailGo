@@ -46,6 +46,7 @@ func StoreAndOwnerCreationTx(ctx context.Context, reqStore *ent.Store, reqUser *
 	}
 
 	_, err = tx.UserToStore.Update().
+		Where(usertostore.StoreID(newStore.ID), usertostore.UserID(newUser.ID)).
 		SetClerkUserID(newUser.ClerkUserID).
 		SetPermissionLevel(0).
 		SetStoreName(newStore.StoreName).
