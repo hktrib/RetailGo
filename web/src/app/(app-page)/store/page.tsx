@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 
 type StoreMetadata = {
   Permission_level: number;
