@@ -34,31 +34,41 @@ func (srv *Server) UserCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = srv.DBClient.User.Create().
+	newUser, err := srv.DBClient.User.Create().
 		SetClerkUserID(reqUser.ClerkUserID).
 		SetEmail(reqUser.Email).
 		SetIsOwner(reqUser.IsOwner).
 		SetFirstName(reqUser.FirstName).
 		SetLastName(reqUser.LastName).
 		SetStoreID(reqUser.StoreID).Save(ctx)
-	
 	if err != nil {
-		log.Debug().Err(err).Msg("User Creation didn't work:")
+		log.Debug().Err(err).Msg("User Creation didn't work")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	// Add StoreID -> to "stores" list in private_metadata for clerk user
 
+	// Creating New Clerk Store instance of the given User
 	clerkStore, err := clerkHelpers.NewClerkStore(srv.ClerkClient, reqUser.ClerkUserID, srv.Config)
 	if err != nil {
-		log.Debug().Err(err).Msg("NewClerkStore failed: Unable to create ClerkStore instance using clerk user id:")
+		log.Debug().Err(err).Msg("NewClerkStore failed: Unable to create ClerkStore instance using clerk user id")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return	
 	}
 
-	err = clerkStore.AddStore(reqUser.StoreID)
+	// Fetching the UserToStore Relation from the database 
+	newUTS, err := srv.DBClient.UserToStore.Query().
+		Where( usertostore.StoreID(newUser.StoreID), usertostore.UserID(newUser.ID)).
+		Only(ctx)
 	if err != nil {
-		log.Debug().Err(err).Msg("AddStore failed: ")
+		log.Debug().Err(err).Msg("Store Query for Clerk Store updating didn't work")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	// Adding the
+	err = clerkStore.AddMetadata(newUTS)
+	if err != nil {
+		log.Debug().Err(err).Msg("Unable to add user metadata to Clerk Store")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return	
 	}

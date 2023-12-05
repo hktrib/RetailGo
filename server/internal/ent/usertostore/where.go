@@ -18,6 +18,11 @@ func StoreID(v int) predicate.UserToStore {
 	return predicate.UserToStore(sql.FieldEQ(FieldStoreID, v))
 }
 
+// StoreName applies equality check predicate on the "store_name" field. It's identical to StoreNameEQ.
+func StoreName(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldEQ(FieldStoreName, v))
+}
+
 // ClerkUserID applies equality check predicate on the "clerk_user_id" field. It's identical to ClerkUserIDEQ.
 func ClerkUserID(v string) predicate.UserToStore {
 	return predicate.UserToStore(sql.FieldEQ(FieldClerkUserID, v))
@@ -71,6 +76,81 @@ func StoreIDIn(vs ...int) predicate.UserToStore {
 // StoreIDNotIn applies the NotIn predicate on the "store_id" field.
 func StoreIDNotIn(vs ...int) predicate.UserToStore {
 	return predicate.UserToStore(sql.FieldNotIn(FieldStoreID, vs...))
+}
+
+// StoreNameEQ applies the EQ predicate on the "store_name" field.
+func StoreNameEQ(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldEQ(FieldStoreName, v))
+}
+
+// StoreNameNEQ applies the NEQ predicate on the "store_name" field.
+func StoreNameNEQ(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldNEQ(FieldStoreName, v))
+}
+
+// StoreNameIn applies the In predicate on the "store_name" field.
+func StoreNameIn(vs ...string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldIn(FieldStoreName, vs...))
+}
+
+// StoreNameNotIn applies the NotIn predicate on the "store_name" field.
+func StoreNameNotIn(vs ...string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldNotIn(FieldStoreName, vs...))
+}
+
+// StoreNameGT applies the GT predicate on the "store_name" field.
+func StoreNameGT(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldGT(FieldStoreName, v))
+}
+
+// StoreNameGTE applies the GTE predicate on the "store_name" field.
+func StoreNameGTE(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldGTE(FieldStoreName, v))
+}
+
+// StoreNameLT applies the LT predicate on the "store_name" field.
+func StoreNameLT(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldLT(FieldStoreName, v))
+}
+
+// StoreNameLTE applies the LTE predicate on the "store_name" field.
+func StoreNameLTE(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldLTE(FieldStoreName, v))
+}
+
+// StoreNameContains applies the Contains predicate on the "store_name" field.
+func StoreNameContains(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldContains(FieldStoreName, v))
+}
+
+// StoreNameHasPrefix applies the HasPrefix predicate on the "store_name" field.
+func StoreNameHasPrefix(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldHasPrefix(FieldStoreName, v))
+}
+
+// StoreNameHasSuffix applies the HasSuffix predicate on the "store_name" field.
+func StoreNameHasSuffix(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldHasSuffix(FieldStoreName, v))
+}
+
+// StoreNameIsNil applies the IsNil predicate on the "store_name" field.
+func StoreNameIsNil() predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldIsNull(FieldStoreName))
+}
+
+// StoreNameNotNil applies the NotNil predicate on the "store_name" field.
+func StoreNameNotNil() predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldNotNull(FieldStoreName))
+}
+
+// StoreNameEqualFold applies the EqualFold predicate on the "store_name" field.
+func StoreNameEqualFold(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldEqualFold(FieldStoreName, v))
+}
+
+// StoreNameContainsFold applies the ContainsFold predicate on the "store_name" field.
+func StoreNameContainsFold(v string) predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldContainsFold(FieldStoreName, v))
 }
 
 // ClerkUserIDEQ applies the EQ predicate on the "clerk_user_id" field.
