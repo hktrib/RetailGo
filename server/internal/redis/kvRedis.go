@@ -3,10 +3,12 @@ package kv
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
-	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/redis/go-redis/v9"
+
+	"github.com/hktrib/RetailGo/internal/ent"
 )
 
 type Cache struct {
@@ -33,12 +35,14 @@ func (c *Cache) getClient(opts *redis.Options) *redis.Client {
 func (c *Cache) Set(key string, value *ent.User) {
 	client := c.Client
 	// serialize value object to JSON
+
+	fmt.Printf("Set Key: %s\n", key)
 	json, err := json.Marshal(value)
 	if err != nil {
 		panic(err)
 	}
 
-	client.Set(c.ctx, key, json, c.defaultExpiry)
+	client.Set(c.ctx, key, json, 0)
 }
 
 func (c *Cache) SetX(key string, value *ent.User, expiresAt time.Duration) {
@@ -56,6 +60,7 @@ func (c *Cache) SetX(key string, value *ent.User, expiresAt time.Duration) {
 func (c *Cache) Get(key string) *ent.User {
 	client := c.Client
 
+	fmt.Printf("Get Key: %s\n", key)
 	ctx := context.Background()
 	val, err := client.Get(ctx, key).Result()
 	if err != nil {
