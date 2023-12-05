@@ -5,13 +5,13 @@ import { useFetch } from "../utils";
 // http://localhost:8080/
 // https://retailgo-production.up.railway.app/
 
-const Environment : string = "TEST"
+const env : string = process.env.NODE_ENV
 
 // config.tsx
 
 let config : ClassDictionary;
 
-if (Environment == "PRO") {
+if (env == "PROD") {
     config = {
         serverURL: 'https://retailgo-production.up.railway.app/'
     };
