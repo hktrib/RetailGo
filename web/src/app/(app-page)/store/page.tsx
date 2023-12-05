@@ -11,12 +11,13 @@ type StoreMetadata = {
 export default function StoreViewPage() {
   const { sessionClaims } = auth();
 
-  if (!sessionClaims || !sessionClaims.publicMetadata) return notFound();
+  if (!sessionClaims || !sessionClaims.publicMetadata)
+    return redirect("/registrationForm");
 
   const publicMetadata = sessionClaims.publicMetadata as {
     stores?: StoreMetadata[];
   };
-  if (!publicMetadata.stores) redirect("/");
+  if (!publicMetadata.stores) redirect("/registrationForm");
 
   return (
     <main className="bg-gray-50 h-full flex-grow flex">
@@ -43,7 +44,7 @@ export default function StoreViewPage() {
 
 const StoreCard = ({ id, storeName }: { id: number; storeName: string }) => {
   const createUrl = (id: number) => {
-    const baseUrl = `/app/${id}`;
+    const baseUrl = `/store/${id}`;
     return `${baseUrl}`;
   };
 

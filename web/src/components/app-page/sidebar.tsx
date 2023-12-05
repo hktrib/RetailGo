@@ -11,7 +11,7 @@ import {
   Users2,
   ShoppingBag,
 } from "lucide-react";
-import type { StoreMetadata } from "@/app/(app-page)/app/layout";
+import type { StoreMetadata } from "@/app/(app-page)/store/layout";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon },
@@ -64,9 +64,9 @@ export const Navigation = ({
   currentStoreId: string;
 }) => {
   const buildUrl = (href: string) => {
-    if (!currentStoreId) return "/app";
+    if (!currentStoreId) return "/store";
 
-    const baseUrl = `/app/${currentStoreId}`;
+    const baseUrl = `/store/${currentStoreId}`;
     return `${baseUrl}${href}`;
   };
 
@@ -97,7 +97,7 @@ export const Navigation = ({
           <ul role="list" className="space-y-1.5">
             {userStores.map((store) => (
               <li key={store.storename}>
-                <Link href={`/app/${store.id}`}>
+                <Link href={`/store/${store.id}`}>
                   <div className="group text-gray-900 hover:text-black flex items-center gap-x-3 px-3 hover:bg-gray-100 py-1.5 rounded-md">
                     <div className="bg-gray-100 group-hover:bg-white h-4 w-4 flex items-center justify-center rounded-sm">
                       <span className="text-xs">

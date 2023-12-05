@@ -20,18 +20,18 @@ export default function Header() {
         <div className="hidden lg:flex lg:flex-1 lg:justify-end items-center space-x-4">
           {userId ? (
             <>
-            <Link
-              href="/app"
-              className="bg-amber-500 text-white font-medium px-3 py-1.5 rounded-md text-sm"
-            >
-              My stores
-            </Link>
-            <Link
-              href="/registrationForm"
-              className="bg-amber-600 text-white font-medium px-3 py-1.5 rounded-md text-sm"
-            >
-              Add Store
-            </Link>
+              <Link
+                href="/store"
+                className="bg-amber-500 text-white font-medium px-3 py-1.5 rounded-md text-sm"
+              >
+                My stores
+              </Link>
+              <Link
+                href="/registrationForm"
+                className="bg-amber-600 text-white font-medium px-3 py-1.5 rounded-md text-sm"
+              >
+                Add Store
+              </Link>
             </>
           ) : (
             <>
