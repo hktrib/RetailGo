@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/hibiken/asynq"
+
 	"github.com/hktrib/RetailGo/internal/ent"
 	kv "github.com/hktrib/RetailGo/internal/redis"
 	worker "github.com/hktrib/RetailGo/internal/tasks"
@@ -112,7 +113,7 @@ func (s *Server) MountHandlers() {
 			})
 			r.Route("/category", func(r chi.Router) {
 				r.Group(func(r chi.Router) {
-					r.Use(s.ValidateStore)     // add owner validation validation
+					r.Use(s.ValidateOwner)     // add owner validation validation
 					r.Post("/", s.CatCreate)   //
 					r.Delete("/", s.CatDelete) //
 				})

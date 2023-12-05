@@ -70,7 +70,6 @@ func StoreAndOwnerCreationTx(ctx context.Context, reqStore *ent.Store, reqUser *
 
 func rollback(tx *ent.Tx, err error) error {
 
-	// fmt.Println("Hit Rollback!!")
 	if rerr := tx.Rollback(); rerr != nil {
 		err = fmt.Errorf("%w: %v", err, rerr)
 		fmt.Println(err)
