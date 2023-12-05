@@ -162,6 +162,7 @@ var (
 	}
 	// UserToStoresColumns holds the columns for the "user_to_stores" table.
 	UserToStoresColumns = []*schema.Column{
+		{Name: "store_name", Type: field.TypeInt, Nullable: true},
 		{Name: "clerk_user_id", Type: field.TypeString, Nullable: true},
 		{Name: "permission_level", Type: field.TypeInt, Nullable: true},
 		{Name: "joined_at", Type: field.TypeInt, Nullable: true},
@@ -172,17 +173,17 @@ var (
 	UserToStoresTable = &schema.Table{
 		Name:       "user_to_stores",
 		Columns:    UserToStoresColumns,
-		PrimaryKey: []*schema.Column{UserToStoresColumns[3], UserToStoresColumns[4]},
+		PrimaryKey: []*schema.Column{UserToStoresColumns[4], UserToStoresColumns[5]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "user_to_stores_users_user",
-				Columns:    []*schema.Column{UserToStoresColumns[3]},
+				Columns:    []*schema.Column{UserToStoresColumns[4]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "user_to_stores_stores_store",
-				Columns:    []*schema.Column{UserToStoresColumns[4]},
+				Columns:    []*schema.Column{UserToStoresColumns[5]},
 				RefColumns: []*schema.Column{StoresColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

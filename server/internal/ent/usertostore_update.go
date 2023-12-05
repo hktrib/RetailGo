@@ -57,6 +57,33 @@ func (utsu *UserToStoreUpdate) SetNillableStoreID(i *int) *UserToStoreUpdate {
 	return utsu
 }
 
+// SetStoreName sets the "store_name" field.
+func (utsu *UserToStoreUpdate) SetStoreName(i int) *UserToStoreUpdate {
+	utsu.mutation.ResetStoreName()
+	utsu.mutation.SetStoreName(i)
+	return utsu
+}
+
+// SetNillableStoreName sets the "store_name" field if the given value is not nil.
+func (utsu *UserToStoreUpdate) SetNillableStoreName(i *int) *UserToStoreUpdate {
+	if i != nil {
+		utsu.SetStoreName(*i)
+	}
+	return utsu
+}
+
+// AddStoreName adds i to the "store_name" field.
+func (utsu *UserToStoreUpdate) AddStoreName(i int) *UserToStoreUpdate {
+	utsu.mutation.AddStoreName(i)
+	return utsu
+}
+
+// ClearStoreName clears the value of the "store_name" field.
+func (utsu *UserToStoreUpdate) ClearStoreName() *UserToStoreUpdate {
+	utsu.mutation.ClearStoreName()
+	return utsu
+}
+
 // SetClerkUserID sets the "clerk_user_id" field.
 func (utsu *UserToStoreUpdate) SetClerkUserID(s string) *UserToStoreUpdate {
 	utsu.mutation.SetClerkUserID(s)
@@ -208,6 +235,15 @@ func (utsu *UserToStoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := utsu.mutation.StoreName(); ok {
+		_spec.SetField(usertostore.FieldStoreName, field.TypeInt, value)
+	}
+	if value, ok := utsu.mutation.AddedStoreName(); ok {
+		_spec.AddField(usertostore.FieldStoreName, field.TypeInt, value)
+	}
+	if utsu.mutation.StoreNameCleared() {
+		_spec.ClearField(usertostore.FieldStoreName, field.TypeInt)
+	}
 	if value, ok := utsu.mutation.ClerkUserID(); ok {
 		_spec.SetField(usertostore.FieldClerkUserID, field.TypeString, value)
 	}
@@ -335,6 +371,33 @@ func (utsuo *UserToStoreUpdateOne) SetNillableStoreID(i *int) *UserToStoreUpdate
 	if i != nil {
 		utsuo.SetStoreID(*i)
 	}
+	return utsuo
+}
+
+// SetStoreName sets the "store_name" field.
+func (utsuo *UserToStoreUpdateOne) SetStoreName(i int) *UserToStoreUpdateOne {
+	utsuo.mutation.ResetStoreName()
+	utsuo.mutation.SetStoreName(i)
+	return utsuo
+}
+
+// SetNillableStoreName sets the "store_name" field if the given value is not nil.
+func (utsuo *UserToStoreUpdateOne) SetNillableStoreName(i *int) *UserToStoreUpdateOne {
+	if i != nil {
+		utsuo.SetStoreName(*i)
+	}
+	return utsuo
+}
+
+// AddStoreName adds i to the "store_name" field.
+func (utsuo *UserToStoreUpdateOne) AddStoreName(i int) *UserToStoreUpdateOne {
+	utsuo.mutation.AddStoreName(i)
+	return utsuo
+}
+
+// ClearStoreName clears the value of the "store_name" field.
+func (utsuo *UserToStoreUpdateOne) ClearStoreName() *UserToStoreUpdateOne {
+	utsuo.mutation.ClearStoreName()
 	return utsuo
 }
 
@@ -520,6 +583,15 @@ func (utsuo *UserToStoreUpdateOne) sqlSave(ctx context.Context) (_node *UserToSt
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := utsuo.mutation.StoreName(); ok {
+		_spec.SetField(usertostore.FieldStoreName, field.TypeInt, value)
+	}
+	if value, ok := utsuo.mutation.AddedStoreName(); ok {
+		_spec.AddField(usertostore.FieldStoreName, field.TypeInt, value)
+	}
+	if utsuo.mutation.StoreNameCleared() {
+		_spec.ClearField(usertostore.FieldStoreName, field.TypeInt)
 	}
 	if value, ok := utsuo.mutation.ClerkUserID(); ok {
 		_spec.SetField(usertostore.FieldClerkUserID, field.TypeString, value)

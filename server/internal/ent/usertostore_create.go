@@ -33,6 +33,20 @@ func (utsc *UserToStoreCreate) SetStoreID(i int) *UserToStoreCreate {
 	return utsc
 }
 
+// SetStoreName sets the "store_name" field.
+func (utsc *UserToStoreCreate) SetStoreName(i int) *UserToStoreCreate {
+	utsc.mutation.SetStoreName(i)
+	return utsc
+}
+
+// SetNillableStoreName sets the "store_name" field if the given value is not nil.
+func (utsc *UserToStoreCreate) SetNillableStoreName(i *int) *UserToStoreCreate {
+	if i != nil {
+		utsc.SetStoreName(*i)
+	}
+	return utsc
+}
+
 // SetClerkUserID sets the "clerk_user_id" field.
 func (utsc *UserToStoreCreate) SetClerkUserID(s string) *UserToStoreCreate {
 	utsc.mutation.SetClerkUserID(s)
@@ -153,6 +167,10 @@ func (utsc *UserToStoreCreate) createSpec() (*UserToStore, *sqlgraph.CreateSpec)
 		_node = &UserToStore{config: utsc.config}
 		_spec = sqlgraph.NewCreateSpec(usertostore.Table, nil)
 	)
+	if value, ok := utsc.mutation.StoreName(); ok {
+		_spec.SetField(usertostore.FieldStoreName, field.TypeInt, value)
+		_node.StoreName = value
+	}
 	if value, ok := utsc.mutation.ClerkUserID(); ok {
 		_spec.SetField(usertostore.FieldClerkUserID, field.TypeString, value)
 		_node.ClerkUserID = value
