@@ -5,10 +5,19 @@ import { useFetch } from "../../../lib/utils";
 
 import { Client } from "@clerk/nextjs/server";
 import { GetStaffByStore } from "@/lib/hooks/staff";
+import { useSelectedStore } from "@/components/storeprovider";
 
 
 export default function EmployeeTable() {
-  const itemQuery = GetStaffByStore("1");
+  const { selectedStore, selectStore } = useSelectedStore();
+
+  if (!selectedStore?.id) {
+    // Handle the scenario where the id is not available
+    // This could be rendering a placeholder, an error message, or returning null
+    return <div>No store selected</div>;
+  }
+  
+  const itemQuery = GetStaffByStore(selectedStore?.id );
   if (itemQuery.isLoading) {
     return <div>LOADING...</div>;
   }
@@ -16,6 +25,9 @@ export default function EmployeeTable() {
     console.error("Error loading items:", itemQuery.error);
     return <div>There was an error loading your items. Please try again!</div>;
   }
+
+
+  
 
   return (
     <div>
