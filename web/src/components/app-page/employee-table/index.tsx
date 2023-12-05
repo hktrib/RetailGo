@@ -5,10 +5,13 @@ import { useFetch } from "../../../lib/utils";
 
 import { Client } from "@clerk/nextjs/server";
 import { GetStaffByStore } from "@/lib/hooks/staff";
+import { useSelectedStore } from "@/components/storeprovider";
 
 
 export default function EmployeeTable() {
-  const itemQuery = GetStaffByStore("1");
+  const { selectedStore, selectStore } = useSelectedStore();
+
+  const itemQuery = GetStaffByStore(selectedStore?.id ?? 0);
   if (itemQuery.isLoading) {
     return <div>LOADING...</div>;
   }

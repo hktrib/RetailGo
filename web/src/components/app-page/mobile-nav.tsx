@@ -43,7 +43,7 @@ export default function MobileNav() {
           <span className="font-bold">RetailGo</span>
         </div>
         <div>
-          <UserButton />
+          <UserButton afterSignOutUrl="/" />
         </div>
       </div>
     </div>
@@ -56,12 +56,12 @@ const SidebarNav = () => {
   const [stores, setStores] = useState<IStore[]>([]);
 
   const mapMetadataStores = (storesData: any[]) =>
-  storesData.map((store) => ({
-    id: store.id,
-    storename: store.storename,
-    Permission_level: store.Permission_level,
-  }));
-  
+    storesData.map((store) => ({
+      id: store.id,
+      storename: store.storename,
+      Permission_level: store.Permission_level,
+    }));
+
   useEffect(() => {
     async function fetchStores() {
       if (user && user.publicMetadata.stores) {
@@ -69,7 +69,7 @@ const SidebarNav = () => {
         setStores(metadataStores);
       }
     }
-    if(user && stores){
+    if (user && stores) {
       fetchStores();
     }
   }, [user, selectStore]);
