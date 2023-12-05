@@ -3,10 +3,11 @@ package weaviate
 import (
 	"context"
 
-	"github.com/hktrib/RetailGo/internal/ent"
-	"github.com/hktrib/RetailGo/internal/util"
 	weaviateClient "github.com/weaviate/weaviate-go-client/v4/weaviate"
 	weaviateAuth "github.com/weaviate/weaviate-go-client/v4/weaviate/auth"
+
+	"github.com/hktrib/RetailGo/internal/ent"
+	"github.com/hktrib/RetailGo/internal/util"
 )
 
 type Weaviate struct {

@@ -29,6 +29,8 @@ type Item struct {
 	StoreID int `json:"store_id,omitempty"`
 	// StripePriceID holds the value of the "stripe_price_id" field.
 	StripePriceID string `json:"stripe_price_id,omitempty"`
+	// CategoryName holds the value of the "category_name" field.
+	CategoryName string `json:"category_name,omitempty"`
 	// StripeProductID holds the value of the "stripe_product_id" field.
 	StripeProductID string `json:"stripe_product_id,omitempty"`
 	// WeaviateID holds the value of the "weaviate_id" field.
@@ -100,7 +102,7 @@ func (*Item) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case item.FieldID, item.FieldQuantity, item.FieldStoreID, item.FieldNumberSoldSinceUpdate:
 			values[i] = new(sql.NullInt64)
-		case item.FieldName, item.FieldPhoto, item.FieldStripePriceID, item.FieldStripeProductID, item.FieldWeaviateID, item.FieldDateLastSold:
+		case item.FieldName, item.FieldPhoto, item.FieldStripePriceID, item.FieldCategoryName, item.FieldStripeProductID, item.FieldWeaviateID, item.FieldDateLastSold:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -158,6 +160,12 @@ func (i *Item) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field stripe_price_id", values[j])
 			} else if value.Valid {
 				i.StripePriceID = value.String
+			}
+		case item.FieldCategoryName:
+			if value, ok := values[j].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field category_name", values[j])
+			} else if value.Valid {
+				i.CategoryName = value.String
 			}
 		case item.FieldStripeProductID:
 			if value, ok := values[j].(*sql.NullString); !ok {
@@ -257,6 +265,9 @@ func (i *Item) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("stripe_price_id=")
 	builder.WriteString(i.StripePriceID)
+	builder.WriteString(", ")
+	builder.WriteString("category_name=")
+	builder.WriteString(i.CategoryName)
 	builder.WriteString(", ")
 	builder.WriteString("stripe_product_id=")
 	builder.WriteString(i.StripeProductID)

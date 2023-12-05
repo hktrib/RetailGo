@@ -65,6 +65,20 @@ func (ic *ItemCreate) SetNillableStripePriceID(s *string) *ItemCreate {
 	return ic
 }
 
+// SetCategoryName sets the "category_name" field.
+func (ic *ItemCreate) SetCategoryName(s string) *ItemCreate {
+	ic.mutation.SetCategoryName(s)
+	return ic
+}
+
+// SetNillableCategoryName sets the "category_name" field if the given value is not nil.
+func (ic *ItemCreate) SetNillableCategoryName(s *string) *ItemCreate {
+	if s != nil {
+		ic.SetCategoryName(*s)
+	}
+	return ic
+}
+
 // SetStripeProductID sets the "stripe_product_id" field.
 func (ic *ItemCreate) SetStripeProductID(s string) *ItemCreate {
 	ic.mutation.SetStripeProductID(s)
@@ -264,6 +278,10 @@ func (ic *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 	if value, ok := ic.mutation.StripePriceID(); ok {
 		_spec.SetField(item.FieldStripePriceID, field.TypeString, value)
 		_node.StripePriceID = value
+	}
+	if value, ok := ic.mutation.CategoryName(); ok {
+		_spec.SetField(item.FieldCategoryName, field.TypeString, value)
+		_node.CategoryName = value
 	}
 	if value, ok := ic.mutation.StripeProductID(); ok {
 		_spec.SetField(item.FieldStripeProductID, field.TypeString, value)

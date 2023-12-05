@@ -1013,6 +1013,7 @@ type ItemMutation struct {
 	price                       *float64
 	addprice                    *float64
 	stripe_price_id             *string
+	category_name               *string
 	stripe_product_id           *string
 	weaviate_id                 *string
 	vectorized                  *bool
@@ -1403,6 +1404,55 @@ func (m *ItemMutation) ResetStripePriceID() {
 	delete(m.clearedFields, item.FieldStripePriceID)
 }
 
+// SetCategoryName sets the "category_name" field.
+func (m *ItemMutation) SetCategoryName(s string) {
+	m.category_name = &s
+}
+
+// CategoryName returns the value of the "category_name" field in the mutation.
+func (m *ItemMutation) CategoryName() (r string, exists bool) {
+	v := m.category_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCategoryName returns the old "category_name" field's value of the Item entity.
+// If the Item object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ItemMutation) OldCategoryName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCategoryName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCategoryName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCategoryName: %w", err)
+	}
+	return oldValue.CategoryName, nil
+}
+
+// ClearCategoryName clears the value of the "category_name" field.
+func (m *ItemMutation) ClearCategoryName() {
+	m.category_name = nil
+	m.clearedFields[item.FieldCategoryName] = struct{}{}
+}
+
+// CategoryNameCleared returns if the "category_name" field was cleared in this mutation.
+func (m *ItemMutation) CategoryNameCleared() bool {
+	_, ok := m.clearedFields[item.FieldCategoryName]
+	return ok
+}
+
+// ResetCategoryName resets all changes to the "category_name" field.
+func (m *ItemMutation) ResetCategoryName() {
+	m.category_name = nil
+	delete(m.clearedFields, item.FieldCategoryName)
+}
+
 // SetStripeProductID sets the "stripe_product_id" field.
 func (m *ItemMutation) SetStripeProductID(s string) {
 	m.stripe_product_id = &s
@@ -1784,7 +1834,7 @@ func (m *ItemMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ItemMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 12)
 	if m.name != nil {
 		fields = append(fields, item.FieldName)
 	}
@@ -1802,6 +1852,9 @@ func (m *ItemMutation) Fields() []string {
 	}
 	if m.stripe_price_id != nil {
 		fields = append(fields, item.FieldStripePriceID)
+	}
+	if m.category_name != nil {
+		fields = append(fields, item.FieldCategoryName)
 	}
 	if m.stripe_product_id != nil {
 		fields = append(fields, item.FieldStripeProductID)
@@ -1838,6 +1891,8 @@ func (m *ItemMutation) Field(name string) (ent.Value, bool) {
 		return m.StoreID()
 	case item.FieldStripePriceID:
 		return m.StripePriceID()
+	case item.FieldCategoryName:
+		return m.CategoryName()
 	case item.FieldStripeProductID:
 		return m.StripeProductID()
 	case item.FieldWeaviateID:
@@ -1869,6 +1924,8 @@ func (m *ItemMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldStoreID(ctx)
 	case item.FieldStripePriceID:
 		return m.OldStripePriceID(ctx)
+	case item.FieldCategoryName:
+		return m.OldCategoryName(ctx)
 	case item.FieldStripeProductID:
 		return m.OldStripeProductID(ctx)
 	case item.FieldWeaviateID:
@@ -1929,6 +1986,13 @@ func (m *ItemMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStripePriceID(v)
+		return nil
+	case item.FieldCategoryName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCategoryName(v)
 		return nil
 	case item.FieldStripeProductID:
 		v, ok := value.(string)
@@ -2037,6 +2101,9 @@ func (m *ItemMutation) ClearedFields() []string {
 	if m.FieldCleared(item.FieldStripePriceID) {
 		fields = append(fields, item.FieldStripePriceID)
 	}
+	if m.FieldCleared(item.FieldCategoryName) {
+		fields = append(fields, item.FieldCategoryName)
+	}
 	if m.FieldCleared(item.FieldStripeProductID) {
 		fields = append(fields, item.FieldStripeProductID)
 	}
@@ -2068,6 +2135,9 @@ func (m *ItemMutation) ClearField(name string) error {
 	switch name {
 	case item.FieldStripePriceID:
 		m.ClearStripePriceID()
+		return nil
+	case item.FieldCategoryName:
+		m.ClearCategoryName()
 		return nil
 	case item.FieldStripeProductID:
 		m.ClearStripeProductID()
@@ -2109,6 +2179,9 @@ func (m *ItemMutation) ResetField(name string) error {
 		return nil
 	case item.FieldStripePriceID:
 		m.ResetStripePriceID()
+		return nil
+	case item.FieldCategoryName:
+		m.ResetCategoryName()
 		return nil
 	case item.FieldStripeProductID:
 		m.ResetStripeProductID()
