@@ -23,7 +23,7 @@ func (Item) Fields() []ent.Field {
 			SchemaType(map[string]string{
 				dialect.Postgres: "decimal(10,2)",
 			}),
-		field.Int("store_id").Optional(),
+		field.Int("store_id"),
 		field.String("stripe_price_id").Optional(),
 		field.String("stripe_product_id").Optional(),
 		field.String("weaviate_id").Optional(),
