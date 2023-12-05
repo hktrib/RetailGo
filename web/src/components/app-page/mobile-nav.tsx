@@ -12,8 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-
-import type { StoreMetadata } from "@/app/(app-page)/app/layout";
+import type { StoreMetadata } from "@/app/(app-page)/store/layout";
 
 export default function MobileNav({ stores }: { stores: StoreMetadata[] }) {
   return (
