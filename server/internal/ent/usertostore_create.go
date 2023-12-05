@@ -39,6 +39,14 @@ func (utsc *UserToStoreCreate) SetClerkUserID(s string) *UserToStoreCreate {
 	return utsc
 }
 
+// SetNillableClerkUserID sets the "clerk_user_id" field if the given value is not nil.
+func (utsc *UserToStoreCreate) SetNillableClerkUserID(s *string) *UserToStoreCreate {
+	if s != nil {
+		utsc.SetClerkUserID(*s)
+	}
+	return utsc
+}
+
 // SetPermissionLevel sets the "permission_level" field.
 func (utsc *UserToStoreCreate) SetPermissionLevel(i int) *UserToStoreCreate {
 	utsc.mutation.SetPermissionLevel(i)
@@ -116,9 +124,6 @@ func (utsc *UserToStoreCreate) check() error {
 	}
 	if _, ok := utsc.mutation.StoreID(); !ok {
 		return &ValidationError{Name: "store_id", err: errors.New(`ent: missing required field "UserToStore.store_id"`)}
-	}
-	if _, ok := utsc.mutation.ClerkUserID(); !ok {
-		return &ValidationError{Name: "clerk_user_id", err: errors.New(`ent: missing required field "UserToStore.clerk_user_id"`)}
 	}
 	if _, ok := utsc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "UserToStore.user"`)}

@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useFetch } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
+import {config} from "@/lib/hooks/config";
 
 // type Member = {
 //   firstName: string;
@@ -95,7 +96,7 @@ export default function RegistrationForm() {
 
     try {
       console.log("POST Data: ", JSON.stringify(postData));
-      const response = await authFetch("https://retailgo-production.up.railway.app/create/store", {
+      const response = await authFetch(config.serverURL + "create/store", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

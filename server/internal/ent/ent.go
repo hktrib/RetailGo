@@ -14,7 +14,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/hktrib/RetailGo/internal/ent/category"
 	"github.com/hktrib/RetailGo/internal/ent/categoryitem"
-	"github.com/hktrib/RetailGo/internal/ent/clerkuser_store"
 	"github.com/hktrib/RetailGo/internal/ent/item"
 	"github.com/hktrib/RetailGo/internal/ent/store"
 	"github.com/hktrib/RetailGo/internal/ent/user"
@@ -79,13 +78,12 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			category.Table:        category.ValidColumn,
-			categoryitem.Table:    categoryitem.ValidColumn,
-			clerkuser_store.Table: clerkuser_store.ValidColumn,
-			item.Table:            item.ValidColumn,
-			store.Table:           store.ValidColumn,
-			user.Table:            user.ValidColumn,
-			usertostore.Table:     usertostore.ValidColumn,
+			category.Table:     category.ValidColumn,
+			categoryitem.Table: categoryitem.ValidColumn,
+			item.Table:         item.ValidColumn,
+			store.Table:        store.ValidColumn,
+			user.Table:         user.ValidColumn,
+			usertostore.Table:  usertostore.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

@@ -61,18 +61,6 @@ var (
 			},
 		},
 	}
-	// ClerkUserStoresColumns holds the columns for the "clerk_user_stores" table.
-	ClerkUserStoresColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "clerk_id", Type: field.TypeString},
-		{Name: "store_id", Type: field.TypeInt},
-	}
-	// ClerkUserStoresTable holds the schema information for the "clerk_user_stores" table.
-	ClerkUserStoresTable = &schema.Table{
-		Name:       "clerk_user_stores",
-		Columns:    ClerkUserStoresColumns,
-		PrimaryKey: []*schema.Column{ClerkUserStoresColumns[0]},
-	}
 	// ItemsColumns holds the columns for the "items" table.
 	ItemsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -80,12 +68,12 @@ var (
 		{Name: "photo", Type: field.TypeString},
 		{Name: "quantity", Type: field.TypeInt},
 		{Name: "price", Type: field.TypeFloat64, SchemaType: map[string]string{"postgres": "decimal(10,2)"}},
-		{Name: "stripe_price_id", Type: field.TypeString},
-		{Name: "stripe_product_id", Type: field.TypeString},
-		{Name: "category_name", Type: field.TypeString},
-		{Name: "weaviate_id", Type: field.TypeString},
-		{Name: "vectorized", Type: field.TypeBool},
-		{Name: "number_sold", Type: field.TypeInt, Nullable: true},
+		{Name: "stripe_price_id", Type: field.TypeString, Nullable: true},
+		{Name: "category_name", Type: field.TypeString, Nullable: true},
+		{Name: "stripe_product_id", Type: field.TypeString, Nullable: true},
+		{Name: "weaviate_id", Type: field.TypeString, Nullable: true},
+		{Name: "vectorized", Type: field.TypeBool, Nullable: true},
+		{Name: "number_sold_since_update", Type: field.TypeInt, Nullable: true},
 		{Name: "date_last_sold", Type: field.TypeString, Nullable: true},
 		{Name: "store_id", Type: field.TypeInt},
 	}
@@ -111,7 +99,7 @@ var (
 			{
 				Name:    "item_stripe_product_id",
 				Unique:  false,
-				Columns: []*schema.Column{ItemsColumns[6]},
+				Columns: []*schema.Column{ItemsColumns[7]},
 			},
 		},
 	}
@@ -136,6 +124,16 @@ var (
 				Name:    "store_id",
 				Unique:  false,
 				Columns: []*schema.Column{StoresColumns[0]},
+			},
+			{
+				Name:    "store_store_name",
+				Unique:  false,
+				Columns: []*schema.Column{StoresColumns[2]},
+			},
+			{
+				Name:    "store_uuid",
+				Unique:  false,
+				Columns: []*schema.Column{StoresColumns[1]},
 			},
 		},
 	}
@@ -164,7 +162,7 @@ var (
 	}
 	// UserToStoresColumns holds the columns for the "user_to_stores" table.
 	UserToStoresColumns = []*schema.Column{
-		{Name: "clerk_user_id", Type: field.TypeString},
+		{Name: "clerk_user_id", Type: field.TypeString, Nullable: true},
 		{Name: "permission_level", Type: field.TypeInt, Nullable: true},
 		{Name: "joined_at", Type: field.TypeInt, Nullable: true},
 		{Name: "user_id", Type: field.TypeInt},
@@ -194,7 +192,6 @@ var (
 	Tables = []*schema.Table{
 		CategoriesTable,
 		CategoryItemsTable,
-		ClerkUserStoresTable,
 		ItemsTable,
 		StoresTable,
 		UsersTable,
