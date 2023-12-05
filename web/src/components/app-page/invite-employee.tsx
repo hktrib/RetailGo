@@ -1,10 +1,8 @@
-"use client";
-
+"use client"
+import { useState } from "react"; // Import useState
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
-
 import * as z from "zod";
-
 import {
   Dialog,
   DialogContent,
@@ -33,27 +31,37 @@ export default function InviteEmployee() {
     resolver: zodResolver(formSchema),
   });
 
- // Assuming storeId is known or retrieved from somewhere
- const storeId = "1";
- const inviteMutation = SendInvite(storeId);
+  const [isDialogOpen, setDialogOpen] = useState(false); // State to control the dialog
 
- const onSubmit = form.handleSubmit((data) => {
-  console.log(JSON.stringify(data));
-  inviteMutation.mutate(data);
-});
+  // Assuming storeId is known or retrieved from somewhere
+  const storeId = "1";
+  const inviteMutation = SendInvite(storeId);
+
+  const onSubmit = form.handleSubmit((data) => {
+    console.log(JSON.stringify(data));
+    inviteMutation.mutate(data);
+
+    // Close the dialog on successful submission
+    if (inviteMutation.isSuccess) {
+      setDialogOpen(false);
+    }
+  });
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button className="bg-blue-500 text-sm px-3 py-1.5 text-white font-medium rounded-md">
+        <button
+          className="bg-blue-500 text-sm px-3 py-1.5 text-white font-medium rounded-md"
+          onClick={() => setDialogOpen(true)} // Open the dialog on button click
+        >
           Invite
         </button>
       </DialogTrigger>
 
-      <Form {...form}>
-        <form>
-          <DialogContent>
-            <form onSubmit={onSubmit} {...form}>
+      {isDialogOpen && (
+        <Form {...form}>
+          <form onSubmit={onSubmit} {...form}>
+            <DialogContent>
               <DialogHeader>
                 <DialogTitle>Invite employee</DialogTitle>
               </DialogHeader>
@@ -83,18 +91,18 @@ export default function InviteEmployee() {
                   </FormItem>
                 )}
               />
-              <DialogFooter className="gap-x-4">
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-sm px-3 py-1.5 text-white font-medium rounded-md mt-5"
-                >
-                  Invite
-                </button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </form>
-      </Form>
+            </DialogContent>
+            <DialogFooter className="gap-x-4">
+              <button
+                type="submit"
+                className="bg-blue-500 text-sm px-3 py-1.5 text-white font-medium rounded-md mt-5"
+              >
+                Invite
+              </button>
+            </DialogFooter>
+          </form>
+        </Form>
+      )}
     </Dialog>
   );
 }
