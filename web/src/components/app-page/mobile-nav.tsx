@@ -6,6 +6,7 @@ import {
   Package2,
   Settings,
   ShoppingBag,
+  Users2,
 } from "lucide-react";
 
 import {
@@ -22,6 +23,7 @@ import Link from "next/link";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon },
+  { name: "Employees", href: "/employees", icon: Users2 },
   { name: "Inventory", href: "/inventory", icon: Package2 },
   { name: "POS", href: "/pos", icon: ShoppingBag },
 ];
