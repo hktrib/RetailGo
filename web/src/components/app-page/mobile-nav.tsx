@@ -65,7 +65,9 @@ const SidebarNav = () => {
   useEffect(() => {
     async function fetchStores() {
       if (user && user.publicMetadata.stores) {
-        const metadataStores = mapMetadataStores(user.publicMetadata.stores as any[]);
+        const metadataStores = mapMetadataStores(
+          user.publicMetadata.stores as any[]
+        );
         setStores(metadataStores);
       }
     }
@@ -73,6 +75,7 @@ const SidebarNav = () => {
       fetchStores();
     }
   }, [user, selectStore]);
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -84,9 +87,14 @@ const SidebarNav = () => {
         <SheetHeader className="border-b pb-5">
           <div className="px-3 py-1.5 flex items-center gap-x-3 bg-gray-100 rounded-md shadow">
             <div className="h-4 w-4 bg-white flex items-center justify-center rounded-md">
-              <span className="text-xs">{selectedStore?.storename.charAt(0)}</span>
+              <span className="text-xs">
+                {selectedStore?.storename.charAt(0)}
+              </span>
             </div>
-            <SheetTitle className="text-sm"> {selectedStore?.storename} </SheetTitle>
+            <SheetTitle className="text-sm">
+              {" "}
+              {selectedStore?.storename}{" "}
+            </SheetTitle>
           </div>
         </SheetHeader>
 
@@ -119,7 +127,9 @@ const SidebarNav = () => {
                   <li key={store.storename}>
                     <div className="group text-gray-900 hover:text-black flex items-center gap-x-3 px-3 hover:bg-gray-100 py-1.5 rounded-md">
                       <div className="bg-gray-100 group-hover:bg-white h-4 w-4 flex items-center justify-center rounded-md">
-                        <span className="text-xs">{store.storename.charAt(0)}</span>
+                        <span className="text-xs">
+                          {store.storename.charAt(0)}
+                        </span>
                       </div>
                       <span className="text-sm">{store.storename}</span>
                     </div>
