@@ -1,40 +1,60 @@
-"use client"
+import { auth } from "@clerk/nextjs";
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import isAuth from "@/components/isAuth";
+type StoreMetadata = {
+  Permission_level: number;
+  id: number;
+  storename: string;
+};
 
-function DashboardPage() {
+export default function StoreViewPage() {
+  const { sessionClaims } = auth();
+
+  if (!sessionClaims || !sessionClaims.publicMetadata) return notFound();
+
+  const publicMetadata = sessionClaims.publicMetadata as {
+    stores?: StoreMetadata[];
+  };
+  if (!publicMetadata.stores) redirect("/");
+
   return (
     <main className="bg-gray-50 h-full flex-grow flex">
       <div className="py-6 px-6 md:px-8 max-w-6xl mx-auto lg:ml-0 flex-grow">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <h1 className="text-2xl font-bold">My stores</h1>
         </div>
 
-        <Tabs defaultValue="overview" className="w-full pt-6 -mt-2 h-full">
-          <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="activity">Activity</TabsTrigger>
-          </TabsList>
-          <TabsContent value="overview" className="pt-14 h-full -mt-10 pb-4">
-            <div className="grid grid-cols-4 grid-rows-4 grid-flow-row gap-4 h-full">
-              <div className="bg-gray-200 rounded-md col-span-2 row-span-2" />
-              <div className="bg-gray-200 rounded-md col-span-2 row-span-2" />
+        <hr className="my-4" />
 
-              <div className="bg-gray-200 rounded-md col-span-1 row-span-1" />
-              <div className="bg-gray-200 rounded-md col-span-1 row-span-1" />
-              <div className="bg-gray-200 rounded-md col-span-1 row-span-1" />
-              <div className="bg-gray-200 rounded-md col-span-1 row-span-1" />
-
-              <div className="bg-gray-200 rounded-md col-span-2 row-span-2" />
-              <div className="bg-gray-200 rounded-md col-span-2 row-span-2" />
-            </div>
-          </TabsContent>
-          <TabsContent value="activity">Activity</TabsContent>
-        </Tabs>
+        <section className="flex flex-row flex-wrap gap-4">
+          {publicMetadata.stores.map((store: StoreMetadata) => (
+            <StoreCard
+              key={store.id}
+              id={store.id}
+              storeName={store.storename}
+            />
+          ))}
+        </section>
       </div>
     </main>
   );
 }
 
-export default isAuth(DashboardPage);
+const StoreCard = ({ id, storeName }: { id: number; storeName: string }) => {
+  const createUrl = (id: number) => {
+    const baseUrl = `/app/${id}`;
+    return `${baseUrl}`;
+  };
+
+  return (
+    <Link href={createUrl(id)}>
+      <article className="bg-white rounded-md shadow-sm w-52">
+        <div className="w-full h-40 bg-gray-100" />
+        <div className="p-4">
+          <span className="font-medium">{storeName}</span>
+        </div>
+      </article>
+    </Link>
+  );
+};
