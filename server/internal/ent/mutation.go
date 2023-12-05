@@ -4114,8 +4114,7 @@ type UserToStoreMutation struct {
 	config
 	op                  Op
 	typ                 string
-	store_name          *int
-	addstore_name       *int
+	store_name          *string
 	clerk_user_id       *string
 	permission_level    *int
 	addpermission_level *int
@@ -4208,32 +4207,13 @@ func (m *UserToStoreMutation) ResetStoreID() {
 }
 
 // SetStoreName sets the "store_name" field.
-func (m *UserToStoreMutation) SetStoreName(i int) {
-	m.store_name = &i
-	m.addstore_name = nil
+func (m *UserToStoreMutation) SetStoreName(s string) {
+	m.store_name = &s
 }
 
 // StoreName returns the value of the "store_name" field in the mutation.
-func (m *UserToStoreMutation) StoreName() (r int, exists bool) {
+func (m *UserToStoreMutation) StoreName() (r string, exists bool) {
 	v := m.store_name
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// AddStoreName adds i to the "store_name" field.
-func (m *UserToStoreMutation) AddStoreName(i int) {
-	if m.addstore_name != nil {
-		*m.addstore_name += i
-	} else {
-		m.addstore_name = &i
-	}
-}
-
-// AddedStoreName returns the value that was added to the "store_name" field in this mutation.
-func (m *UserToStoreMutation) AddedStoreName() (r int, exists bool) {
-	v := m.addstore_name
 	if v == nil {
 		return
 	}
@@ -4243,7 +4223,6 @@ func (m *UserToStoreMutation) AddedStoreName() (r int, exists bool) {
 // ClearStoreName clears the value of the "store_name" field.
 func (m *UserToStoreMutation) ClearStoreName() {
 	m.store_name = nil
-	m.addstore_name = nil
 	m.clearedFields[usertostore.FieldStoreName] = struct{}{}
 }
 
@@ -4256,7 +4235,6 @@ func (m *UserToStoreMutation) StoreNameCleared() bool {
 // ResetStoreName resets all changes to the "store_name" field.
 func (m *UserToStoreMutation) ResetStoreName() {
 	m.store_name = nil
-	m.addstore_name = nil
 	delete(m.clearedFields, usertostore.FieldStoreName)
 }
 
@@ -4556,7 +4534,7 @@ func (m *UserToStoreMutation) SetField(name string, value ent.Value) error {
 		m.SetStoreID(v)
 		return nil
 	case usertostore.FieldStoreName:
-		v, ok := value.(int)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -4591,9 +4569,6 @@ func (m *UserToStoreMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *UserToStoreMutation) AddedFields() []string {
 	var fields []string
-	if m.addstore_name != nil {
-		fields = append(fields, usertostore.FieldStoreName)
-	}
 	if m.addpermission_level != nil {
 		fields = append(fields, usertostore.FieldPermissionLevel)
 	}
@@ -4608,8 +4583,6 @@ func (m *UserToStoreMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *UserToStoreMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case usertostore.FieldStoreName:
-		return m.AddedStoreName()
 	case usertostore.FieldPermissionLevel:
 		return m.AddedPermissionLevel()
 	case usertostore.FieldJoinedAt:
@@ -4623,13 +4596,6 @@ func (m *UserToStoreMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *UserToStoreMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case usertostore.FieldStoreName:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddStoreName(v)
-		return nil
 	case usertostore.FieldPermissionLevel:
 		v, ok := value.(int)
 		if !ok {

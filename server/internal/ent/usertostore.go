@@ -21,7 +21,7 @@ type UserToStore struct {
 	// StoreID holds the value of the "store_id" field.
 	StoreID int `json:"store_id,omitempty"`
 	// StoreName holds the value of the "store_name" field.
-	StoreName int `json:"store_name,omitempty"`
+	StoreName string `json:"store_name,omitempty"`
 	// ClerkUserID holds the value of the "clerk_user_id" field.
 	ClerkUserID string `json:"clerk_user_id,omitempty"`
 	// PermissionLevel holds the value of the "permission_level" field.
@@ -76,9 +76,9 @@ func (*UserToStore) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case usertostore.FieldUserID, usertostore.FieldStoreID, usertostore.FieldStoreName, usertostore.FieldPermissionLevel, usertostore.FieldJoinedAt:
+		case usertostore.FieldUserID, usertostore.FieldStoreID, usertostore.FieldPermissionLevel, usertostore.FieldJoinedAt:
 			values[i] = new(sql.NullInt64)
-		case usertostore.FieldClerkUserID:
+		case usertostore.FieldStoreName, usertostore.FieldClerkUserID:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -108,10 +108,10 @@ func (uts *UserToStore) assignValues(columns []string, values []any) error {
 				uts.StoreID = int(value.Int64)
 			}
 		case usertostore.FieldStoreName:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field store_name", values[i])
 			} else if value.Valid {
-				uts.StoreName = int(value.Int64)
+				uts.StoreName = value.String
 			}
 		case usertostore.FieldClerkUserID:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -183,7 +183,7 @@ func (uts *UserToStore) String() string {
 	builder.WriteString(fmt.Sprintf("%v", uts.StoreID))
 	builder.WriteString(", ")
 	builder.WriteString("store_name=")
-	builder.WriteString(fmt.Sprintf("%v", uts.StoreName))
+	builder.WriteString(uts.StoreName)
 	builder.WriteString(", ")
 	builder.WriteString("clerk_user_id=")
 	builder.WriteString(uts.ClerkUserID)
