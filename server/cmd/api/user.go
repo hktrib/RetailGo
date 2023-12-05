@@ -41,6 +41,7 @@ func (srv *Server) UserCreate(w http.ResponseWriter, r *http.Request) {
 		SetFirstName(reqUser.FirstName).
 		SetLastName(reqUser.LastName).
 		SetStoreID(reqUser.StoreID).Save(ctx)
+
 	if err != nil {
 		log.Debug().Err(err).Msg("User Creation didn't work")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -52,7 +53,7 @@ func (srv *Server) UserCreate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Debug().Err(err).Msg("NewClerkStore failed: Unable to create ClerkStore instance using clerk user id")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return	
+		return
 	}
 
 	// Fetching the UserToStore Relation from the database 
@@ -70,9 +71,9 @@ func (srv *Server) UserCreate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Debug().Err(err).Msg("Unable to add user metadata to Clerk Store")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return	
+		return
 	}
-	
+
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("OK\n"))
 }
@@ -330,6 +331,18 @@ func (srv *Server) UserJoinStore(w http.ResponseWriter, r *http.Request) {
 		Save(ctx)
 
 	if create_err != nil {
+		fmt.Println("User Creation didn't work:", create_err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	_, user_store_error := srv.DBClient.UserToStore.Create().
+		SetStoreID(store.ID).
+		SetClerkUserID(clerkUser.ID).
+		SetPermissionLevel(2). // Employee permission level
+		Save(ctx)
+
+	if user_store_error != nil {
 		fmt.Println("User Creation didn't work:", create_err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return

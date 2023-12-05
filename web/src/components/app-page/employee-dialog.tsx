@@ -34,7 +34,7 @@ const formSchema = z.object({
 
 // The component definition
 export default function EmployeeDialog({
-  employeeData,
+  employeeData = new Employee(),
   mode = "add",
 }: {
   employeeData: Employee;

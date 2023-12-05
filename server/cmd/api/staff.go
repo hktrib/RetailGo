@@ -12,6 +12,7 @@ import (
 	"net/smtp"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/store"
 	"github.com/hktrib/RetailGo/internal/ent/user"
 )
@@ -66,6 +67,36 @@ type HtmlTemplate struct {
 	Store_name  string `json:"store_name"`
 	Sender_name string `json:"sender_name"`
 	Action_url  string `json:"action_url"`
+}
+
+func (srv *Server) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
+
+	// Verify user credentials using clerk
+	_, clerk_err := VerifyUserCredentials(r)
+	if clerk_err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("Unauthorized"))
+		return
+	}
+
+	// get item id from url query string
+	ctx := r.Context()
+	user_id, id_err := strconv.Atoi(chi.URLParam(r, "user_id"))
+	if id_err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	_, err := srv.DBClient.User.Query().Where(user.ID(user_id)).Only(ctx)
+
+	if ent.IsNotFound(err) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	} else if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
 }
 
 // TestEmailHandler handles the email testing request
@@ -152,7 +183,7 @@ func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 		Store_name:  storeObj.StoreName,
 		Sender_name: firstName + " " + lastName,
 		//Sender_name: "Billy Bob",
-		Action_url: "http://localhost:3000/sign-up/invite?code=" + storeObj.UUID,
+		Action_url: "http://localhost:3000/app/invite?code=" + storeObj.UUID,
 	}
 	err_io := tmpl.Execute(htmlBody, templateData)
 

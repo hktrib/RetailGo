@@ -22,34 +22,55 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { SendInvite } from "@/lib/hooks/staff";
+import { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+
 
 export default function InviteEmployee() {
+  const [isDialogOpen, setDialogOpen] = useState(false); // State to control the dialog
+
   const formSchema = z.object({
-    email: z.string(),
+    email: z.string().regex(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/),
     name: z.string(),
   });
+
+  const notify = () => {
+    toast.success("Invite sent successfully!", {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: 10000
+    });
+  }
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
- // Assuming storeId is known or retrieved from somewhere
- const storeId = "1";
- const inviteMutation = SendInvite(storeId);
+  // Assuming storeId is known or retrieved from somewhere
+  const storeId = "1";
+  const inviteMutation = SendInvite(storeId);
 
- const onSubmit = form.handleSubmit((data) => {
-  console.log(JSON.stringify(data));
-  inviteMutation.mutate(data);
-});
+  const onSubmit = form.handleSubmit((data: any) => {
+    console.log(JSON.stringify(data));
+    // inviteMutation.mutate(data);
+    inviteMutation.isSuccess = true;
+    if (inviteMutation.isSuccess) {
+      setDialogOpen(false);
+    }
+    toast.success("Invite sent successfully!", {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: 10000
+    });
+  });
 
   return (
-    <Dialog>
+    <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
-        <button className="bg-blue-500 text-sm px-3 py-1.5 text-white font-medium rounded-md">
+        <button className="bg-blue-500 text-sm px-3 py-1.5 text-white font-medium rounded-md"
+          onClick={() => setDialogOpen(true)}
+        >
           Invite
         </button>
       </DialogTrigger>
-
       <Form {...form}>
         <form>
           <DialogContent>

@@ -40,8 +40,4 @@ export const columns: ColumnDef<Employee>[] = [
       );
     },
   },
-  {
-    accessorKey: "department",
-    header: () => <div className="text-xs">ID</div>,
-  },
 ];

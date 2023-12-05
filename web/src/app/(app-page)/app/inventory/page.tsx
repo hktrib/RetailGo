@@ -32,6 +32,7 @@ export default function Inventory() {
   ];
 
   const newItem = new Item();
+  const data=JSON.parse(JSON.stringify(newItem))
 
   const queryClient = new QueryClient();
 
@@ -42,7 +43,7 @@ export default function Inventory() {
           <h1 className="text-2xl font-bold">Inventory</h1>
 
           <div>
-            <AddItemDialog item={newItem} />
+            <AddItemDialog item={data} />
           </div>
         </div>
         <hr className="my-4" />
