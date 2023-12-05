@@ -31,7 +31,7 @@ func StoreAndOwnerCreationTx(ctx context.Context, reqStore *ent.Store, reqUser *
 	}
 
 	_, err = tx.User.Create().
-		SetClerkUserID(reqStore.UUID).
+		SetClerkUserID(reqUser.ClerkUserID).
 		SetEmail(reqUser.Email).
 		SetIsOwner(true).
 		SetFirstName(reqUser.FirstName).
@@ -41,6 +41,9 @@ func StoreAndOwnerCreationTx(ctx context.Context, reqStore *ent.Store, reqUser *
 	if err != nil {
 		return rollback(tx, fmt.Errorf("tx_error: Unable to create owner: %w", err))
 	}
+
+	// check if reqStore id changed
+	reqStore.ID = store.ID
 
 	_, err = tx.UserToStore.Update().
 		AddPermissionLevel(0).Save(ctx)

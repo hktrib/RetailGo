@@ -71,6 +71,12 @@ func (utsu *UserToStoreUpdate) SetNillableClerkUserID(s *string) *UserToStoreUpd
 	return utsu
 }
 
+// ClearClerkUserID clears the value of the "clerk_user_id" field.
+func (utsu *UserToStoreUpdate) ClearClerkUserID() *UserToStoreUpdate {
+	utsu.mutation.ClearClerkUserID()
+	return utsu
+}
+
 // SetPermissionLevel sets the "permission_level" field.
 func (utsu *UserToStoreUpdate) SetPermissionLevel(i int) *UserToStoreUpdate {
 	utsu.mutation.ResetPermissionLevel()
@@ -204,6 +210,9 @@ func (utsu *UserToStoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := utsu.mutation.ClerkUserID(); ok {
 		_spec.SetField(usertostore.FieldClerkUserID, field.TypeString, value)
+	}
+	if utsu.mutation.ClerkUserIDCleared() {
+		_spec.ClearField(usertostore.FieldClerkUserID, field.TypeString)
 	}
 	if value, ok := utsu.mutation.PermissionLevel(); ok {
 		_spec.SetField(usertostore.FieldPermissionLevel, field.TypeInt, value)
@@ -340,6 +349,12 @@ func (utsuo *UserToStoreUpdateOne) SetNillableClerkUserID(s *string) *UserToStor
 	if s != nil {
 		utsuo.SetClerkUserID(*s)
 	}
+	return utsuo
+}
+
+// ClearClerkUserID clears the value of the "clerk_user_id" field.
+func (utsuo *UserToStoreUpdateOne) ClearClerkUserID() *UserToStoreUpdateOne {
+	utsuo.mutation.ClearClerkUserID()
 	return utsuo
 }
 
@@ -508,6 +523,9 @@ func (utsuo *UserToStoreUpdateOne) sqlSave(ctx context.Context) (_node *UserToSt
 	}
 	if value, ok := utsuo.mutation.ClerkUserID(); ok {
 		_spec.SetField(usertostore.FieldClerkUserID, field.TypeString, value)
+	}
+	if utsuo.mutation.ClerkUserIDCleared() {
+		_spec.ClearField(usertostore.FieldClerkUserID, field.TypeString)
 	}
 	if value, ok := utsuo.mutation.PermissionLevel(); ok {
 		_spec.SetField(usertostore.FieldPermissionLevel, field.TypeInt, value)

@@ -128,6 +128,16 @@ func ClerkUserIDHasSuffix(v string) predicate.UserToStore {
 	return predicate.UserToStore(sql.FieldHasSuffix(FieldClerkUserID, v))
 }
 
+// ClerkUserIDIsNil applies the IsNil predicate on the "clerk_user_id" field.
+func ClerkUserIDIsNil() predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldIsNull(FieldClerkUserID))
+}
+
+// ClerkUserIDNotNil applies the NotNil predicate on the "clerk_user_id" field.
+func ClerkUserIDNotNil() predicate.UserToStore {
+	return predicate.UserToStore(sql.FieldNotNull(FieldClerkUserID))
+}
+
 // ClerkUserIDEqualFold applies the EqualFold predicate on the "clerk_user_id" field.
 func ClerkUserIDEqualFold(v string) predicate.UserToStore {
 	return predicate.UserToStore(sql.FieldEqualFold(FieldClerkUserID, v))
