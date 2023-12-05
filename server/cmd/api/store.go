@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog/log"
 
-	clerkHelpers "github.com/hktrib/RetailGo/internal/clerk"
+	clerkstorage "github.com/hktrib/RetailGo/internal/clerk"
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/user"
 	"github.com/hktrib/RetailGo/internal/transactions"
@@ -18,29 +18,23 @@ import (
 func (srv *Server) CreateStore(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
-
 	reqStore := ctx.Value(Param("store")).(*ent.Store)
 	reqUser := ctx.Value(Param("owner")).(*ent.User)
-	err := transactions.StoreAndOwnerCreationTx(ctx, reqStore, reqUser, srv.DBClient)
-	if err != nil {
-		fmt.Println("Could not executed Store|Owner Transaction:", err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
 
-	// Geting newly created store
-
-	// store, err := srv.DBClient.Store.Query().Where(store.ByStoreName())
-
-	// Adding storeid to clerk store
-	clerkStore, err := clerkHelpers.NewClerkStore(srv.ClerkClient, reqUser.ClerkUserID, srv.Config)
+	clerkStore, err := clerkstorage.NewClerkStore(srv.ClerkClient, reqUser.ClerkUserID, srv.Config)
 	if err != nil {
 		log.Debug().Err(err).Msg("NewClerkStore failed: Unable to create ClerkStore instance using clerk user id:")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return	
 	}
 
-	err = clerkStore.AddStore(reqStore.ID)
+	err = transactions.StoreAndOwnerCreationTx(ctx, reqStore, reqUser, srv.DBClient, clerkStore)
+	if err != nil {
+		fmt.Println("Could not executed Store|Owner Transaction:", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
 	if err != nil {
 		log.Debug().Err(err).Msg("AddStore failed: ")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -50,6 +44,7 @@ func (srv *Server) CreateStore(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("Created!"))
 }
+
 func (srv *Server) GetStoreUsers(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
