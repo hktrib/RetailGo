@@ -4,62 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-
-	. "github.com/hktrib/RetailGo/cmd/api/stripe-components"
-
 	"net/http"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+
+	. "github.com/hktrib/RetailGo/cmd/api/stripe-components"
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/item"
 	"github.com/hktrib/RetailGo/internal/weaviate"
 )
-
-func (srv *Server) HelloWorld(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello World -> RetailGo!!"))
-
-	ctx := r.Context()
-
-	user, err := srv.DBClient.User.
-		Create().
-		SetFirstName("Giridhar").
-		SetLastName("Vadhul").
-		SetEmail("gvadhul@ucsc.edu").
-		SetIsOwner(true).
-		Save(ctx)
-
-	if err != nil {
-		fmt.Println("Create user failed")
-		fmt.Println(err)
-	}
-
-	store, err := srv.DBClient.Store.
-		Create().
-		SetStoreName("Giridhar's Test Store").
-		SetID(1391).
-		Save(ctx)
-
-	if err != nil {
-		fmt.Println("Create Store Failed")
-		fmt.Println(err)
-	}
-
-	item1, err := srv.DBClient.Item.Create().SetName("Giridhar Food 1").SetStoreID(1391).SetPhoto("myimage").SetQuantity(1).Save(ctx)
-	if err != nil {
-
-		fmt.Println(err)
-	}
-	item2, err := srv.DBClient.Item.Create().SetName("Giridhar Food 2").SetStoreID(1391).SetPhoto("anotherimage").SetQuantity(2).Save(ctx)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	fmt.Println(user)
-	fmt.Println(store)
-	fmt.Printf("Item1: %s\n", item1)
-	fmt.Printf("Item2: %s\n", item2)
-}
 
 func (srv *Server) InvRead(w http.ResponseWriter, r *http.Request) {
 
