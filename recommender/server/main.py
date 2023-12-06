@@ -33,7 +33,7 @@ def vectorize_batch(batch: ItemBatch, response: Response):
             # If you are going to reach a change in store, write the discounted average to the store vector as well
             if current_store_id and item.StoreId != current_store_id:
                 print("Hello from Write to store")
-                Writer.write_store_vector(item.StoreId, todays_store_vector / todays_sales)
+                Writer.write_store_vector(item.StoreId, todays_store_vector / todays_sales if todays_sales > 0 else todays_store_vector)
                 print("Write Store Vector")
                 todays_store_vector *= 0
                 print("Reset Store Vector")
