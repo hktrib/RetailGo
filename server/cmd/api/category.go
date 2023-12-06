@@ -16,13 +16,14 @@ import (
 )
 
 /*
-
 CatDelete Brief:
+
 	________________________________________
 
 -> Deletes category given category id specified in Query Parameters (Ex: ?category=10)
 
 External Package Calls:
+
 	DBClient.Category.DeleteOneID
 */
 func (srv *Server) CatDelete(w http.ResponseWriter, r *http.Request) {
@@ -51,14 +52,16 @@ func (srv *Server) CatDelete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
 }
-/*
 
+/*
 CatCreate Brief:
+
 	________________________________________
 
 -> Creates category given category id specified in Query Parameters (Ex: ?category=10)
 
 External Package Calls:
+
 	DBClient.Category.Create()
 */
 func (srv *Server) CatCreate(w http.ResponseWriter, r *http.Request) {
@@ -101,13 +104,21 @@ func (srv *Server) CatCreate(w http.ResponseWriter, r *http.Request) {
 	w.Write(responseBody)
 }
 
+/*
+CatItemRead Brief:
 
+-> Retrieves items belonging to a specified category by category ID from Query Parameters (Ex: ?category_id=15)
+
+External Package Calls:
+- DBClient.Category.Query()
+- srv.DBClient.Item.Query()
+*/
 func (srv *Server) CatItemRead(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	category_id, err := strconv.Atoi(chi.URLParam(r, "category_id"))
 	if err != nil {
-		log.Debug().Err(err).Msg("CatItemRead: Invalid Store ID")	
+		log.Debug().Err(err).Msg("CatItemRead: Invalid Store ID")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -122,18 +133,26 @@ func (srv *Server) CatItemRead(w http.ResponseWriter, r *http.Request) {
 
 	// get items for each targetCategory
 	items, _ := srv.DBClient.Item.Query().Where(item.HasCategoryWith(category.ID(targetCategory.ID))).All(ctx)
-	 
+
 	response[targetCategory.Name] = append(response[targetCategory.Name], items...)
-	 
+
 	responseBody, _ := json.Marshal(response)
 	w.WriteHeader(http.StatusOK)
 	w.Write(responseBody)
 }
 
+/*
+CatItemAdd Brief:
+
+-> Adds items to a category specified by category ID from the URL parameters.
+
+External Package Calls:
+- srv.DBClient.Category.UpdateOneID()
+*/
 func (srv *Server) CatItemAdd(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
-	 
+
 	cat_id, err := strconv.Atoi(chi.URLParam(r, "category_id"))
 
 	if err != nil {
@@ -159,42 +178,31 @@ func (srv *Server) CatItemAdd(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	var targetItem *ent.Item
-	 
- 
+
 	err = srv.DBClient.Category.UpdateOneID(cat_id).AddItemIDs(itemIDs...).Exec(ctx)
-		if err != nil {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
-		}
 
- 
- 		
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
 	if ent.IsNotFound(err) {
-			fmt.Println("Item not found:", err)
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-			return
-		}
-
-	
+		fmt.Println("Item not found:", err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
 
 	if err != nil {
 		fmt.Println("Create didn't work:", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	srv.DBClient.Category.UpdateOneID(cat_id).AddItems(targetItem).ExecX(ctx)
-
-	responseBody, _ := json.Marshal(map[string]interface{}{
-		"id": targetItem.ID,
-	})
 
 	w.WriteHeader(http.StatusCreated)
-	w.Write(responseBody)
-
+	w.Write([]byte("OK"))
 }
 
-
+// Deprecated
 func (srv *Server) CatItemList(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
