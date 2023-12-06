@@ -21,7 +21,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     stores?: StoreMetadata[];
   };
   if (!publicMetadata.stores) redirect("/");
-
   return (
     <Providers>
       <div className="min-h-screen h-full flex flex-col">

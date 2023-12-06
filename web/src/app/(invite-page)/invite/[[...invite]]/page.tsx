@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { PostJoinStore } from "@/lib/hooks/user";
-import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
+import { RedirectToSignIn, SignIn, SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
 
 const InvitePage = () => {
@@ -46,7 +46,7 @@ const InvitePage = () => {
         </div>
       </SignedIn>
       <SignedOut>
-        <div>You are signed Out</div>
+        <RedirectToSignIn />
       </SignedOut>
     </div>
   );

@@ -104,7 +104,7 @@ func (srv *Server) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 // TestEmailHandler handles the email testing request
 func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 
-	entries, dummy_err := os.ReadDir("./cmd")
+	entries, dummy_err := os.ReadDir("./")
 	if dummy_err != nil {
 		log.Fatal(dummy_err)
 		fmt.Println(dummy_err)
