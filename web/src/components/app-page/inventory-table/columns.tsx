@@ -6,18 +6,15 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 
-import { Item } from "@/models/item";
-
 export type InventoryItem = {
   id: number;
   name: string;
-  description: string;
-  category: string;
+  category_name: string;
   price: number;
   quantity: number;
 };
 
-export const columns: ColumnDef<Item>[] = [
+export const columns: ColumnDef<InventoryItem>[] = [
   {
     accessorKey: "id",
     header: () => <div className="text-xs">ID</div>,
@@ -27,7 +24,7 @@ export const columns: ColumnDef<Item>[] = [
     header: () => <div className="text-xs">Name</div>,
   },
   {
-    accessorKey: "category",
+    accessorKey: "category_name",
     header: ({ column }) => {
       return (
         <Button

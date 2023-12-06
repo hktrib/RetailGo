@@ -27,15 +27,18 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { Item } from "@/models/item";
+import { InventoryItem } from "./columns";
 
-interface DataTableProps<TData extends Item, TValue> {
+interface DataTableProps<TData extends InventoryItem, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  categories: Category[];
 }
 
-export function DataTable<TData extends Item, TValue>({
+export function DataTable<TData extends InventoryItem, TValue>({
   columns,
   data,
+  categories,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -106,7 +109,17 @@ export function DataTable<TData extends Item, TValue>({
                   ))}
                   <TableCell>
                     <div className="text-right flex flex-row space-x-2 h-8 w-8 p-0">
-                      <ItemDialog item={row.original} mode="edit" />
+                      <ItemDialog
+                        item={{
+                          id: row.original.id,
+                          name: row.original.name,
+                          price: row.original.price,
+                          quantity: row.original.quantity,
+                          category_name: row.original.category_name,
+                        }}
+                        mode="edit"
+                        categories={categories}
+                      />
                       <button
                         onClick={() =>
                           deleteItemMutation.mutate(row.original.id)
