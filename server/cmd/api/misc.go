@@ -39,8 +39,12 @@ func MarshalItem(TargetItem ClientItem) ([]byte, error) {
 }
 func PruneItems(TargetItems ...*ent.Item) []ClientItem {
 	var clientItems []ClientItem
+
 	for _, item := range TargetItems {
 		clientItems = append(clientItems, ClientItem(*item))
+	}
+	if clientItems == nil {
+		clientItems = make([]ClientItem, 0)
 	}
 	return clientItems
 
