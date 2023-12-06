@@ -9,6 +9,11 @@ app = FastAPI()
 CLIP_vectorizer = Vectorizer()
 Writer = WeaviateWriter()
 
+@app.get("/recommend/{store_id}", status_code = 200)
+
+def recommend(store_id: int):
+    pass
+
 @app.post("/vectorizeItems", status_code = 201)
 def vectorize_batch(batch: ItemBatch, response: Response):
     # Call a vectorizing function on the whole batch of items

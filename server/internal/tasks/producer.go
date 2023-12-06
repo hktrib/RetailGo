@@ -10,9 +10,14 @@ import (
 /*
  */
 type TaskProducer interface {
-	TaskOwnerCreationCheck(
+	ProduceTaskOwnerCreationCheck(
 		ctx context.Context,
 		ownerEmailID *string,
+		processInTime time.Duration,
+		opts ...asynq.Option,
+	) error
+	ProduceTaskUpdateVectors(
+		ctx context.Context,
 		processInTime time.Duration,
 		opts ...asynq.Option,
 	) error

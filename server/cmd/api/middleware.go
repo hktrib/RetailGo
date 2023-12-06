@@ -20,7 +20,6 @@ import (
 	user2 "github.com/hktrib/RetailGo/internal/ent/user"
 )
 
-
 func (srv *Server) GetAuthenticatedUserEmail(ctx context.Context) (string, error) {
 	sessClaims, ok := clerk.SessionFromContext(ctx)
 	if !ok {
@@ -124,13 +123,13 @@ func (srv *Server) IsOwnerCreateHandle(next http.Handler) http.Handler {
 		if potentialOwner.StoreID == 0 {
 			fmt.Println("HIT BRANCH")
 			taskLifeTime := 10 * time.Minute
-			err := srv.TaskProducer.TaskOwnerCreationCheck(ctx, &potentialOwner.Email, taskLifeTime)
+			err := srv.TaskProducer.ProduceTaskOwnerCreationCheck(ctx, &potentialOwner.Email, taskLifeTime)
 			if err != nil {
 				log.Debug().Err(err).Msg("TaskOwnerCreationCheck failed..")
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 				return
 			}
-			srv.Cache.Set("storecreate|" + potentialOwner.Email, &potentialOwner)
+			srv.Cache.Set("storecreate|"+potentialOwner.Email, &potentialOwner)
 			w.WriteHeader(http.StatusCreated)
 			w.Write([]byte("OK!"))
 			return

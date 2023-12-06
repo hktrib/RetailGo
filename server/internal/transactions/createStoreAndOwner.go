@@ -5,10 +5,11 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	clerkstorage "github.com/hktrib/RetailGo/internal/clerk"
 	"github.com/hktrib/RetailGo/internal/ent"
 )
 
-func StoreAndOwnerCreationTx(ctx context.Context, reqStore *ent.Store, reqUser *ent.User, dbClient *ent.Client) error {
+func StoreAndOwnerCreationTx(ctx context.Context, reqStore *ent.Store, reqUser *ent.User, dbClient *ent.Client, clerkStore *clerkstorage.ClerkStorage) error {
 	tx, err := dbClient.Tx(ctx)
 	if err != nil {
 		return rollback(tx, fmt.Errorf("tx_error: starting a transaction: %w", err))
