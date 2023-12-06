@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -290,19 +289,3 @@ func (i *Item) String() string {
 
 // Items is a parsable slice of Item.
 type Items []*Item
-
-func (ite Item) MarshalJSON() ([]byte, error) {
-	return MarshalItem(ite)
-}
-
-func MarshalItem(TargetItem Item) ([]byte, error) {
-
-	return json.Marshal(map[string]interface{}{
-		"id":       TargetItem.ID,
-		"name":     TargetItem.Name,
-		"photo":    TargetItem.Photo,
-		"quantity": TargetItem.Quantity,
-		"price":    TargetItem.Price,
-		"category": TargetItem.CategoryName,
-	})
-}
