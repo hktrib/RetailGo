@@ -1,8 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "lucide-react";
 
-import type { Item } from "./controller";
-
 const POSProducts = ({
   products,
   visibleProducts,
@@ -77,7 +75,7 @@ const POSProducts = ({
             id: product.id,
             name: product.name,
             price: product.price,
-            category: fetchCategoryById(product.category),
+            category: product.category_name,
           }}
           qty={fetchProductCartQty(product.id) ?? 0}
           addItem={addItemToCart}

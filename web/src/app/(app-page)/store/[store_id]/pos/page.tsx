@@ -1,26 +1,19 @@
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from "@tanstack/react-query";
-import { getCategories, getProducts } from "./actions";
 import POSController from "./controller";
 
-export default async function POSPage() {
-  const queryClient = new QueryClient();
-
-  await queryClient.prefetchQuery({
-    queryKey: ["items"],
-    queryFn: getProducts,
-  });
-  await queryClient.prefetchQuery({
-    queryKey: ["categories"],
-    queryFn: getCategories,
-  });
-
-  return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <POSController />
-    </HydrationBoundary>
+export default async function POSPage({
+  params,
+}: {
+  params: { store_id: string };
+}) {
+  const res = await fetch(
+    `https://retailgo-production.up.railway.app/store/${params.store_id}/pos/info`,
+    { cache: "force-cache" }
   );
+  if (!res.ok) return <div>failed to fetch pos stuff</div>;
+
+  const data: { categories: Category[]; items: Item[] } = JSON.parse(
+    await res.text()
+  );
+
+  return <POSController categories={data.categories} items={data.items} />;
 }
