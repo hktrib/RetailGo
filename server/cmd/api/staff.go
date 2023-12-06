@@ -5,11 +5,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"net/mail"
+	"os"
 	"strconv"
 
 	"net/smtp"
+
+	"fmt"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/hktrib/RetailGo/internal/ent"
@@ -101,6 +105,16 @@ func (srv *Server) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 
 // TestEmailHandler handles the email testing request
 func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
+
+	entries, err := os.ReadDir("./")
+	if err != nil {
+		log.Fatal(err)
+		fmt.Println(err)
+	}
+	for _, e := range entries {
+		fmt.Println(e.Name())
+	}
+
 	ctx := r.Context()
 
 	// Verify user credentials using clerk
