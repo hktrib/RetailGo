@@ -24,10 +24,14 @@ import { Input } from "@/components/ui/input";
 import { SendInvite } from "@/lib/hooks/staff";
 import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
+import { useSelectedStore } from "@/components/storeprovider";
+import { useParams  } from "next/navigation";
 
 
 export default function InviteEmployee() {
   const [isDialogOpen, setDialogOpen] = useState(false); // State to control the dialog
+  const { selectedStore, selectStore } = useSelectedStore();
+  const params = useParams()
 
   const formSchema = z.object({
     email: z.string().regex(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/),
@@ -45,14 +49,12 @@ export default function InviteEmployee() {
     resolver: zodResolver(formSchema),
   });
 
-  // Assuming storeId is known or retrieved from somewhere
-  const storeId = "1";
-  const inviteMutation = SendInvite(storeId);
+  const id = params.store_id;
+  const inviteMutation = SendInvite(id.toString());
 
   const onSubmit = form.handleSubmit((data: any) => {
     console.log(JSON.stringify(data));
-    // inviteMutation.mutate(data);
-    inviteMutation.isSuccess = true;
+    inviteMutation.mutate(data);
     if (inviteMutation.isSuccess) {
       setDialogOpen(false);
     }
