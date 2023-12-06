@@ -50,7 +50,6 @@ func NewServer(
 	cache *kv.Cache,
 	taskProducer worker.TaskProducer,
 	config *util.Config,
-	supabase *supa.Client,
 ) *Server {
 
 	srv := &Server{}
@@ -63,8 +62,6 @@ func NewServer(
 	srv.Cache = cache
 	srv.TaskProducer = taskProducer
 	srv.Config = config
-	srv.Supabase = supabase
-	
 	return srv
 }
 

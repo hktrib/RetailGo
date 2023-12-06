@@ -9,7 +9,6 @@ import (
 	"github.com/clerkinc/clerk-sdk-go/clerk"
 	"github.com/hibiken/asynq"
 	_ "github.com/lib/pq"
-	supa "github.com/nedpals/supabase-go"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 	"github.com/stripe/stripe-go/v76"
@@ -39,11 +38,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-
-	supabaseUrl := config.SUPABASE_URL
-	supabaseKey := config.SUPABASE_KEY
-	supabase := supa.CreateClient(supabaseUrl, supabaseKey)
 
 	stripe.Key = config.STRIPE_SK
 
@@ -88,7 +82,7 @@ func main() {
 	go func() {
 		injectActiveSession := clerk.WithSessionV2(clerkClient)
 
-		srv := server.NewServer(clerkClient, entClient, taskQueueClient, weaviateClient, cache, taskProducer, &config, supabase)
+		srv := server.NewServer(clerkClient, entClient, taskQueueClient, weaviateClient, cache, taskProducer, &config)
 		srv.Router.Use(injectActiveSession)
 
 		srv.MountHandlers()
