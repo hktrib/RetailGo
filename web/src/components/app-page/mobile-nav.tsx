@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 import { Navigation } from "./sidebar";
@@ -7,12 +8,12 @@ import {
   Sheet,
   SheetContent,
   SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import type { StoreMetadata } from "@/app/(app-page)/store/layout";
+import StoreSelector from "./store-selector";
 
 export default function MobileNav({ stores }: { stores: StoreMetadata[] }) {
   return (
@@ -21,7 +22,9 @@ export default function MobileNav({ stores }: { stores: StoreMetadata[] }) {
         <div className="flex items-center gap-x-2">
           <SidebarNav stores={stores} />
 
-          <span className="font-bold">RetailGo</span>
+          <Link href="/store" className="font-semibold text-lg">
+            RetailGo
+          </Link>
         </div>
         <div>
           <UserButton afterSignOutUrl="/" />
@@ -49,18 +52,11 @@ const SidebarNav = ({ stores }: { stores: StoreMetadata[] }) => {
       </SheetTrigger>
       <SheetContent side="left" className="h-full w-[300px]">
         <SheetHeader className={`${store_id && "border-b pb-5"}`}>
-          {currentStore && (
-            <div className="px-3 py-1.5 flex items-center gap-x-3 bg-gray-100 rounded-md shadow">
-              <div className="h-4 w-4 bg-white flex items-center justify-center rounded-md">
-                <span className="text-xs">
-                  {currentStore.storename.charAt(0)}
-                </span>
-              </div>
-              <SheetTitle className="text-sm">
-                {currentStore.storename}
-              </SheetTitle>
-            </div>
-          )}
+          <StoreSelector
+            stores={stores}
+            currentStoreId={store_id as string}
+            type="mobile"
+          />
         </SheetHeader>
 
         <Navigation userStores={stores} currentStoreId={store_id as string} />
