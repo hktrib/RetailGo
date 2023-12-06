@@ -1,6 +1,6 @@
 "use client"
 // Import necessary libraries and components
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -24,12 +24,16 @@ import { Input } from "@/components/ui/input";
 import { useFetch } from "@/lib/utils";
 import { PencilIcon } from "lucide-react";
 import { Employee } from "@/models/employee";
+import { config } from "@/lib/hooks/config";
+import { useParams } from "next/navigation";
+import { toast } from "react-toastify";
+import { PutUser } from "@/lib/hooks/user";
 
 // Schema for form validation using Zod
 const formSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email address"),
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string(),
+  email: z.string().regex(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/),
 });
 
 // The component definition
@@ -45,7 +49,9 @@ export default function EmployeeDialog({
   });
 
   // Set up your fetch utility
-  let authFetch = useFetch();
+  const [isDialogOpen, setDialogOpen] = useState(false); // State to control the dialog
+  const params = useParams()
+  const id = params.store_id;
 
   // Pre-fill the form when editing an employee
   useEffect(() => {
@@ -55,57 +61,43 @@ export default function EmployeeDialog({
     }
   }, [employeeData, form]);
 
-  // Handler for form submission
-  const onEmployeeSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (
-    values
-  ) => {
-    const url = employeeData
-      ? `http://localhost:8080/employees/${employeeData}/update`
-      : "http://localhost:8080/employees/create";
-    const method = employeeData ? "PUT" : "POST";
-
-    try {
-      const response = await authFetch(
-        url,
-        {
-          method: method,
-          body: JSON.stringify(values),
-        },
-        {
-          "Content-Type": "application/json",
-        }
-      );
-
-      if (!response.id) {
-        throw new Error(
-          `Failed to ${employeeData ? "update" : "add"} the employee.`
-        );
+  const inviteMutation = PutUser(employeeData.id.toString());
+  const onSubmit = form.handleSubmit((data: any) => {
+    console.log(JSON.stringify(data));
+    inviteMutation.mutate(data);
+    if (inviteMutation.isSuccess) {
+      setDialogOpen(false);
+      toast.success("User updated successfully!", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 10000
+      });
+    }else{
+      toast.error("Failed to update user!", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 10000
       }
-    } catch (error) {
-      console.error("There was an error:", error);
+      );
+      console.log(inviteMutation.error)
     }
-  };
+
+  });
 
   return (
-    <Dialog>
+    <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
-        {mode === "edit" ? (
-          <button className="icon-button">
+      <button className="icon-button">
             <PencilIcon
               style={{ color: "orange" }}
               className="h-5 w-5 p-0"
             ></PencilIcon>
           </button>
-        ) : (
-          <button className="bg-amber-500 text-sm px-3 py-1.5 text-white font-medium rounded-md">
-            Add Employee
-          </button>
-        )}
       </DialogTrigger>
 
       <Form {...form}>
         <form>
           <DialogContent>
+          <form onSubmit={onSubmit} {...form}>
+
             <DialogHeader>
               <DialogTitle>
                 {mode === "edit" ? "Edit" : "Add"} Employee
@@ -150,45 +142,16 @@ export default function EmployeeDialog({
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="position"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Position</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="hireDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Hire Date</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="date"
-                      defaultValue={new Date().toJSON()}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
             <DialogFooter className="gap-x-4">
               <button type="submit">
                 {mode === "edit" ? "Update" : "Save"}
               </button>
             </DialogFooter>
+            </form>
           </DialogContent>
         </form>
       </Form>
+
     </Dialog>
   );
 }
