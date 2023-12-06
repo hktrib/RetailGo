@@ -10,7 +10,7 @@ import (
 func (weaviate *Weaviate) DoVectorize(ctx context.Context, taskProducer worker.TaskProducer) error {
 
 	for {
-		err := taskProducer.ProduceTaskUpdateVectors(ctx, time.Second)
+		err := taskProducer.ProduceTaskUpdateVectors(ctx, time.Minute)
 		if err != nil {
 			return err
 		}
