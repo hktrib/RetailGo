@@ -38,23 +38,12 @@ const initialInventory = [
   },
 ];
 
-export default function InventoryTable() {
-  const itemQuery = useItems("10");
-
-  // let data = initialInventory;
-
-  if (itemQuery.isLoading) {
-    return <div>LOADING...</div>;
-  }
-
-  if (!itemQuery.isSuccess) {
-    console.error("Error loading items:", itemQuery.error);
-    return <div>There was an error loading your items. Please try again!</div>;
-  }
+export default function InventoryTable({ items }: { items: Item[] }) {
+  if (!items || !items.length) return <div>You have no items.</div>;
 
   return (
     <div>
-      <DataTable columns={columns} data={itemQuery.data} />
+      <DataTable columns={columns} data={items} />
     </div>
   );
 }

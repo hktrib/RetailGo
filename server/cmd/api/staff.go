@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"net/mail"
+	"os"
 	"strconv"
 
 	"net/smtp"
@@ -101,6 +103,16 @@ func (srv *Server) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 
 // TestEmailHandler handles the email testing request
 func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
+
+	entries, dummy_err := os.ReadDir("./cmd")
+	if dummy_err != nil {
+		log.Fatal(dummy_err)
+		fmt.Println(dummy_err)
+	}
+	for _, e := range entries {
+		fmt.Println(e.Name())
+	}
+
 	ctx := r.Context()
 
 	// Verify user credentials using clerk
@@ -155,10 +167,10 @@ func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 
 	// HTML message
 
-	tmpl, err_file := template.ParseFiles("../templates/email_invitation.html")
+	tmpl, err_file := template.ParseGlob("./cmd/templates/*")
 	if err_file != nil {
 		// Handle error (e.g., file not found)
-		http.Error(w, "Failed to open email template: "+err_file.Error(), http.StatusInternalServerError)
+		http.Error(w, "Failed to open email template folder: "+err_file.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -183,10 +195,10 @@ func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 		Store_name:  storeObj.StoreName,
 		Sender_name: firstName + " " + lastName,
 		//Sender_name: "Billy Bob",
-		//	Action_url: "http://localhost:3000/app/invite?code=" + storeObj.UUID,
+		//    Action_url: "http://localhost:3000/app/invite?code=" + storeObj.UUID,
 		Action_url: "https://retailgo-production.up.railway.app/store/invite?code=" + storeObj.UUID,
 	}
-	err_io := tmpl.Execute(htmlBody, templateData)
+	err_io := tmpl.ExecuteTemplate(htmlBody, "email_invitation.html", templateData)
 
 	if err_io != nil {
 		// Handle error (e.g., error while reading)
