@@ -43,7 +43,7 @@ export default async function Inventory({
   );
   if (!res.ok) return <div>failed to fetch pos stuff</div>;
 
-  const items = JSON.parse(await res.text());
+  const items = JSON.parse(await res.text()) ?? [];
 
   const newItem = new Item();
   const data = JSON.parse(JSON.stringify(newItem));
