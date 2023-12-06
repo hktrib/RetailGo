@@ -7,6 +7,7 @@ class Item(BaseModel):
     Photo: str
     Name: str
     StoreId: int
+    NumberSoldSinceUpdate: int
 
 class ItemBatch(BaseModel):
     items: List[Item]

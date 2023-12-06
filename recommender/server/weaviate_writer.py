@@ -13,14 +13,16 @@ class WeaviateWriter(object):
 
     def write_item_vector(self, item, vector):
         self.client.data_object.update(
-            uuid = item.WeaviateID,
-            class_name="item",
-            vector = vector
+        uuid = item.WeaviateID,
+        data_object={},
+        class_name="item",
+        vector = vector
         )
-    
+
     def write_store_vector(self, store_id, average_today):
 
         store_exists = False
+        print("Hello from write_store_vector")
 
         try:
             store = self.client.query.get(
@@ -30,6 +32,7 @@ class WeaviateWriter(object):
 
             curr_vector = store["vector"]
             store_uuid = store["id"]
+            print(store_uuid)
 
             store_exists = True
 
@@ -43,11 +46,14 @@ class WeaviateWriter(object):
                 class_name = "store",
                 vector = self.discount_factor * curr_vector + average_today
             )
+            print("Updated", store_uuid)
 
         else:
-            self.client.data_object.create({
+            uuid = self.client.data_object.create({
                 "store_id": store_id,
             },
             vector = average_today,
             class_name="store"
             )
+
+            print("Created Store, ", uuid)
