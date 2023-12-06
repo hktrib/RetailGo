@@ -174,16 +174,15 @@ func (srv *Server) GetPosInfo(w http.ResponseWriter, r *http.Request) {
 		response["categories"] = append(response["categories"], catInfo)
 		delete(response["categories"][i].(map[string]interface{}), "edges") // the edges field is not needed in the response
 		items, _ := srv.DBClient.Item.Query().Where(item.HasCategoryWith(category.ID(cat.ID))).All(ctx)
-		for j, item2 := range items {
+		for _, item2 := range items {
 			it, _ := json.Marshal(item2)
 			itemInfo := make(map[string]interface{})
 			_ = json.Unmarshal(it, &itemInfo) // unmarshal the map into the respons
-			fmt.Printf("%s\n", itemInfo)
-
+			delete(itemInfo, "edges")
+			itemInfo["category_id"] = cat.ID
+			itemInfo["category"] = cat.Name
 			response["items"] = append(response["items"], itemInfo)
-			delete(response["items"][j].(map[string]interface{}), "edges")
-			response["items"][j].(map[string]interface{})["category_id"] = cat.ID // these typecasts are necessary go  doesn't allow you to add or remove fields to the struct
-			response["items"][j].(map[string]interface{})["category"] = cat.Name
+
 		}
 	}
 	responseBody, _ := json.Marshal(response)
