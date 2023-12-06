@@ -8,6 +8,8 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/hibiken/asynq"
+	supa "github.com/nedpals/supabase-go"
+
 	"github.com/hktrib/RetailGo/internal/ent"
 	kv "github.com/hktrib/RetailGo/internal/redis"
 	worker "github.com/hktrib/RetailGo/internal/tasks"
@@ -35,6 +37,7 @@ type Server struct {
 	Cache           *kv.Cache
 	TaskProducer    worker.TaskProducer
 	Config          *util.Config
+	Supabase 		*supa.Client
 }
 
 // Define a type for Item-Change Requests (Create, Update, Delete)
@@ -112,7 +115,7 @@ func (s *Server) MountHandlers() {
 			})
 			r.Route("/category", func(r chi.Router) {
 				r.Group(func(r chi.Router) {
-					r.Use(s.ValidateStore)     // add owner validation validation
+					r.Use(s.ValidateOwner)     // add owner validation validation
 					r.Post("/", s.CatCreate)   //
 					r.Delete("/", s.CatDelete) //
 				})
@@ -137,6 +140,7 @@ func (s *Server) MountHandlers() {
 
 			r.Route("/pos", func(r chi.Router) {
 				r.Get("/checkout", s.StoreCheckout)
+				r.Get("/info", s.GetPosInfo)
 			})
 			r.Route("/users", func(r chi.Router) {
 				r.Get("/", s.GetStoreUsers)
@@ -145,7 +149,8 @@ func (s *Server) MountHandlers() {
 	})
 	s.Router.Route("/user", func(r chi.Router) {
 		r.Get("/store", s.UserHasStore) // Checks if a user has a store
-		r.Route("/{store_id}", func(r chi.Router) {
+
+		r.Route("/{user_id}", func(r chi.Router) {
 			r.Delete("/", s.UserDelete) // Delete a user by ID
 			r.Put("/", s.userUpdate)    // Update a user by ID
 			r.Get("/", s.UserQuery)     // Get a user by ID

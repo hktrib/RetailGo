@@ -33,9 +33,31 @@ func (utsc *UserToStoreCreate) SetStoreID(i int) *UserToStoreCreate {
 	return utsc
 }
 
+// SetStoreName sets the "store_name" field.
+func (utsc *UserToStoreCreate) SetStoreName(s string) *UserToStoreCreate {
+	utsc.mutation.SetStoreName(s)
+	return utsc
+}
+
+// SetNillableStoreName sets the "store_name" field if the given value is not nil.
+func (utsc *UserToStoreCreate) SetNillableStoreName(s *string) *UserToStoreCreate {
+	if s != nil {
+		utsc.SetStoreName(*s)
+	}
+	return utsc
+}
+
 // SetClerkUserID sets the "clerk_user_id" field.
 func (utsc *UserToStoreCreate) SetClerkUserID(s string) *UserToStoreCreate {
 	utsc.mutation.SetClerkUserID(s)
+	return utsc
+}
+
+// SetNillableClerkUserID sets the "clerk_user_id" field if the given value is not nil.
+func (utsc *UserToStoreCreate) SetNillableClerkUserID(s *string) *UserToStoreCreate {
+	if s != nil {
+		utsc.SetClerkUserID(*s)
+	}
 	return utsc
 }
 
@@ -117,9 +139,6 @@ func (utsc *UserToStoreCreate) check() error {
 	if _, ok := utsc.mutation.StoreID(); !ok {
 		return &ValidationError{Name: "store_id", err: errors.New(`ent: missing required field "UserToStore.store_id"`)}
 	}
-	if _, ok := utsc.mutation.ClerkUserID(); !ok {
-		return &ValidationError{Name: "clerk_user_id", err: errors.New(`ent: missing required field "UserToStore.clerk_user_id"`)}
-	}
 	if _, ok := utsc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "UserToStore.user"`)}
 	}
@@ -148,6 +167,10 @@ func (utsc *UserToStoreCreate) createSpec() (*UserToStore, *sqlgraph.CreateSpec)
 		_node = &UserToStore{config: utsc.config}
 		_spec = sqlgraph.NewCreateSpec(usertostore.Table, nil)
 	)
+	if value, ok := utsc.mutation.StoreName(); ok {
+		_spec.SetField(usertostore.FieldStoreName, field.TypeString, value)
+		_node.StoreName = value
+	}
 	if value, ok := utsc.mutation.ClerkUserID(); ok {
 		_spec.SetField(usertostore.FieldClerkUserID, field.TypeString, value)
 		_node.ClerkUserID = value

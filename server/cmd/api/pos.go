@@ -4,26 +4,33 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	. "github.com/hktrib/RetailGo/cmd/api/stripe-components"
-	"github.com/hktrib/RetailGo/internal/ent"
-	"github.com/hktrib/RetailGo/internal/ent/item"
-	"github.com/stripe/stripe-go/v76"
-	"github.com/stripe/stripe-go/v76/webhook"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/rs/zerolog/log"
+	"github.com/stripe/stripe-go/v76"
+	"github.com/stripe/stripe-go/v76/webhook"
+
+	StripeHelper "github.com/hktrib/RetailGo/cmd/api/stripe-components"
+	"github.com/hktrib/RetailGo/internal/ent"
+	"github.com/hktrib/RetailGo/internal/ent/category"
+	"github.com/hktrib/RetailGo/internal/ent/item"
 )
 
 func (srv *Server) StoreCheckout(writer http.ResponseWriter, request *http.Request) {
-	var cart []CartItem
+	var cart []StripeHelper.CartItem
 	req_body, err := io.ReadAll(request.Body)
 	if err != nil {
+		log.Debug().Err(err).Msg("StoreCheckout: unable to read request body")
 		http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 	err = json.Unmarshal(req_body, &cart)
 	if err != nil {
+		log.Debug().Err(err).Msg("StoreCheckout: unable to Unmarshal request body")
 		http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -31,9 +38,11 @@ func (srv *Server) StoreCheckout(writer http.ResponseWriter, request *http.Reque
 	for i := range cart {
 		LineItem, err := srv.DBClient.Item.Query().Where(item.ID(cart[i].Id)).Only(request.Context())
 		if ent.IsNotFound(err) {
+			log.Debug().Err(err).Msg("StoreCheckout: ent didn't find the item in the database")
 			http.Error(writer, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		} else if err != nil {
+			log.Debug().Err(err).Msg("StoreCheckout: server failed to execute find item query")
 			http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
@@ -42,16 +51,16 @@ func (srv *Server) StoreCheckout(writer http.ResponseWriter, request *http.Reque
 	}
 
 	// Create a new Stripe Checkout Session
-	CreateCheckoutSession(cart, writer, request)
+	StripeHelper.CreateCheckoutSession(cart, writer, request)
 
 }
 func (srv *Server) StripeWebhookRouter(w http.ResponseWriter, r *http.Request) {
 
 	const MaxBodyBytes = int64(65536)
 	r.Body = http.MaxBytesReader(w, r.Body, MaxBodyBytes)
-	payload, err := ioutil.ReadAll(r.Body)
+	payload, err := io.ReadAll(r.Body)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading request body: %v\n", err)
+		log.Debug().Err(err).Msg("StripeWebhookRouter: server failed to read request body")
 		w.WriteHeader(http.StatusServiceUnavailable)
 		return
 	}
@@ -132,6 +141,7 @@ func HandleTransSuccess(w http.ResponseWriter, event stripe.Event, srv *Server) 
 func (srv *Server) FulfillOrder(LineItemList *stripe.LineItemList) {
 	for i := range LineItemList.Data {
 		// update item quantity
+
 		LineItem, err := srv.DBClient.Item.Query().Where(item.StripeProductID(LineItemList.Data[i].ID)).Only(context.Background())
 		if err != nil {
 			panic(err)
@@ -139,4 +149,34 @@ func (srv *Server) FulfillOrder(LineItemList *stripe.LineItemList) {
 		_, err = srv.DBClient.Item.UpdateOne(LineItem).SetQuantity(LineItem.Quantity - int(LineItemList.Data[i].Quantity)).Save(context.Background())
 
 	}
+}
+
+func (srv *Server) GetPosInfo(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+	store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
+	if err != nil {
+		fmt.Println("Invalid store id:", err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	categories, err := srv.DBClient.Category.Query().Where(category.StoreID(store_id)).All(ctx)
+	if err != nil {
+		log.Debug().Err(err).Msg("GetPosInfo failed")
+	}
+	response := make(map[string][]interface{}, 1)
+
+	for i, cat := range categories {
+		// get items for each category
+		c, _ := json.Marshal(cat) // marshal the category into a map
+		catInfo := make(map[string]interface{})
+		_ = json.Unmarshal(c, &catInfo) // unmarshal the map into the response map
+		response["categories"] = append(response["categories"], catInfo)
+		delete(response["categories"][i].(map[string]interface{}), "edges") // the edges field is not needed in the response
+		items, _ := srv.DBClient.Item.Query().Where(item.HasCategoryWith(category.ID(cat.ID))).All(ctx)
+		response["items"] = append(response["items"], PruneItems(items...))
+	}
+	responseBody, _ := json.Marshal(response)
+	w.WriteHeader(http.StatusOK)
+	w.Write(responseBody)
 }

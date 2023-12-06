@@ -33,3 +33,12 @@ export function useFetch() {
 
   return authenticatedFetch;
 }
+
+export function useAuthenticated() : boolean{
+  const {isSignedIn} = useAuth()
+  if (!isSignedIn) {
+    return false
+  }
+  return true
+}
+

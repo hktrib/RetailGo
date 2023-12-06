@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -17,34 +16,43 @@ type Config struct {
 	STRIPE_SK            string // `"STRIPE_SK"`
 	HOST                 string // `"HOST"`
 	WEAVIATE_HOSTNAME    string // `"WEAVIATE_HOSTNAME"`
-	WEAVIATE_SK          string // `"WEAVIATE_SK"`
+	WEAVIATE_SK    		 string // `"WEAVIATE_SK"`
+
+	SUPABASE_URL          string // `"SUPABASE_URL"`
+	SUPABASE_KEY          string // `"SUPABASE_KEY"`
 
 	STRIPE_WEBHOOK_SECRET string //
 }
 
 func LoadConfig() (config Config, err error) {
-	// viper.AddConfigPath("./util/config")
-	// viper.SetConfigName(".env")
-	// viper.SetConfigType("env")
 
-	// viper.AutomaticEnv()
-
+	// Supabase
+	config.SUPABASE_URL = os.Getenv("SUPABASE_URL")
+	config.SUPABASE_KEY = os.Getenv("SUPABASE_KEY")
+	
+	// PostgresDB
 	config.DB_DRIVER = os.Getenv("DB_DRIVER")
 	config.DB_SOURCE = os.Getenv("DB_SOURCE")
-	fmt.Println(config.DB_SOURCE)
-	config.SERVER_ADDRESS = envPortOr("8080")
+	
+	// Clerk
 	config.CLERK_SK = os.Getenv("CLERK_SK")
 	config.CLERK_WEBHOOK_SECRET = os.Getenv("CLERK_WEBHOOK_SECRET")
+	
+	// Redis
 	config.REDIS_HOSTNAME = os.Getenv("REDIS_HOSTNAME")
 	config.REDIS_PORT = os.Getenv("REDIS_PORT")
 	config.REDIS_PASSWORD = os.Getenv("REDIS_PASSWORD")
-	config.STRIPE_SK = os.Getenv("STRIPE_SK")
+	
+	// Weaviate
 	config.WEAVIATE_HOSTNAME = os.Getenv("WEAVIATE_HOSTNAME")
 	config.WEAVIATE_SK = os.Getenv("WEAVIATE_SK")
+	
+	// Stripe
+	config.STRIPE_SK = os.Getenv("STRIPE_SK")
 	config.STRIPE_WEBHOOK_SECRET = os.Getenv("STRIPE_WEBHOOK_SECRET")
-
-	// fmt.Println(config)
-
+	
+	// Server Address
+	config.SERVER_ADDRESS = envPortOr("8080")
 	return
 }
 

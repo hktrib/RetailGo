@@ -7,15 +7,18 @@ export default authMiddleware({
   publicRoutes: ["/"],
   afterAuth(auth, req, evt) {
     // redirect them to organization selection page
-    if(auth.userId && !auth.orgId && req.nextUrl.pathname !== "/registrationForm" && false){
-      const orgSelection = new URL('/registrationForm', req.url)
-      return NextResponse.redirect(orgSelection)
+    if (
+      auth.userId &&
+      !auth.orgId &&
+      req.nextUrl.pathname !== "/registrationForm" &&
+      false
+    ) {
+      const orgSelection = new URL("/registrationForm", req.url);
+      return NextResponse.redirect(orgSelection);
     }
-  }
+  },
 });
 
 export const config = {
   matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 };
-
-

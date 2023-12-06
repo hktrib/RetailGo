@@ -33,18 +33,6 @@ func (f CategoryItemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CategoryItemMutation", m)
 }
 
-// The ClerkUser_StoreFunc type is an adapter to allow the use of ordinary
-// function as ClerkUser_Store mutator.
-type ClerkUser_StoreFunc func(context.Context, *ent.ClerkUserStoreMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f ClerkUser_StoreFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ClerkUserStoreMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ClerkUserStoreMutation", m)
-}
-
 // The ItemFunc type is an adapter to allow the use of ordinary
 // function as Item mutator.
 type ItemFunc func(context.Context, *ent.ItemMutation) (ent.Value, error)

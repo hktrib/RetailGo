@@ -5,13 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"net/mail"
+	"os"
 	"strconv"
 
 	"net/smtp"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/store"
 	"github.com/hktrib/RetailGo/internal/ent/user"
 )
@@ -68,8 +71,48 @@ type HtmlTemplate struct {
 	Action_url  string `json:"action_url"`
 }
 
+func (srv *Server) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
+
+	// Verify user credentials using clerk
+	_, clerk_err := VerifyUserCredentials(r)
+	if clerk_err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("Unauthorized"))
+		return
+	}
+
+	// get item id from url query string
+	ctx := r.Context()
+	user_id, id_err := strconv.Atoi(chi.URLParam(r, "user_id"))
+	if id_err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	_, err := srv.DBClient.User.Query().Where(user.ID(user_id)).Only(ctx)
+
+	if ent.IsNotFound(err) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	} else if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+}
+
 // TestEmailHandler handles the email testing request
 func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
+
+	entries, dummy_err := os.ReadDir("./")
+	if dummy_err != nil {
+		log.Fatal(dummy_err)
+		fmt.Println(dummy_err)
+	}
+	for _, e := range entries {
+		fmt.Println(e.Name())
+	}
+
 	ctx := r.Context()
 
 	// Verify user credentials using clerk
@@ -105,7 +148,7 @@ func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 	auth := smtp.PlainAuth(
 		"",
 		"retailgoco@gmail.com",
-		"iirp tdgd sbcp ktsp",
+		"hhqm pqgw lxmi weqb",
 		"smtp.gmail.com",
 	)
 
@@ -124,10 +167,10 @@ func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 
 	// HTML message
 
-	tmpl, err_file := template.ParseFiles("templates/email_invitation.html")
+	tmpl, err_file := template.ParseGlob("./cmd/templates/*")
 	if err_file != nil {
 		// Handle error (e.g., file not found)
-		http.Error(w, "Failed to open email template: "+err_file.Error(), http.StatusInternalServerError)
+		http.Error(w, "Failed to open email template folder: "+err_file.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -152,9 +195,10 @@ func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 		Store_name:  storeObj.StoreName,
 		Sender_name: firstName + " " + lastName,
 		//Sender_name: "Billy Bob",
-		Action_url: "http://localhost:3000/sign-up/invite?code=" + storeObj.UUID,
+		//    Action_url: "http://localhost:3000/app/invite?code=" + storeObj.UUID,
+		Action_url: "https://retail-go.vercel.app/store/invite?code=" + storeObj.UUID,
 	}
-	err_io := tmpl.Execute(htmlBody, templateData)
+	err_io := tmpl.ExecuteTemplate(htmlBody, "email_invitation.html", templateData)
 
 	if err_io != nil {
 		// Handle error (e.g., error while reading)

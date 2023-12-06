@@ -8,6 +8,11 @@ import (
 
 	"github.com/clerkinc/clerk-sdk-go/clerk"
 	"github.com/hibiken/asynq"
+	_ "github.com/lib/pq"
+	"github.com/redis/go-redis/v9"
+	"github.com/rs/zerolog/log"
+	"github.com/stripe/stripe-go/v76"
+
 	server "github.com/hktrib/RetailGo/cmd/api"
 	"github.com/hktrib/RetailGo/internal/ent"
 	kvRedis "github.com/hktrib/RetailGo/internal/redis"
@@ -15,10 +20,6 @@ import (
 	"github.com/hktrib/RetailGo/internal/util"
 	weaviate "github.com/hktrib/RetailGo/internal/weaviate"
 	"github.com/hktrib/RetailGo/internal/webhook"
-	_ "github.com/lib/pq"
-	"github.com/redis/go-redis/v9"
-	"github.com/rs/zerolog/log"
-	"github.com/stripe/stripe-go/v76"
 )
 
 // var log = util.NewLogger()

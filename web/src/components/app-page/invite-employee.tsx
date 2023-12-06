@@ -22,34 +22,65 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { SendInvite } from "@/lib/hooks/staff";
+import { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import { useSelectedStore } from "@/components/storeprovider";
+import { useParams  } from "next/navigation";
+
 
 export default function InviteEmployee() {
+  const [isDialogOpen, setDialogOpen] = useState(false); // State to control the dialog
+  const { selectedStore, selectStore } = useSelectedStore();
+  const params = useParams()
+
   const formSchema = z.object({
-    email: z.string(),
+    email: z.string().regex(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/),
     name: z.string(),
   });
+
+  const notify = () => {
+    toast.success("Invite sent successfully!", {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: 10000
+    });
+  }
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
- // Assuming storeId is known or retrieved from somewhere
- const storeId = "1";
- const inviteMutation = SendInvite(storeId);
+  const id = params.store_id;
+  const inviteMutation = SendInvite(id.toString());
 
- const onSubmit = form.handleSubmit((data) => {
-  console.log(JSON.stringify(data));
-  inviteMutation.mutate(data);
-});
+  const onSubmit = form.handleSubmit((data: any) => {
+    console.log(JSON.stringify(data));
+    inviteMutation.mutate(data);
+    if (inviteMutation.isSuccess) {
+      setDialogOpen(false);
+      toast.success("Invite sent successfully!", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 10000
+      });
+    }else{
+      toast.error("Error sending invite!", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 10000
+      }
+      );
+      console.log(inviteMutation.error)
+    }
+
+  });
 
   return (
-    <Dialog>
+    <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
-        <button className="bg-blue-500 text-sm px-3 py-1.5 text-white font-medium rounded-md">
+        <button className="bg-blue-500 text-sm px-3 py-1.5 text-white font-medium rounded-md"
+          onClick={() => setDialogOpen(true)}
+        >
           Invite
         </button>
       </DialogTrigger>
-
       <Form {...form}>
         <form>
           <DialogContent>

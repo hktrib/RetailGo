@@ -17,7 +17,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/hktrib/RetailGo/internal/ent/category"
 	"github.com/hktrib/RetailGo/internal/ent/categoryitem"
-	"github.com/hktrib/RetailGo/internal/ent/clerkuser_store"
 	"github.com/hktrib/RetailGo/internal/ent/item"
 	"github.com/hktrib/RetailGo/internal/ent/store"
 	"github.com/hktrib/RetailGo/internal/ent/user"
@@ -33,8 +32,6 @@ type Client struct {
 	Category *CategoryClient
 	// CategoryItem is the client for interacting with the CategoryItem builders.
 	CategoryItem *CategoryItemClient
-	// ClerkUser_Store is the client for interacting with the ClerkUser_Store builders.
-	ClerkUser_Store *ClerkUserStoreClient
 	// Item is the client for interacting with the Item builders.
 	Item *ItemClient
 	// Store is the client for interacting with the Store builders.
@@ -56,7 +53,6 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Category = NewCategoryClient(c.config)
 	c.CategoryItem = NewCategoryItemClient(c.config)
-	c.ClerkUser_Store = NewClerkUserStoreClient(c.config)
 	c.Item = NewItemClient(c.config)
 	c.Store = NewStoreClient(c.config)
 	c.User = NewUserClient(c.config)
@@ -151,15 +147,14 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:             ctx,
-		config:          cfg,
-		Category:        NewCategoryClient(cfg),
-		CategoryItem:    NewCategoryItemClient(cfg),
-		ClerkUser_Store: NewClerkUserStoreClient(cfg),
-		Item:            NewItemClient(cfg),
-		Store:           NewStoreClient(cfg),
-		User:            NewUserClient(cfg),
-		UserToStore:     NewUserToStoreClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		Category:     NewCategoryClient(cfg),
+		CategoryItem: NewCategoryItemClient(cfg),
+		Item:         NewItemClient(cfg),
+		Store:        NewStoreClient(cfg),
+		User:         NewUserClient(cfg),
+		UserToStore:  NewUserToStoreClient(cfg),
 	}, nil
 }
 
@@ -177,15 +172,14 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:             ctx,
-		config:          cfg,
-		Category:        NewCategoryClient(cfg),
-		CategoryItem:    NewCategoryItemClient(cfg),
-		ClerkUser_Store: NewClerkUserStoreClient(cfg),
-		Item:            NewItemClient(cfg),
-		Store:           NewStoreClient(cfg),
-		User:            NewUserClient(cfg),
-		UserToStore:     NewUserToStoreClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		Category:     NewCategoryClient(cfg),
+		CategoryItem: NewCategoryItemClient(cfg),
+		Item:         NewItemClient(cfg),
+		Store:        NewStoreClient(cfg),
+		User:         NewUserClient(cfg),
+		UserToStore:  NewUserToStoreClient(cfg),
 	}, nil
 }
 
@@ -215,8 +209,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Category, c.CategoryItem, c.ClerkUser_Store, c.Item, c.Store, c.User,
-		c.UserToStore,
+		c.Category, c.CategoryItem, c.Item, c.Store, c.User, c.UserToStore,
 	} {
 		n.Use(hooks...)
 	}
@@ -226,8 +219,7 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Category, c.CategoryItem, c.ClerkUser_Store, c.Item, c.Store, c.User,
-		c.UserToStore,
+		c.Category, c.CategoryItem, c.Item, c.Store, c.User, c.UserToStore,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -240,8 +232,6 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Category.mutate(ctx, m)
 	case *CategoryItemMutation:
 		return c.CategoryItem.mutate(ctx, m)
-	case *ClerkUserStoreMutation:
-		return c.ClerkUser_Store.mutate(ctx, m)
 	case *ItemMutation:
 		return c.Item.mutate(ctx, m)
 	case *StoreMutation:
@@ -549,139 +539,6 @@ func (c *CategoryItemClient) mutate(ctx context.Context, m *CategoryItemMutation
 		return (&CategoryItemDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown CategoryItem mutation op: %q", m.Op())
-	}
-}
-
-// ClerkUserStoreClient is a client for the ClerkUser_Store schema.
-type ClerkUserStoreClient struct {
-	config
-}
-
-// NewClerkUserStoreClient returns a client for the ClerkUser_Store from the given config.
-func NewClerkUserStoreClient(c config) *ClerkUserStoreClient {
-	return &ClerkUserStoreClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `clerkuser_store.Hooks(f(g(h())))`.
-func (c *ClerkUserStoreClient) Use(hooks ...Hook) {
-	c.hooks.ClerkUser_Store = append(c.hooks.ClerkUser_Store, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `clerkuser_store.Intercept(f(g(h())))`.
-func (c *ClerkUserStoreClient) Intercept(interceptors ...Interceptor) {
-	c.inters.ClerkUser_Store = append(c.inters.ClerkUser_Store, interceptors...)
-}
-
-// Create returns a builder for creating a ClerkUser_Store entity.
-func (c *ClerkUserStoreClient) Create() *ClerkUserStoreCreate {
-	mutation := newClerkUserStoreMutation(c.config, OpCreate)
-	return &ClerkUserStoreCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of ClerkUser_Store entities.
-func (c *ClerkUserStoreClient) CreateBulk(builders ...*ClerkUserStoreCreate) *ClerkUserStoreCreateBulk {
-	return &ClerkUserStoreCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *ClerkUserStoreClient) MapCreateBulk(slice any, setFunc func(*ClerkUserStoreCreate, int)) *ClerkUserStoreCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &ClerkUserStoreCreateBulk{err: fmt.Errorf("calling to ClerkUserStoreClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*ClerkUserStoreCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &ClerkUserStoreCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for ClerkUser_Store.
-func (c *ClerkUserStoreClient) Update() *ClerkUserStoreUpdate {
-	mutation := newClerkUserStoreMutation(c.config, OpUpdate)
-	return &ClerkUserStoreUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *ClerkUserStoreClient) UpdateOne(cus *ClerkUser_Store) *ClerkUserStoreUpdateOne {
-	mutation := newClerkUserStoreMutation(c.config, OpUpdateOne, withClerkUser_Store(cus))
-	return &ClerkUserStoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *ClerkUserStoreClient) UpdateOneID(id int) *ClerkUserStoreUpdateOne {
-	mutation := newClerkUserStoreMutation(c.config, OpUpdateOne, withClerkUser_StoreID(id))
-	return &ClerkUserStoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for ClerkUser_Store.
-func (c *ClerkUserStoreClient) Delete() *ClerkUserStoreDelete {
-	mutation := newClerkUserStoreMutation(c.config, OpDelete)
-	return &ClerkUserStoreDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *ClerkUserStoreClient) DeleteOne(cus *ClerkUser_Store) *ClerkUserStoreDeleteOne {
-	return c.DeleteOneID(cus.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ClerkUserStoreClient) DeleteOneID(id int) *ClerkUserStoreDeleteOne {
-	builder := c.Delete().Where(clerkuser_store.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &ClerkUserStoreDeleteOne{builder}
-}
-
-// Query returns a query builder for ClerkUser_Store.
-func (c *ClerkUserStoreClient) Query() *ClerkUserStoreQuery {
-	return &ClerkUserStoreQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeClerkUserStore},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a ClerkUser_Store entity by its id.
-func (c *ClerkUserStoreClient) Get(ctx context.Context, id int) (*ClerkUser_Store, error) {
-	return c.Query().Where(clerkuser_store.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *ClerkUserStoreClient) GetX(ctx context.Context, id int) *ClerkUser_Store {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// Hooks returns the client hooks.
-func (c *ClerkUserStoreClient) Hooks() []Hook {
-	return c.hooks.ClerkUser_Store
-}
-
-// Interceptors returns the client interceptors.
-func (c *ClerkUserStoreClient) Interceptors() []Interceptor {
-	return c.inters.ClerkUser_Store
-}
-
-func (c *ClerkUserStoreClient) mutate(ctx context.Context, m *ClerkUserStoreMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&ClerkUserStoreCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&ClerkUserStoreUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&ClerkUserStoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&ClerkUserStoreDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown ClerkUser_Store mutation op: %q", m.Op())
 	}
 }
 
@@ -1347,11 +1204,9 @@ func (c *UserToStoreClient) mutate(ctx context.Context, m *UserToStoreMutation) 
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Category, CategoryItem, ClerkUser_Store, Item, Store, User,
-		UserToStore []ent.Hook
+		Category, CategoryItem, Item, Store, User, UserToStore []ent.Hook
 	}
 	inters struct {
-		Category, CategoryItem, ClerkUser_Store, Item, Store, User,
-		UserToStore []ent.Interceptor
+		Category, CategoryItem, Item, Store, User, UserToStore []ent.Interceptor
 	}
 )

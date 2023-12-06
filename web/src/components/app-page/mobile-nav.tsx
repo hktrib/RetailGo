@@ -1,51 +1,48 @@
-import { UserButton } from "@clerk/nextjs";
-import {
-  HelpCircle,
-  HomeIcon,
-  Menu,
-  Package2,
-  Settings,
-  ShoppingBag,
-} from "lucide-react";
+"use client";
 
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { UserButton } from "@clerk/nextjs";
+import { Navigation } from "./sidebar";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
-  SheetFooter,
   SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Menu } from "lucide-react";
+import type { StoreMetadata } from "@/app/(app-page)/store/layout";
+import StoreSelector from "./store-selector";
 
-const navigation = [
-  { name: "Dashboard", href: "/", icon: HomeIcon },
-  { name: "Inventory", href: "/inventory", icon: Package2 },
-  { name: "POS", href: "/pos", icon: ShoppingBag },
-];
-
-const fakeStores = [{ name: "RetailGo", id: "123" }];
-
-export default function MobileNav() {
+export default function MobileNav({ stores }: { stores: StoreMetadata[] }) {
   return (
     <div className="xl:hidden block bg-white/75 border-b">
       <div className="px-6 md:px-8 h-12 flex items-center justify-between">
         <div className="flex items-center gap-x-2">
-          <SidebarNav />
+          <SidebarNav stores={stores} />
 
-          <span className="font-bold">RetailGo</span>
+          <Link href="/store" className="font-semibold text-lg">
+            RetailGo
+          </Link>
         </div>
         <div>
-          <UserButton />
+          <UserButton afterSignOutUrl="/" />
         </div>
       </div>
     </div>
   );
 }
 
-const SidebarNav = () => {
+const SidebarNav = ({ stores }: { stores: StoreMetadata[] }) => {
+  const { store_id } = useParams();
+
+  let currentStore;
+  if (store_id) {
+    const store = stores.filter((store) => store.id === Number(store_id));
+    currentStore = store[0];
+  }
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -54,68 +51,15 @@ const SidebarNav = () => {
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="h-full w-[300px]">
-        <SheetHeader className="border-b pb-5">
-          <div className="px-3 py-1.5 flex items-center gap-x-3 bg-gray-100 rounded-md shadow">
-            <div className="h-4 w-4 bg-white flex items-center justify-center rounded-md">
-              <span className="text-xs">R</span>
-            </div>
-            <SheetTitle className="text-sm">Current store name</SheetTitle>
-          </div>
+        <SheetHeader className={`${store_id && "border-b pb-5"}`}>
+          <StoreSelector
+            stores={stores}
+            currentStoreId={store_id as string}
+            type="mobile"
+          />
         </SheetHeader>
 
-        <nav className="flex flex-1 flex-col h-full">
-          <ul role="list" className="flex flex-1 flex-col">
-            <li className="py-5 border-b">
-              <div className="text-xs text-gray-600 mb-2.5 px-3">
-                Navigation
-              </div>
-              <ul role="list" className="space-y-1.5">
-                {navigation.map((item) => (
-                  <li key={item.name}>
-                    <Link
-                      href={`/app/${item.href}`}
-                      className="text-gray-900 hover:text-black flex items-center gap-x-3 px-3 hover:bg-gray-100 py-1.5 rounded-md"
-                    >
-                      <item.icon className="w-4 h-4" aria-hidden="true" />
-                      <span className="text-sm">{item.name}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </li>
-            <li className="py-5 border-b">
-              <div className="text-xs text-gray-600 mb-2.5 px-3">
-                Your stores
-              </div>
-              <ul role="list" className="space-y-1.5">
-                {fakeStores.map((store) => (
-                  <li key={store.name}>
-                    <div className="group text-gray-900 hover:text-black flex items-center gap-x-3 px-3 hover:bg-gray-100 py-1.5 rounded-md">
-                      <div className="bg-gray-100 group-hover:bg-white h-4 w-4 flex items-center justify-center rounded-md">
-                        <span className="text-xs">{store.name.charAt(0)}</span>
-                      </div>
-                      <span className="text-sm">{store.name}</span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </li>
-
-            <li className="mt-auto pb-12">
-              <ul role="list" className="space-y-1.5">
-                <li className="flex items-center px-3 py-1.5 gap-x-3">
-                  <Settings className="w-4 h-4" aria-hidden="true" />
-                  <span className="text-sm text-gray-900">Settings</span>
-                </li>
-
-                <li className="flex items-center px-3 py-1.5 gap-x-3">
-                  <HelpCircle className="w-4 h-4" aria-hidden="true" />
-                  <span className="text-sm text-gray-900">Help</span>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </nav>
+        <Navigation userStores={stores} currentStoreId={store_id as string} />
       </SheetContent>
     </Sheet>
   );

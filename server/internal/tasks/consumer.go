@@ -19,6 +19,7 @@ const (
 type TaskConsumer interface {
 	Start() error
 	ConsumeTaskOwnerCreationCheck(ctx context.Context, task *asynq.Task) error
+	ConsumeTaskUpdateVectors(ctx context.Context, task *asynq.Task) error
 }
 
 type RedisConsumer struct {
@@ -58,5 +59,6 @@ func NewRedisTaskConsumer(redisOpt asynq.RedisClientOpt, dbClient *ent.Client, c
 func (p *RedisConsumer) Start() error {
 	mux := asynq.NewServeMux()
 	mux.HandleFunc(TaskOwnerCreationCheck, p.ConsumeTaskOwnerCreationCheck)
+	mux.HandleFunc(TaskUpdateVectors, p.ConsumeTaskUpdateVectors)
 	return p.server.Start(mux)
 }

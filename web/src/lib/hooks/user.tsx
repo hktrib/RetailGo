@@ -43,6 +43,30 @@ export function PostJoinStore(storeId: string) {
   });
 }
 
+export function PutUser(user_id: string) {
+  const authFetch = useFetch();
+  return useMutation({
+    mutationFn: (Employee) =>
+    authFetch(
+      `${storeURL}${user_id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(Employee),
+      },
+      {
+        "Content-Type": "application/json",
+      }
+    ),
+    onError: (err, email, context) => {
+      console.log("Error updating user", ":", err);
+    },
+    onSuccess: (email) => {
+      console.log("Updated User", email);
+      // You can add any additional logic you need on successful invite here
+    },
+  });
+}
+
 
 export { config };
 

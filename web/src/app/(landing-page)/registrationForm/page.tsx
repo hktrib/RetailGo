@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useFetch } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
+import { useRouter } from 'next/navigation'
+import {config} from "@/lib/hooks/config";
 
 // type Member = {
 //   firstName: string;
@@ -30,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Router } from "next/router";
 
 const formSchema = z.object({
   storeName: z.string().min(0),
@@ -49,6 +52,7 @@ const businessTypes = [
 ];
 
 export default function RegistrationForm() {
+  const router = useRouter()
   const { user } = useUser();
   const authFetch = useFetch();
 
@@ -95,7 +99,7 @@ export default function RegistrationForm() {
 
     try {
       console.log("POST Data: ", JSON.stringify(postData));
-      const response = await authFetch("https://retailgo-production.up.railway.app/create/store", {
+      const response = await authFetch(config.serverURL + "create/store", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -105,6 +109,11 @@ export default function RegistrationForm() {
       });
 
       console.log("Response:", response);
+
+      if (response.statusCode === 200 || response.statusCode === 201) {
+        router.push("/store")
+      }
+
       // Handle the response as needed
     } catch (error) {
       console.error("Error making POST request:", error);

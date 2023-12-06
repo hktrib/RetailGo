@@ -14,37 +14,11 @@ import (
 
 	"github.com/clerkinc/clerk-sdk-go/clerk"
 	"github.com/go-chi/chi/v5"
-	"github.com/hktrib/RetailGo/internal/ent"
-	store2 "github.com/hktrib/RetailGo/internal/ent/store"
-	user2 "github.com/hktrib/RetailGo/internal/ent/user"
 	"github.com/rs/zerolog/log"
+
+	"github.com/hktrib/RetailGo/internal/ent"
+	user2 "github.com/hktrib/RetailGo/internal/ent/user"
 )
-
-func (srv *Server) ValidateStore(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		store_id := chi.URLParam(r, "store_id")
-		StoreId, err := strconv.Atoi(store_id)
-		if err != nil {
-			log.Debug().Err(err).Msg(fmt.Sprintf("store id %s is not a integer", store_id))
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-			return
-		}
-		store, err := srv.DBClient.Store.
-			Query().Where(store2.ID(StoreId)).Only(r.Context())
-		if ent.IsNotFound(err) {
-			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-			return
-		} else if err != nil {
-			log.Debug().Err(err).Msg(fmt.Sprintf("duplicate store on store id %s", store))
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
-		}
-
-		ctx := context.WithValue(r.Context(), Param("store_var"), store)
-
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
-}
 
 func (srv *Server) GetAuthenticatedUserEmail(ctx context.Context) (string, error) {
 	sessClaims, ok := clerk.SessionFromContext(ctx)
@@ -144,15 +118,18 @@ func (srv *Server) IsOwnerCreateHandle(next http.Handler) http.Handler {
 			return
 		}
 
+		fmt.Printf("PotentialOwner %v\n", potentialOwner)
+
 		if potentialOwner.StoreID == 0 {
-			taskLifeTime := 1 * time.Minute
+			fmt.Println("HIT BRANCH")
+			taskLifeTime := 10 * time.Minute
 			err := srv.TaskProducer.ProduceTaskOwnerCreationCheck(ctx, &potentialOwner.Email, taskLifeTime)
 			if err != nil {
 				log.Debug().Err(err).Msg("TaskOwnerCreationCheck failed..")
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 				return
 			}
-			srv.Cache.SetX(potentialOwner.Email, &potentialOwner, 10*taskLifeTime)
+			srv.Cache.Set("storecreate|"+potentialOwner.Email, &potentialOwner)
 			w.WriteHeader(http.StatusCreated)
 			w.Write([]byte("OK!"))
 			return
@@ -182,7 +159,7 @@ func (srv *Server) StoreCreateHandle(next http.Handler) http.Handler {
 			return
 		}
 
-		owner := srv.Cache.Get(store.OwnerEmail)
+		owner := srv.Cache.Get("storecreate|" + store.OwnerEmail)
 		if owner == nil {
 			log.Debug().Err(err).Msg("Owner's user data is outdated...")
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
