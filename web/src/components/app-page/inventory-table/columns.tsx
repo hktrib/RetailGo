@@ -1,10 +1,10 @@
 "use client";
 
+import React from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import React, { useState } from 'react';
 
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, MoreHorizontal, PencilIcon, Trash2 } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 
 import { Item } from "@/models/item";
 
@@ -16,7 +16,6 @@ export type InventoryItem = {
   price: number;
   quantity: number;
 };
-
 
 export const columns: ColumnDef<Item>[] = [
   {

@@ -13,8 +13,8 @@ import {
   getSortedRowModel,
   getPaginationRowModel,
 } from "@tanstack/react-table";
-import Link from 'next/link'
 
+import ItemDialog from "../item-dialog";
 import {
   Table,
   TableBody,
@@ -26,7 +26,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import ItemDialog from "../item-dialog";
 import { Item } from "@/models/item";
 
 interface DataTableProps<TData extends Item, TValue> {
@@ -113,10 +112,7 @@ export function DataTable<TData extends Item, TValue>({
                           deleteItemMutation.mutate(row.original.id)
                         }
                       >
-                        <Trash2
-                          style={{ color: "red" }}
-                          className="h-5 w-5 p-0"
-                        ></Trash2>
+                        <Trash2 className="h-5 w-5 p-0 text-red-500" />
                       </button>
                     </div>
                   </TableCell>

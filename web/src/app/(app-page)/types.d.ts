@@ -17,6 +17,7 @@ type Item = {
   category_id: number;
   category_name: string;
   date_last_sold: string;
+  quantity: number;
   id: number;
   name: string;
   number_sold_since_update: number;

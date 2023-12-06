@@ -51,7 +51,7 @@ const POSController = ({
 
     setSelectedCategory(-2);
     setVisibleProducts(filteredProducts);
-  }, [searchTerm]);
+  }, [searchTerm, items]);
 
   const fetchCategoryById = (categoryId: number) => {
     if (!categories) return "";
