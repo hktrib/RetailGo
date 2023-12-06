@@ -19,7 +19,7 @@ const InvitePage = () => {
   const onSubmit = () => {
     if (!user) return;
     joinMutation.mutate(user.id);
-    router.push("/app");
+    router.push("/store");
   };
 
   return (

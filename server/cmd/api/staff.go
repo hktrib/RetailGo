@@ -196,7 +196,7 @@ func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 		Sender_name: firstName + " " + lastName,
 		//Sender_name: "Billy Bob",
 		//    Action_url: "http://localhost:3000/app/invite?code=" + storeObj.UUID,
-		Action_url: "https://retailgo-production.up.railway.app/store/invite?code=" + storeObj.UUID,
+		Action_url: "https://retail-go.vercel.app/store/invite?code=" + storeObj.UUID,
 	}
 	err_io := tmpl.ExecuteTemplate(htmlBody, "email_invitation.html", templateData)
 
