@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/hibiken/asynq"
+	supa "github.com/nedpals/supabase-go"
 
 	"github.com/hktrib/RetailGo/internal/ent"
 	kv "github.com/hktrib/RetailGo/internal/redis"
@@ -36,6 +37,7 @@ type Server struct {
 	Cache           *kv.Cache
 	TaskProducer    worker.TaskProducer
 	Config          *util.Config
+	Supabase 		*supa.Client
 }
 
 // Define a type for Item-Change Requests (Create, Update, Delete)
@@ -48,6 +50,7 @@ func NewServer(
 	cache *kv.Cache,
 	taskProducer worker.TaskProducer,
 	config *util.Config,
+	supabase *supa.Client,
 ) *Server {
 
 	srv := &Server{}
@@ -60,6 +63,8 @@ func NewServer(
 	srv.Cache = cache
 	srv.TaskProducer = taskProducer
 	srv.Config = config
+	srv.Supabase = supabase
+	
 	return srv
 }
 
