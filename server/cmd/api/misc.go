@@ -2,16 +2,17 @@ package server
 
 import (
 	"encoding/json"
+
 	"github.com/hktrib/RetailGo/internal/ent"
 )
 
-// ClientItem item that is sent to the client
+// Item with only the feilds the client should see
 type ClientItem ent.Item
-
-func (ite ClientItem) MarshalJSON() ([]byte, error) {
-	return MarshalItem(ite)
+// Overload for default json marshaller
+func (i ClientItem) MarshalJSON() ([]byte, error) {
+	return MarshalItem(i)
 }
-
+// Overload for default json marshaller 
 func MarshalItem(TargetItem ClientItem) ([]byte, error) {
 	/*
 		cats, err := temp.Category.Query().Where(category.HasItemsWith(item.ID(TargetItem.ID))).All(context.Background())
