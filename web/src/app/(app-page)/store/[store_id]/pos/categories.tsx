@@ -1,22 +1,24 @@
-import type { Category } from "./controller";
-
 const POSCategories = ({
-  numProducts,
+  items,
   categories,
   selectedCategory,
   setSelectedCategory,
 }: {
-  numProducts: number;
+  items: Item[];
   categories: Category[];
   selectedCategory: number;
   setSelectedCategory: React.Dispatch<React.SetStateAction<number>>;
 }) => {
+  const fetchNumProductsInCategory = (categoryId: number) => {
+    return items.filter((item) => item.category_id === categoryId).length;
+  };
+
   return (
     <section className="grid lg:grid-cols-3 gap-3">
       <CategoryCard
         id={-1}
         name="All"
-        items={numProducts}
+        items={items.length}
         selected={selectedCategory === -1}
         setSelectedCategory={setSelectedCategory}
       />
@@ -26,7 +28,7 @@ const POSCategories = ({
           key={category.id}
           id={category.id}
           name={category.name}
-          items={category.items}
+          items={fetchNumProductsInCategory(category.id)}
           selected={selectedCategory === category.id}
           setSelectedCategory={setSelectedCategory}
         />
