@@ -34,7 +34,7 @@ export default function Sidebar({ stores }: { stores: StoreMetadata[] }) {
       <div className="flex grow flex-col overflow-y-auto px-6 border-r">
         <div className="flex items-center justify-between py-5">
           <span className="text-lg font-semibold">RetailGo</span>
-          <UserButton />
+          <UserButton afterSignOutUrl="/" />
         </div>
 
         <div className="h-full pb-8">
