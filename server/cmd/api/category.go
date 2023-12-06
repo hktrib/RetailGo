@@ -132,7 +132,12 @@ func (srv *Server) CatItemRead(w http.ResponseWriter, r *http.Request) {
 	response := make(map[string][]*ent.Item)
 
 	// get items for each targetCategory
-	items, _ := srv.DBClient.Item.Query().Where(item.HasCategoryWith(category.ID(targetCategory.ID))).All(ctx)
+	items, err := srv.DBClient.Item.Query().Where(item.HasCategoryWith(category.ID(targetCategory.ID))).All(ctx)
+	if err != nil {
+		log.Debug().Err(err).Msg("unable to query for all items in category")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
 
 	response[targetCategory.Name] = append(response[targetCategory.Name], items...)
 
@@ -156,7 +161,7 @@ func (srv *Server) CatItemAdd(w http.ResponseWriter, r *http.Request) {
 	cat_id, err := strconv.Atoi(chi.URLParam(r, "category_id"))
 
 	if err != nil {
-		fmt.Println("Invalid category id:", err)
+		log.Debug().Err(err).Msg("Invalid category id")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -164,7 +169,7 @@ func (srv *Server) CatItemAdd(w http.ResponseWriter, r *http.Request) {
 	req_body, err := io.ReadAll(r.Body)
 
 	if err != nil {
-		fmt.Println("Server failed to read message body:", err)
+		log.Debug().Err(err).Msg("server failed to read message body")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -174,26 +179,20 @@ func (srv *Server) CatItemAdd(w http.ResponseWriter, r *http.Request) {
 	body_parse_err := json.Unmarshal(req_body, &itemIDs)
 
 	if body_parse_err != nil {
-		fmt.Println("Unmarshalling failed:", body_parse_err)
+		log.Debug().Err(body_parse_err).Msg("server failed to read message body")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	err = srv.DBClient.Category.UpdateOneID(cat_id).AddItemIDs(itemIDs...).Exec(ctx)
-
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
 	if ent.IsNotFound(err) {
-		fmt.Println("Item not found:", err)
+		log.Debug().Err(body_parse_err).Msg("server query of cat_id database")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	if err != nil {
-		fmt.Println("Create didn't work:", err)
+		log.Debug().Err(body_parse_err).Msg("server query of cat_id database")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -202,7 +201,6 @@ func (srv *Server) CatItemAdd(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("OK"))
 }
 
-// Deprecated
 func (srv *Server) CatItemList(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
@@ -214,12 +212,16 @@ func (srv *Server) CatItemList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	categories, err := srv.DBClient.Category.Query().Where(category.StoreID(store_id)).All(ctx)
-	response := make(map[string][]*ent.Item)
+	response := make(map[string]map[string]interface{}, 1)
+
+	response["categories"] = make(map[string]interface{}, 2)
+	response["categories"]["id"] = []int{}
+	response["categories"]["name"] = []string{}
 
 	for _, cat := range categories {
 		// get items for each category
-		items, _ := srv.DBClient.Item.Query().Where(item.HasCategoryWith(category.ID(cat.ID))).All(ctx)
-		response[cat.Name] = append(response[cat.Name], items...)
+		response["categories"]["name"] = append(response["categories"]["name"].([]string), cat.Name)
+		response["categories"]["id"] = append(response["categories"]["id"].([]int), cat.ID)
 	}
 	responseBody, _ := json.Marshal(response)
 	w.WriteHeader(http.StatusOK)
