@@ -4,6 +4,7 @@ import numpy as np
 
 class Weaviate(object):
     def __init__(self):
+        print("Weaviate:", weaviate)
         self.auth_config = weaviate.AuthApiKey(api_key=os.getenv("WEAVIATE_SK"))
         self.client = weaviate.Client(
                 url = os.getenv("WEAVIATE_HOSTNAME"),
