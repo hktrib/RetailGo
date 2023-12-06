@@ -6,7 +6,7 @@ class WeaviateWriter(object):
     def __init__(self):
         self.auth_config = weaviate.AuthApiKey(api_key=os.getenv("WEAVIATE_SK"))
         self.client = weaviate.Client(
-                url = "https://retailgo-recengine-eb6uzggu.weaviate.network",
+                url = "https://retailgo-recengine-eb6uzggu.weaviate.network", #os.getenv("WEAVIATE_HOSTNAME"),
                 auth_client_secret=self.auth_config,
         )
         self.discount_factor = 0.99
