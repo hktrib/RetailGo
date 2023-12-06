@@ -9,7 +9,7 @@ import { PostEmailInviteModel } from "@/models/staff";
 const storeURL = config.serverURL + "store/";
 
 
-export function GetStaffByStore(storeId: number) {
+export function GetStaffByStore(storeId: string) {
   // const queryClient = useQueryClient()
   const authFetch = useFetch();
   console.log(storeURL + storeId + "/staff")

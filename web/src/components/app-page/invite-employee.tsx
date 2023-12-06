@@ -57,11 +57,19 @@ export default function InviteEmployee() {
     inviteMutation.mutate(data);
     if (inviteMutation.isSuccess) {
       setDialogOpen(false);
+      toast.success("Invite sent successfully!", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 10000
+      });
+    }else{
+      toast.error("Error sending invite!", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 10000
+      }
+      );
+      console.log(inviteMutation.error)
     }
-    toast.success("Invite sent successfully!", {
-      position: toast.POSITION.TOP_RIGHT,
-      autoClose: 10000
-    });
+
   });
 
   return (

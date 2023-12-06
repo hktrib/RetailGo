@@ -11,6 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	clerkHelpers "github.com/hktrib/RetailGo/internal/clerk"
+	clerkstorage "github.com/hktrib/RetailGo/internal/clerk"
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/store"
 	"github.com/hktrib/RetailGo/internal/ent/user"
@@ -56,9 +57,9 @@ func (srv *Server) UserCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Fetching the UserToStore Relation from the database 
+	// Fetching the UserToStore Relation from the database
 	newUTS, err := srv.DBClient.UserToStore.Query().
-		Where( usertostore.StoreID(newUser.StoreID), usertostore.UserID(newUser.ID)).
+		Where(usertostore.StoreID(newUser.StoreID), usertostore.UserID(newUser.ID)).
 		Only(ctx)
 	if err != nil {
 		log.Debug().Err(err).Msg("Store Query for Clerk Store updating didn't work")
@@ -263,6 +264,7 @@ func (srv *Server) UserHasStore(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("true"))
 }
+
 func (srv *Server) UserJoinStore(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -319,31 +321,58 @@ func (srv *Server) UserJoinStore(w http.ResponseWriter, r *http.Request) {
 	} else if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
-	} // Create a new User entity
+	}
 
-	_, create_err := srv.DBClient.User.Create().
+	// Create a new User entity
+	newUser, create_err := srv.DBClient.User.Create().
 		SetEmail(email).
 		SetIsOwner(false).
 		SetStoreID(store.ID).
 		SetClerkUserID(clerkUser.ID).
 		SetFirstName(firstName).
 		SetLastName(lastName).
+		AddStoreIDs(store.ID).
 		Save(ctx)
-
 	if create_err != nil {
 		fmt.Println("User Creation didn't work:", create_err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	_, user_store_error := srv.DBClient.UserToStore.Create().
+	_, user_store_error := srv.DBClient.UserToStore.Update().
 		SetStoreID(store.ID).
+		SetStoreName(store.StoreName).
 		SetClerkUserID(clerkUser.ID).
-		SetPermissionLevel(2). // Employee permission level
+		SetPermissionLevel(1). // Employee permission level
 		Save(ctx)
-
 	if user_store_error != nil {
 		fmt.Println("User Creation didn't work:", create_err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	// Creating ClerkStore instance for new employee to add user_to_store relationship to metadata
+	clerkStore, err := clerkstorage.NewClerkStore(srv.ClerkClient, newUser.ClerkUserID, srv.Config)
+	if err != nil {
+		log.Debug().Err(err).Msg("NewClerkStore failed: Unable to create ClerkStore instance using clerk user id:")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	// Querying user_to_store table for user_to_store relationship for new employee
+	newUTS, err := srv.DBClient.UserToStore.Query().
+		Where(usertostore.StoreID(store.ID), usertostore.UserID(newUser.ID)).
+		Only(ctx)
+	if err != nil {
+		log.Debug().Err(err).Msg("UserJoinStore: unable to query from usertostore table in database")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	// Adding the user_to_store relationship to Clerk's Data Store
+	err = clerkStore.AddMetadata(newUTS)
+	if err != nil {
+		log.Debug().Err(err).Msg("UserJoinStore: unable to user metadata to Clerk Store")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
