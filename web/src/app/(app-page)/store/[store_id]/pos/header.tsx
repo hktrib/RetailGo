@@ -1,17 +1,13 @@
 import { Input } from "@/components/ui/input";
 import { MoveRight } from "lucide-react";
 
-import type { Category } from "./controller";
-
 const POSHeader = ({
   searchTerm,
   setSearchTerm,
-  categories,
   selectedCategory,
 }: {
   searchTerm: string;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
-  categories: Category[];
   selectedCategory: number;
 }) => {
   return (

@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Item } from "./controller";
 
 const POSOrderSummary = ({
   cart,

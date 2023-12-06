@@ -32,12 +32,12 @@ export default function Sidebar({ stores }: { stores: StoreMetadata[] }) {
   return (
     <div className="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-64 xl:flex-col">
       <div className="flex grow flex-col overflow-y-auto px-6 border-r">
-        <div className="flex items-center justify-between py-5 border-b">
+        <div className="flex items-center justify-between py-5">
           <span className="text-lg font-semibold">RetailGo</span>
           <UserButton />
         </div>
 
-        <div className="py-5 border-b h-full">
+        <div className="h-full pb-8">
           {currentStore && (
             <div className="px-3 py-1.5 flex items-center gap-x-3 bg-gray-100 rounded-md shadow">
               <div className="h-4 w-4 bg-white flex items-center justify-center rounded-md">
@@ -112,7 +112,7 @@ export const Navigation = ({
           </ul>
         </li>
 
-        <li className="mt-auto pt-5">
+        <li className="mt-auto pb-12 xl:pb-4">
           <ul role="list" className="space-y-1.5">
             <li className="flex items-center px-3 py-1.5 gap-x-3">
               <Settings className="w-4 h-4" aria-hidden="true" />

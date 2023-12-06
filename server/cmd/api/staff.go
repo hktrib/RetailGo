@@ -136,7 +136,7 @@ func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 	auth := smtp.PlainAuth(
 		"",
 		"retailgoco@gmail.com",
-		"iirp tdgd sbcp ktsp",
+		"hhqm pqgw lxmi weqb",
 		"smtp.gmail.com",
 	)
 
@@ -155,7 +155,7 @@ func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 
 	// HTML message
 
-	tmpl, err_file := template.ParseFiles("templates/email_invitation.html")
+	tmpl, err_file := template.ParseFiles("../templates/email_invitation.html")
 	if err_file != nil {
 		// Handle error (e.g., file not found)
 		http.Error(w, "Failed to open email template: "+err_file.Error(), http.StatusInternalServerError)
@@ -183,7 +183,8 @@ func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 		Store_name:  storeObj.StoreName,
 		Sender_name: firstName + " " + lastName,
 		//Sender_name: "Billy Bob",
-		Action_url: "http://localhost:3000/app/invite?code=" + storeObj.UUID,
+		//	Action_url: "http://localhost:3000/app/invite?code=" + storeObj.UUID,
+		Action_url: "https://retailgo-production.up.railway.app/store/invite?code=" + storeObj.UUID,
 	}
 	err_io := tmpl.Execute(htmlBody, templateData)
 
