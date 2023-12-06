@@ -17,13 +17,14 @@ import (
 )
 
 /*
-
 InvRead Brief:
+
 	________________________________________
 
 -> Read's all items from Specified Store's (Ex: store/{store_id}) Inventory
 
 External Package Calls:
+
 	N/A
 */
 func (srv *Server) InvRead(w http.ResponseWriter, r *http.Request) {
@@ -48,7 +49,8 @@ func (srv *Server) InvRead(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	inventory_bytes, err := json.Marshal(inventory)
+	// Format and return
+	inventory_bytes, err := json.Marshal(PruneItems(inventory...))
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
@@ -59,13 +61,14 @@ func (srv *Server) InvRead(w http.ResponseWriter, r *http.Request) {
 }
 
 /*
-
 InvCreate Brief:
+
 	________________________________________
 
 -> Creates an item in a specified store's inventory (Ex: store/{store_id}/inventory/create)
 
 External Package Calls:
+
 	N/A
 */
 func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
@@ -112,21 +115,21 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-    // set all item parameters
+	// set all item parameters
 	createdItem, create_err := srv.DBClient.
-			Item.Create().
-			SetPrice(float64(reqItem.Price)).
-			SetName(reqItem.Name).
-			SetStripePriceID(ProductId.DefaultPrice.ID).
-			SetStripeProductID(ProductId.ID).
-			SetPhoto(reqItem.Photo).
-			SetQuantity(reqItem.Quantity).
-			SetStoreID(store_id).
-			SetCategoryName(reqItem.CategoryName).
-			SetWeaviateID("").
-			SetVectorized(false).
-			SetNumberSoldSinceUpdate(0).
-			SetDateLastSold("").
+		Item.Create().
+		SetPrice(float64(reqItem.Price)).
+		SetName(reqItem.Name).
+		SetStripePriceID(ProductId.DefaultPrice.ID).
+		SetStripeProductID(ProductId.ID).
+		SetPhoto(reqItem.Photo).
+		SetQuantity(reqItem.Quantity).
+		SetStoreID(store_id).
+		SetCategoryName(reqItem.CategoryName).
+		SetWeaviateID("").
+		SetVectorized(false).
+		SetNumberSoldSinceUpdate(0).
+		SetDateLastSold("").
 		Save(ctx)
 	// If this create doesn't work, InternalServerError
 	if create_err != nil {
@@ -143,7 +146,7 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Weaviate ID on create:", weaviateID)
 
-	// Currently raises 500 if creation of weaviate copy or storing the weaviate id fails. 
+	// Currently raises 500 if creation of weaviate copy or storing the weaviate id fails.
 	// Attempts to roll back the database in response to this so that there are no ghost items for Weaviate.
 
 	if weaviateErr != nil {
@@ -174,14 +177,16 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 	w.Write(responseBody)
 
 }
-/*
 
+/*
 InvUpdate Brief:
+
 	________________________________________
 
 -> Updates an item in a specified store's inventory (Ex: store/{store_id}/inventory/update)
 
 External Package Calls:
+
 	N/A
 */
 func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
@@ -239,15 +244,15 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		NumberSoldSinceUpdate: false, // Assume that sales is taken care of elsewhere. If not, this is subject to change.
 		DateLastSold:          false, // Assume that sales is taken care of elsewhere. If not, this is subject to change.
 	}
-	
+
 	// Update the item's paramaters in the database
 	_, err = targetItem.Update().
-			SetQuantity(reqItem.Quantity).
-			SetName(reqItem.Name).
-			SetPhoto(reqItem.Photo).
-			SetPrice(reqItem.Price).
-			SetCategoryName(reqItem.CategoryName).
-			SetVectorized(originalItem.Vectorized && !(weaviate.ChangesVectorizedProperties(fieldsUpdated))).
+		SetQuantity(reqItem.Quantity).
+		SetName(reqItem.Name).
+		SetPhoto(reqItem.Photo).
+		SetPrice(reqItem.Price).
+		SetCategoryName(reqItem.CategoryName).
+		SetVectorized(originalItem.Vectorized && !(weaviate.ChangesVectorizedProperties(fieldsUpdated))).
 		Save(r.Context())
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -265,7 +270,7 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 			SetPrice(originalItem.Price).
 			SetCategoryName(originalItem.CategoryName).
 			SetVectorized(originalItem.Vectorized).
-		Save(r.Context())
+			Save(r.Context())
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -279,14 +284,16 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
-/*
 
+/*
 InvDelete Brief:
+
 	________________________________________
 
 -> Deletes an item in a specified store's inventory (Ex: store/{store_id}/inventory/update)
 
 External Package Calls:
+
 	N/A
 */
 func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
