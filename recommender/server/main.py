@@ -29,14 +29,10 @@ def vectorize_batch(batch: ItemBatch, response: Response):
     for item, vector in zip(batch.items, vectors):
         try:
             Writer.write_item_vector(item, vector)
-            print("Item Write")
             # If you are going to reach a change in store, write the discounted average to the store vector as well
             if current_store_id and item.StoreId != current_store_id:
-                print("Hello from Write to store")
                 Writer.write_store_vector(item.StoreId, todays_store_vector / todays_sales if todays_sales > 0 else todays_store_vector)
-                print("Write Store Vector")
                 todays_store_vector *= 0
-                print("Reset Store Vector")
                 todays_sales = 0
             todays_store_vector += item.NumberSoldSinceUpdate * vector    
             todays_sales += item.NumberSoldSinceUpdate
@@ -46,20 +42,13 @@ def vectorize_batch(batch: ItemBatch, response: Response):
             failures.add(item.ID)
 
     try:
-        print("Hello from Write to store")
         Writer.write_store_vector(item.StoreId, todays_store_vector / todays_sales)
-        print("Write Store Vector")
         todays_store_vector *= 0
-        print("Reset Store Vector")
         todays_sales = 0
-        print("Write To Store")
-
+        
     except:
         failures.add(item.ID)
 
     # Send back a JSON with all the item ids that were not successfully written to Weaviate. (If none, assume all went well).   
-    if len(failures) > 0:
-        print("Failures:", failures)
-        raise HTTPException(status_code = 200) 
-    
-    return list(failures)
+        
+    return {"idsFailedToVectorize": list(failures)}
