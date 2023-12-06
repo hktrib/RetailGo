@@ -50,10 +50,7 @@ export default async function Inventory({
           <h1 className="text-2xl font-bold">Inventory</h1>
 
           <div>
-            <AddItemDialog
-              currentStoreId={params.store_id}
-              categories={categories}
-            />
+            <AddItemDialog categories={categories} />
           </div>
         </div>
         <hr className="my-4" />
