@@ -155,7 +155,7 @@ func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 
 	// HTML message
 
-	tmpl, err_file := template.ParseFiles("templates/email_invitation.html")
+	tmpl, err_file := template.ParseFiles("../templates/email_invitation.html")
 	if err_file != nil {
 		// Handle error (e.g., file not found)
 		http.Error(w, "Failed to open email template: "+err_file.Error(), http.StatusInternalServerError)
