@@ -175,8 +175,13 @@ func (srv *Server) GetPosInfo(w http.ResponseWriter, r *http.Request) {
 		delete(response["categories"][i].(map[string]interface{}), "edges") // the edges field is not needed in the response
 		items, _ := srv.DBClient.Item.Query().Where(item.HasCategoryWith(category.ID(cat.ID))).All(ctx)
 		for _, item2 := range items {
-			it := PruneItems(item2)
-			response["items"] = append(response["items"], it)
+			it, _ := json.Marshal(item2)
+			itemInfo := make(map[string]interface{})
+			_ = json.Unmarshal(it, &itemInfo) // unmarshal the map into the respons
+			delete(itemInfo, "edges")
+			itemInfo["category_id"] = cat.ID
+			itemInfo["category"] = cat.Name
+			response["items"] = append(response["items"], itemInfo)
 
 		}
 	}
