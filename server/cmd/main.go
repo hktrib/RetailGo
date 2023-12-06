@@ -78,6 +78,9 @@ func main() {
 		log.Fatal().Err(err).Msg("failed creating schema resources")
 	}
 	println("checkpoint 3")
+
+	go weaviateClient.DoVectorize(context.Background(), taskProducer)
+
 	go func() {
 		injectActiveSession := clerk.WithSessionV2(clerkClient)
 
