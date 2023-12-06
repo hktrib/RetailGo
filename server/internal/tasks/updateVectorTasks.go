@@ -25,14 +25,14 @@ const (
 func vectorize(unvectorizedItems []*ent.Item) ([]int, error) {
 	REC_SERVER_URL := "https://retailgo-production.up.railway.app/"
 	// Marshall items to JSON
-	reqeuestBody, err := json.Marshal(unvectorizedItems)
+	requestBody, err := json.Marshal(unvectorizedItems)
 	var ids []int
 
 	if err != nil {
 		return ([]int{}), err
 	}
 
-	response, err := http.Post(REC_SERVER_URL+"vectorizeItems", "application/json", bytes.NewBuffer(reqeuestBody))
+	response, err := http.Post(REC_SERVER_URL+"vectorizeItems", "application/json", bytes.NewBuffer(requestBody))
 
 	if err != nil {
 		return ([]int{}), err
@@ -92,7 +92,7 @@ func (rc *RedisConsumer) ConsumeTaskUpdateVectors(ctx context.Context, task *asy
 			continue
 		}
 
-		_, _ = failedItem.Update().SetVectorized(false).Save(ctx)
+		_, _ = failedItem.Update().SetVectorized(false).SetNumberSoldSinceUpdate(0).Save(ctx)
 	}
 
 	return nil
