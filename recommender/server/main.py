@@ -1,7 +1,7 @@
 from fastapi import FastAPI, status, Response, HTTPException
 from data_models import Item, ItemBatch
 from vectorize import Vectorizer
-from weaviate import Weaviate
+from weaviate_client import Weaviate
 import numpy as np
 
 app = FastAPI()
