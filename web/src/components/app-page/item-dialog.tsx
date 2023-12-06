@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { useFetch } from "../../lib/utils";
-import { useCreateItem, useEditItem } from "@/lib/hooks/items";
-
 import * as z from "zod";
+import { useForm } from "react-hook-form";
+
+import { createItem } from "@/app/(app-page)/store/[store_id]/inventory/actions";
 
 import {
   Dialog,
@@ -23,36 +22,50 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Item, ItemWithoutId } from "@/models/item";
-import { useEffect } from "react";
 import { PencilIcon } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string(),
   price: z.coerce.number(),
   quantity: z.coerce.number(),
-  category: z.string(),
+  category_name: z.string(),
 });
 
 export default function ItemDialog({
   item,
   mode = "add",
+  categories,
 }: {
-  item: Item;
+  item?: Item;
   mode?: string;
+  categories: Category[];
 }) {
+  const params = useParams();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: item ? item.name : undefined,
+      price: item ? item.price : undefined,
+      quantity: item ? item.quantity : undefined,
+      category_name: item ? item.category_name : undefined,
+    },
   });
 
-  const createItemMutation = useCreateItem("1");
-  const editItemMutation = useEditItem("1");
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!params.store_id) return;
 
-  const [inputName, setInputName] = useState(item.name);
-  const [inputCategory, setInputCategory] = useState(item.category);
-  const [inputPrice, setInputPrice] = useState(item.price);
-  const [inputQuantity, setInputQuantity] = useState(item.quantity);
+    await createItem({ item: values, store_id: params.store_id as string });
+  };
 
   return (
     <Dialog>
@@ -68,121 +81,91 @@ export default function ItemDialog({
         )}
       </DialogTrigger>
 
-      <Form {...form}>
-        <form>
-          <DialogContent>
-            <form
-              onSubmit={form.handleSubmit(
-                (data) => {
-                  console.log("Data:", data);
-                  return mode === "edit"
-                    ? editItemMutation.mutate({ ...item, ...data })
-                    : createItemMutation.mutate(data);
-                },
-                (data) =>
-                  console.log(
-                    "Error:",
-                    data,
-                    "InputName:",
-                    inputName,
-                    "inputCategory:",
-                    inputCategory,
-                    "InputQuantity:",
-                    inputQuantity
-                  )
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{mode === "edit" ? "Edit" : "Add"} Item</DialogTitle>
+        </DialogHeader>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-1">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Item name" />
+                  </FormControl>
+                </FormItem>
               )}
-            >
-              <DialogHeader>
-                <DialogTitle>
-                  {mode === "edit" ? "Edit" : "Add"} Item
-                </DialogTitle>
-              </DialogHeader>
+            />
 
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
+            <FormField
+              control={form.control}
+              name="category_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
-                      <Input
-                        {...field}
-                        value={inputName}
-                        onChange={(e) => setInputName(e.currentTarget.value)}
-                      />
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a category" />
+                      </SelectTrigger>
                     </FormControl>
-                  </FormItem>
-                )}
-              />
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.name}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Category</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        value={inputCategory}
-                        onChange={(e) =>
-                          setInputCategory(e.currentTarget.value)
-                        }
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Price</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="number" placeholder="Item price" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="price"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Price</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        value={inputPrice}
-                        onChange={(e) =>
-                          setInputPrice(parseFloat(e.currentTarget.value))
-                        }
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="quantity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Quantity</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="number"
+                      placeholder="Item quantity"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="quantity"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Quantity</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        value={inputQuantity}
-                        onChange={(e) =>
-                          setInputQuantity(parseInt(e.currentTarget.value))
-                        }
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <DialogFooter className="gap-x-4">
-                <button type="submit">
-                  {mode === "edit" ? "Save" : "Add"}
-                </button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </form>
-      </Form>
+            <DialogFooter className="gap-x-4 pt-2">
+              <Button type="submit">
+                {mode === "edit" ? "Update" : "Add"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
     </Dialog>
   );
 }

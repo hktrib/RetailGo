@@ -3,6 +3,7 @@ import AddItemDialog from "@/components/app-page/item-dialog";
 import { Item } from "@/models/item";
 import { auth } from "@clerk/nextjs";
 import { cx } from "class-variance-authority";
+import { getStoreItemCategories, getStoreItems } from "../../queries";
 
 const stats = [
   {
@@ -30,23 +31,17 @@ export default async function Inventory({
 }: {
   params: { store_id: string };
 }) {
-  const { sessionId } = auth();
+  const itemsData = await getStoreItems({ store_id: params.store_id });
+  if (!itemsData.success) return <div>failed to fetch inventory items</div>;
 
-  const res = await fetch(
-    `https://retailgo-production.up.railway.app/store/${params.store_id}/inventory`,
-    {
-      cache: "force-cache",
-      headers: {
-        Authorization: `Bearer ${sessionId}`,
-      },
-    }
-  );
-  if (!res.ok) return <div>failed to fetch pos stuff</div>;
+  const items = itemsData.items;
 
-  const items = JSON.parse(await res.text()) ?? [];
+  const storeCategoryData = await getStoreItemCategories({
+    store_id: params.store_id,
+  });
+  if (!storeCategoryData.success) return <div>failed to fetch categories</div>;
 
-  const newItem = new Item();
-  const data = JSON.parse(JSON.stringify(newItem));
+  const categories = storeCategoryData.categories;
 
   return (
     <main className="bg-gray-50 h-full flex-grow">
@@ -55,7 +50,10 @@ export default async function Inventory({
           <h1 className="text-2xl font-bold">Inventory</h1>
 
           <div>
-            <AddItemDialog item={data} />
+            <AddItemDialog
+              currentStoreId={params.store_id}
+              categories={categories}
+            />
           </div>
         </div>
         <hr className="my-4" />
@@ -94,7 +92,7 @@ export default async function Inventory({
         </div>
 
         <div className="mt-6">
-          <InventoryTable items={items} />
+          <InventoryTable items={items} categories={categories} />
         </div>
       </div>
     </main>
