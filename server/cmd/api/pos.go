@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog/log"
@@ -186,8 +187,16 @@ func (srv *Server) FulfillOrder(LineItemList *stripe.LineItemList) {
 		if err != nil {
 			panic(err)
 		}
-		_, err = srv.DBClient.Item.UpdateOne(LineItem).SetQuantity(LineItem.Quantity - int(LineItemList.Data[i].Quantity)).Save(context.Background())
-
+		_, err = srv.DBClient.Item.
+			UpdateOne(LineItem).
+			SetQuantity(LineItem.Quantity - int(LineItemList.Data[i].Quantity)).
+			AddNumberSoldSinceUpdate(int(LineItemList.Data[i].Quantity)).
+			SetDateLastSold(time.Now().Format("2006-01-02")).
+			Save(context.Background())
+		
+		if err != nil {
+			log.Debug().Err(err).Msg("FulfillOrder: Unable to update item")
+		}
 	}
 }
 /*
