@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useFetch } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import {config} from "@/lib/hooks/config";
 
 // type Member = {
