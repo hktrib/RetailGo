@@ -35,7 +35,7 @@ func MarshalItem(TargetItem ClientItem) ([]byte, error) {
 		"photo":    TargetItem.Photo,
 		"quantity": TargetItem.Quantity,
 		"price":    TargetItem.Price,
-		"category": TargetItem.CategoryName,
+		"category_name": TargetItem.CategoryName,
 	})
 }
 func PruneItems(TargetItems ...*ent.Item) []ClientItem {
