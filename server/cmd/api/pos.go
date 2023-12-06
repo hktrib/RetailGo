@@ -177,6 +177,9 @@ func (srv *Server) GetPosInfo(w http.ResponseWriter, r *http.Request) {
 		response["items"] = append(response["items"], PruneItems(items...))
 	}
 	responseBody, _ := json.Marshal(response)
+	if len(categories) == 0 {
+		responseBody = []byte("{categories: [], items: []}")
+	}
 	w.WriteHeader(http.StatusOK)
 	w.Write(responseBody)
 }
