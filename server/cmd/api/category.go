@@ -212,16 +212,14 @@ func (srv *Server) CatItemList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	categories, err := srv.DBClient.Category.Query().Where(category.StoreID(store_id)).All(ctx)
-	response := make(map[string]map[string]interface{}, 1)
-
-	response["categories"] = make(map[string]interface{}, 2)
-	response["categories"]["id"] = []int{}
-	response["categories"]["name"] = []string{}
+	response := make(map[string][]map[string]interface{}, 1)
 
 	for _, cat := range categories {
-		// get items for each category
-		response["categories"]["name"] = append(response["categories"]["name"].([]string), cat.Name)
-		response["categories"]["id"] = append(response["categories"]["id"].([]int), cat.ID)
+		mp := make(map[string]interface{}, 1)
+		mp["id"] = cat.ID
+		mp["name"] = cat.Name
+		response["categories"] = append(response["categories"], mp)
+
 	}
 	responseBody, _ := json.Marshal(response)
 	w.WriteHeader(http.StatusOK)

@@ -251,9 +251,8 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 
 	weaviateUpdateErr := srv.WeaviateClient.EditItem(targetItem, fieldsUpdated)
 	if weaviateUpdateErr != nil {
-		log.Debug().Err(err).Msg("InvUpdate: weaviate failed to update item")
 		// Rolls back Database update if Weaviate update fails, but no guarantee of rollback working..
-		log.Debug().Err(weaviateUpdateErr).Msg("Failed to edit item in Weaviate")
+		log.Debug().Err(weaviateUpdateErr).Msg("InvUpdate: weaviate failed to update item")
 		_, _ = targetItem.Update().
 			SetQuantity(originalItem.Quantity).
 			SetPhoto(originalItem.Photo).
