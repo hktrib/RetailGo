@@ -34,7 +34,7 @@ func (srv *Server) InvRead(w http.ResponseWriter, r *http.Request) {
 	// Parse the store id
 	store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
 	if err != nil {
-		fmt.Println("Error with Store Id")
+		log.Debug().Err(err).Msg("InvRead: invalid store_id")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -44,7 +44,7 @@ func (srv *Server) InvRead(w http.ResponseWriter, r *http.Request) {
 		Where(item.StoreID(store_id)).
 		All(ctx)
 	if err != nil {
-		fmt.Println("Issue with querying the DB.")
+		log.Debug().Err(err).Msg("InvCreate: unable to query for store's inventory")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -52,6 +52,7 @@ func (srv *Server) InvRead(w http.ResponseWriter, r *http.Request) {
 	// Format and return
 	inventory_bytes, err := json.Marshal(PruneItems(inventory...))
 	if err != nil {
+		log.Debug().Err(err).Msg("InvCreate: unable to marshal items in inventory")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -81,28 +82,23 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 	store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
 
 	if err != nil {
-		fmt.Println("Invalid store id:", err)
+		log.Debug().Err(err).Msg("InvCreate: invalid store id")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	// Load the message parameters (Name, Photo, Quantity, Category)
 	req_body, err := io.ReadAll(r.Body)
-
 	if err != nil {
-		fmt.Println("Server failed to read message body:", err)
+		log.Debug().Err(err).Msg("InvCreate: unable to read request body")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
 	reqItem := ent.Item{}
-
-	body_parse_err := json.Unmarshal(req_body, &reqItem)
-
-	// If any are not present or not do not meet requirements (type for example), BadRequest
-
-	if body_parse_err != nil {
-		fmt.Println("Unmarshalling failed:", body_parse_err)
+	err = json.Unmarshal(req_body, &reqItem)
+	if err != nil {
+		log.Debug().Err(err).Msg("InvCreate: unable to unmarshal request body")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -111,12 +107,12 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 
 	ProductId, err := CreateStripeItem(&reqItem)
 	if err != nil {
-		fmt.Println("Stripe Create didn't work:", err)
+		log.Debug().Err(err).Msg("InvCreate: stripe item cannot be created")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 	// set all item parameters
-	createdItem, create_err := srv.DBClient.
+	createdItem, err := srv.DBClient.
 		Item.Create().
 		SetPrice(float64(reqItem.Price)).
 		SetName(reqItem.Name).
@@ -131,26 +127,20 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		SetNumberSoldSinceUpdate(0).
 		SetDateLastSold("").
 		Save(ctx)
-	// If this create doesn't work, InternalServerError
-	if create_err != nil {
-		fmt.Println("Create didn't work:", create_err)
+	if err != nil {
+		log.Debug().Err(err).Msg("InvCreate: inable to create item")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-
+	
 	responseBody, _ := json.Marshal(map[string]interface{}{
 		"id": createdItem.ID,
 	})
-
-	weaviateID, weaviateErr := srv.WeaviateClient.CreateItem(createdItem)
-
-	fmt.Println("Weaviate ID on create:", weaviateID)
-
-	// Currently raises 500 if creation of weaviate copy or storing the weaviate id fails.
+	
 	// Attempts to roll back the database in response to this so that there are no ghost items for Weaviate.
-
+	weaviateID, weaviateErr := srv.WeaviateClient.CreateItem(createdItem)
 	if weaviateErr != nil {
-		fmt.Println("Weaviate Create didn't work")
+		log.Debug().Err(err).Msg("InvCreate: cannot create weaviate item")
 		_ = srv.DBClient.
 			Item.DeleteOneID(createdItem.ID).
 			Where(item.StoreID(store_id)).
@@ -161,9 +151,8 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, setWeaviateIDErr := createdItem.Update().SetWeaviateID(weaviateID).Save(r.Context())
-
 	if setWeaviateIDErr != nil {
-		fmt.Println("Failed to set Weaviate ID")
+		log.Debug().Err(err).Msg("InvCreate: cannot update weaviateid")	
 		_ = srv.DBClient.
 			Item.DeleteOneID(createdItem.ID).
 			Where(item.StoreID(store_id)).
@@ -194,7 +183,7 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 	req_body, err := io.ReadAll(r.Body)
 
 	if err != nil {
-		fmt.Println("Server failed to read message body:", err)
+		log.Debug().Err(err).Msg("InvUpdate: server failed to read message body")	
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -206,7 +195,7 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 	// If any are not present or not do not meet requirements (type for example), BadRequest
 
 	if body_parse_err != nil {
-		fmt.Println("Unmarshalling failed:", body_parse_err)
+		log.Debug().Err(err).Msg("InvUpdate: unmarshalling failed")	
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -255,12 +244,14 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		SetVectorized(originalItem.Vectorized && !(weaviate.ChangesVectorizedProperties(fieldsUpdated))).
 		Save(r.Context())
 	if err != nil {
+		log.Debug().Err(err).Msg("InvUpdate: unable to update item in database")	
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
 	weaviateUpdateErr := srv.WeaviateClient.EditItem(targetItem, fieldsUpdated)
 	if weaviateUpdateErr != nil {
+		log.Debug().Err(err).Msg("InvUpdate: weaviate failed to update item")
 		// Rolls back Database update if Weaviate update fails, but no guarantee of rollback working..
 		log.Debug().Err(weaviateUpdateErr).Msg("Failed to edit item in Weaviate")
 		_, _ = targetItem.Update().
@@ -276,13 +267,7 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	_, err = w.Write([]byte("OK"))
-
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
+	w.Write([]byte("OK"))
 }
 
 /*
@@ -303,14 +288,14 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 	store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
 
 	if err != nil {
-		fmt.Println("Store Id parsing failed")
+		log.Debug().Err(err).Msg("InvDelete: unable to parse store_id")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	itemId, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
-		log.Debug().Err(err).Msg("InvDelete")
+		log.Debug().Err(err).Msg("InvDelete: unable to get id from URL params")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -330,6 +315,7 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 	// }
 
 	if ent.IsNotFound(err) {
+		log.Debug().Err(err).Msg("InvDelete: server failed to find target item")
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
@@ -342,9 +328,11 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 		Exec(r.Context())
 
 	if ent.IsNotFound(err) {
+		log.Debug().Err(err).Msg("InvDelete: server failed to find target item")
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	} else if err != nil {
+		log.Debug().Err(err).Msg("InvDelete: server failed to delete target item")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -352,7 +340,7 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 	err = srv.WeaviateClient.DeleteItem(weaviateID)
 
 	if err != nil {
-		log.Debug().Err(err).Msg("Delete in Weaviate Failed")
+		log.Debug().Err(err).Msg("InvDelete: weaviate failed to delete target item")
 		// Should Roll back delete - for now, naively, by just creating a new item -, but doesn't do this yet.
 		// _, _ = srv.DBClient.Item.Create().SetQuantity(originalItem.Quantity).SetPhoto(originalItem.Photo).SetName(originalItem.Name).SetPrice(originalItem.Price).SetCategoryName(originalItem.CategoryName).SetVectorized(originalItem.Vectorized).SetNumberSoldSinceUpdate(originalItem.NumberSoldSinceUpdate).SetDateLastSold(originalItem.DateLastSold).SetStore(originalItem.Edges.Store).Set.Save(r.Context())
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

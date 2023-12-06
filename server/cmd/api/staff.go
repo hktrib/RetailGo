@@ -8,12 +8,12 @@ import (
 	"log"
 	"net/http"
 	"net/mail"
+	"net/smtp"
 	"os"
 	"strconv"
 
-	"net/smtp"
-
 	"github.com/go-chi/chi/v5"
+
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/store"
 	"github.com/hktrib/RetailGo/internal/ent/user"
@@ -32,9 +32,7 @@ func (srv *Server) GetAllEmployees(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Verify valid store id (not SQL Injection)
-
-	// Run the SQL Query by store id on the items table, to get all items belonging to this store
+	// get all employees belonging to this store
 	user_data, err := srv.DBClient.User.Query().Where(user.StoreID(store_id)).All(ctx)
 
 	if err != nil {
@@ -43,17 +41,13 @@ func (srv *Server) GetAllEmployees(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user_bytes, err := json.MarshalIndent(user_data, "", "")
-
-	// Format and return
-
+	user_bytes, err := json.Marshal(user_data)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusAccepted)
-
 	w.Write(user_bytes)
 }
 
@@ -179,12 +173,14 @@ func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 		firstName = *clerk_user.FirstName
 	} else {
 		// Handle the nil case for FirstName
+		firstName = "unknown"
 	}
 
 	if clerk_user.LastName != nil {
 		lastName = *clerk_user.LastName
 	} else {
 		// Handle the nil case for LastName
+		lastName = "unknown"
 	}
 
 	// Read file content
