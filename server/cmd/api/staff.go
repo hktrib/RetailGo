@@ -13,8 +13,6 @@ import (
 
 	"net/smtp"
 
-	"fmt"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/store"
@@ -106,10 +104,10 @@ func (srv *Server) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 // TestEmailHandler handles the email testing request
 func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 
-	entries, err := os.ReadDir("./")
-	if err != nil {
-		log.Fatal(err)
-		fmt.Println(err)
+	entries, dummy_err := os.ReadDir("./")
+	if dummy_err != nil {
+		log.Fatal(dummy_err)
+		fmt.Println(dummy_err)
 	}
 	for _, e := range entries {
 		fmt.Println(e.Name())
