@@ -104,7 +104,7 @@ func (srv *Server) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 // TestEmailHandler handles the email testing request
 func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 
-	entries, dummy_err := os.ReadDir("./")
+	entries, dummy_err := os.ReadDir("./cmd")
 	if dummy_err != nil {
 		log.Fatal(dummy_err)
 		fmt.Println(dummy_err)
@@ -167,7 +167,7 @@ func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 
 	// HTML message
 
-	tmpl, err_file := template.ParseGlob("./templates/*")
+	tmpl, err_file := template.ParseGlob("./cmd/templates/*")
 	if err_file != nil {
 		// Handle error (e.g., file not found)
 		http.Error(w, "Failed to open email template folder: "+err_file.Error(), http.StatusInternalServerError)
