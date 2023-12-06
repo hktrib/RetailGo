@@ -16,7 +16,8 @@ class Vectorizer(object):
     def get_image_features(self, items):
         return np.array(map(
             lambda item: self.model.get_image_features(**self.processor(requests.get(item.Photo, stream = True).raw), return_tensor = "pt", dtype = np.float16) if len(item.Photo) > 0 
-            else np.zeros(self.dimension)
+            else np.zeros(self.dimension),
+            items
         ))
 
     def vectorize(self, items: ItemBatch):
