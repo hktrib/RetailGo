@@ -1,7 +1,5 @@
 import InventoryTable from "@/components/app-page/inventory-table";
 import AddItemDialog from "@/components/app-page/item-dialog";
-import { Item } from "@/models/item";
-import { auth } from "@clerk/nextjs";
 import { cx } from "class-variance-authority";
 import { getStoreItemCategories, getStoreItems } from "../../queries";
 
