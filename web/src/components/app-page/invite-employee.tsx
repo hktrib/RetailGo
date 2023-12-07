@@ -38,13 +38,6 @@ export default function InviteEmployee() {
     name: z.string(),
   });
 
-  const notify = () => {
-    toast.success("Invite sent successfully!", {
-      position: toast.POSITION.TOP_RIGHT,
-      autoClose: 10000
-    });
-  }
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
@@ -70,6 +63,9 @@ export default function InviteEmployee() {
       }
       );
       console.log(inviteMutation.error)
+    }
+    else{
+      console.log("idk??")
     }
 
   });

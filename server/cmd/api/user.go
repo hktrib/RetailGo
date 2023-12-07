@@ -81,9 +81,20 @@ func (srv *Server) UserCreate(w http.ResponseWriter, r *http.Request) {
 
 func (srv *Server) UserDelete(w http.ResponseWriter, r *http.Request) {
 
-	user_id, err := strconv.Atoi(r.URL.Query().Get("user"))
+	user_id, err := strconv.Atoi(chi.URLParam(r, "user_id"))
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, http.StatusText(http.StatusBadRequest)+": no user id", http.StatusBadRequest)
+		return
+	}
+
+	// Delete entries in usertostore table based on user_id
+	_, err = srv.DBClient.
+		UserToStore.
+		Delete().
+		Where(usertostore.UserID(user_id)). // Assuming there is a UserID field in userToStore
+		Exec(r.Context())
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -95,7 +106,7 @@ func (srv *Server) UserDelete(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	} else if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError)+":"+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -171,6 +182,14 @@ func (srv *Server) userAdd(w http.ResponseWriter, r *http.Request) {
 	w.Write(responseBody)
 }
 
+// Assuming you have a struct to map the request body
+type UserUpdateRequest struct {
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
+	// Add other fields as necessary
+}
+
 func (srv *Server) userUpdate(w http.ResponseWriter, r *http.Request) {
 	// get item id from url query string
 	ctx := r.Context()
@@ -183,43 +202,40 @@ func (srv *Server) userUpdate(w http.ResponseWriter, r *http.Request) {
 	targetUser, err := srv.DBClient.User.Query().Where(user.ID(user_id)).Only(ctx)
 
 	if ent.IsNotFound(err) {
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		http.Error(w, http.StatusText(http.StatusNotFound)+": user not found", http.StatusNotFound)
 		return
 	} else if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	//get all query params
-	values := r.URL.Query()
+	// Decode the request body
+	var req UserUpdateRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
 
-	// set appropriate fields
-	if name, ok := values["first_name"]; ok {
-		targetUser.Update().SetFirstName(name[0]).SaveX(ctx)
+	// Update user with new values
+	update := targetUser.Update()
+	if req.FirstName != "" {
+		update.SetFirstName(req.FirstName)
 	}
-	if name, ok := values["last_name"]; ok {
-		targetUser.Update().SetLastName(name[0]).SaveX(ctx)
+	if req.LastName != "" {
+		update.SetLastName(req.LastName)
 	}
-	if name, ok := values["email"]; ok {
-		targetUser.Update().SetEmail(name[0]).SaveX(ctx)
+	if req.Email != "" {
+		update.SetEmail(req.Email)
 	}
-	if name, ok := values["isowner"]; ok {
-		targetUser.Update().SetIsOwner(name[0] == "true").SaveX(ctx)
-	}
-	if name, ok := values["storeid"]; ok {
-		val, err := strconv.Atoi(name[0])
-		if err != nil {
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-			return
-		}
-		targetUser.Update().SetStoreID(val).SaveX(ctx)
-	}
-	w.WriteHeader(http.StatusOK)
-	_, err = w.Write([]byte("OK"))
-	if err != nil {
+
+	// Save the changes
+	if _, err := update.Save(ctx); err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
 
 }
 

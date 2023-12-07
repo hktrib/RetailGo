@@ -38,6 +38,9 @@ import AddEmployee from "../employee-dialog";
 import AddItemDialog from "../item-dialog";
 import EmployeeDialog from "../employee-dialog";
 import { PencilIcon, Trash2 } from "lucide-react";
+import { DeleteUser } from "@/lib/hooks/user";
+import { useParams } from "next/navigation";
+import { toast } from "react-toastify";
 
 interface DataTableProps<TData extends Employee, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -69,6 +72,30 @@ export function DataTable<TData extends Employee, TValue>({
       columnVisibility,
     },
   });
+
+  const params = useParams()
+  const id = params.store_id;
+  const deleteMutation = DeleteUser();
+
+  const onDelete =  (userId : string) => {
+    console.log("Deleting user with id:", id);
+    deleteMutation.mutate(userId);
+    if (deleteMutation.isSuccess) {
+      console.log("Invite Mutations Success")
+      toast.success("Deleted user sucessfully!", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 10000
+      });
+    }else if (deleteMutation.isError) {
+      console.log("Invite Mutations Failuire")
+      toast.error("Error deleting user!", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 10000
+      }
+      );
+      console.log(deleteMutation.error)
+    }
+  };
 
   return (
     <div>
@@ -150,8 +177,7 @@ export function DataTable<TData extends Employee, TValue>({
                     <div className="text-right flex flex-row space-x-2 h-8 w-8 p-0">
                       <EmployeeDialog employeeData={row.original} mode="edit" />
                       <button
-                        onClick={() => console.log("Delete button clicked")}
-                      >
+                        onClick={() => onDelete(row.original.id.toString())}>
                         <Trash2
                           style={{ color: "red" }}
                           className="h-5 w-5 p-0"

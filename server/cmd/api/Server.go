@@ -37,7 +37,7 @@ type Server struct {
 	Cache           *kv.Cache
 	TaskProducer    worker.TaskProducer
 	Config          *util.Config
-	Supabase 		*supa.Client
+	Supabase        *supa.Client
 }
 
 // Define a type for Item-Change Requests (Create, Update, Delete)
@@ -147,9 +147,9 @@ func (s *Server) MountHandlers() {
 			})
 		})
 	})
+
 	s.Router.Route("/user", func(r chi.Router) {
 		r.Get("/store", s.UserHasStore) // Checks if a user has a store
-
 		r.Route("/{user_id}", func(r chi.Router) {
 			r.Delete("/", s.UserDelete) // Delete a user by ID
 			r.Put("/", s.userUpdate)    // Update a user by ID

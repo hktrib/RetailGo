@@ -67,6 +67,29 @@ export function PutUser(user_id: string) {
   });
 }
 
+export function DeleteUser() {
+  const authFetch = useFetch();
+  return useMutation({
+    mutationFn: (user_id: string) =>
+    authFetch(
+      `${storeURL}${user_id}`,
+      {
+        method: "DELETE",
+      },
+      {
+        "Content-Type": "application/json",
+      }
+    ),
+    onError: (err, email, context) => {
+      console.log("Error deleting user", ":", err);
+    },
+    onSuccess: (email) => {
+      console.log("Deleted User", email);
+      // You can add any additional logic you need on successful invite here
+    },
+  });
+}
+
 
 export { config };
 
