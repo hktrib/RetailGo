@@ -16,8 +16,8 @@ const POSCategories = ({
   return (
     <section className="grid lg:grid-cols-3 gap-3">
       <CategoryCard
-        id={-1}
-        name="All"
+        name="-1"
+        displayName="All"
         items={items.length}
         selected={selectedCategory === "-1"}
         setSelectedCategory={setSelectedCategory}
@@ -26,7 +26,7 @@ const POSCategories = ({
       {categories.map((category) => (
         <CategoryCard
           key={category.id}
-          id={category.id}
+          displayName={category.name}
           name={category.name}
           items={fetchNumProductsInCategory(category.name)}
           selected={selectedCategory === category.name}
@@ -38,14 +38,14 @@ const POSCategories = ({
 };
 
 const CategoryCard = ({
-  id,
   name,
+  displayName,
   items,
   selected,
   setSelectedCategory,
 }: {
-  id: number;
   name: string;
+  displayName: string;
   items: number;
   selected: boolean;
   setSelectedCategory: (name: string) => void;
@@ -57,7 +57,7 @@ const CategoryCard = ({
       }`}
       onClick={() => setSelectedCategory(name)}
     >
-      <div className="text-xl font-medium">{name}</div>
+      <div className="text-xl font-medium">{displayName}</div>
       <div className="text-sm text-gray-600 leading-6">
         {items} <span>{items === 1 ? "item" : "items"}</span>
       </div>
