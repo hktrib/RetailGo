@@ -4,6 +4,10 @@ RetailGo
 
 Contributors: Colby Frey, Apramay Singh, David Nguyen, Giridhar Vadhul, Leo Asatoorian, Jonathan Michel
 
+## Reccomendation Engine
+
+    Install requirements as per requirements.txt in recommender/server/, and run uvicorn main:app
+
 
 ## Backend
 
