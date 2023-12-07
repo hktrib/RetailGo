@@ -31,7 +31,7 @@ var (
 		Indexes: []*schema.Index{
 			{
 				Name:    "category_name",
-				Unique:  true,
+				Unique:  false,
 				Columns: []*schema.Column{CategoriesColumns[1]},
 			},
 		},

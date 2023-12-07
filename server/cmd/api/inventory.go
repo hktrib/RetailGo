@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -98,6 +99,7 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	reqItem := ent.Item{}
+	reqItem.StoreID = store_id
 	body_parse_err := json.Unmarshal(req_body, &reqItem)
 
 	// If any are not present or not do not meet requirements (type for example), BadRequest
@@ -140,19 +142,8 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	if reqItem.CategoryName != "" {
-		_, err = srv.DBClient.Category.Update().Where(category.Name(reqItem.CategoryName)).AddItems(createdItem).Save(ctx)
-
-		if err != nil {
-			if ent.IsNotFound(err) {
-				log.Debug().Err(err).Msg("Category not found Defaulting to Uncategorized")
-
-			} else {
-				log.Debug().Err(err).Msg("Failed to query category")
-				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-				return
-			}
-		}
+	if UpdateItemCategory(w, reqItem, err, srv, createdItem, ctx) {
+		return
 	}
 
 	responseBody, _ := json.Marshal(map[string]interface{}{
@@ -195,6 +186,52 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func UpdateItemCategory(w http.ResponseWriter, reqItem ent.Item, err error, srv *Server, createdItem *ent.Item, ctx context.Context) bool {
+	var cat *ent.Category
+	if reqItem.CategoryName == "" {
+		// does uncategorized exist?
+		cat, err = srv.DBClient.Category.Query().Where(category.Name("Uncategorized"), category.StoreID(reqItem.StoreID)).Only(ctx)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				log.Debug().Err(err).Msg("Uncategorized not found lets create it")
+				_, err = srv.DBClient.Category.Create().SetName("Uncategorized").SetStoreID(createdItem.StoreID).AddItems(createdItem).SetPhoto([]byte("hello")).Save(ctx)
+				if err != nil {
+					log.Debug().Err(err).Msg("Failed to create Uncategorized")
+					http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+					return true
+				}
+				return false
+			} else {
+				log.Debug().Err(err).Msg("Failed to query Uncategorized")
+				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				return true
+			}
+		}
+	} else {
+		cat, err = srv.DBClient.Category.Query().Where(category.Name(reqItem.CategoryName), category.StoreID(reqItem.StoreID)).Only(ctx)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				log.Debug().Err(err).Msg("Category not found lets create it")
+				_, err = srv.DBClient.Category.Create().SetName(reqItem.CategoryName).SetStoreID(createdItem.StoreID).AddItems(createdItem).SetPhoto([]byte("hello")).Save(ctx)
+				if err != nil {
+					log.Debug().Err(err).Msg("Failed to create Category")
+					http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+					return true
+				}
+				return false
+			} else {
+				log.Debug().Err(err).Msg("Failed to query Category")
+				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				return true
+			}
+		}
+		_, err = srv.DBClient.Category.UpdateOne(cat).AddItems(createdItem).Save(ctx)
+		return false
+
+	}
+
+	return false
+}
 
 /*
 InvUpdate Brief:
@@ -212,7 +249,7 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 	req_body, err := io.ReadAll(r.Body)
 
 	if err != nil {
-		log.Debug().Err(err).Msg("InvUpdate: server failed to read message body")	
+		log.Debug().Err(err).Msg("InvUpdate: server failed to read message body")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -224,7 +261,7 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 	// If any are not present or not do not meet requirements (type for example), BadRequest
 
 	if body_parse_err != nil {
-		log.Debug().Err(err).Msg("InvUpdate: unmarshalling failed")	
+		log.Debug().Err(err).Msg("InvUpdate: unmarshalling failed")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -273,7 +310,7 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		SetVectorized(originalItem.Vectorized && !(weaviate.ChangesVectorizedProperties(fieldsUpdated))).
 		Save(r.Context())
 	if err != nil {
-		log.Debug().Err(err).Msg("InvUpdate: unable to update item in database")	
+		log.Debug().Err(err).Msg("InvUpdate: unable to update item in database")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
