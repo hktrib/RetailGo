@@ -71,5 +71,6 @@ Requires: RetailGo Backend ENV variables
 Requires: RetailGo Frontend ENV variables
 
 -> `pnpm install`
+
 -> `pnpm run dev`
 
