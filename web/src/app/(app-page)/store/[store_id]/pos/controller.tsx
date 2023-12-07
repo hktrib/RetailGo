@@ -16,21 +16,21 @@ const POSController = ({
   categories: Category[];
   items: Item[];
 }) => {
-  const [selectedCategory, setSelectedCategory] = useState(-1);
+  const [selectedCategory, setSelectedCategory] = useState("-1");
   const [cart, setCart] = useState<(Item & { quantity: number })[]>([]);
   const [visibleProducts, setVisibleProducts] = useState(items ?? []);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     if (!items) return;
-    if (selectedCategory === -2) return;
-    if (selectedCategory === -1) {
+    if (selectedCategory === "-2") return;
+    if (selectedCategory === "-1") {
       setVisibleProducts(items);
       return;
     }
 
     const filteredProducts = items.filter(
-      (product) => product.category_id === selectedCategory
+      (product) => product.category_name === selectedCategory
     );
 
     setVisibleProducts(filteredProducts);
@@ -38,7 +38,7 @@ const POSController = ({
 
   useEffect(() => {
     if (searchTerm.length === 0) {
-      setSelectedCategory(-1);
+      setSelectedCategory("-1");
       return;
     }
 
@@ -49,7 +49,7 @@ const POSController = ({
         product.id.toString().toLowerCase().includes(query)
     );
 
-    setSelectedCategory(-2);
+    setSelectedCategory("-2");
     setVisibleProducts(filteredProducts);
   }, [searchTerm, items]);
 
@@ -58,6 +58,8 @@ const POSController = ({
 
     return categories.filter((category) => category.id === categoryId)[0].name;
   };
+
+  console.log(categories, items);
 
   return (
     <div>

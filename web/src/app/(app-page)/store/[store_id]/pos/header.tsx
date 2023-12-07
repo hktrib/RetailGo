@@ -8,12 +8,12 @@ const POSHeader = ({
 }: {
   searchTerm: string;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
-  selectedCategory: number;
+  selectedCategory: string;
 }) => {
   return (
     <div className="w-full lg:w-auto">
       <div>
-        {selectedCategory === -1 ? (
+        {selectedCategory === "-1" ? (
           <span className="text-gray-700 flex items-center text-sm">
             All products
           </span>

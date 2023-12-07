@@ -6,11 +6,11 @@ const POSCategories = ({
 }: {
   items: Item[];
   categories: Category[];
-  selectedCategory: number;
-  setSelectedCategory: React.Dispatch<React.SetStateAction<number>>;
+  selectedCategory: string;
+  setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
 }) => {
-  const fetchNumProductsInCategory = (categoryId: number) => {
-    return items.filter((item) => item.category_id === categoryId).length;
+  const fetchNumProductsInCategory = (categoryName: string) => {
+    return items.filter((item) => item.category_name === categoryName).length;
   };
 
   return (
@@ -19,7 +19,7 @@ const POSCategories = ({
         id={-1}
         name="All"
         items={items.length}
-        selected={selectedCategory === -1}
+        selected={selectedCategory === "-1"}
         setSelectedCategory={setSelectedCategory}
       />
 
@@ -28,8 +28,8 @@ const POSCategories = ({
           key={category.id}
           id={category.id}
           name={category.name}
-          items={fetchNumProductsInCategory(category.id)}
-          selected={selectedCategory === category.id}
+          items={fetchNumProductsInCategory(category.name)}
+          selected={selectedCategory === category.name}
           setSelectedCategory={setSelectedCategory}
         />
       ))}
@@ -48,14 +48,14 @@ const CategoryCard = ({
   name: string;
   items: number;
   selected: boolean;
-  setSelectedCategory: (id: number) => void;
+  setSelectedCategory: (name: string) => void;
 }) => {
   return (
     <article
       className={`bg-gray-100 p-4 rounded-lg cursor-pointer ${
         selected && "ring ring-blue-200"
       }`}
-      onClick={() => setSelectedCategory(id)}
+      onClick={() => setSelectedCategory(name)}
     >
       <div className="text-xl font-medium">{name}</div>
       <div className="text-sm text-gray-600 leading-6">
