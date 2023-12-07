@@ -27,7 +27,9 @@ import { Employee } from "@/models/employee";
 import { config } from "@/lib/hooks/config";
 import { useParams } from "next/navigation";
 import { toast } from "react-toastify";
-import { PutUser } from "@/lib/hooks/user";
+import { DeleteUser, PutUser } from "@/lib/hooks/user";
+import { updateUser } from "@/app/(app-page)/store/[store_id]/employees/action";
+import router from "next/router";
 
 // Schema for form validation using Zod
 const formSchema = z.object({
@@ -36,23 +38,28 @@ const formSchema = z.object({
   email: z.string().regex(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/),
 });
 
+
+
 // The component definition
 export default function EmployeeDialog({
   employeeData = new Employee(),
   mode = "add",
 }: {
-  employeeData: Employee;
+  employeeData?: Employee;
   mode?: string;
 }) {
-  const form = useForm({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      first_name: employeeData ? employeeData.first_name : undefined,
+      last_name: employeeData ? employeeData.last_name : undefined,
+      email: employeeData ? employeeData.email : undefined,
+    },
   });
 
   // Set up your fetch utility
   const [isDialogOpen, setDialogOpen] = useState(false); // State to control the dialog
   const params = useParams()
-  const id = params.store_id;
-
   // Pre-fill the form when editing an employee
   useEffect(() => {
     if (employeeData != null) {
@@ -62,41 +69,41 @@ export default function EmployeeDialog({
   }, [employeeData, form]);
 
   const inviteMutation = PutUser(employeeData.id.toString());
-  const onSubmit = form.handleSubmit((data: any) => {
-    console.log(JSON.stringify(data));
-    inviteMutation.mutate(data);
-    if (inviteMutation.isSuccess) {
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!params.store_id) return;
+    let response = await updateUser({ user: values, user_id: employeeData.id.toString() });
+    if (response) {
       setDialogOpen(false);
-      toast.success("User updated successfully!", {
+      toast.success("Employee updated successfully!", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 10000
       });
+      router.reload();
+
     }else{
-      toast.error("Failed to update user!", {
+      toast.error("Error updating employee!", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 10000
-      }
-      );
-      console.log(inviteMutation.error)
+      });
     }
-
-  });
+    
+  }
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
-      <button className="icon-button">
-            <PencilIcon
-              style={{ color: "orange" }}
-              className="h-5 w-5 p-0"
-            ></PencilIcon>
-          </button>
+        <button className="icon-button">
+          <PencilIcon
+            style={{ color: "orange" }}
+            className="h-5 w-5 p-0"
+          ></PencilIcon>
+        </button>
       </DialogTrigger>
 
       <Form {...form}>
-        <form>
-          <DialogContent>
-          <form onSubmit={onSubmit} {...form}>
+        <DialogContent>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-1">
 
             <DialogHeader>
               <DialogTitle>
@@ -147,9 +154,8 @@ export default function EmployeeDialog({
                 {mode === "edit" ? "Update" : "Save"}
               </button>
             </DialogFooter>
-            </form>
-          </DialogContent>
-        </form>
+          </form>
+        </DialogContent>
       </Form>
 
     </Dialog>
