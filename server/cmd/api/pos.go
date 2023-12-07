@@ -25,8 +25,10 @@ import (
 StoreCheckout Brief:
 
 -> Processes a checkout for items in a cart.
-   Reads request body to retrieve cart items, queries the database for each item,
-   and creates a Stripe Checkout Session using S
+
+	Reads request body to retrieve cart items, queries the database for each item,
+	and creates a Stripe Checkout Session using S
+
 External Package Calls:
 - srv.DBClient.Item.Query()
 - StripeHelper.CreateCheckoutSession()
@@ -65,12 +67,14 @@ func (srv *Server) StoreCheckout(writer http.ResponseWriter, request *http.Reque
 	StripeHelper.CreateCheckoutSession(cart, writer, request)
 
 }
+
 /*
 StripeWebhookRouter Brief:
 
 -> Handles incoming webhook events from Stripe and routes them based on event types.
-   Verifies the webhook signature, constructs the event, and routes it to respective
-   functions based on event types such as account updates, payment successes/failures, etc.
+
+	Verifies the webhook signature, constructs the event, and routes it to respective
+	functions based on event types such as account updates, payment successes/failures, etc.
 
 External Package Calls:
 - webhook.ConstructEvent()
@@ -138,12 +142,14 @@ func (srv *Server) StripeWebhookRouter(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 }
+
 /*
 HandleTransSuccess Brief:
 
 -> Handles successful transaction events from Stripe webhook.
-   Parses the webhook JSON, retrieves line items from the session, and fulfills orders by updating
-   item quantities using srv.FulfillOrder(LineItemList).
+
+	Parses the webhook JSON, retrieves line items from the session, and fulfills orders by updating
+	item quantities using srv.FulfillOrder(LineItemList).
 
 External Package Calls:
 - json.Unmarshal()
@@ -193,12 +199,13 @@ func (srv *Server) FulfillOrder(LineItemList *stripe.LineItemList) {
 			AddNumberSoldSinceUpdate(int(LineItemList.Data[i].Quantity)).
 			SetDateLastSold(time.Now().Format("2006-01-02")).
 			Save(context.Background())
-		
+
 		if err != nil {
 			log.Debug().Err(err).Msg("FulfillOrder: Unable to update item")
 		}
 	}
 }
+
 /*
 GetPosInfo Brief:
 
@@ -222,7 +229,8 @@ func (srv *Server) GetPosInfo(w http.ResponseWriter, r *http.Request) {
 		log.Debug().Err(err).Msg("GetPosInfo failed")
 	}
 	response := make(map[string][]interface{}, 1)
-
+	response["categories"] = make([]interface{}, 0)
+	response["items"] = make([]interface{}, 0)
 	for i, cat := range categories {
 		// get items for each category
 		c, _ := json.Marshal(cat) // marshal the category into a map
