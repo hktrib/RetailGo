@@ -31,6 +31,6 @@ func (Category) Edges() []ent.Edge {
 func (Category) Indexes() []ent.Index {
 	return []ent.Index{
 		// index from name
-		index.Fields("name").Unique(),
+		index.Fields("name"),
 	}
 }
