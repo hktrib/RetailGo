@@ -5,28 +5,71 @@ RetailGo
 Contributors: Colby Frey, Apramay Singh, David Nguyen, Giridhar Vadhul, Leo Asatoorian, Jonathan Michel
 
 
-### Getting Started with the Backend!
+## Backend
 
-```console foo@bar:~$ git clone git@github.com:hktrib/RetailGo.git```
+#### Boot PostgreSQL / Redis / Weaviate / Stripe Database
+    Requires: Docker
+    
+    -> run `make devpostres` or equivalient command found in makefile to start PostgreSQL service in Docker container
+    
+    -> run `make devcreatedb` or equivalient command found in makefile to create database
+    
+    -> run `make startredis` or equivalent command found in makefile to start redis service. 
+    
+    -> Create Weaviate Cloud Service Instance/Sandbox
+    
+    -> Create Clerk Account and Link Secret Key and Webhook Secret
+    
+    -> Create Stripe Account and provide keys. 
+    
+    
+    -> Attach necessary secrets to env variables in a .env file.
+    
+        `
+            DB_DRIVER=postgres
+            DB_SOURCE=
+            CLERK_SK=
+            CLERK_WEBHOOK_SECRET=
+            SERVER_ADDRESS=8080
+            REDIS_HOSTNAME=
+            REDIS_PORT=
+            REDIS_PASSWORD=
+            STRIPE_SK=
+            RAILWAY_DOCKERFILE_PATH=
+            STRIPE_WEBHOOK_SECRET=
+            WEAVIATE_HOSTNAME=
+            WEAVIATE_SK=
+        `
+    
+#### Run Backend!
+
+Requires: RetailGo Backend ENV variables
+
+-> `go mod tidy`
+
+-> `go run main.go`
 
 
-To lessen the install burden, we'll work with postgres on a docker container via PORT# 5432
+#### Run Frontend!
 
-1. Ensure that you have docker desktop installed. If not download it here https://www.docker.com/products/docker-desktop/
+    `
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+        CLERK_SECRET_KEY=
+        CLERK_WEBHOOK_SECRET=
+        
+        NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+        NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+        NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
+        NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
+        
+        EMAIL_USER=retailgoco@gmail.com
+        EMAIL_PASSWORD=RG-cse115a
+        
+        PUBLIC_SUPABASE_URL=
+        PUBLIC_SUPABASE_KEY=
+    `
+Requires: RetailGo Frontend ENV variables
 
-4. Once your project has been cloned navigate to the **server/Makefile** file.
+-> `pnpm install`
+-> `pnpm run dev`
 
-
-5. Makefile commands are pretty self-explanatory. 
-    - ```foo@bar:RetailGo/server$ make postgres``` spins up a docker container
-    - ```foo@bar:RetailGo/server$ make createdb``` creates a database -> retail_go
-    - ```foo@bar:RetailGo/server$ make drodb``` deletes a database -> retail_go
-    - ```console foo@bar:RetailGo/server$ make sqlc_delete``` deletes the **db/sqlc** folder.
-6. run **make postgres** **make createdb** and Configure TablePlus to connect to the retail_go database via PORT# 5432 (Password: secret)
-7. Run ```console foo@bar:RetailGo/server$ go run main.go``` 
-
-##### Working With Ent
-https://entgo.io/docs/getting-started
-
-##### Docs
-Go-Chi -> https://go-chi.io/
