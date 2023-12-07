@@ -5,7 +5,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 
-import { createItem } from "@/app/(app-page)/store/[store_id]/inventory/actions";
+import {
+  createItem,
+  updateItem,
+} from "@/app/(app-page)/store/[store_id]/inventory/actions";
 
 import {
   Dialog,
@@ -63,6 +66,17 @@ export default function ItemDialog({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!params.store_id) return;
+
+    if (mode === "edit") {
+      if (!item) return;
+
+      await updateItem({
+        item: { id: item.id, ...values },
+        store_id: params.store_id as string,
+      });
+
+      return;
+    }
 
     await createItem({ item: values, store_id: params.store_id as string });
   };
