@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export const createItem = async ({
   item,
@@ -32,6 +32,7 @@ export const createItem = async ({
   }
 
   revalidatePath("/store/[store]", "page");
+  revalidateTag("storeCategories");
 };
 
 export const updateItem = async ({
