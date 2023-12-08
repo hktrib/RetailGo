@@ -4,25 +4,30 @@ import numpy as np
 
 class Weaviate(object):
     def __init__(self):
-        print("Weaviate:", weaviate)
         self.auth_config = weaviate.AuthApiKey(api_key=os.getenv("WEAVIATE_SK"))
         self.client = weaviate.Client(
-                url = os.getenv("WEAVIATE_HOSTNAME"),
+                url = "https://retailgo-recengine-eb6uzggu.weaviate.network",
                 auth_client_secret=self.auth_config,
         )
-        self.discount_factor = 0.99
+        self.discount_factor = 1
 
     def write_item_vector(self, item, vector):
+        print("Weaviate_Id:", item.weaviate_id)
         self.client.data_object.update(
-        uuid = item.WeaviateID,
-        data_object={},
+        uuid = item.weaviate_id,
+        data_object={
+            "Updated": True
+        },
         class_name="item",
         vector = vector
         )
+        print("Worked?")
 
     def write_store_vector(self, store_id, average_today):
 
         store_exists = False
+
+        print("Average Today:", average_today)
 
         try:
             store = self.client.query.get(
@@ -40,14 +45,19 @@ class Weaviate(object):
             pass
 
         if store_exists:
+            print("Updating existing store", curr_vector.shape, average_today.shape)
+            print("Store_UUID:", store_uuid)
             self.client.data_object.update(
                 uuid = store_uuid,
                 class_name = "store",
-                data_object={},
+                data_object={
+                    'completed': True
+                },
                 vector = self.discount_factor * curr_vector + average_today
             )
 
         else:
+            print("Creating store")
             _ = self.client.data_object.create({
                 "store_id": store_id,
             },
@@ -68,4 +78,6 @@ class Weaviate(object):
         return store_vector
 
     def search(self, store_vector):
-        return self.client.query().get("item", ["name", "categoryName", "imageURL", "price"]).with_limit(50).do()
+        return self.client.query().get("item", ["name", "categoryName", "imageURL", "price"]).with_near_vector({
+            'vector': store_vector
+        }).with_limit(50).do()
