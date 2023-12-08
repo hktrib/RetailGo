@@ -16,13 +16,17 @@ export const getStoreItemCategories = async ({
       headers: {
         Authorization: `Bearer ${sessionId}`,
       },
+      next: { tags: ["storeCategories"] },
     });
     if (!res.ok) return { success: false, categories: [] };
 
-    const categories = JSON.parse(await res.text()) ?? [];
-    console.log("fetched categories:", categories);
+    const data = JSON.parse(await res.text()) ?? [];
+    console.log("fetched categories:", data);
 
-    return { success: true, categories: categories };
+    return {
+      success: true,
+      categories: data,
+    };
   } catch (err) {
     console.error("error fetching store categories");
     return { success: false, categories: [] };
@@ -41,13 +45,14 @@ export const getStoreItems = async ({ store_id }: { store_id: string }) => {
       headers: {
         Authorization: `Bearer ${sessionId}`,
       },
+      next: { tags: ["storeItems"] },
     });
     if (!res.ok) return { success: false, items: [] };
 
-    const items = JSON.parse(await res.text()) ?? [];
-    console.log("fetched items:", items);
+    const data = JSON.parse(await res.text()) ?? [];
+    console.log("fetched items:", data);
 
-    return { success: true, items: items };
+    return { success: true, items: data };
   } catch (err) {
     console.error("error fetching store items");
     return { success: false, items: [] };
