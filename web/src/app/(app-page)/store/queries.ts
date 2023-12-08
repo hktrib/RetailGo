@@ -20,9 +20,9 @@ export const getStoreItemCategories = async ({
     if (!res.ok) return { success: false, categories: [] };
 
     const categories = JSON.parse(await res.text()) ?? [];
-    console.log("fetched categories:", categories.categories ?? []);
+    console.log("fetched categories:", categories);
 
-    return { success: true, categories: categories.categories ?? [] };
+    return { success: true, categories: categories };
   } catch (err) {
     console.error("error fetching store categories");
     return { success: false, categories: [] };
