@@ -1,3 +1,4 @@
+import { getPOSData } from "../../queries";
 import POSController from "./controller";
 
 export default async function POSPage({
@@ -5,15 +6,9 @@ export default async function POSPage({
 }: {
   params: { store_id: string };
 }) {
-  const res = await fetch(
-    `https://retailgo-production.up.railway.app/store/${params.store_id}/pos/info`,
-    { cache: "force-cache" }
-  );
-  if (!res.ok) return <div>failed to fetch pos stuff</div>;
+  const res = await getPOSData({ store_id: params.store_id });
 
-  const data: { categories: Category[]; items: Item[] } = JSON.parse(
-    await res.text()
+  return (
+    <POSController categories={res.data.categories} items={res.data.items} />
   );
-
-  return <POSController categories={data.categories} items={data.items} />;
 }
