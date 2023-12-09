@@ -34,11 +34,12 @@ export function useFetch() {
   return authenticatedFetch;
 }
 
-export function useAuthenticated() : boolean{
-  const {isSignedIn} = useAuth()
+export function useAuthenticated(): boolean {
+  const { isSignedIn } = useAuth();
   if (!isSignedIn) {
-    return false
+    return false;
   }
-  return true
+  return true;
 }
 
+export const wait = () => new Promise((resolve) => setTimeout(resolve, 1000));

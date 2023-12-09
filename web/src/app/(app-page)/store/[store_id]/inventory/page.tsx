@@ -47,9 +47,9 @@ export default async function Inventory({
         <div className="flex items-center justify-between ">
           <h1 className="text-2xl font-bold">Inventory</h1>
 
-          <div>
+          <>
             <AddItemDialog categories={categories} />
-          </div>
+          </>
         </div>
         <hr className="my-4" />
 

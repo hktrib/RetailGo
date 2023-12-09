@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -8,7 +9,7 @@ import {
   createItem,
   updateItem,
 } from "@/app/(app-page)/store/[store_id]/inventory/actions";
-import { cn } from "@/lib/utils";
+import { cn, wait } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -50,6 +51,7 @@ export default function ItemDialog({
   categories: Category[];
 }) {
   const params = useParams();
+  const [open, setOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -72,14 +74,17 @@ export default function ItemDialog({
         store_id: params.store_id as string,
       });
 
+      wait().then(() => setOpen(false));
       return;
     }
 
     await createItem({ item: values, store_id: params.store_id as string });
+    wait().then(() => setOpen(false));
   };
 
   const displayCategory = (value: string) => {
     if (!value) return "Select category";
+    if (!categories || !categories.length) return value;
 
     const categoryName = categories.find((category) => category.name === value)
       ?.name;
@@ -90,7 +95,7 @@ export default function ItemDialog({
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {mode === "edit" ? (
           <button className="icon-button">
