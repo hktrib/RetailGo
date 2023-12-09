@@ -7,6 +7,7 @@ import { useFetch } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from 'next/navigation'
 import {config} from "@/lib/hooks/config";
+import {createStore} from "./actions"
 
 // type Member = {
 //   firstName: string;
@@ -52,72 +53,41 @@ const businessTypes = [
 ];
 
 export default function RegistrationForm() {
-  const router = useRouter()
   const { user } = useUser();
-  const authFetch = useFetch();
+  const router = useRouter()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
-  // const [members, setMembers] = useState<Member[]>([]);
-  // const [showMemberFields, setShowMemberFields] = useState(false);
-  // const [memberFirstName, setMemberFirstName] = useState('');
-  // const [memberLastName, setMemberLastName] = useState('');
-  // const [memberEmail, setMemberEmail] = useState('');
-  // const [memberRole, setMemberRole] = useState('');
-
-  // const handleAddMembersClick = () => setShowMemberFields(true);
-  // const handleMemberFirstName = e => setMemberFirstName(e.target.value);
-  // const handleMemberLastName = e => setMemberLastName(e.target.value);
-  // const handleMemberEmail = e => setMemberEmail(e.target.value);
-  // const handleMemberRole = e => setMemberRole(e.target.value);
-
-  // const addMember = () => {
-  //   setMembers(prevMembers => [
-  //     ...prevMembers,
-  //     { firstName: memberFirstName, lastName: memberLastName, email: memberEmail, role: memberRole }
-  //   ]);
-  //   setMemberFirstName('');
-  //   setMemberLastName('');
-  //   setMemberEmail('');
-  //   setMemberRole('');
-  // };
+  console.log(config.serverURL)
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     // not doing anything with `address2` yet
+
     const { storeName, phoneNumber, address1, address2, businessType } = values;
 
     // data to be sent in POST request body
     const postData = {
-      store_name: storeName,
-      store_phone: phoneNumber,
-      store_address: address1,
-      store_type: businessType,
-      owner_email: user?.emailAddresses[0].emailAddress,
+      store_name: storeName || "",
+      store_phone: phoneNumber || "",
+      store_address: address1 || "",
+      store_type: businessType || "",
+      owner_email: user?.emailAddresses[0]?.emailAddress || "",
     };
 
     try {
-      console.log("POST Data: ", JSON.stringify(postData));
-      const response = await authFetch(config.serverURL + "create/store", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // Any additional headers you need
-        },
-        body: JSON.stringify(postData),
-      });
+      let response : Boolean = await createStore({postData});
 
-      console.log("Response:", response);
-
-      if (response.statusCode === 200 || response.statusCode === 201) {
-        router.push("/store")
+      if (response === true) {
+        // router.refresh()
+        router.push("/store?store_type='store_id'") 
+      } else {
+        throw "Failed to create store"
       }
 
-      // Handle the response as needed
     } catch (error) {
-      console.error("Error making POST request:", error);
-      // Handle errors
+      console.error("Error making create store request:", error);
     }
   };
 
@@ -223,30 +193,5 @@ export default function RegistrationForm() {
         </Form>
       </div>
     </div>
-    //      add members component
-    //     {showMemberFields && (
-    //       <>
-    //         <label className={styles.label}>Member's Name</label>
-    //         <input type="text" className={styles.input} placeholder="First Name" value={memberFirstName} onChange={handleMemberFirstName} />
-    //         <input type="text" className={styles.input} placeholder="Last Name" value={memberLastName} onChange={handleMemberLastName} />
-    //         <input type="email" className={styles.input} placeholder="Email" value={memberEmail} onChange={handleMemberEmail} />
-    //         <select className={styles.input} value={memberRole} onChange={handleMemberRole}>
-    //           <option value="">Select Role</option>
-    //           <option value="owner">Owner</option>
-    //           <option value="manager">Manager</option>
-    //           <option value="employee">Employee</option>
-    //         </select>
-    //         <button type="button" onClick={addMember} className={styles.addButton}>Add Member</button>
-    //       </>
-    //     )}
-    //     <button type="button" onClick={() => setShowMemberFields(!showMemberFields)} className={styles.toggleButton}>
-    //       {showMemberFields ? 'Close' : 'Add Members'}
-    //     </button>
-
-    //     {members.map((member, index) => (
-    //       <div key={index} className={styles.memberInfo}>
-    //         {member.firstName} {member.lastName} ({member.email}) - {member.role}
-    //       </div>
-    //     ))}
   );
 }
