@@ -132,6 +132,26 @@ func (su *StoreUpdate) ClearStorePhone() *StoreUpdate {
 	return su
 }
 
+// SetStripeAccountID sets the "stripe_account_id" field.
+func (su *StoreUpdate) SetStripeAccountID(s string) *StoreUpdate {
+	su.mutation.SetStripeAccountID(s)
+	return su
+}
+
+// SetNillableStripeAccountID sets the "stripe_account_id" field if the given value is not nil.
+func (su *StoreUpdate) SetNillableStripeAccountID(s *string) *StoreUpdate {
+	if s != nil {
+		su.SetStripeAccountID(*s)
+	}
+	return su
+}
+
+// ClearStripeAccountID clears the value of the "stripe_account_id" field.
+func (su *StoreUpdate) ClearStripeAccountID() *StoreUpdate {
+	su.mutation.ClearStripeAccountID()
+	return su
+}
+
 // SetStoreType sets the "store_type" field.
 func (su *StoreUpdate) SetStoreType(s string) *StoreUpdate {
 	su.mutation.SetStoreType(s)
@@ -327,6 +347,12 @@ func (su *StoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if su.mutation.StorePhoneCleared() {
 		_spec.ClearField(store.FieldStorePhone, field.TypeString)
+	}
+	if value, ok := su.mutation.StripeAccountID(); ok {
+		_spec.SetField(store.FieldStripeAccountID, field.TypeString, value)
+	}
+	if su.mutation.StripeAccountIDCleared() {
+		_spec.ClearField(store.FieldStripeAccountID, field.TypeString)
 	}
 	if value, ok := su.mutation.StoreType(); ok {
 		_spec.SetField(store.FieldStoreType, field.TypeString, value)
@@ -591,6 +617,26 @@ func (suo *StoreUpdateOne) ClearStorePhone() *StoreUpdateOne {
 	return suo
 }
 
+// SetStripeAccountID sets the "stripe_account_id" field.
+func (suo *StoreUpdateOne) SetStripeAccountID(s string) *StoreUpdateOne {
+	suo.mutation.SetStripeAccountID(s)
+	return suo
+}
+
+// SetNillableStripeAccountID sets the "stripe_account_id" field if the given value is not nil.
+func (suo *StoreUpdateOne) SetNillableStripeAccountID(s *string) *StoreUpdateOne {
+	if s != nil {
+		suo.SetStripeAccountID(*s)
+	}
+	return suo
+}
+
+// ClearStripeAccountID clears the value of the "stripe_account_id" field.
+func (suo *StoreUpdateOne) ClearStripeAccountID() *StoreUpdateOne {
+	suo.mutation.ClearStripeAccountID()
+	return suo
+}
+
 // SetStoreType sets the "store_type" field.
 func (suo *StoreUpdateOne) SetStoreType(s string) *StoreUpdateOne {
 	suo.mutation.SetStoreType(s)
@@ -816,6 +862,12 @@ func (suo *StoreUpdateOne) sqlSave(ctx context.Context) (_node *Store, err error
 	}
 	if suo.mutation.StorePhoneCleared() {
 		_spec.ClearField(store.FieldStorePhone, field.TypeString)
+	}
+	if value, ok := suo.mutation.StripeAccountID(); ok {
+		_spec.SetField(store.FieldStripeAccountID, field.TypeString, value)
+	}
+	if suo.mutation.StripeAccountIDCleared() {
+		_spec.ClearField(store.FieldStripeAccountID, field.TypeString)
 	}
 	if value, ok := suo.mutation.StoreType(); ok {
 		_spec.SetField(store.FieldStoreType, field.TypeString, value)

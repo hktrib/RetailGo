@@ -82,6 +82,20 @@ func (sc *StoreCreate) SetNillableStorePhone(s *string) *StoreCreate {
 	return sc
 }
 
+// SetStripeAccountID sets the "stripe_account_id" field.
+func (sc *StoreCreate) SetStripeAccountID(s string) *StoreCreate {
+	sc.mutation.SetStripeAccountID(s)
+	return sc
+}
+
+// SetNillableStripeAccountID sets the "stripe_account_id" field if the given value is not nil.
+func (sc *StoreCreate) SetNillableStripeAccountID(s *string) *StoreCreate {
+	if s != nil {
+		sc.SetStripeAccountID(*s)
+	}
+	return sc
+}
+
 // SetStoreType sets the "store_type" field.
 func (sc *StoreCreate) SetStoreType(s string) *StoreCreate {
 	sc.mutation.SetStoreType(s)
@@ -245,6 +259,10 @@ func (sc *StoreCreate) createSpec() (*Store, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.StorePhone(); ok {
 		_spec.SetField(store.FieldStorePhone, field.TypeString, value)
 		_node.StorePhone = value
+	}
+	if value, ok := sc.mutation.StripeAccountID(); ok {
+		_spec.SetField(store.FieldStripeAccountID, field.TypeString, value)
+		_node.StripeAccountID = value
 	}
 	if value, ok := sc.mutation.StoreType(); ok {
 		_spec.SetField(store.FieldStoreType, field.TypeString, value)

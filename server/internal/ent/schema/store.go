@@ -22,6 +22,7 @@ func (Store) Fields() []ent.Field {
 		field.String("owner_email").Optional(),
 		field.String("store_address").Optional(),
 		field.String("store_phone").Optional(),
+		field.String("stripe_account_id").Optional(),
 		field.String("store_type").Optional(),
 	}
 }
