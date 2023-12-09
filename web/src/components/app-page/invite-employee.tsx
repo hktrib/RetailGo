@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from "react";
+import { useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, SubmitHandler } from "react-hook-form";
-
+import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { SendInvite } from "@/lib/hooks/staff";
 
+import { toast } from "react-toastify";
 import {
   Dialog,
   DialogContent,
@@ -21,17 +24,10 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { SendInvite } from "@/lib/hooks/staff";
-import { useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import { useSelectedStore } from "@/components/storeprovider";
-import { useParams  } from "next/navigation";
-
 
 export default function InviteEmployee() {
   const [isDialogOpen, setDialogOpen] = useState(false); // State to control the dialog
-  const { selectedStore, selectStore } = useSelectedStore();
-  const params = useParams()
+  const params = useParams();
 
   const formSchema = z.object({
     email: z.string().regex(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/),
@@ -49,81 +45,79 @@ export default function InviteEmployee() {
     console.log(JSON.stringify(data));
     inviteMutation.mutate(data);
     if (inviteMutation.isSuccess) {
-      console.log("Invite Mutations Success")
+      console.log("Invite Mutations Success");
       setDialogOpen(false);
       toast.success("Invite sent successfully!", {
         position: toast.POSITION.TOP_RIGHT,
-        autoClose: 10000
+        autoClose: 10000,
       });
-    }else if (inviteMutation.isError) {
-      console.log("Invite Mutations Failuire")
+    } else if (inviteMutation.isError) {
+      console.log("Invite Mutations Failuire");
       toast.error("Error sending invite!", {
         position: toast.POSITION.TOP_RIGHT,
-        autoClose: 10000
-      }
-      );
-      console.log(inviteMutation.error)
+        autoClose: 10000,
+      });
+      console.log(inviteMutation.error);
+    } else {
+      console.log("idk??");
     }
-    else{
-      console.log("idk??")
-    }
-
   });
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
-        <button className="bg-blue-500 text-sm px-3 py-1.5 text-white font-medium rounded-md"
+        <button
+          className="bg-blue-500 text-sm px-3 py-1.5 text-white font-medium rounded-md"
           onClick={() => setDialogOpen(true)}
         >
           Invite
         </button>
       </DialogTrigger>
-      <Form {...form}>
-        <form>
-          <DialogContent>
-            <form onSubmit={onSubmit} {...form}>
-              <DialogHeader>
-                <DialogTitle>Invite employee</DialogTitle>
-              </DialogHeader>
 
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Bob Jones" />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Invite employee</DialogTitle>
+        </DialogHeader>
 
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="person@google.com" />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <DialogFooter className="gap-x-4">
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-sm px-3 py-1.5 text-white font-medium rounded-md mt-5"
-                >
-                  Invite
-                </button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </form>
-      </Form>
+        <Form {...form}>
+          <form onSubmit={onSubmit} {...form}>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Bob Jones" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="person@google.com" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <DialogFooter>
+              <button
+                type="submit"
+                className="bg-blue-500 text-sm px-3 py-1.5 text-white font-medium rounded-md mt-5"
+              >
+                Invite
+              </button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
     </Dialog>
   );
 }
