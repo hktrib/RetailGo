@@ -25,7 +25,9 @@ export class Employee {
 }
 
 // Create a function to convert an Employee instance to a plain data object
-export function convertEmployeeToPlainObject(employee: Employee): Record<string, any> {
+export function convertEmployeeToPlainObject(
+  employee: Employee
+): Record<string, any> {
   return {
     first_name: employee.first_name,
     last_name: employee.last_name,

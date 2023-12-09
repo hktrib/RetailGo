@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-//import { InviteEmployee } from "../invite-employee"; // Import the InviteEmployee component
+import { useParams } from "next/navigation";
+import { DeleteUser } from "@/lib/hooks/user";
 
+import { toast } from "react-toastify";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -31,30 +33,23 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown";
-import { Employee } from "@/models/employee";
-
-import InviteEmployee from "../invite-employee";
-import AddEmployee from "../employee-dialog";
-import AddItemDialog from "../item-dialog";
 import EmployeeDialog from "../employee-dialog";
 import { PencilIcon, Trash2 } from "lucide-react";
-import { DeleteUser } from "@/lib/hooks/user";
-import { useParams } from "next/navigation";
-import { toast } from "react-toastify";
 
-interface DataTableProps<TData extends Employee, TValue> {
+import type { EmployeeData } from "./columns";
+
+interface DataTableProps<TData extends EmployeeData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function DataTable<TData extends Employee, TValue>({
+export function DataTable<TData extends EmployeeData, TValue>({
   columns,
   data,
-}: DataTableProps<Employee, TValue>) {
+}: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-
 
   const table = useReactTable({
     data,
@@ -73,27 +68,26 @@ export function DataTable<TData extends Employee, TValue>({
     },
   });
 
-  const params = useParams()
+  const params = useParams();
   const id = params.store_id;
   const deleteMutation = DeleteUser();
 
-  const onDelete =  (userId : string) => {
+  const onDelete = (userId: string) => {
     console.log("Deleting user with id:", id);
     deleteMutation.mutate(userId);
     if (deleteMutation.isSuccess) {
-      console.log("Invite Mutations Success")
+      console.log("Invite Mutations Success");
       toast.success("Deleted user sucessfully!", {
         position: toast.POSITION.TOP_RIGHT,
-        autoClose: 10000
+        autoClose: 10000,
       });
-    }else if (deleteMutation.isError) {
-      console.log("Invite Mutations Failuire")
+    } else if (deleteMutation.isError) {
+      console.log("Invite Mutations Failuire");
       toast.error("Error deleting user!", {
         position: toast.POSITION.TOP_RIGHT,
-        autoClose: 10000
-      }
-      );
-      console.log(deleteMutation.error)
+        autoClose: 10000,
+      });
+      console.log(deleteMutation.error);
     }
   };
 
@@ -175,9 +169,10 @@ export function DataTable<TData extends Employee, TValue>({
                   ))}
                   <TableCell>
                     <div className="text-right flex flex-row space-x-2 h-8 w-8 p-0">
-                      <EmployeeDialog employeeData={row.original} mode="edit" />
+                      <EmployeeDialog employeeData={row.original} />
                       <button
-                        onClick={() => onDelete(row.original.id.toString())}>
+                        onClick={() => onDelete(row.original.id.toString())}
+                      >
                         <Trash2
                           style={{ color: "red" }}
                           className="h-5 w-5 p-0"
