@@ -21,18 +21,28 @@ const (
 	TaskUpdateVectors = "vectors:update"
 )
 
+type ItemBatch struct {
+	Items []ent.Item
+}
+
 // Need to marshall items to JSON, send them to the Python Server, receive the response, read the body, read the ids that were not vectorized, and set them
-func vectorize(unvectorizedItems []*ent.Item) ([]int, error) {
-	REC_SERVER_URL := "https://recommendation-server-production.up.railway.app"
+func vectorize(unvectorizedItems []ent.Item) ([]int, error) {
+	REC_SERVER_URL := "http://127.0.0.1:8000" // "https://recommendation-server-production.up.railway.app"
 	// Marshall items to JSON
-	requestBody, err := json.Marshal(unvectorizedItems)
+	itemBatch := new(ItemBatch)
+	itemBatch.Items = unvectorizedItems
+	requestBody, err := json.Marshal(itemBatch)
+	unvectBody, _ := json.Marshal(unvectorizedItems)
+
+	fmt.Println("Request Body:", (string)(requestBody))
+	fmt.Println("Items Body:", (string)(unvectBody))
 	var ids []int
 
 	if err != nil {
 		return ([]int{}), err
 	}
 
-	response, err := http.Post(REC_SERVER_URL+"vectorizeItems", "application/json", bytes.NewBuffer(requestBody))
+	response, err := http.Post(REC_SERVER_URL+"/vectorizeItems", "application/json", bytes.NewBuffer(requestBody))
 
 	if err != nil {
 		return ([]int{}), err
@@ -72,6 +82,8 @@ func (rp *RedisProducer) ProduceTaskUpdateVectors(ctx context.Context, processIn
 func (rc *RedisConsumer) ConsumeTaskUpdateVectors(ctx context.Context, task *asynq.Task) error {
 	// Run the transaction to query and set to vectorized all unvectorized items
 	unvectorizedItems, err := transactions.QueryUnvectorizedItemsAndMarkVectorized(ctx, rc.dbClient)
+
+	fmt.Println("unvectorizedItems:", unvectorizedItems)
 
 	if err != nil {
 		return fmt.Errorf("failed to query/update unvectorized items to vectorized: %w", err)
