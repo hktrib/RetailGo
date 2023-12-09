@@ -17,4 +17,6 @@ type Item = {
   photo?: string;
   price: number;
   quantity: number;
+  stripe_price_id?: string;
+  stripe_product_id?: string;
 };
