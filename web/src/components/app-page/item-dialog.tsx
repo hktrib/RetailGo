@@ -80,6 +80,7 @@ export default function ItemDialog({
 
   const displayCategory = (value: string) => {
     if (!value) return "Select category";
+    if (!categories || !categories.length) return value;
 
     const categoryName = categories.find((category) => category.name === value)
       ?.name;
