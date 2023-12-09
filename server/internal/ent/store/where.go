@@ -83,6 +83,11 @@ func StorePhone(v string) predicate.Store {
 	return predicate.Store(sql.FieldEQ(FieldStorePhone, v))
 }
 
+// StripeAccountID applies equality check predicate on the "stripe_account_id" field. It's identical to StripeAccountIDEQ.
+func StripeAccountID(v string) predicate.Store {
+	return predicate.Store(sql.FieldEQ(FieldStripeAccountID, v))
+}
+
 // StoreType applies equality check predicate on the "store_type" field. It's identical to StoreTypeEQ.
 func StoreType(v string) predicate.Store {
 	return predicate.Store(sql.FieldEQ(FieldStoreType, v))
@@ -506,6 +511,81 @@ func StorePhoneEqualFold(v string) predicate.Store {
 // StorePhoneContainsFold applies the ContainsFold predicate on the "store_phone" field.
 func StorePhoneContainsFold(v string) predicate.Store {
 	return predicate.Store(sql.FieldContainsFold(FieldStorePhone, v))
+}
+
+// StripeAccountIDEQ applies the EQ predicate on the "stripe_account_id" field.
+func StripeAccountIDEQ(v string) predicate.Store {
+	return predicate.Store(sql.FieldEQ(FieldStripeAccountID, v))
+}
+
+// StripeAccountIDNEQ applies the NEQ predicate on the "stripe_account_id" field.
+func StripeAccountIDNEQ(v string) predicate.Store {
+	return predicate.Store(sql.FieldNEQ(FieldStripeAccountID, v))
+}
+
+// StripeAccountIDIn applies the In predicate on the "stripe_account_id" field.
+func StripeAccountIDIn(vs ...string) predicate.Store {
+	return predicate.Store(sql.FieldIn(FieldStripeAccountID, vs...))
+}
+
+// StripeAccountIDNotIn applies the NotIn predicate on the "stripe_account_id" field.
+func StripeAccountIDNotIn(vs ...string) predicate.Store {
+	return predicate.Store(sql.FieldNotIn(FieldStripeAccountID, vs...))
+}
+
+// StripeAccountIDGT applies the GT predicate on the "stripe_account_id" field.
+func StripeAccountIDGT(v string) predicate.Store {
+	return predicate.Store(sql.FieldGT(FieldStripeAccountID, v))
+}
+
+// StripeAccountIDGTE applies the GTE predicate on the "stripe_account_id" field.
+func StripeAccountIDGTE(v string) predicate.Store {
+	return predicate.Store(sql.FieldGTE(FieldStripeAccountID, v))
+}
+
+// StripeAccountIDLT applies the LT predicate on the "stripe_account_id" field.
+func StripeAccountIDLT(v string) predicate.Store {
+	return predicate.Store(sql.FieldLT(FieldStripeAccountID, v))
+}
+
+// StripeAccountIDLTE applies the LTE predicate on the "stripe_account_id" field.
+func StripeAccountIDLTE(v string) predicate.Store {
+	return predicate.Store(sql.FieldLTE(FieldStripeAccountID, v))
+}
+
+// StripeAccountIDContains applies the Contains predicate on the "stripe_account_id" field.
+func StripeAccountIDContains(v string) predicate.Store {
+	return predicate.Store(sql.FieldContains(FieldStripeAccountID, v))
+}
+
+// StripeAccountIDHasPrefix applies the HasPrefix predicate on the "stripe_account_id" field.
+func StripeAccountIDHasPrefix(v string) predicate.Store {
+	return predicate.Store(sql.FieldHasPrefix(FieldStripeAccountID, v))
+}
+
+// StripeAccountIDHasSuffix applies the HasSuffix predicate on the "stripe_account_id" field.
+func StripeAccountIDHasSuffix(v string) predicate.Store {
+	return predicate.Store(sql.FieldHasSuffix(FieldStripeAccountID, v))
+}
+
+// StripeAccountIDIsNil applies the IsNil predicate on the "stripe_account_id" field.
+func StripeAccountIDIsNil() predicate.Store {
+	return predicate.Store(sql.FieldIsNull(FieldStripeAccountID))
+}
+
+// StripeAccountIDNotNil applies the NotNil predicate on the "stripe_account_id" field.
+func StripeAccountIDNotNil() predicate.Store {
+	return predicate.Store(sql.FieldNotNull(FieldStripeAccountID))
+}
+
+// StripeAccountIDEqualFold applies the EqualFold predicate on the "stripe_account_id" field.
+func StripeAccountIDEqualFold(v string) predicate.Store {
+	return predicate.Store(sql.FieldEqualFold(FieldStripeAccountID, v))
+}
+
+// StripeAccountIDContainsFold applies the ContainsFold predicate on the "stripe_account_id" field.
+func StripeAccountIDContainsFold(v string) predicate.Store {
+	return predicate.Store(sql.FieldContainsFold(FieldStripeAccountID, v))
 }
 
 // StoreTypeEQ applies the EQ predicate on the "store_type" field.

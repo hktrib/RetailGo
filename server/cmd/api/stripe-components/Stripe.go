@@ -3,7 +3,11 @@ package StripeComponents
 import (
 	"fmt"
 	"github.com/hktrib/RetailGo/internal/ent"
+	"github.com/hktrib/RetailGo/internal/ent/store"
+	"github.com/rs/zerolog/log"
 	"github.com/stripe/stripe-go/v76"
+	"github.com/stripe/stripe-go/v76/account"
+	"github.com/stripe/stripe-go/v76/accountlink"
 	"github.com/stripe/stripe-go/v76/checkout/session"
 	"github.com/stripe/stripe-go/v76/product"
 	"net/http"
@@ -13,6 +17,45 @@ type CartItem struct {
 	Id       int
 	Item     *ent.Item
 	Quantity int
+}
+
+func CreateConnectedAccount() (*stripe.Account, error) {
+
+	params := &stripe.AccountParams{
+		Type: stripe.String(string(stripe.AccountTypeExpress)),
+		Capabilities: &stripe.AccountCapabilitiesParams{
+			CardPayments: &stripe.AccountCapabilitiesCardPaymentsParams{
+				Requested: stripe.Bool(true),
+			},
+			Transfers: &stripe.AccountCapabilitiesTransfersParams{
+				Requested: stripe.Bool(true),
+			},
+		},
+	}
+	result, err := account.New(params)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func startOnboarding(accountId string) (*stripe.AccountLink, error) {
+
+	// Set your secret key. Remember to switch to your live secret key in production.
+	// See your keys here: https://dashboard.stripe.com/apikeys
+
+	params := &stripe.AccountLinkParams{
+		Account:    stripe.String("{{CONNECTED_ACCOUNT_ID}}"),
+		RefreshURL: stripe.String("https://example.com/reauth"),
+		ReturnURL:  stripe.String("https://example.com/return"),
+		Type:       stripe.String("account_onboarding"),
+		Collect:    stripe.String("eventually_due"),
+	}
+	result, err := accountlink.New(params)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // CreateStripeItem creates a new product in Stripe
@@ -61,5 +104,23 @@ func CreateCheckoutSession(items []CartItem, w http.ResponseWriter, r *http.Requ
 	}
 	w.WriteHeader(302)
 	fmt.Fprintf(w, "%s", s.URL)
+
+}
+
+func HandleOnboarding(w http.ResponseWriter, r *http.Request) {
+	store_id := r.Context().Value("store_var").(int)
+	// Get store
+	store, err := ent.FromContext(r.Context()).Store.Query().Where(store.IDEQ(store_id)).Only(r.Context())
+	if err != nil {
+		log.Debug().Err(err).Msg("HandleOnboarding: unable to fetch store from database")
+		return
+	}
+	accLink, err := startOnboarding(store.StripeAccountID)
+	if err != nil {
+		log.Debug().Err(err).Msg("HandleOnboarding: unable to start onboarding")
+		return
+	}
+	w.WriteHeader(302)
+	fmt.Fprintf(w, "%s", accLink.URL)
 
 }
