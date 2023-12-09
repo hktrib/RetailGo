@@ -1,4 +1,4 @@
-"use client"
+"use client";
 // Import necessary libraries and components
 import { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -38,8 +38,6 @@ const formSchema = z.object({
   email: z.string().regex(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/),
 });
 
-
-
 // The component definition
 export default function EmployeeDialog({
   employeeData = new Employee(),
@@ -59,7 +57,7 @@ export default function EmployeeDialog({
 
   // Set up your fetch utility
   const [isDialogOpen, setDialogOpen] = useState(false); // State to control the dialog
-  const params = useParams()
+  const params = useParams();
   // Pre-fill the form when editing an employee
   useEffect(() => {
     if (employeeData != null) {
@@ -72,23 +70,24 @@ export default function EmployeeDialog({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!params.store_id) return;
-    let response = await updateUser({ user: values, user_id: employeeData.id.toString() });
+    let response = await updateUser({
+      user: values,
+      user_id: employeeData.id.toString(),
+    });
     if (response) {
       setDialogOpen(false);
       toast.success("Employee updated successfully!", {
         position: toast.POSITION.TOP_RIGHT,
-        autoClose: 10000
+        autoClose: 10000,
       });
       router.reload();
-
-    }else{
+    } else {
       toast.error("Error updating employee!", {
         position: toast.POSITION.TOP_RIGHT,
-        autoClose: 10000
+        autoClose: 10000,
       });
     }
-    
-  }
+  };
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
@@ -104,7 +103,6 @@ export default function EmployeeDialog({
       <Form {...form}>
         <DialogContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-1">
-
             <DialogHeader>
               <DialogTitle>
                 {mode === "edit" ? "Edit" : "Add"} Employee
@@ -157,7 +155,6 @@ export default function EmployeeDialog({
           </form>
         </DialogContent>
       </Form>
-
     </Dialog>
   );
 }
