@@ -59,8 +59,6 @@ const POSController = ({
     return categories.filter((category) => category.id === categoryId)[0].name;
   };
 
-  console.log(categories, items);
-
   return (
     <div>
       <div className="py-5 px-8 h-full flex-grow flex flex-col w-full mx-auto max-w-2xl lg:max-w-7xl items-center lg:items-start">

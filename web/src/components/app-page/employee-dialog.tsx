@@ -1,10 +1,14 @@
-"use client"
-// Import necessary libraries and components
-import { useEffect, useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+"use client";
+
+import { useState } from "react";
+import router from "next/router";
+import { useParams } from "next/navigation";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { updateUser } from "@/app/(app-page)/store/[store_id]/employees/actions";
 
+import { toast } from "react-toastify";
 import {
   Dialog,
   DialogContent,
@@ -21,15 +25,9 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useFetch } from "@/lib/utils";
 import { PencilIcon } from "lucide-react";
-import { Employee } from "@/models/employee";
-import { config } from "@/lib/hooks/config";
-import { useParams } from "next/navigation";
-import { toast } from "react-toastify";
-import { DeleteUser, PutUser } from "@/lib/hooks/user";
-import { updateUser } from "@/app/(app-page)/store/[store_id]/employees/action";
-import router from "next/router";
+
+import type { EmployeeData } from "./employee-table/columns";
 
 // Schema for form validation using Zod
 const formSchema = z.object({
@@ -38,79 +36,61 @@ const formSchema = z.object({
   email: z.string().regex(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/),
 });
 
-
-
-// The component definition
 export default function EmployeeDialog({
-  employeeData = new Employee(),
-  mode = "add",
+  employeeData,
 }: {
-  employeeData?: Employee;
-  mode?: string;
+  employeeData: EmployeeData;
 }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      first_name: employeeData ? employeeData.first_name : undefined,
-      last_name: employeeData ? employeeData.last_name : undefined,
-      email: employeeData ? employeeData.email : undefined,
+      first_name: employeeData.first_name,
+      last_name: employeeData.last_name,
+      email: employeeData.email,
     },
   });
 
-  // Set up your fetch utility
-  const [isDialogOpen, setDialogOpen] = useState(false); // State to control the dialog
-  const params = useParams()
-  // Pre-fill the form when editing an employee
-  useEffect(() => {
-    if (employeeData != null) {
-      console.log("Employee Data:", employeeData);
-      form.reset(employeeData);
-    }
-  }, [employeeData, form]);
-
-  const inviteMutation = PutUser(employeeData.id.toString());
+  const [isDialogOpen, setDialogOpen] = useState(false);
+  const params = useParams();
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!params.store_id) return;
-    let response = await updateUser({ user: values, user_id: employeeData.id.toString() });
+
+    let response = await updateUser({
+      user: values,
+      user_id: employeeData.id.toString(),
+    });
+
     if (response) {
       setDialogOpen(false);
       toast.success("Employee updated successfully!", {
         position: toast.POSITION.TOP_RIGHT,
-        autoClose: 10000
+        autoClose: 10000,
       });
       router.reload();
-
-    }else{
+    } else {
       toast.error("Error updating employee!", {
         position: toast.POSITION.TOP_RIGHT,
-        autoClose: 10000
+        autoClose: 10000,
       });
     }
-    
-  }
+  };
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         <button className="icon-button">
-          <PencilIcon
-            style={{ color: "orange" }}
-            className="h-5 w-5 p-0"
-          ></PencilIcon>
+          <PencilIcon className="h-5 w-5 p-0 text-amber-500" />
         </button>
       </DialogTrigger>
 
-      <Form {...form}>
-        <DialogContent>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit Employee</DialogTitle>
+        </DialogHeader>
+
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-1">
-
-            <DialogHeader>
-              <DialogTitle>
-                {mode === "edit" ? "Edit" : "Add"} Employee
-              </DialogTitle>
-            </DialogHeader>
-
             <FormField
               control={form.control}
               name="first_name"
@@ -149,15 +129,13 @@ export default function EmployeeDialog({
                 </FormItem>
               )}
             />
-            <DialogFooter className="gap-x-4">
-              <button type="submit">
-                {mode === "edit" ? "Update" : "Save"}
-              </button>
+
+            <DialogFooter>
+              <button type="submit">Update</button>
             </DialogFooter>
           </form>
-        </DialogContent>
-      </Form>
-
+        </Form>
+      </DialogContent>
     </Dialog>
   );
 }

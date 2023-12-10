@@ -217,13 +217,13 @@ func (srv *Server) CatItemList(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	response := make(map[string][]map[string]interface{}, 1)
+	response := make([]map[string]interface{}, 0)
 
 	for _, cat := range categories {
 		mp := make(map[string]interface{}, 1)
 		mp["id"] = cat.ID
 		mp["name"] = cat.Name
-		response["categories"] = append(response["categories"], mp)
+		response = append(response, mp)
 
 	}
 	responseBody, _ := json.Marshal(response)

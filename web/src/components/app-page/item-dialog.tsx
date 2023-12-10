@@ -1,12 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
-
-import { createItem } from "@/app/(app-page)/store/[store_id]/inventory/actions";
-
+import {
+  createItem,
+  updateItem,
+} from "@/app/(app-page)/store/[store_id]/inventory/actions";
+import { cn, wait } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -23,15 +26,13 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PencilIcon } from "lucide-react";
+import { ChevronsUpDown, PencilIcon } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string(),
@@ -50,6 +51,7 @@ export default function ItemDialog({
   categories: Category[];
 }) {
   const params = useParams();
+  const [open, setOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -64,11 +66,36 @@ export default function ItemDialog({
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!params.store_id) return;
 
+    if (mode === "edit") {
+      if (!item) return;
+
+      await updateItem({
+        item: { id: item.id, ...values },
+        store_id: params.store_id as string,
+      });
+
+      wait().then(() => setOpen(false));
+      return;
+    }
+
     await createItem({ item: values, store_id: params.store_id as string });
+    wait().then(() => setOpen(false));
+  };
+
+  const displayCategory = (value: string) => {
+    if (!value) return "Select category";
+    if (!categories || !categories.length) return value;
+
+    const categoryName = categories.find((category) => category.name === value)
+      ?.name;
+
+    if (categoryName) return categoryName;
+
+    return value;
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {mode === "edit" ? (
           <button className="icon-button">
@@ -87,7 +114,7 @@ export default function ItemDialog({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-1">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
             <FormField
               control={form.control}
               name="name"
@@ -97,33 +124,6 @@ export default function ItemDialog({
                   <FormControl>
                     <Input {...field} placeholder="Item name" />
                   </FormControl>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="category_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a category" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.name}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
                 </FormItem>
               )}
             />
@@ -154,6 +154,60 @@ export default function ItemDialog({
                       placeholder="Item quantity"
                     />
                   </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="category_name"
+              render={({ field }) => (
+                <FormItem className="group pt-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "justify-between w-full",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {displayCategory(field.value)}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+
+                    <PopoverContent className="w-72 p-2">
+                      <Input {...field} placeholder="Enter a category" />
+
+                      {categories.length ? (
+                        <div className="mt-4 flex flex-col space-y-0.5">
+                          {categories.map((category) => (
+                            <Button
+                              key={category.id}
+                              variant="default"
+                              value={category.name}
+                              // @ts-ignore
+                              onClick={(e) => field.onChange(e.target.value)}
+                              className="bg-white text-black shadow-none hover:text-black hover:bg-gray-100 text-left justify-start"
+                            >
+                              {category.name}
+                            </Button>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="pt-2 text-center">
+                          <span className="text-sm text-muted-foreground">
+                            You don{"'"}t have any categories created yet.
+                            Create a new one now!
+                          </span>
+                        </div>
+                      )}
+                    </PopoverContent>
+                  </Popover>
                 </FormItem>
               )}
             />

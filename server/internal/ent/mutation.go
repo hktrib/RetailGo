@@ -2316,6 +2316,7 @@ type StoreMutation struct {
 	owner_email       *string
 	store_address     *string
 	store_phone       *string
+	stripe_account_id *string
 	store_type        *string
 	clearedFields     map[string]struct{}
 	items             map[int]struct{}
@@ -2691,6 +2692,55 @@ func (m *StoreMutation) ResetStorePhone() {
 	delete(m.clearedFields, store.FieldStorePhone)
 }
 
+// SetStripeAccountID sets the "stripe_account_id" field.
+func (m *StoreMutation) SetStripeAccountID(s string) {
+	m.stripe_account_id = &s
+}
+
+// StripeAccountID returns the value of the "stripe_account_id" field in the mutation.
+func (m *StoreMutation) StripeAccountID() (r string, exists bool) {
+	v := m.stripe_account_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStripeAccountID returns the old "stripe_account_id" field's value of the Store entity.
+// If the Store object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StoreMutation) OldStripeAccountID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStripeAccountID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStripeAccountID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStripeAccountID: %w", err)
+	}
+	return oldValue.StripeAccountID, nil
+}
+
+// ClearStripeAccountID clears the value of the "stripe_account_id" field.
+func (m *StoreMutation) ClearStripeAccountID() {
+	m.stripe_account_id = nil
+	m.clearedFields[store.FieldStripeAccountID] = struct{}{}
+}
+
+// StripeAccountIDCleared returns if the "stripe_account_id" field was cleared in this mutation.
+func (m *StoreMutation) StripeAccountIDCleared() bool {
+	_, ok := m.clearedFields[store.FieldStripeAccountID]
+	return ok
+}
+
+// ResetStripeAccountID resets all changes to the "stripe_account_id" field.
+func (m *StoreMutation) ResetStripeAccountID() {
+	m.stripe_account_id = nil
+	delete(m.clearedFields, store.FieldStripeAccountID)
+}
+
 // SetStoreType sets the "store_type" field.
 func (m *StoreMutation) SetStoreType(s string) {
 	m.store_type = &s
@@ -2936,7 +2986,7 @@ func (m *StoreMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *StoreMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.uuid != nil {
 		fields = append(fields, store.FieldUUID)
 	}
@@ -2954,6 +3004,9 @@ func (m *StoreMutation) Fields() []string {
 	}
 	if m.store_phone != nil {
 		fields = append(fields, store.FieldStorePhone)
+	}
+	if m.stripe_account_id != nil {
+		fields = append(fields, store.FieldStripeAccountID)
 	}
 	if m.store_type != nil {
 		fields = append(fields, store.FieldStoreType)
@@ -2978,6 +3031,8 @@ func (m *StoreMutation) Field(name string) (ent.Value, bool) {
 		return m.StoreAddress()
 	case store.FieldStorePhone:
 		return m.StorePhone()
+	case store.FieldStripeAccountID:
+		return m.StripeAccountID()
 	case store.FieldStoreType:
 		return m.StoreType()
 	}
@@ -3001,6 +3056,8 @@ func (m *StoreMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldStoreAddress(ctx)
 	case store.FieldStorePhone:
 		return m.OldStorePhone(ctx)
+	case store.FieldStripeAccountID:
+		return m.OldStripeAccountID(ctx)
 	case store.FieldStoreType:
 		return m.OldStoreType(ctx)
 	}
@@ -3054,6 +3111,13 @@ func (m *StoreMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStorePhone(v)
 		return nil
+	case store.FieldStripeAccountID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStripeAccountID(v)
+		return nil
 	case store.FieldStoreType:
 		v, ok := value.(string)
 		if !ok {
@@ -3100,6 +3164,9 @@ func (m *StoreMutation) ClearedFields() []string {
 	if m.FieldCleared(store.FieldStorePhone) {
 		fields = append(fields, store.FieldStorePhone)
 	}
+	if m.FieldCleared(store.FieldStripeAccountID) {
+		fields = append(fields, store.FieldStripeAccountID)
+	}
 	if m.FieldCleared(store.FieldStoreType) {
 		fields = append(fields, store.FieldStoreType)
 	}
@@ -3125,6 +3192,9 @@ func (m *StoreMutation) ClearField(name string) error {
 		return nil
 	case store.FieldStorePhone:
 		m.ClearStorePhone()
+		return nil
+	case store.FieldStripeAccountID:
+		m.ClearStripeAccountID()
 		return nil
 	case store.FieldStoreType:
 		m.ClearStoreType()
@@ -3154,6 +3224,9 @@ func (m *StoreMutation) ResetField(name string) error {
 		return nil
 	case store.FieldStorePhone:
 		m.ResetStorePhone()
+		return nil
+	case store.FieldStripeAccountID:
+		m.ResetStripeAccountID()
 		return nil
 	case store.FieldStoreType:
 		m.ResetStoreType()

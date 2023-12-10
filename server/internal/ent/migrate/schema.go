@@ -112,6 +112,7 @@ var (
 		{Name: "owner_email", Type: field.TypeString, Nullable: true},
 		{Name: "store_address", Type: field.TypeString, Nullable: true},
 		{Name: "store_phone", Type: field.TypeString, Nullable: true},
+		{Name: "stripe_account_id", Type: field.TypeString, Nullable: true},
 		{Name: "store_type", Type: field.TypeString, Nullable: true},
 	}
 	// StoresTable holds the schema information for the "stores" table.

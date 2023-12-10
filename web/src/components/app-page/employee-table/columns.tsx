@@ -1,13 +1,20 @@
 "use client";
 
+import React from "react";
 import { ColumnDef } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, MoreHorizontal, PencilIcon, Trash2 } from "lucide-react";
-import React, { useState } from "react";
-import { Employee } from "@/models/employee";
+import { ArrowUpDown } from "lucide-react";
 
-export const columns: ColumnDef<Employee>[] = [
+export type EmployeeData = {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  position: string;
+};
+
+export const columns: ColumnDef<EmployeeData>[] = [
   {
     accessorKey: "id",
     header: () => <div className="text-xs">ID</div>,

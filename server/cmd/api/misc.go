@@ -8,11 +8,13 @@ import (
 
 // Item with only the feilds the client should see
 type ClientItem ent.Item
+
 // Overload for default json marshaller
 func (i ClientItem) MarshalJSON() ([]byte, error) {
 	return MarshalItem(i)
 }
-// Overload for default json marshaller 
+
+// Overload for default json marshaller
 func MarshalItem(TargetItem ClientItem) ([]byte, error) {
 	/*
 		cats, err := temp.Category.Query().Where(category.HasItemsWith(item.ID(TargetItem.ID))).All(context.Background())
@@ -30,12 +32,14 @@ func MarshalItem(TargetItem ClientItem) ([]byte, error) {
 
 	*/
 	return json.Marshal(map[string]interface{}{
-		"id":       TargetItem.ID,
-		"name":     TargetItem.Name,
-		"photo":    TargetItem.Photo,
-		"quantity": TargetItem.Quantity,
-		"price":    TargetItem.Price,
-		"category_name": TargetItem.CategoryName,
+		"id":                TargetItem.ID,
+		"name":              TargetItem.Name,
+		"photo":             TargetItem.Photo,
+		"quantity":          TargetItem.Quantity,
+		"price":             TargetItem.Price,
+		"category_name":     TargetItem.CategoryName,
+		"stripe_product_id": TargetItem.StripeProductID,
+		"stripe_price_id":   TargetItem.StripePriceID,
 	})
 }
 func PruneItems(TargetItems ...*ent.Item) []ClientItem {
