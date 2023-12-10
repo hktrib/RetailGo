@@ -93,8 +93,8 @@ func CreateCheckoutSession(items []CartItem, w http.ResponseWriter, r *http.Requ
 		}),
 		LineItems:  lineItems,
 		Mode:       stripe.String(string(stripe.CheckoutSessionModePayment)),
-		SuccessURL: stripe.String("http://localhost:8080/" + "success?session_id={CHECKOUT_SESSION_ID}"),
-		CancelURL:  stripe.String("http://localhost:8080/" + "cancel?session_id={CHECKOUT_SESSION_ID}"),
+		SuccessURL: stripe.String("https://retail-go.vercel.app/store"),
+		CancelURL:  stripe.String("https://retail-go.vercel.app/store"),
 	}
 
 	s, err := session.New(params)
@@ -102,9 +102,12 @@ func CreateCheckoutSession(items []CartItem, w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		fmt.Printf("session.New: %v", err)
 	}
-	w.WriteHeader(302)
-	fmt.Fprintf(w, "%s", s.URL)
-
+	w.WriteHeader(200)
+	res := map[string]string{
+		"ClientSecret": s.ClientSecret,
+	}
+	resp, _ := json.Marshal(res)
+	w.Write(resp)
 }
 
 func HandleOnboarding(w http.ResponseWriter, r *http.Request) {
