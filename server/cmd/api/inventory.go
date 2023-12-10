@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/hktrib/RetailGo/internal/ent/categoryitem"
 	"github.com/hktrib/RetailGo/internal/ent/store"
 	"io"
 	"net/http"
@@ -478,14 +479,9 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 
 func DetangleItem(Client *ent.Client, item *ent.Item) error {
 	// Get the item's category
-	cat, err := Client.Category.Query().Where(category.Name(item.CategoryName)).Only(context.Background())
-	if err != nil {
-		log.Debug().Err(err).Msg("DetangleItem: failed to query category")
-		return err
-	}
 
 	// Remove the item from the category
-	_, err = Client.Category.UpdateOne(cat).RemoveItems(item).Save(context.Background())
+	_, err := Client.CategoryItem.Delete().Where(categoryitem.ItemID(item.ID)).Exec(context.Background())
 	if err != nil {
 		log.Debug().Err(err).Msg("DetangleItem: failed to remove item from category")
 		return err
