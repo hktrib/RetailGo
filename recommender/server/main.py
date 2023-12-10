@@ -3,7 +3,8 @@ from data_models import Item, ItemBatch
 from vdb import DB
 from recsys import Recommender
 from models import DefaultWord2VecModel, DefaultGloveModel
-
+import uvicorn
+import os
 
 app = FastAPI()
 
@@ -84,3 +85,6 @@ def recommend(store_id: int):
 
     # Return all
     return results
+
+if __name__ == "__main__":
+    uvicorn.run(app, host = "0.0.0.0", port = os.getenv("PORT"))
