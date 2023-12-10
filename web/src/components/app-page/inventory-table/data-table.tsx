@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useDeleteItem } from "@/lib/hooks/items";
+import { useParams } from "next/navigation";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -41,7 +42,11 @@ export function DataTable<TData extends InventoryItem, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const deleteItemMutation = useDeleteItem("10");
+
+
+  const params = useParams();
+  const id = params.store_id;
+  const deleteItemMutation = useDeleteItem(id.toString());
 
   const table = useReactTable({
     data,

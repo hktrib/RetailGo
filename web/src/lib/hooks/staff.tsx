@@ -9,13 +9,6 @@ import { PostEmailInviteModel } from "@/models/staff";
 const storeURL = config.serverURL + "store/";
 
 
-export function GetStaffByStore(storeId: string) {
-  const authFetch = useFetch();
-  return useQuery({
-    queryKey: ["staff", storeId],
-    queryFn: () => authFetch(storeURL + storeId + "/staff", {}, {}, true),
-  });
-}
 
 export function SendInvite(storeId: string) {
   const authFetch = useFetch();
