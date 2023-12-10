@@ -2,14 +2,14 @@ from fastapi import FastAPI, status, Response, HTTPException
 from data_models import Item, ItemBatch
 from vdb import DB
 from recsys import Recommender
-from models import DefaultWord2VecModel
+from models import DefaultWord2VecModel, DefaultGloveModel
 
 
 app = FastAPI()
 
 # A Recommender Class that does embedding, ranking and reranking.
 try:
-    default_w2v = DefaultWord2VecModel()
+    default_w2v = DefaultGloveModel()
     recommender = Recommender(default_w2v)
 except Exception as error:
     print("Initialization failed:", error)
