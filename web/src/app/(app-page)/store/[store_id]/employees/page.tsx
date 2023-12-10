@@ -3,10 +3,18 @@ import EmployeeTable from "@/components/app-page/employee-table";
 import { Employee } from "@/models/employee";
 import InviteEmployee from "@/components/app-page/invite-employee";
 import AddEmployee from "@/components/app-page/employee-dialog";
+import { GetStaffByStore} from "../../queries";
 
-export default function Employees() {
-  const employeeData = new Employee(); // Creating an empty Employee instance
-  const data = JSON.parse(JSON.stringify(employeeData));
+export default async function Employees({
+  params,
+}: {
+  params: { store_id: string };
+}) {
+  const itemQuery = await GetStaffByStore({store_id: params.store_id});
+  const employees = itemQuery.employees;
+  if (!itemQuery.success) {
+    return <div>Failed to fetch Employees</div>;
+  }
 
   return (
     <main className="bg-gray-50 h-full flex-grow">
@@ -20,7 +28,7 @@ export default function Employees() {
 
         <hr className="my-4" />
         <div className="mt-6">
-          <EmployeeTable />
+          <EmployeeTable employees={employees} />
         </div>
       </div>
     </main>

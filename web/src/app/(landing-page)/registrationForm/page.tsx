@@ -34,6 +34,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Router } from "next/router";
+import { toast } from "react-toastify";
 
 const formSchema = z.object({
   storeName: z.string().min(0),
@@ -81,12 +82,24 @@ export default function RegistrationForm() {
 
       if (response === true) {
         // router.refresh()
-        router.push("/store?store_type='store_id'") 
+        toast.success("Store created successfully!", {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 10000,
+        });
+        router.push("/store?refresh='refresh'") 
       } else {
+        toast.error("Error creating store!", {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 10000,
+        });
         throw "Failed to create store"
       }
 
     } catch (error) {
+      toast.error("Error creating store!", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 10000,
+      });
       console.error("Error making create store request:", error);
     }
   };

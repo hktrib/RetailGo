@@ -81,32 +81,73 @@ func (srv *Server) UserCreate(w http.ResponseWriter, r *http.Request) {
 
 func (srv *Server) UserDelete(w http.ResponseWriter, r *http.Request) {
 
-	user_id, err := strconv.Atoi(chi.URLParam(r, "user_id"))
+	ctx := r.Context()
+
+	userID, err := strconv.Atoi(chi.URLParam(r, "user_id"))
 	if err != nil {
+		log.Debug().Err(err).Msg("Bad/No user_id")
 		http.Error(w, http.StatusText(http.StatusBadRequest)+": no user id", http.StatusBadRequest)
 		return
 	}
 
-	// Delete entries in usertostore table based on user_id
-	_, err = srv.DBClient.
-		UserToStore.
-		Delete().
-		Where(usertostore.UserID(user_id)). // Assuming there is a UserID field in userToStore
-		Exec(r.Context())
+	// Fetching User from Database
+	fetchedUser, err := srv.DBClient.User.Query().
+		Where(user.ID(userID)).Only(ctx)
 	if err != nil {
+		log.Debug().Err(err).Msg("Unable to fetch user from database")
 		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	// Querying for the user to store relation
+	newUTS, err := srv.DBClient.UserToStore.Query().
+		Where(usertostore.UserID(fetchedUser.ID), usertostore.StoreID(fetchedUser.StoreID)).
+		Only(ctx)
+	if err != nil {
+		log.Debug().Err(err).Msg("Unable to query entry in userToStore table")
+		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Delete entries in usertostore table based on userID
+	_, err = srv.DBClient.
+		UserToStore.
+		Delete().
+		Where(usertostore.UserID(userID)). // Assuming there is a UserID field in userToStore
+		Exec(r.Context())
+	if err != nil {
+		log.Debug().Err(err).Msg("Unable to delete entry in userToStore table")
+		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Deleting user from Database
 	err = srv.DBClient.
-		User.DeleteOneID(user_id).
+		User.DeleteOneID(userID).
 		Exec(r.Context())
 
 	if ent.IsNotFound(err) {
+		log.Debug().Err(err).Msg("ent is not found")
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	} else if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError)+":"+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Create Clerk Store Instance
+	clerkStore, err := clerkstorage.NewClerkStore(srv.ClerkClient, fetchedUser.ClerkUserID, srv.Config)
+	if err != nil {
+		log.Debug().Err(err).Msg("unable to create clerk store instance")
+		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Removing user's store relation from user's Clerk Public Metadata.
+	err = clerkStore.RemoveMetadata(newUTS)
+	if err != nil {
+		log.Debug().Err(err).Msg("unable to remove user's store relation from Clerk Store")
+		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -115,13 +156,13 @@ func (srv *Server) UserDelete(w http.ResponseWriter, r *http.Request) {
 
 func (srv *Server) UserQuery(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	user_id, err := strconv.Atoi(chi.URLParam(r, "user_id"))
+	userID, err := strconv.Atoi(chi.URLParam(r, "userID"))
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
-	user_data, err := srv.DBClient.User.Query().Where(user.ID(user_id)).Only(ctx)
+	user_data, err := srv.DBClient.User.Query().Where(user.ID(userID)).Only(ctx)
 	if ent.IsNotFound(err) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
@@ -193,13 +234,13 @@ type UserUpdateRequest struct {
 func (srv *Server) userUpdate(w http.ResponseWriter, r *http.Request) {
 	// get item id from url query string
 	ctx := r.Context()
-	user_id, err := strconv.Atoi(chi.URLParam(r, "user_id"))
+	userID, err := strconv.Atoi(chi.URLParam(r, "userID"))
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
-	targetUser, err := srv.DBClient.User.Query().Where(user.ID(user_id)).Only(ctx)
+	targetUser, err := srv.DBClient.User.Query().Where(user.ID(userID)).Only(ctx)
 
 	if ent.IsNotFound(err) {
 		http.Error(w, http.StatusText(http.StatusNotFound)+": user not found", http.StatusNotFound)

@@ -1,6 +1,10 @@
-import { auth } from "@clerk/nextjs";
+"use client"
+
+import { auth, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 type StoreMetadata = {
   Permission_level: number;
@@ -9,12 +13,22 @@ type StoreMetadata = {
 };
 
 export default function StoreViewPage() {
-  const { sessionClaims } = auth();
+  const router = useRouter()
 
-  if (!sessionClaims || !sessionClaims.publicMetadata)
+  const {isLoaded, user} = useUser();
+  const searchParam = useSearchParams();
+
+  user?.reload();
+  
+  if (!isLoaded) {
+    return <p>Loading...</p>;
+  }
+
+  // Stall til not Loaded
+  if (!user || !user.publicMetadata)
     return redirect("/registrationForm");
 
-  const publicMetadata = sessionClaims.publicMetadata as {
+  const publicMetadata = user.publicMetadata as {
     stores?: StoreMetadata[];
   };
   if (!publicMetadata.stores) redirect("/registrationForm");
