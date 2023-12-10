@@ -19,6 +19,7 @@ func (weaviate *Weaviate) CreateItem(item *ent.Item) (string, error) {
 				"price":                 item.Price,
 				"numberSoldSinceUpdate": item.NumberSoldSinceUpdate,
 				"dateLastSold":          item.DateLastSold,
+				"storeId":               item.StoreID,
 			}).
 		Do(weaviate.ctx)
 
