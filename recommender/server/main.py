@@ -2,23 +2,25 @@ from fastapi import FastAPI, status, Response, HTTPException
 from data_models import Item, ItemBatch
 from vdb import DB
 from recsys import Recommender
-from models import DefaultWord2VecModel
+from models import DefaultWord2VecModel, DefaultGloveModel
 
 
 app = FastAPI()
 
-# DB() to init the vector database
-database = DB(discount_factor=0.99)
-print("DB initialized")
 # A Recommender Class that does embedding, ranking and reranking.
 try:
-    default_w2v = DefaultWord2VecModel()
+    default_w2v = DefaultGloveModel()
     recommender = Recommender(default_w2v)
 except Exception as error:
     print("Initialization failed:", error)
     assert False
 
 print("Recommender initialized")
+
+# DB() to init the vector database
+database = DB(discount_factor=0.99, dimension=recommender.dimension)
+print("DB initialized")
+
 
 @app.post("/vectorizeItems", status_code = 201)
 def vectorize_batch(batch: ItemBatch, response: Response):
@@ -48,6 +50,8 @@ def vectorize_batch(batch: ItemBatch, response: Response):
 
         if written_items == batch_size or batch.Items[written_items].store_id != item.store_id:
             database.write_store()
+
+    print("Out of", batch_size, "items,", len(embedding_failed), "failed to be embedded.")
 
     # Return the list of failed items' ids.
     return embedding_failed
