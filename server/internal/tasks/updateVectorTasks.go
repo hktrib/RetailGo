@@ -27,7 +27,7 @@ type ItemBatch struct {
 
 // Need to marshall items to JSON, send them to the Python Server, receive the response, read the body, read the ids that were not vectorized, and set them
 func vectorize(unvectorizedItems []ent.Item) ([]int, error) {
-	REC_SERVER_URL := "http://127.0.0.1:8000" // "https://recommendation-server-production.up.railway.app"
+	REC_SERVER_URL := "https://recommendation-server-production.up.railway.app"
 	// Marshall items to JSON
 	itemBatch := new(ItemBatch)
 	itemBatch.Items = unvectorizedItems
