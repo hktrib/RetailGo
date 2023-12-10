@@ -67,7 +67,6 @@ export default function EmployeeDialog({
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 10000,
       });
-      router.reload();
     } else {
       toast.error("Error updating employee!", {
         position: toast.POSITION.TOP_RIGHT,
@@ -124,7 +123,7 @@ export default function EmployeeDialog({
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input {...field} type="email" />
+                    <Input {...field} type="email" disabled={true} />
                   </FormControl>
                 </FormItem>
               )}
