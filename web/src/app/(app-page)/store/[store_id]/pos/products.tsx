@@ -10,9 +10,9 @@ const POSProducts = ({
 }: {
   products: Item[];
   visibleProducts: Item[];
-  cart: (Item & { quantity: number })[];
+  cart: (Item & { quantityAdded: number })[];
   setCart: React.Dispatch<
-    React.SetStateAction<(Item & { quantity: number })[]>
+    React.SetStateAction<(Item & { quantityAdded: number })[]>
   >;
   fetchCategoryById: (categoryId: number) => string;
 }) => {
@@ -21,7 +21,10 @@ const POSProducts = ({
     // update qty
     if (cart.some((product) => product.id === pid)) {
       const i = cart.findIndex((i) => i.id === pid);
-      const updatedProduct = { ...cart[i], quantity: cart[i].quantity + 1 };
+      const updatedProduct = {
+        ...cart[i],
+        quantityAdded: cart[i].quantityAdded + 1,
+      };
 
       const newCart = [...cart];
       newCart[i] = updatedProduct;
@@ -33,7 +36,7 @@ const POSProducts = ({
     // filter product by id
     const product = {
       ...products.filter((product) => product.id === pid)[0],
-      quantity: 1,
+      quantityAdded: 1,
     };
     setCart([...cart, product]);
   };
@@ -44,7 +47,7 @@ const POSProducts = ({
 
     // delete item from cart
     const product = cart.filter((product) => product.id === pid)[0];
-    if (product.quantity === 1) {
+    if (product.quantityAdded === 1) {
       setCart(cart.filter((product) => product.id !== pid));
 
       return;
@@ -52,7 +55,10 @@ const POSProducts = ({
 
     // update qty
     const i = cart.findIndex((i) => i.id === pid);
-    const updatedProduct = { ...cart[i], quantity: cart[i].quantity - 1 };
+    const updatedProduct = {
+      ...cart[i],
+      quantityAdded: cart[i].quantityAdded - 1,
+    };
 
     const newCart = [...cart];
     newCart[i] = updatedProduct;
@@ -63,7 +69,7 @@ const POSProducts = ({
     if (!cart.some((product) => product.id === pid)) return;
 
     const i = cart.findIndex((i) => i.id === pid);
-    return cart[i].quantity;
+    return cart[i].quantityAdded;
   };
 
   return (

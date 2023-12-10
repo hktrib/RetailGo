@@ -12,12 +12,14 @@ const TAX_RATE = 1;
 const POSController = ({
   categories,
   items,
+  storeId,
 }: {
   categories: Category[];
   items: Item[];
+  storeId: string;
 }) => {
   const [selectedCategory, setSelectedCategory] = useState("-1");
-  const [cart, setCart] = useState<(Item & { quantity: number })[]>([]);
+  const [cart, setCart] = useState<(Item & { quantityAdded: number })[]>([]);
   const [visibleProducts, setVisibleProducts] = useState(items ?? []);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -70,7 +72,11 @@ const POSController = ({
 
         <div className="flex-grow mt-6 mx-auto grid max-w-2xl w-full grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
           <div className="lg:col-start-3 lg:row-end-1">
-            <POSOrderSummary cart={cart} TAX_RATE={TAX_RATE} />
+            <POSOrderSummary
+              cart={cart}
+              TAX_RATE={TAX_RATE}
+              storeId={storeId}
+            />
           </div>
 
           <div className="lg:col-span-2 lg:row-span-2">
