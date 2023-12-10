@@ -16,7 +16,7 @@ class DefaultWord2VecModel(Model):
     def __init__(self, corpus = "word2vec-google-news-300"):
         super().__init__()
         self.w2v = downloader.load(corpus)
-        self.dimension = corpus.split("-")[-1]
+        self.dimension = int(corpus.split("-")[-1])
     
     def preprocess(self, items: List[Item]):
         return map(
