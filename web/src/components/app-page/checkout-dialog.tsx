@@ -37,12 +37,14 @@ export function CheckoutDialog({
         <DialogHeader>
           <DialogTitle>Checkout</DialogTitle>
         </DialogHeader>
+
         <EmbeddedCheckoutProvider
           stripe={stripePromise}
           options={{ clientSecret }}
         >
-          <EmbeddedCheckout className="w-full" />
+          <EmbeddedCheckout />
         </EmbeddedCheckoutProvider>
+
         <DialogFooter>
           <Button type="submit">Save changes</Button>
         </DialogFooter>
