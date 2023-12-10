@@ -11,7 +11,8 @@ app = FastAPI()
 database = DB(discount_factor=0.99)
 print("DB initialized")
 # A Recommender Class that does embedding, ranking and reranking.
-recommender = Recommender(DefaultWord2VecModel())
+default_w2v = DefaultWord2VecModel()
+recommender = Recommender(default_w2v)
 print("Recommender initialized")
 
 @app.post("/vectorizeItems", status_code = 201)
