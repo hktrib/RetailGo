@@ -11,8 +11,13 @@ app = FastAPI()
 database = DB(discount_factor=0.99)
 print("DB initialized")
 # A Recommender Class that does embedding, ranking and reranking.
-default_w2v = DefaultWord2VecModel()
-recommender = Recommender(default_w2v)
+try:
+    default_w2v = DefaultWord2VecModel()
+    recommender = Recommender(default_w2v)
+except Exception as error:
+    print("Initialization failed:", error)
+    assert False
+
 print("Recommender initialized")
 
 @app.post("/vectorizeItems", status_code = 201)
