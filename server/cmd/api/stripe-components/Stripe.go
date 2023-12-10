@@ -40,7 +40,7 @@ func CreateConnectedAccount() (*stripe.Account, error) {
 }
 
 // CreateStripeItem creates a new product in Stripe
-func CreateStripeItem(item *ent.Item) (*stripe.Product, error) {
+func CreateStripeItem(item *ent.Item, store *ent.Store) (*stripe.Product, error) {
 
 	productParams := &stripe.ProductParams{
 		Name: stripe.String(item.Name),
@@ -49,7 +49,8 @@ func CreateStripeItem(item *ent.Item) (*stripe.Product, error) {
 			UnitAmount: stripe.Int64(int64(item.Price * 100)),
 		},
 	}
-	productParams.StripeAccount = stripe.String(item.Edges.Store.StripeAccountID)
+
+	productParams.StripeAccount = stripe.String(store.StripeAccountID)
 	product, err := product.New(productParams)
 
 	if err != nil {
@@ -69,18 +70,18 @@ func UpdateStripeItem(item *ent.Item, name string) (*stripe.Product, error) {
 	}
 	return product, nil
 }
-func UpdateStripePrice(item *ent.Item, newPrice float64) (*stripe.Price, error) {
+func UpdateStripePrice(item *ent.Item, newPrice float64, StoreStripeID string) (*stripe.Price, error) {
 
 	priceParams := &stripe.PriceParams{
 		Product:    stripe.String(item.StripeProductID),
 		Currency:   stripe.String(string(stripe.CurrencyUSD)),
-		UnitAmount: stripe.Int64(int64(item.Price * 100)),
+		UnitAmount: stripe.Int64(int64(newPrice * 100)),
 	}
 	priceId, err := price.New(priceParams)
 	if err != nil {
 		return nil, err
 	}
-	priceParams.StripeAccount = stripe.String(item.Edges.Store.StripeAccountID)
+	priceParams.StripeAccount = stripe.String(StoreStripeID)
 
 	productParams := &stripe.ProductParams{DefaultPrice: stripe.String(priceId.ID)}
 
@@ -91,7 +92,7 @@ func UpdateStripePrice(item *ent.Item, newPrice float64) (*stripe.Price, error) 
 	return priceId, nil
 }
 
-func CreateCheckoutSession(items []CartItem, w http.ResponseWriter, r *http.Request) {
+func CreateCheckoutSession(items []CartItem, StoreStripeID string, w http.ResponseWriter, r *http.Request) {
 	//TODO: ADD ENVIRONMENT VARIABLE FOR SERVER ADDRESS
 	var lineItems []*stripe.CheckoutSessionLineItemParams
 
@@ -114,7 +115,7 @@ func CreateCheckoutSession(items []CartItem, w http.ResponseWriter, r *http.Requ
 		Mode:      stripe.String(string(stripe.CheckoutSessionModePayment)),
 		ReturnURL: stripe.String("https://retail-go.vercel.app/store"),
 	}
-	params.StripeAccount = stripe.String(items[0].Item.Edges.Store.StripeAccountID)
+	params.StripeAccount = stripe.String(StoreStripeID)
 
 	s, err := session.New(params)
 

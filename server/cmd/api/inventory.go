@@ -112,8 +112,15 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create item in database with name, photo, quantity, store_id, category
+	// get the stores stripe id
+	targetStore, err := srv.DBClient.Store.Query().Where(store.IDEQ(store_id)).Only(ctx)
+	if err != nil {
+		fmt.Println("Unable to find store:", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 
-	ProductId, err := CreateStripeItem(&reqItem)
+	ProductId, err := CreateStripeItem(&reqItem, targetStore)
 	if err != nil {
 		fmt.Println("Stripe Create didn't work:", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -311,7 +318,14 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		reqItem.StripePriceID = np.DefaultPrice.ID
 	}
 	if targetItem.Price != reqItem.Price {
-		p, err := UpdateStripePrice(targetItem, reqItem.Price)
+		// get the stores stripe id
+		targetStore, err := srv.DBClient.Store.Query().Where(store.IDEQ(targetItem.StoreID)).Only(r.Context())
+		if err != nil {
+			fmt.Println("Unable to find store:", err)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		p, err := UpdateStripePrice(targetItem, reqItem.Price, targetStore.StripeAccountID)
 		if err != nil {
 			log.Debug().Err(err).Msg("InvUpdate: failed to update stripe price")
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

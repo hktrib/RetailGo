@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/hktrib/RetailGo/internal/ent/store"
 	"io"
 	"net/http"
 	"os"
@@ -62,9 +63,28 @@ func (srv *Server) StoreCheckout(writer http.ResponseWriter, request *http.Reque
 		cart[i].Item = LineItem
 
 	}
+	// get store id from url query string
+	store_id, id_err := strconv.Atoi(chi.URLParam(request, "store_id"))
+	if id_err != nil {
+		log.Debug().Err(err).Msg("StoreCheckout: unable to parse store_id")
+		http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	// get store
+	targetStore, err := srv.DBClient.Store.Query().Where(store.ID(store_id)).Only(request.Context())
+	if ent.IsNotFound(err) {
+		log.Debug().Err(err).Msg("StoreCheckout: ent didn't find the store in the database")
+		http.Error(writer, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+	if err != nil {
+		log.Debug().Err(err).Msg("StoreCheckout: server failed to execute find store query")
+		http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 
 	// Create a new Stripe Checkout Session
-	StripeHelper.CreateCheckoutSession(cart, writer, request)
+	StripeHelper.CreateCheckoutSession(cart, targetStore.StripeAccountID, writer, request)
 
 }
 
