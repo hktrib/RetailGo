@@ -67,7 +67,6 @@ export default function EmployeeDialog({
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 10000,
       });
-      router.reload();
     } else {
       toast.error("Error updating employee!", {
         position: toast.POSITION.TOP_RIGHT,
