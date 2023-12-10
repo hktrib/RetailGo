@@ -1,18 +1,58 @@
+import { useState, useEffect } from "react";
+import { createCheckout } from "./actions";
+import { CheckoutDialog } from "@/components/app-page/checkout-dialog";
 import { Button } from "@/components/ui/button";
 
 const POSOrderSummary = ({
   cart,
   TAX_RATE,
+  storeId,
 }: {
-  cart: (Item & { quantity: number })[];
+  cart: (Item & { quantityAdded: number })[];
   TAX_RATE: number;
+  storeId: string;
 }) => {
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [clientSecret, setClientSecret] = useState("");
+
   const subtotal = cart.reduce(
     (acc, val) => acc + parseFloat((val.price * val.quantity).toFixed(2)),
     0
   );
 
   const total = parseFloat((subtotal * TAX_RATE).toFixed(2));
+
+  const generateCheckoutEmbed = async () => {
+    const lineItems = cart.map((item) => {
+      return {
+        id: item.id,
+        quantity: item.quantityAdded,
+      };
+    });
+
+    const res = await createCheckout({
+      lineItems: lineItems,
+      store_id: storeId,
+    });
+
+    if (!res) {
+      console.error("something went wrong...");
+      return;
+    }
+
+    const newClientSecret = JSON.parse(res).ClientSecret;
+
+    setClientSecret(newClientSecret);
+  };
+
+  useEffect(() => {
+    if (!clientSecret) {
+      setCheckoutOpen(false);
+      return;
+    }
+
+    setCheckoutOpen(true);
+  }, [clientSecret]);
 
   return (
     <div className="h-full">
@@ -28,12 +68,12 @@ const POSOrderSummary = ({
                   <span className="text-xs">{idx + 1}</span>
                 </div>
                 <span>{cartItem.name}</span>
-                <span className="text-gray-600">x{cartItem.quantity}</span>
+                <span className="text-gray-600">x{cartItem.quantityAdded}</span>
               </div>
 
               <div>
                 <span className="text-sm">
-                  ${(cartItem.price * cartItem.quantity).toFixed(2)}
+                  ${(cartItem.price * cartItem.quantityAdded).toFixed(2)}
                 </span>
               </div>
             </div>
@@ -70,10 +110,24 @@ const POSOrderSummary = ({
           </div>
 
           <div className="mt-6">
-            <Button className="rounded-full w-full py-5">Place order</Button>
+            <Button
+              type="submit"
+              disabled={!cart.length}
+              onClick={generateCheckoutEmbed}
+              className="rounded-full w-full py-5"
+            >
+              Place order
+            </Button>
           </div>
         </div>
       </div>
+
+      <CheckoutDialog
+        open={checkoutOpen}
+        setOpen={setCheckoutOpen}
+        clientSecret={clientSecret}
+        setClientSecret={setClientSecret}
+      />
     </div>
   );
 };
