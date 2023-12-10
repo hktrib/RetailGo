@@ -83,7 +83,7 @@ func (srv *Server) UserDelete(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 
-	userID, err := strconv.Atoi(chi.URLParam(r, "user"))
+	userID, err := strconv.Atoi(chi.URLParam(r, "user_id"))
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusBadRequest)+": no user id", http.StatusBadRequest)
 		return
