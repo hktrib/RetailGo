@@ -26,7 +26,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import { Item } from "@/models/item";
 import { InventoryItem } from "./columns";
 
 interface DataTableProps<TData extends InventoryItem, TValue> {

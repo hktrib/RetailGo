@@ -28,6 +28,8 @@ type Store struct {
 	StoreAddress string `json:"store_address,omitempty"`
 	// StorePhone holds the value of the "store_phone" field.
 	StorePhone string `json:"store_phone,omitempty"`
+	// StripeAccountID holds the value of the "stripe_account_id" field.
+	StripeAccountID string `json:"stripe_account_id,omitempty"`
 	// StoreType holds the value of the "store_type" field.
 	StoreType string `json:"store_type,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -94,7 +96,7 @@ func (*Store) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case store.FieldID:
 			values[i] = new(sql.NullInt64)
-		case store.FieldUUID, store.FieldStoreName, store.FieldCreatedBy, store.FieldOwnerEmail, store.FieldStoreAddress, store.FieldStorePhone, store.FieldStoreType:
+		case store.FieldUUID, store.FieldStoreName, store.FieldCreatedBy, store.FieldOwnerEmail, store.FieldStoreAddress, store.FieldStorePhone, store.FieldStripeAccountID, store.FieldStoreType:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -152,6 +154,12 @@ func (s *Store) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field store_phone", values[i])
 			} else if value.Valid {
 				s.StorePhone = value.String
+			}
+		case store.FieldStripeAccountID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field stripe_account_id", values[i])
+			} else if value.Valid {
+				s.StripeAccountID = value.String
 			}
 		case store.FieldStoreType:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -232,6 +240,9 @@ func (s *Store) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("store_phone=")
 	builder.WriteString(s.StorePhone)
+	builder.WriteString(", ")
+	builder.WriteString("stripe_account_id=")
+	builder.WriteString(s.StripeAccountID)
 	builder.WriteString(", ")
 	builder.WriteString("store_type=")
 	builder.WriteString(s.StoreType)

@@ -24,6 +24,8 @@ const (
 	FieldStoreAddress = "store_address"
 	// FieldStorePhone holds the string denoting the store_phone field in the database.
 	FieldStorePhone = "store_phone"
+	// FieldStripeAccountID holds the string denoting the stripe_account_id field in the database.
+	FieldStripeAccountID = "stripe_account_id"
 	// FieldStoreType holds the string denoting the store_type field in the database.
 	FieldStoreType = "store_type"
 	// EdgeItems holds the string denoting the items edge name in mutations.
@@ -73,6 +75,7 @@ var Columns = []string{
 	FieldOwnerEmail,
 	FieldStoreAddress,
 	FieldStorePhone,
+	FieldStripeAccountID,
 	FieldStoreType,
 }
 
@@ -128,6 +131,11 @@ func ByStoreAddress(opts ...sql.OrderTermOption) OrderOption {
 // ByStorePhone orders the results by the store_phone field.
 func ByStorePhone(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStorePhone, opts...).ToFunc()
+}
+
+// ByStripeAccountID orders the results by the stripe_account_id field.
+func ByStripeAccountID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStripeAccountID, opts...).ToFunc()
 }
 
 // ByStoreType orders the results by the store_type field.
