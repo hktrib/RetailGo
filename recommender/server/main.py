@@ -7,9 +7,6 @@ from models import DefaultWord2VecModel
 
 app = FastAPI()
 
-# DB() to init the vector database
-database = DB(discount_factor=0.99)
-print("DB initialized")
 # A Recommender Class that does embedding, ranking and reranking.
 try:
     default_w2v = DefaultWord2VecModel()
@@ -19,6 +16,11 @@ except Exception as error:
     assert False
 
 print("Recommender initialized")
+
+# DB() to init the vector database
+database = DB(discount_factor=0.99, dimension=recommender.dimension)
+print("DB initialized")
+
 
 @app.post("/vectorizeItems", status_code = 201)
 def vectorize_batch(batch: ItemBatch, response: Response):
