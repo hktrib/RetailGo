@@ -56,12 +56,12 @@ func vectorize(unvectorizedItems []ent.Item) ([]int, error) {
 
 	response, err := http.Post(REC_SERVER_URL+"/vectorizeItems", "application/json", bytes.NewBuffer(requestBody))
 
-	if response.StatusCode == 500 {
-		fmt.Println("Failed to vectorize: Internal Server Error.")
+	if err != nil {
 		return ([]int{}), err
 	}
 
-	if err != nil {
+	if response.StatusCode == 500 {
+		fmt.Println("Failed to vectorize: Internal Server Error.")
 		return ([]int{}), err
 	}
 
