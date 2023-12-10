@@ -10,6 +10,7 @@ import (
 	"github.com/stripe/stripe-go/v76/account"
 	"github.com/stripe/stripe-go/v76/accountlink"
 	"github.com/stripe/stripe-go/v76/checkout/session"
+	"github.com/stripe/stripe-go/v76/price"
 	"github.com/stripe/stripe-go/v76/product"
 	"net/http"
 )
@@ -77,21 +78,35 @@ func CreateStripeItem(item *ent.Item) (*stripe.Product, error) {
 	return product, nil
 }
 
-func UpdateStripeItem(item *ent.Item, price float64, name string) (*stripe.Product, error) {
+func UpdateStripeItem(item *ent.Item, name string) (*stripe.Product, error) {
 
-	productParams := &stripe.ProductParams{
-		Name: stripe.String(name),
-		DefaultPriceData: &stripe.ProductDefaultPriceDataParams{
-			Currency:   stripe.String(string(stripe.CurrencyUSD)),
-			UnitAmount: stripe.Int64(int64(price * 100)),
-		},
-	}
+	productParams := &stripe.ProductParams{}
+	productParams.Name = stripe.String(name)
 	product, err := product.Update(item.StripeProductID, productParams)
 
 	if err != nil {
 		return nil, err
 	}
 	return product, nil
+}
+func UpdateStripePrice(item *ent.Item, newPrice float64) (*stripe.Price, error) {
+
+	priceParams := &stripe.PriceParams{
+		Product:    stripe.String(item.StripeProductID),
+		Currency:   stripe.String(string(stripe.CurrencyUSD)),
+		UnitAmount: stripe.Int64(int64(item.Price * 100)),
+	}
+	priceId, err := price.New(priceParams)
+	if err != nil {
+		return nil, err
+	}
+	productParams := &stripe.ProductParams{DefaultPrice: stripe.String(priceId.ID)}
+
+	_, err = product.Update(item.StripeProductID, productParams)
+	if err != nil {
+		return nil, err
+	}
+	return priceId, nil
 }
 
 func CreateCheckoutSession(items []CartItem, w http.ResponseWriter, r *http.Request) {

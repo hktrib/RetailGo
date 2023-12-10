@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/hktrib/RetailGo/internal/ent/store"
 	"io"
 	"net/http"
 	"strconv"
@@ -202,7 +203,7 @@ func createOrUpdateCategory(categoryName string, createdItem *ent.Item, ctx cont
 	return err
 }
 func swapCategories(item1 *ent.Item, newCatName string, ctx context.Context, srv *Server) error {
-	oldCat, err := srv.DBClient.Category.Query().Where(category.Name(item1.CategoryName)).Only(ctx)
+	oldCat, err := srv.DBClient.Category.Query().Where(category.Name(item1.CategoryName), category.HasStoreWith(store.ID(item1.StoreID))).Only(ctx)
 	if err != nil {
 		log.Debug().Err(err).Msg("Failed to query old category")
 		return err
@@ -299,20 +300,24 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	if reqItem.Name == "" {
-		reqItem.Name = targetItem.Name
-	}
-	if reqItem.Price == 0 {
-		reqItem.Price = targetItem.Price
-	}
-	if reqItem.Price != targetItem.Price || reqItem.Name != targetItem.Name {
-		prod, err := UpdateStripeItem(&reqItem, reqItem.Price, reqItem.Name)
+	if targetItem.Name != reqItem.Name {
+		np, err := UpdateStripeItem(targetItem, reqItem.Name)
 		if err != nil {
 			log.Debug().Err(err).Msg("InvUpdate: failed to update stripe item")
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		_, err = srv.DBClient.Item.UpdateOne(targetItem).SetStripePriceID(prod.DefaultPrice.ID).SetStripeProductID(prod.ID).Save(r.Context())
+		reqItem.StripeProductID = np.ID
+		reqItem.StripePriceID = np.DefaultPrice.ID
+	}
+	if targetItem.Price != reqItem.Price {
+		p, err := UpdateStripePrice(targetItem, reqItem.Price)
+		if err != nil {
+			log.Debug().Err(err).Msg("InvUpdate: failed to update stripe price")
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		reqItem.StripePriceID = p.ID
 	}
 
 	originalItem := ent.Item{
