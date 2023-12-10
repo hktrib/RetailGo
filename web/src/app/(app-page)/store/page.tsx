@@ -13,16 +13,19 @@ type StoreMetadata = {
 };
 
 export default function StoreViewPage() {
+
   const router = useRouter()
 
   const {isLoaded, user} = useUser();
   const searchParam = useSearchParams();
 
+  // Reloades Clerk Metadata
   user?.reload();
   
   if (!isLoaded) {
     return <p>Loading...</p>;
   }
+
 
   // Stall til not Loaded
   if (!user || !user.publicMetadata)
