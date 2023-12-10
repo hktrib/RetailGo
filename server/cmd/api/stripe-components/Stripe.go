@@ -89,13 +89,13 @@ func CreateCheckoutSession(items []CartItem, w http.ResponseWriter, r *http.Requ
 	}
 
 	params := &stripe.CheckoutSessionParams{
+		UIMode: stripe.String("embedded"),
 		PaymentMethodTypes: stripe.StringSlice([]string{
 			"card",
 		}),
-		LineItems:  lineItems,
-		Mode:       stripe.String(string(stripe.CheckoutSessionModePayment)),
-		SuccessURL: stripe.String("https://retail-go.vercel.app/store"),
-		CancelURL:  stripe.String("https://retail-go.vercel.app/store"),
+		LineItems: lineItems,
+		Mode:      stripe.String(string(stripe.CheckoutSessionModePayment)),
+		ReturnURL: stripe.String("https://retail-go.vercel.app/store"),
 	}
 
 	s, err := session.New(params)
