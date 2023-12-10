@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { auth } from "@clerk/nextjs";
+import { UserButton, auth } from "@clerk/nextjs";
 
 export default function Header() {
   const { userId } = auth();
@@ -32,6 +32,8 @@ export default function Header() {
               >
                 Add Store
               </Link>
+              <UserButton afterSignOutUrl="/" />
+
             </>
           ) : (
             <>
