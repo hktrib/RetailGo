@@ -81,25 +81,45 @@ func (srv *Server) UserCreate(w http.ResponseWriter, r *http.Request) {
 
 func (srv *Server) UserDelete(w http.ResponseWriter, r *http.Request) {
 
-	user_id, err := strconv.Atoi(chi.URLParam(r, "user_id"))
+	ctx := r.Context()
+
+	userID, err := strconv.Atoi(chi.URLParam(r, "user"))
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusBadRequest)+": no user id", http.StatusBadRequest)
 		return
 	}
 
-	// Delete entries in usertostore table based on user_id
+	// Fetching User from Database
+	fetchedUser, err := srv.DBClient.User.Query().
+		Where(user.ID(userID)).Only(ctx)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Querying for the user to store relation
+	newUTS, err := srv.DBClient.UserToStore.Query().
+		Where(usertostore.UserID(fetchedUser.ID)).
+		Only(ctx)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Delete entries in usertostore table based on userID
 	_, err = srv.DBClient.
 		UserToStore.
 		Delete().
-		Where(usertostore.UserID(user_id)). // Assuming there is a UserID field in userToStore
+		Where(usertostore.UserID(userID)). // Assuming there is a UserID field in userToStore
 		Exec(r.Context())
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	// Deleting user from Database
 	err = srv.DBClient.
-		User.DeleteOneID(user_id).
+		User.DeleteOneID(userID).
 		Exec(r.Context())
 
 	if ent.IsNotFound(err) {
@@ -109,19 +129,33 @@ func (srv *Server) UserDelete(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError)+":"+err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// Create Clerk Store Instance
+	clerkStore, err := clerkstorage.NewClerkStore(srv.ClerkClient, fetchedUser.ClerkUserID, srv.Config)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Removing user's store relation from user's Clerk Public Metadata.
+	err = clerkStore.RemoveMetadata(newUTS)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
 }
 
 func (srv *Server) UserQuery(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	user_id, err := strconv.Atoi(chi.URLParam(r, "user_id"))
+	userID, err := strconv.Atoi(chi.URLParam(r, "userID"))
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
-	user_data, err := srv.DBClient.User.Query().Where(user.ID(user_id)).Only(ctx)
+	user_data, err := srv.DBClient.User.Query().Where(user.ID(userID)).Only(ctx)
 	if ent.IsNotFound(err) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
@@ -193,13 +227,13 @@ type UserUpdateRequest struct {
 func (srv *Server) userUpdate(w http.ResponseWriter, r *http.Request) {
 	// get item id from url query string
 	ctx := r.Context()
-	user_id, err := strconv.Atoi(chi.URLParam(r, "user_id"))
+	userID, err := strconv.Atoi(chi.URLParam(r, "userID"))
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
-	targetUser, err := srv.DBClient.User.Query().Where(user.ID(user_id)).Only(ctx)
+	targetUser, err := srv.DBClient.User.Query().Where(user.ID(userID)).Only(ctx)
 
 	if ent.IsNotFound(err) {
 		http.Error(w, http.StatusText(http.StatusNotFound)+": user not found", http.StatusNotFound)

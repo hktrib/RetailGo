@@ -32,6 +32,9 @@ type storeData struct {
 	PermissionLevel int `json:"Permission_level"`
 }
 
+func Equal(a storeData, b storeData) bool {
+	return a.StoreID == b.StoreID && a.Name == b.Name && a.PermissionLevel == b.PermissionLevel
+}
 
 func NewClerkStore(client clerk.Client, clerkUserID string, config *util.Config) (*ClerkStorage, error) {
 	cus := &ClerkStorage{}
@@ -69,3 +72,22 @@ func (cs ClerkStorage) AddMetadata(userStoreRelation *ent.UserToStore) error {
 	return nil
 }
 
+func (cs ClerkStorage) RemoveMetadata(userStoreRelation *ent.UserToStore) error {
+	
+	clerkUserMetadata, err := cs.removeStoreFromPublicMetadata(cs.user, userStoreRelation)	
+	if err != nil {
+		log.Debug().Err(err).Msg("Unable to Remove Store from User's Public Metadata")
+		return err
+	}
+
+	log.Debug().Msg(fmt.Sprintf("User ID: %v | public metadata: %v\n", cs.userID, *clerkUserMetadata))
+
+	user, err := cs.updateMetadata(*clerkUserMetadata)
+	if err != nil {
+		log.Debug().Err(err).Msg("Unable to update metadata")
+		return err
+	}
+	
+	log.Debug().Msg(fmt.Sprintf("User PublicMetadata: %v\n", user.PublicMetadata))
+	return nil
+}

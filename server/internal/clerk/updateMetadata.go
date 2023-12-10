@@ -9,8 +9,9 @@ import (
 	"net/http"
 
 	"github.com/clerkinc/clerk-sdk-go/clerk"
-	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/rs/zerolog/log"
+
+	"github.com/hktrib/RetailGo/internal/ent"
 )
 
 
@@ -98,6 +99,49 @@ func (cs ClerkStorage) addStoreToPublicMetadata(user *clerk.User, uts *ent.UserT
 	return metadata, nil
 }
 
+
+
+func (cs ClerkStorage) removeStoreFromPublicMetadata(user *clerk.User, uts *ent.UserToStore) (*ClerkUserMetadata, error) {
+
+	metadata, err := cs.NewClerkUserMetadata()
+	if err != nil {
+		return nil, err
+	}
+
+	stores, ok := metadata.PublicMetadata["stores"].([]storeData) 
+	if !ok {
+		return nil, fmt.Errorf("no Clerk Metadata! Something went wrong")
+	} else {
+		storeDataToDelete := storeData{
+			StoreID: uts.StoreID,
+			Name: uts.StoreName,
+			PermissionLevel : uts.PermissionLevel, 
+		}
+
+		storeIndexToDelete := -1
+		for index, store := range stores {
+			if store == storeDataToDelete {
+				storeIndexToDelete = index
+				break
+			}
+		}
+
+		if storeIndexToDelete != -1 {
+			if storeIndexToDelete == 0 {
+				metadata.PublicMetadata["stores"] = stores[:1]
+			} else if storeIndexToDelete == len(stores) - 1 {
+				metadata.PublicMetadata["stores"] = stores[len(stores)-1:]
+			} else {
+				metadata.PublicMetadata["stores"] = append(stores[:storeIndexToDelete], stores[storeIndexToDelete + 1:]...)
+			}
+		} else {
+			log.Debug().Msg(fmt.Sprintf("Stores: %v | UserToStore", stores))
+			return nil, fmt.Errorf("store index %d not found", storeIndexToDelete)
+		}
+	}
+
+	return metadata, nil
+}
 
 func (cs ClerkStorage) updateMetadata(c ClerkUserMetadata) (*clerk.User, error) {
 	url := fmt.Sprintf("%s/%s/%s/metadata", baseURL, usersurl, cs.userID)
