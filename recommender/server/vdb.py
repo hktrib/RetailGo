@@ -32,9 +32,10 @@ class DB(object):
     def find_item_near_vector(self, vector, result_limit = 50):
 
         try:
-            nearby_items = self.client.query().get("item", ["name", "categoryName", "imageURL", "price"]).with_near_vector({
+            nearby_items = self.client.query.get("item", ["name", "categoryName", "imageURL", "price"]).with_limit(result_limit).with_near_vector({
                 'vector': vector
-            }).with_limit(result_limit).do()
+            }).do()
+
             return nearby_items
 
         except Exception as error:
@@ -161,15 +162,22 @@ class DB(object):
     def retrieve_candidates_to_recommend(self, store_id):
 
         # Find the store's vector
+        try:
+            store = self.get_store(store_id)
+        except:
+            return None
 
-        store_vector = self.get_store(store_id)
-        
         # If it doesn't exist, start with no preferences - reranking will improve these cold start recommendations
 
-        if not store_vector:
+        if not store or len(store["vector"]) == 0:
             store_vector = np.zeros((self.dimension, 1)).astype(np.float16)
-
+        else:
+            store_vector = store["vector"]
+        
         # Search for nearby items, candidates to be recommended
-        candidates = self.find_item_near_vector(store_vector)
+        try:
+            candidates = self.find_item_near_vector(store_vector)
+        except:
+            return None
 
-        return candidates
+        return candidates["data"]["Get"]["Item"]

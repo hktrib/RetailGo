@@ -20,6 +20,15 @@ class Recommender(object):
 
         return np.concatenate(batch_item_vectors, axis = 0)
     
+    def filter(self, candidates, store_id):
+        print("Candidates:", candidates)
+        return list(
+            filter(
+                lambda candidate: candidate["storeId"] == store_id if "storeId" in candidate else True,
+                candidates
+            )
+        )
+
     def rerank(self, candidates, final_candidates = 15):
         # Maximize diversity among candidates
         return candidates[:final_candidates]

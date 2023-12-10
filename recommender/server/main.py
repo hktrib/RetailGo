@@ -52,12 +52,21 @@ def recommend(store_id: int):
     results = database.retrieve_candidates_to_recommend(store_id)
     
     if not results:
+        print("Failed to retrieve candidates.")
+        raise HTTPException(500)    
+
+    # Filter them
+    try:
+        results = recommender.filter(results, store_id)
+    except Exception as error:
+        print("Failed to Filter:", error)
         raise HTTPException(500)
 
     # Rerank them
     try:
         results = recommender.rerank(results)
-    except:
+    except Exception as error:
+        print("Failed to rerank:", error)
         raise HTTPException(500)
 
     # Return all
