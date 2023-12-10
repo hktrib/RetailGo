@@ -33,7 +33,7 @@ export function CheckoutDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-5xl w-full overflow-y-scroll h-full">
+      <DialogContent className="overflow-y-scroll h-full">
         <DialogHeader>
           <DialogTitle>Checkout</DialogTitle>
         </DialogHeader>

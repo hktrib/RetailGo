@@ -16,7 +16,7 @@ const POSOrderSummary = ({
   const [clientSecret, setClientSecret] = useState("");
 
   const subtotal = cart.reduce(
-    (acc, val) => acc + parseFloat((val.price * val.quantity).toFixed(2)),
+    (acc, val) => acc + parseFloat((val.price * val.quantityAdded).toFixed(2)),
     0
   );
 
