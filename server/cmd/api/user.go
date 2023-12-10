@@ -85,6 +85,7 @@ func (srv *Server) UserDelete(w http.ResponseWriter, r *http.Request) {
 
 	userID, err := strconv.Atoi(chi.URLParam(r, "user_id"))
 	if err != nil {
+		log.Debug().Err(err).Msg("Bad/No user_id")
 		http.Error(w, http.StatusText(http.StatusBadRequest)+": no user id", http.StatusBadRequest)
 		return
 	}
@@ -93,6 +94,7 @@ func (srv *Server) UserDelete(w http.ResponseWriter, r *http.Request) {
 	fetchedUser, err := srv.DBClient.User.Query().
 		Where(user.ID(userID)).Only(ctx)
 	if err != nil {
+		log.Debug().Err(err).Msg("Unable to fetch user from database")
 		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -102,6 +104,7 @@ func (srv *Server) UserDelete(w http.ResponseWriter, r *http.Request) {
 		Where(usertostore.UserID(fetchedUser.ID)).
 		Only(ctx)
 	if err != nil {
+		log.Debug().Err(err).Msg("Unable to query entry in userToStore table")
 		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -113,6 +116,7 @@ func (srv *Server) UserDelete(w http.ResponseWriter, r *http.Request) {
 		Where(usertostore.UserID(userID)). // Assuming there is a UserID field in userToStore
 		Exec(r.Context())
 	if err != nil {
+		log.Debug().Err(err).Msg("Unable to delete entry in userToStore table")
 		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -123,6 +127,7 @@ func (srv *Server) UserDelete(w http.ResponseWriter, r *http.Request) {
 		Exec(r.Context())
 
 	if ent.IsNotFound(err) {
+		log.Debug().Err(err).Msg("ent is not found")
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	} else if err != nil {
@@ -133,6 +138,7 @@ func (srv *Server) UserDelete(w http.ResponseWriter, r *http.Request) {
 	// Create Clerk Store Instance
 	clerkStore, err := clerkstorage.NewClerkStore(srv.ClerkClient, fetchedUser.ClerkUserID, srv.Config)
 	if err != nil {
+		log.Debug().Err(err).Msg("unable to create clerk store instance")
 		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -140,6 +146,7 @@ func (srv *Server) UserDelete(w http.ResponseWriter, r *http.Request) {
 	// Removing user's store relation from user's Clerk Public Metadata.
 	err = clerkStore.RemoveMetadata(newUTS)
 	if err != nil {
+		log.Debug().Err(err).Msg("unable to remove user's store relation from Clerk Store")
 		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
 		return
 	}
