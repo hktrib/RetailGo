@@ -1,13 +1,13 @@
-from pydantic import BaseModel
-from typing import List
+from pydantic import BaseModel, Field
+from typing import List, Optional
 
 class Item(BaseModel):
     id: int
     weaviate_id: str
-    photo: str
+    photo: Optional[str]
     name: str
     store_id: int
-    number_sold_since_update: int
+    number_sold_since_update: Optional[int] = Field(default = 0)
     quantity: int
     price: float
     stripe_price_id: str

@@ -25,6 +25,9 @@ print("DB initialized")
 @app.post("/vectorizeItems", status_code = 201)
 def vectorize_batch(batch: ItemBatch, response: Response):
 
+    if len(batch.Items) == 0:
+        return []
+
     embedding_failed = []
     batch_size = len(batch.Items)
 

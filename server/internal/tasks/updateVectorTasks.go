@@ -25,17 +25,29 @@ type ItemBatch struct {
 	Items []ent.Item
 }
 
+func getSales(unvectorizedItems []ent.Item) (map[int]int, []int) {
+	unvectorizedSales := make(map[int]int)
+	var unvectorizedIds []int
+
+	for _, item := range unvectorizedItems {
+		// unvectorizedSales = append(unvectorizedSales, item.NumberSoldSinceUpdate)
+		unvectorizedSales[item.ID] = item.NumberSoldSinceUpdate
+		unvectorizedIds = append(unvectorizedIds, item.ID)
+	}
+
+	return unvectorizedSales, unvectorizedIds
+}
+
 // Need to marshall items to JSON, send them to the Python Server, receive the response, read the body, read the ids that were not vectorized, and set them
 func vectorize(unvectorizedItems []ent.Item) ([]int, error) {
-	REC_SERVER_URL := "https://recommendation-server-production.up.railway.app"
+	REC_SERVER_URL := "http://localhost:8000" // "https://recommendation-server-production.up.railway.app"
 	// Marshall items to JSON
 	itemBatch := new(ItemBatch)
 	itemBatch.Items = unvectorizedItems
-	requestBody, err := json.Marshal(itemBatch)
-	unvectBody, _ := json.Marshal(unvectorizedItems)
 
+	requestBody, err := json.Marshal(itemBatch)
 	fmt.Println("Request Body:", (string)(requestBody))
-	fmt.Println("Items Body:", (string)(unvectBody))
+
 	var ids []int
 
 	if err != nil {
@@ -44,6 +56,11 @@ func vectorize(unvectorizedItems []ent.Item) ([]int, error) {
 
 	response, err := http.Post(REC_SERVER_URL+"/vectorizeItems", "application/json", bytes.NewBuffer(requestBody))
 
+	if response.StatusCode == 500 {
+		fmt.Println("Failed to vectorize: Internal Server Error.")
+		return ([]int{}), err
+	}
+
 	if err != nil {
 		return ([]int{}), err
 	}
@@ -51,6 +68,8 @@ func vectorize(unvectorizedItems []ent.Item) ([]int, error) {
 	defer response.Body.Close()
 
 	responseBody, err := io.ReadAll(response.Body)
+
+	fmt.Printf("ResponseBody: %s\n", responseBody)
 
 	if err != nil {
 		return ([]int{}), err
@@ -63,6 +82,17 @@ func vectorize(unvectorizedItems []ent.Item) ([]int, error) {
 	}
 
 	return ids, nil
+}
+
+func rollbackSales(ctx context.Context, dbClient *ent.Client, itemsFailedToVectorize []int, idToNumberSoldSinceUpdate map[int]int) {
+	for itemID := range itemsFailedToVectorize {
+		failedItem, err := dbClient.Item.Query().Where(item.ID(itemID)).Only(ctx)
+		if err != nil {
+			continue
+		}
+
+		_, _ = failedItem.Update().SetVectorized(false).SetNumberSoldSinceUpdate(failedItem.NumberSoldSinceUpdate + idToNumberSoldSinceUpdate[itemID]).Save(ctx)
+	}
 }
 
 func (rp *RedisProducer) ProduceTaskUpdateVectors(ctx context.Context, processInTime time.Duration, opts ...asynq.Option) error {
@@ -82,30 +112,25 @@ func (rp *RedisProducer) ProduceTaskUpdateVectors(ctx context.Context, processIn
 func (rc *RedisConsumer) ConsumeTaskUpdateVectors(ctx context.Context, task *asynq.Task) error {
 	// Run the transaction to query and set to vectorized all unvectorized items
 	unvectorizedItems, err := transactions.QueryUnvectorizedItemsAndMarkVectorized(ctx, rc.dbClient)
-
-	fmt.Println("unvectorizedItems:", unvectorizedItems)
+	idToNumberSoldSinceUpdate, idsUnvectorized := getSales(unvectorizedItems)
 
 	if err != nil {
+		rollbackSales(ctx, rc.dbClient, idsUnvectorized, idToNumberSoldSinceUpdate)
 		return fmt.Errorf("failed to query/update unvectorized items to vectorized: %w", err)
+	} else if len(unvectorizedItems) == 0 {
+		fmt.Println("no items to vectorize.")
+		return nil
 	}
 
 	// Send all unvectorized items to Python Server
-	// Add to ENVVARs + Config.go, but for now, use the actual URL.
-	// Need to marshall items to JSON, send them to the Python Server, receive the response, read the body, read the ids that were not vectorized, and set them
 	itemsFailedToVectorize, err := vectorize(unvectorizedItems)
 	if err != nil {
+		rollbackSales(ctx, rc.dbClient, idsUnvectorized, idToNumberSoldSinceUpdate)
 		return fmt.Errorf("failed to vectorize: %w", err)
 	}
 
 	// Based on result, update the database.
-	for itemID := range itemsFailedToVectorize {
-		failedItem, err := rc.dbClient.Item.Query().Where(item.ID(itemID)).Only(ctx)
-		if err != nil {
-			continue
-		}
-
-		_, _ = failedItem.Update().SetVectorized(false).SetNumberSoldSinceUpdate(0).Save(ctx)
-	}
+	rollbackSales(ctx, rc.dbClient, itemsFailedToVectorize, idToNumberSoldSinceUpdate)
 
 	return nil
 }

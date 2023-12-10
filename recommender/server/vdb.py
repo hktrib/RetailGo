@@ -8,8 +8,8 @@ class DB(object):
     def __init__(self, discount_factor, dimension = 300):
         try:
             self.client = weaviate.Client(
-                    url = os.getenv("WEAVIATE_HOSTNAME"),
-                    auth_client_secret = weaviate.AuthApiKey(api_key=os.getenv("WEAVIATE_SK")),
+                    url = "https://retailgo-recengine-eb6uzggu.weaviate.network",
+                    auth_client_secret = weaviate.AuthApiKey(api_key="isYZjIQAxvMOhFkTUt0bI5xqETVAHGHqO6fU"),
             )
         except Exception as error:
             print("Failed to connect to Vector Database at {WEAVIATE_HOSTNAME}, with Secret Key {WEAVIATE_SK}".format(os.getenv("WEAVIATE_HOSTNAME"), os.getenv("WEAVIATE_SK")), error)
@@ -113,16 +113,17 @@ class DB(object):
             vector = vector
             )
         except Exception as error:
-            print("Error updating item {id}'s vector:".format(item.id), error)
+            itemId = item.id
+            print("Error updating vector for item", itemId, error)
 
             success = False
-            return success
 
         # Update the store's periodic total to account for the new item
-        self.add_item(item.store_id, vector)
+        if item.number_sold_since_update != 0:
+            self.add_item(item.store_id, vector)
 
         # If it didn't fail, return True for success
-        return True
+        return success
 
     # Write Store.
     def write_store(self):

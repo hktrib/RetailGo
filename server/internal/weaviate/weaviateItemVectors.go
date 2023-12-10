@@ -16,6 +16,6 @@ func (weaviate *Weaviate) DoVectorize(ctx context.Context, taskProducer worker.T
 			fmt.Println("Error producing update vectors task", err)
 			return err
 		}
-		time.Sleep(time.Minute)
+		time.Sleep(time.Hour)
 	}
 }

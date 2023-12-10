@@ -28,7 +28,7 @@ func QueryUnvectorizedItemsAndMarkVectorized(ctx context.Context, dbClient *ent.
 
 	fmt.Println("Previously Unvectorized Items:", previouslyUnvectorizedItems)
 
-	_, err = tx.Item.Update().Where(item.Vectorized(false)).SetVectorized(true).Save(ctx)
+	_, err = tx.Item.Update().Where(item.Vectorized(false)).SetVectorized(true).SetNumberSoldSinceUpdate(0).Save(ctx)
 
 	if err != nil {
 		return nil, rollback(tx, fmt.Errorf("tx_error: marking items vectorized: %w", err))
