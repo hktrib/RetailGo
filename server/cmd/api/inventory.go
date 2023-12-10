@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/hktrib/RetailGo/internal/ent/store"
 	"io"
 	"net/http"
 	"strconv"
@@ -142,13 +143,7 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	if UpdateItemCategory(w, reqItem, err, srv, createdItem, ctx) {
-		return
-	}
-
-	responseBody, _ := json.Marshal(map[string]interface{}{
-		"id": createdItem.ID,
-	})
+	err = createOrUpdateCategory(reqItem.CategoryName, createdItem, ctx, srv)
 
 	weaviateID, weaviateErr := srv.WeaviateClient.CreateItem(createdItem)
 
@@ -182,55 +177,74 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	w.Write(responseBody)
+	w.Write([]byte("Created"))
 
 }
-
-func UpdateItemCategory(w http.ResponseWriter, reqItem ent.Item, err error, srv *Server, createdItem *ent.Item, ctx context.Context) bool {
+func createOrUpdateCategory(categoryName string, createdItem *ent.Item, ctx context.Context, srv *Server) error {
 	var cat *ent.Category
-	if reqItem.CategoryName == "" {
-		// does uncategorized exist?
-		cat, err = srv.DBClient.Category.Query().Where(category.Name("Uncategorized"), category.StoreID(reqItem.StoreID)).Only(ctx)
-		if err != nil {
-			if ent.IsNotFound(err) {
-				log.Debug().Err(err).Msg("Uncategorized not found lets create it")
-				_, err = srv.DBClient.Category.Create().SetName("Uncategorized").SetStoreID(createdItem.StoreID).AddItems(createdItem).SetPhoto([]byte("hello")).Save(ctx)
-				if err != nil {
-					log.Debug().Err(err).Msg("Failed to create Uncategorized")
-					http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-					return true
-				}
-				return false
-			} else {
-				log.Debug().Err(err).Msg("Failed to query Uncategorized")
-				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-				return true
-			}
-		}
-	} else {
-		cat, err = srv.DBClient.Category.Query().Where(category.Name(reqItem.CategoryName), category.StoreID(reqItem.StoreID)).Only(ctx)
-		if err != nil {
-			if ent.IsNotFound(err) {
-				log.Debug().Err(err).Msg("Category not found lets create it")
-				_, err = srv.DBClient.Category.Create().SetName(reqItem.CategoryName).SetStoreID(createdItem.StoreID).AddItems(createdItem).SetPhoto([]byte("hello")).Save(ctx)
-				if err != nil {
-					log.Debug().Err(err).Msg("Failed to create Category")
-					http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-					return true
-				}
-				return false
-			} else {
-				log.Debug().Err(err).Msg("Failed to query Category")
-				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-				return true
-			}
-		}
-		_, err = srv.DBClient.Category.UpdateOne(cat).AddItems(createdItem).Save(ctx)
-		return false
+	var err error
 
+	if categoryName == "" {
+		cat, err = srv.DBClient.Category.Query().Where(category.Name("Uncategorized"), category.StoreID(createdItem.StoreID)).Only(ctx)
+	} else {
+		cat, err = srv.DBClient.Category.Query().Where(category.Name(categoryName), category.StoreID(createdItem.StoreID)).Only(ctx)
 	}
 
-	return false
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return CreateCatWithItem(createdItem, categoryName, ctx, srv)
+		}
+
+		log.Debug().Err(err).Msgf("Failed to query %s", categoryName)
+		return err
+	}
+
+	_, err = srv.DBClient.Category.UpdateOne(cat).AddItems(createdItem).Save(ctx)
+	return err
+}
+func swapCategories(item1 *ent.Item, newCatName string, ctx context.Context, srv *Server) error {
+	oldCat, err := srv.DBClient.Category.Query().Where(category.Name(item1.CategoryName), category.HasStoreWith(store.ID(item1.StoreID))).Only(ctx)
+	if err != nil {
+		log.Debug().Err(err).Msg("Failed to query old category")
+		return err
+	}
+
+	newCat, err := srv.DBClient.Category.Query().Where(category.Name(newCatName)).Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return CreateCatWithItem(item1, newCatName, ctx, srv)
+		}
+		log.Debug().Err(err).Msg("Failed to query new category")
+		return err
+	}
+
+	_, err = srv.DBClient.Category.UpdateOne(oldCat).RemoveItems(item1).Save(ctx)
+	if err != nil {
+		log.Debug().Err(err).Msg("Failed to remove item from old category")
+		return err
+	}
+
+	_, err = srv.DBClient.Category.UpdateOne(newCat).AddItems(item1).Save(ctx)
+	if err != nil {
+		log.Debug().Err(err).Msg("Failed to add item to new category")
+		return err
+	}
+
+	return nil
+}
+
+func CreateCatWithItem(item1 *ent.Item, newCatName string, ctx context.Context, srv *Server) error {
+	_, err := srv.DBClient.Category.Create().
+		SetName(newCatName).
+		SetStoreID(item1.StoreID).
+		AddItems(item1).
+		SetPhoto([]byte("hello")).Save(ctx)
+
+	if err != nil {
+		log.Debug().Err(err).Msgf("Failed to create %s", newCatName)
+		return err
+	}
+	return nil
 }
 
 /*
@@ -277,6 +291,33 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 	} else if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
+	}
+	if targetItem.CategoryName != reqItem.CategoryName {
+		err := swapCategories(targetItem, reqItem.CategoryName, r.Context(), srv)
+		if err != nil {
+			log.Debug().Err(err).Msg("InvUpdate: failed to swap categories")
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+	}
+	if targetItem.Name != reqItem.Name {
+		np, err := UpdateStripeItem(targetItem, reqItem.Name)
+		if err != nil {
+			log.Debug().Err(err).Msg("InvUpdate: failed to update stripe item")
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		reqItem.StripeProductID = np.ID
+		reqItem.StripePriceID = np.DefaultPrice.ID
+	}
+	if targetItem.Price != reqItem.Price {
+		p, err := UpdateStripePrice(targetItem, reqItem.Price)
+		if err != nil {
+			log.Debug().Err(err).Msg("InvUpdate: failed to update stripe price")
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		reqItem.StripePriceID = p.ID
 	}
 
 	originalItem := ent.Item{
@@ -386,7 +427,12 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	weaviateID := targetItem.WeaviateID
-
+	err = DetangleItem(srv.DBClient, targetItem)
+	if err != nil {
+		log.Debug().Err(err).Msg("InvDelete: server failed to detangle item")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 	err = srv.DBClient.
 		Item.DeleteOneID(itemId).
 		Where(item.StoreID(store_id)).
@@ -414,4 +460,22 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
+}
+
+func DetangleItem(Client *ent.Client, item *ent.Item) error {
+	// Get the item's category
+	cat, err := Client.Category.Query().Where(category.Name(item.CategoryName)).Only(context.Background())
+	if err != nil {
+		log.Debug().Err(err).Msg("DetangleItem: failed to query category")
+		return err
+	}
+
+	// Remove the item from the category
+	_, err = Client.Category.UpdateOne(cat).RemoveItems(item).Save(context.Background())
+	if err != nil {
+		log.Debug().Err(err).Msg("DetangleItem: failed to remove item from category")
+		return err
+	}
+
+	return nil
 }
