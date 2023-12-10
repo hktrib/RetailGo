@@ -7,6 +7,7 @@ class Recommender(object):
     def __init__(self, model: Model):
         # Load the model
         self.model = model
+        self.dimension = self.model.dimension
 
     def embed_batch(self, items: List[Item], batch_size = 64):
         batch_item_vectors = []
