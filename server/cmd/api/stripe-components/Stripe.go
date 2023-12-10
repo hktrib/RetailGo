@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/hktrib/RetailGo/internal/ent"
-	"github.com/hktrib/RetailGo/internal/ent/store"
-	"github.com/rs/zerolog/log"
 	"github.com/stripe/stripe-go/v76"
 	"github.com/stripe/stripe-go/v76/account"
 	"github.com/stripe/stripe-go/v76/accountlink"
@@ -41,25 +39,6 @@ func CreateConnectedAccount() (*stripe.Account, error) {
 	return result, nil
 }
 
-func startOnboarding(accountId string) (*stripe.AccountLink, error) {
-
-	// Set your secret key. Remember to switch to your live secret key in production.
-	// See your keys here: https://dashboard.stripe.com/apikeys
-
-	params := &stripe.AccountLinkParams{
-		Account:    stripe.String("{{CONNECTED_ACCOUNT_ID}}"),
-		RefreshURL: stripe.String("https://example.com/reauth"),
-		ReturnURL:  stripe.String("https://example.com/return"),
-		Type:       stripe.String("account_onboarding"),
-		Collect:    stripe.String("eventually_due"),
-	}
-	result, err := accountlink.New(params)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
 // CreateStripeItem creates a new product in Stripe
 func CreateStripeItem(item *ent.Item) (*stripe.Product, error) {
 
@@ -70,6 +49,7 @@ func CreateStripeItem(item *ent.Item) (*stripe.Product, error) {
 			UnitAmount: stripe.Int64(int64(item.Price * 100)),
 		},
 	}
+	productParams.StripeAccount = stripe.String(item.Edges.Store.StripeAccountID)
 	product, err := product.New(productParams)
 
 	if err != nil {
@@ -100,6 +80,8 @@ func UpdateStripePrice(item *ent.Item, newPrice float64) (*stripe.Price, error) 
 	if err != nil {
 		return nil, err
 	}
+	priceParams.StripeAccount = stripe.String(item.Edges.Store.StripeAccountID)
+
 	productParams := &stripe.ProductParams{DefaultPrice: stripe.String(priceId.ID)}
 
 	_, err = product.Update(item.StripeProductID, productParams)
@@ -125,10 +107,14 @@ func CreateCheckoutSession(items []CartItem, w http.ResponseWriter, r *http.Requ
 		PaymentMethodTypes: stripe.StringSlice([]string{
 			"card",
 		}),
+		PaymentIntentData: &stripe.CheckoutSessionPaymentIntentDataParams{
+			ApplicationFeeAmount: stripe.Int64(500),
+		},
 		LineItems: lineItems,
 		Mode:      stripe.String(string(stripe.CheckoutSessionModePayment)),
 		ReturnURL: stripe.String("https://retail-go.vercel.app/store"),
 	}
+	params.StripeAccount = stripe.String(items[0].Item.Edges.Store.StripeAccountID)
 
 	s, err := session.New(params)
 
@@ -142,21 +128,21 @@ func CreateCheckoutSession(items []CartItem, w http.ResponseWriter, r *http.Requ
 	resp, _ := json.Marshal(res)
 	w.Write(resp)
 }
+func StartOnboarding(accountId string) (*stripe.AccountLink, error) {
 
-func HandleOnboarding(w http.ResponseWriter, r *http.Request) {
-	store_id := r.Context().Value("store_var").(int)
-	// Get store
-	store, err := ent.FromContext(r.Context()).Store.Query().Where(store.IDEQ(store_id)).Only(r.Context())
-	if err != nil {
-		log.Debug().Err(err).Msg("HandleOnboarding: unable to fetch store from database")
-		return
-	}
-	accLink, err := startOnboarding(store.StripeAccountID)
-	if err != nil {
-		log.Debug().Err(err).Msg("HandleOnboarding: unable to start onboarding")
-		return
-	}
-	w.WriteHeader(302)
-	fmt.Fprintf(w, "%s", accLink.URL)
+	// Set your secret key. Remember to switch to your live secret key in production.
+	// See your keys here: https://dashboard.stripe.com/apikeys
 
+	params := &stripe.AccountLinkParams{
+		Account:    stripe.String(accountId),
+		RefreshURL: stripe.String("https://example.com/reauth"),
+		ReturnURL:  stripe.String("https://example.com/return"),
+		Type:       stripe.String("account_onboarding"),
+		Collect:    stripe.String("eventually_due"),
+	}
+	result, err := accountlink.New(params)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }

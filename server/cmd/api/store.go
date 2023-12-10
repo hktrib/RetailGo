@@ -2,7 +2,10 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/go-chi/chi/v5"
+	. "github.com/hktrib/RetailGo/cmd/api/stripe-components"
+	"github.com/hktrib/RetailGo/internal/ent/store"
 	"github.com/rs/zerolog/log"
 	"net/http"
 	"strconv"
@@ -103,4 +106,20 @@ func (srv *Server) GetStoreUsers(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(resp)
+}
+func (srv *Server) HandleOnboarding(w http.ResponseWriter, r *http.Request) {
+	store_id := r.Context().Value("store_var").(int)
+	// Get store
+	store, err := ent.FromContext(r.Context()).Store.Query().Where(store.IDEQ(store_id)).Only(r.Context())
+	if err != nil {
+		log.Debug().Err(err).Msg("HandleOnboarding: unable to fetch store from database")
+		return
+	}
+	accLink, err := StartOnboarding(store.StripeAccountID)
+	if err != nil {
+		log.Debug().Err(err).Msg("HandleOnboarding: unable to start onboarding")
+		return
+	}
+	w.WriteHeader(302)
+	fmt.Fprintf(w, "%s", accLink.URL)
 }
