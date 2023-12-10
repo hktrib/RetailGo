@@ -29,7 +29,7 @@ export const updateUser = async ({
       body: JSON.stringify(user),
     });
     console.log(`response: ${response.status} + ${response.statusText}`);
-    if (response.status === 200) {
+    if (response.status === 200 || response.status === 201 || response.status === 202) {
       revalidatePath("/user/[user]", "page");
       return true;
     }
