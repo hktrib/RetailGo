@@ -101,7 +101,7 @@ func (srv *Server) UserDelete(w http.ResponseWriter, r *http.Request) {
 
 	// Querying for the user to store relation
 	newUTS, err := srv.DBClient.UserToStore.Query().
-		Where(usertostore.UserID(fetchedUser.ID)).
+		Where(usertostore.UserID(fetchedUser.ID), usertostore.StoreID(fetchedUser.StoreID)).
 		Only(ctx)
 	if err != nil {
 		log.Debug().Err(err).Msg("Unable to query entry in userToStore table")
