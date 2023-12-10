@@ -1,5 +1,11 @@
 import { auth } from "@clerk/nextjs";
 
+let serverUrl = "https://retailgo-production.up.railway.app"
+const env: string = process.env.NODE_ENV;
+if (env === "development") {
+  serverUrl = "http://localhost:8080"
+}
+
 export const getStoreItemCategories = async ({
   store_id,
 }: {
@@ -79,5 +85,43 @@ export const getPOSData = async ({ store_id }: { store_id: string }) => {
     console.error("error fetching POS data");
 
     return { success: false, data: { categories: [], items: [] } };
+  }
+};
+
+
+//Employee Items
+
+
+
+export const GetStaffByStore = async ({
+  store_id,
+}: {
+  store_id: string;
+}) => {
+  const fetchUrl = `${serverUrl}/store/${store_id}/staff`;
+  console.log(`fetching employees: ${fetchUrl}`);
+
+  const { sessionId } = auth();
+
+  try {
+    const res = await fetch(fetchUrl, {
+      cache: "force-cache",
+      headers: {
+        Authorization: `Bearer ${sessionId}`,
+      },
+      next: { tags: ["storeEmployees"] },
+    });
+    if (!res.ok) return { success: false, employees: [] };
+
+    const data = JSON.parse(await res.text()) ?? [];
+    console.log("fetched categories:", data);
+    console.log("fetched employees:", data);
+    return {
+      success: true,
+      employees: data,
+    };
+  } catch (err) {
+    console.error("error fetching store employees");
+    return { success: false, employees: [] };
   }
 };
