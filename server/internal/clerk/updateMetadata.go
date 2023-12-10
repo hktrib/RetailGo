@@ -93,7 +93,10 @@ func (cs ClerkStorage) addStoreToPublicMetadata(user *clerk.User, uts *ent.UserT
 		}
 
 		for _, data := range stores {
-			store := data.(storeData)
+			store, ok := data.(storeData)
+			if !ok {
+				return nil, fmt.Errorf("malformed data, %v", data)
+			}
 			if Equal(store, newStoreData) {
 				return metadata, nil
 			}

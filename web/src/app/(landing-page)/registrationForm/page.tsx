@@ -86,7 +86,7 @@ export default function RegistrationForm() {
           position: toast.POSITION.TOP_RIGHT,
           autoClose: 10000,
         });
-        router.push("/store?refresh='refresh'") 
+        router.push("/store") 
       } else {
         toast.error("Error creating store!", {
           position: toast.POSITION.TOP_RIGHT,
