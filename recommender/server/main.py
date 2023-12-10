@@ -51,6 +51,8 @@ def vectorize_batch(batch: ItemBatch, response: Response):
         if written_items == batch_size or batch.Items[written_items].store_id != item.store_id:
             database.write_store()
 
+    print("Out of", batch_size, "items,", len(embedding_failed), "failed to be embedded.")
+
     # Return the list of failed items' ids.
     return embedding_failed
 
