@@ -1,9 +1,6 @@
 'use server'
 
-
-import { revalidatePath, revalidateTag } from "next/cache";
 import {config} from "@/lib/hooks/config";
-import { useFetch } from "@/lib/utils"; 
 
 export const createStore = async ({
     postData
@@ -27,17 +24,7 @@ export const createStore = async ({
         });
         
         console.log(`response: ${response.status} + ${response.statusText}`);
-
-
-        console.log("Response:", response);
-        console.log("Response StatusCode: ", response.status);
-  
         if (response.status === 200 || response.status === 201) {
-          console.log("Redirecting")
-        //   redirect("/store")
-
-            revalidatePath("/store", "layout");
-            revalidatePath("/store", "page");
             return true
         }
   
