@@ -8,8 +8,8 @@ class DB(object):
     def __init__(self, discount_factor, dimension = 300):
         try:
             self.client = weaviate.Client(
-                    url = "https://retailgo-recengine-eb6uzggu.weaviate.network", #os.getenv("WEAVIATE_HOSTNAME"),
-                    auth_client_secret = weaviate.AuthApiKey(api_key="isYZjIQAxvMOhFkTUt0bI5xqETVAHGHqO6fU"), # os.getenv("WEAVIATE_SK"),
+                    url = os.getenv("WEAVIATE_HOSTNAME"),
+                    auth_client_secret = weaviate.AuthApiKey(api_key=os.getenv("WEAVIATE_SK")),
             )
         except Exception as error:
             print("Failed to connect to Vector Database at {WEAVIATE_HOSTNAME}, with Secret Key {WEAVIATE_SK}".format(os.getenv("WEAVIATE_HOSTNAME"), os.getenv("WEAVIATE_SK")), error)
