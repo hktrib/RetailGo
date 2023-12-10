@@ -104,6 +104,7 @@ func (s *Server) MountHandlers() {
 	s.Router.Route("/store", func(r chi.Router) {
 		r.Route("/{store_id}", func(r chi.Router) {
 			//	r.Use(s.ValidateStoreAccess) // add [Employee || Owner] validation
+
 			r.Route("/inventory", func(r chi.Router) {
 				r.Group(func(r chi.Router) {
 					//		r.Use(s.ValidateOwner)         // add owner validation validation

@@ -77,6 +77,23 @@ func CreateStripeItem(item *ent.Item) (*stripe.Product, error) {
 	return product, nil
 }
 
+func UpdateStripeItem(item *ent.Item, price float64, name string) (*stripe.Product, error) {
+
+	productParams := &stripe.ProductParams{
+		Name: stripe.String(name),
+		DefaultPriceData: &stripe.ProductDefaultPriceDataParams{
+			Currency:   stripe.String(string(stripe.CurrencyUSD)),
+			UnitAmount: stripe.Int64(int64(price * 100)),
+		},
+	}
+	product, err := product.Update(item.StripeProductID, productParams)
+
+	if err != nil {
+		return nil, err
+	}
+	return product, nil
+}
+
 func CreateCheckoutSession(items []CartItem, w http.ResponseWriter, r *http.Request) {
 	//TODO: ADD ENVIRONMENT VARIABLE FOR SERVER ADDRESS
 	var lineItems []*stripe.CheckoutSessionLineItemParams
