@@ -29,10 +29,21 @@ export default function StoreSelector({
     currentStore = store[0];
   }
 
-  const routeStore = (storeId: string) => {
-    if (!storeId) return;
+  const routeStore = (selectedValue: string) => {
+    if (!selectedValue) return;
 
-    router.push(`/store/${storeId}`);
+    if(selectedValue == "register") {
+      router.push('/web/src/app/(landing-page)/registrationForm');
+    }
+    else {
+      router.push(`/store/${selectedValue}`);
+    }
+  };
+
+  const plusIconStyle = {
+    display: 'inline-block',
+    marginRight: '8px',
+    content: '"+"', 
   };
 
   return (
@@ -67,6 +78,10 @@ export default function StoreSelector({
               {store.storename}
             </SelectItem>
           ))}
+          <SelectItem value="register">
+            <span style={plusIconStyle}></span>
+            Add Store
+          </SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>

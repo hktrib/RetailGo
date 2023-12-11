@@ -47,7 +47,7 @@ const businessTypes = [
   "Clothing",
   "Grocery",
   "Convenience",
-  "Departmnet",
+  "Department",
   "Restaurant",
   "Other",
 ];
