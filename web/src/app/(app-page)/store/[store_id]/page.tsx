@@ -38,7 +38,7 @@ async function ItemGrid({storeId}: {storeId: string}){
   return (
     recommendedItems.items.map(
     (item: any) => (
-    <div className="bg-gray-200 rounded-md col-span-2 row-span-2">
+    <div className="bg-gray-200 rounded-md col-span-2 row-span-2" key = {item.id}>
       <article className="bg-white rounded-md shadow-sm w-52">
         <RemoteImage imageURL = {item.imageURL} key = {item.id}/>
         <div className="p-4">
