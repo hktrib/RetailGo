@@ -3,6 +3,9 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"strconv"
+
 	"github.com/go-chi/chi/v5"
 	. "github.com/hktrib/RetailGo/cmd/api/stripe-components"
 	clerkstorage "github.com/hktrib/RetailGo/internal/clerk"
@@ -11,8 +14,6 @@ import (
 	"github.com/hktrib/RetailGo/internal/ent/user"
 	"github.com/hktrib/RetailGo/internal/transactions"
 	"github.com/rs/zerolog/log"
-	"net/http"
-	"strconv"
 )
 
 /*
@@ -58,7 +59,7 @@ func (srv *Server) CreateStore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("Created!"))
+	w.Write([]byte(strconv.Itoa(nStore.ID)))
 }
 
 /*
