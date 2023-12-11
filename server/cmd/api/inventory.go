@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/hktrib/RetailGo/internal/ent/categoryitem"
 	"github.com/hktrib/RetailGo/internal/ent/store"
 	"io"
 	"net/http"
@@ -307,8 +308,14 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	targetStore, err := srv.DBClient.Store.Query().Where(store.IDEQ(targetItem.StoreID)).Only(r.Context())
+	if err != nil {
+		fmt.Println("Unable to find store:", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 	if targetItem.Name != reqItem.Name {
-		np, err := UpdateStripeItem(targetItem, reqItem.Name)
+		np, err := UpdateStripeItem(targetItem, reqItem.Name, targetStore.StripeAccountID)
 		if err != nil {
 			log.Debug().Err(err).Msg("InvUpdate: failed to update stripe item")
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -319,12 +326,7 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	if targetItem.Price != reqItem.Price {
 		// get the stores stripe id
-		targetStore, err := srv.DBClient.Store.Query().Where(store.IDEQ(targetItem.StoreID)).Only(r.Context())
-		if err != nil {
-			fmt.Println("Unable to find store:", err)
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
-		}
+
 		p, err := UpdateStripePrice(targetItem, reqItem.Price, targetStore.StripeAccountID)
 		if err != nil {
 			log.Debug().Err(err).Msg("InvUpdate: failed to update stripe price")
@@ -478,14 +480,9 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 
 func DetangleItem(Client *ent.Client, item *ent.Item) error {
 	// Get the item's category
-	cat, err := Client.Category.Query().Where(category.Name(item.CategoryName)).Only(context.Background())
-	if err != nil {
-		log.Debug().Err(err).Msg("DetangleItem: failed to query category")
-		return err
-	}
 
 	// Remove the item from the category
-	_, err = Client.Category.UpdateOne(cat).RemoveItems(item).Save(context.Background())
+	_, err := Client.CategoryItem.Delete().Where(categoryitem.ItemID(item.ID)).Exec(context.Background())
 	if err != nil {
 		log.Debug().Err(err).Msg("DetangleItem: failed to remove item from category")
 		return err
