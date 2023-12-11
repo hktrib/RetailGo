@@ -15,7 +15,7 @@ export const createStore = async ({
 }) => {
     try {
         console.log("POST Data: ", JSON.stringify(postData));
-        const response = await fetch(config.serverURL + "create/store", {
+        const response = await fetch(`${config.serverURL}/create/store`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

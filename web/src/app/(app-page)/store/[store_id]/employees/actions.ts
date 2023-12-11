@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-
+import { config } from "@/lib/hooks/config";
 export const updateUser = async ({
   user,
   user_id,
@@ -13,13 +13,11 @@ export const updateUser = async ({
   };
   user_id: string;
 }) => {
-  const env: string = process.env.NODE_ENV;
 
-  let serverUrl = `https://retailgo-production.up.railway.app/user/${user_id}/`;
-  if (env === "development") {
-    serverUrl = `http://localhost:8080/user/${user_id}/`;
-  }
+  let serverUrl = `${config.serverURL}/user/${user_id}/`;
+
   console.log(`attempting to update user ${user_id}`);
+
   try {
     let response = await fetch(serverUrl, {
       method: "PUT",
