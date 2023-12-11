@@ -4,9 +4,12 @@ import { auth } from "@clerk/nextjs";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { config } from './config';
 import { PostJoinStoreModel } from "@/models/user";
+import router from "next/router";
+import { toast } from "react-toastify";
 
 
-const storeURL = config.serverURL + "user/";
+const storeURL = config.serverURL + "/user/";
+const sleep = (delay: number | undefined) => new Promise((resolve) => setTimeout(resolve, delay))
 
 
 export function HasStore() {
@@ -37,7 +40,12 @@ export function PostJoinStore(storeId: string) {
       console.log("Error while sending invite to", email, ":", err);
     },
     onSuccess: (email) => {
+      toast.success("Successfully! joined store", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 10000,
+      });
       console.log("Invite sent successfully to", email);
+      router.push("/store");
       // You can add any additional logic you need on successful invite here
     },
   });
