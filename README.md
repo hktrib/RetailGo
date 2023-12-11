@@ -18,7 +18,7 @@ To lessen the install burden, we'll work with postgres on a docker container via
 
 
 5. Makefile commands are pretty self-explanatory. 
-    - ```foo@bar:RetailGo/server$ make postgres``` spins up a docker container
+    - ```foo@bar:RetailGo/server$ make postgres``` spins up a docker containers
     - ```foo@bar:RetailGo/server$ make createdb``` creates a database -> retail_go
     - ```foo@bar:RetailGo/server$ make drodb``` deletes a database -> retail_go
     - ```console foo@bar:RetailGo/server$ make sqlc_delete``` deletes the **db/sqlc** folder.
