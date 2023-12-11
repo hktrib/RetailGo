@@ -1,6 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getItemRecommendations } from "../queries";
-import { isValid } from "zod";
 
 async function RemoteImage({imageURL}: {imageURL: string}){
   
@@ -12,18 +11,18 @@ async function RemoteImage({imageURL}: {imageURL: string}){
     catch(e){ 
       return false; 
     }
-}
+  }
 
   if (isValidUrl(imageURL)){
     return (<div className="w-full h-40 bg-gray-100">
-        <img src = {imageURL}/>
+        <img src = {imageURL} />
       </div>)
   }
-  else{
-    return (<div className="w-full h-40 bg-gray-100">
-    No Image Available.
-  </div>) 
-  }
+  return (
+    <div className="w-full h-40 bg-gray-100 text-center">
+      No Image Available.
+    </div>
+  ) 
 }
 
 async function ItemGrid({storeId}: {storeId: string}){
@@ -31,16 +30,17 @@ async function ItemGrid({storeId}: {storeId: string}){
   const recommendedItems = await getItemRecommendations({store_id: storeId})
 
   if (!recommendedItems.success){
-    return (<div className = "text-center">
+    return (<div>
       Nothing to recommend for now!
     </div>)
   }
 
   return (
     recommendedItems.items.map(
-    (item: any) => (<div className="bg-gray-200 rounded-md col-span-2 row-span-2">
+    (item: any) => (
+    <div className="bg-gray-200 rounded-md col-span-2 row-span-2">
       <article className="bg-white rounded-md shadow-sm w-52">
-        <RemoteImage imageURL = {item.imageURL}/>
+        <RemoteImage imageURL = {item.imageURL} key = {item.id}/>
         <div className="p-4">
           <span className="font-medium">{item.name} ({item.categoryName})</span>
         </div>
