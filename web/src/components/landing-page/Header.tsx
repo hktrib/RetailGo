@@ -44,7 +44,7 @@ export default function Header() {
               </Link>
               <Link
                 href="/sign-up"
-                className="rounded-md bg-amber-500 px-3 py-1.5 text-sm font-medium text-white"
+                className="rounded-md bg-sky-500 px-3 py-1.5 text-sm font-medium text-white"
               >
                 Get started <span aria-hidden="true">&rarr;</span>
               </Link>

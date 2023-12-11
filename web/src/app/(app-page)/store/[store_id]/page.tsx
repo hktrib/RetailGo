@@ -23,7 +23,7 @@ function DashboardPage({ params }: { params: { store_id: string } }) {
             <TabsTrigger value="activity">Activity</TabsTrigger>
           </TabsList>
           <TabsContent value="overview" className="mt-6">
-            <h2 className="text-lg font-medium dark:text-zinc-300">
+            <h2 className="text-lg font-medium dark:text-zinc-200">
               Recommended Items
             </h2>
             <ItemRecommendations storeId={String(params.store_id)} />

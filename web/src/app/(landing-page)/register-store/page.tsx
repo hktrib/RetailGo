@@ -90,7 +90,7 @@ export default function RegistrationForm() {
   };
 
   return (
-    <div className="relative isolate flex flex-1 flex-col items-center justify-center px-6 pt-14 lg:px-8">
+    <div className="relative isolate flex flex-1 flex-col items-center justify-center overflow-hidden px-6 pt-14 lg:px-8">
       <div className="absolute left-1/2 top-4 -z-10 h-[1026px] w-[1026px] -translate-x-1/2 stroke-gray-300/70 [mask-image:linear-gradient(to_bottom,white_20%,transparent_75%)] sm:top-16 lg:-top-16 xl:top-8 xl:ml-0">
         <svg
           viewBox="0 0 1026 1026"
@@ -154,14 +154,14 @@ export default function RegistrationForm() {
         </svg>
       </div>
 
-      <div className="mx-auto w-full max-w-xl rounded-3xl bg-gray-50 px-12 py-16 shadow md:px-16">
+      <div className="mx-auto w-full max-w-xl rounded-3xl bg-gray-50 px-6 py-16 shadow md:px-16">
         <div className="flex flex-col items-center">
           <Store className="h-8 w-8" />
 
           <div className="mt-4 text-center">
             <h1 className="text-2xl font-semibold">Register your business</h1>
-            <p className="mt-0.5 leading-6 text-gray-700">
-              Stay ahead of the curve
+            <p className="text-sm leading-6 text-gray-600">
+              Enter your business details below
             </p>
           </div>
         </div>
@@ -223,6 +223,7 @@ export default function RegistrationForm() {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="businessType"
