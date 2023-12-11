@@ -20,11 +20,11 @@ const InvitePage = () => {
   const onSubmit = () => {
     if (!user) return;
     joinMutation.mutate(user.id);
-    
-    console.log("data"+ joinMutation.data);
-    console.log("Joinmutation" + joinMutation.isSuccess);
-    router.push("/store");
+    user.reload();
+
   };
+
+
 
   return (
     <div className="relative isolate px-6 pt-14 lg:px-8 flex-1 flex flex-col justify-center items-center">
