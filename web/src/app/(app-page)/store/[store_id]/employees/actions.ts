@@ -2,14 +2,7 @@
 
 import { useAuth } from "@clerk/nextjs";
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
-
-let serverUrl = "https://retailgo-production.up.railway.app"
-const env: string = process.env.NODE_ENV;
-if (env === "development") {
-  serverUrl = "http://localhost:8080"
-}
-
+import { config } from "@/lib/hooks/config";
 export const updateUser = async ({
   user,
   user_id,
@@ -21,13 +14,11 @@ export const updateUser = async ({
   };
   user_id: string;
 }) => {
-  const env: string = process.env.NODE_ENV;
 
-  let serverUrl = `https://retailgo-production.up.railway.app/user/${user_id}/`;
-  if (env === "development") {
-    serverUrl = `http://localhost:8080/user/${user_id}/`;
-  }
+  let serverUrl = `${config.serverURL}/user/${user_id}/`;
+
   console.log(`attempting to update user ${user_id}`);
+
   try {
     let response = await fetch(serverUrl, {
       method: "PUT",
@@ -37,7 +28,7 @@ export const updateUser = async ({
       body: JSON.stringify(user),
     });
     console.log(`response: ${response.status} + ${response.statusText}`);
-    if (response.status === 200) {
+    if (response.status === 200 || response.status === 201 || response.status === 202) {
       revalidatePath("/user/[user]", "page");
       return true;
     }

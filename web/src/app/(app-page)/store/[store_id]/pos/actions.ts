@@ -1,5 +1,7 @@
 "use server";
 
+import { config } from "@/lib/hooks/config";
+
 export async function createCheckout({
   lineItems,
   store_id,
@@ -7,7 +9,7 @@ export async function createCheckout({
   lineItems: { id: number; quantity: number }[];
   store_id: string;
 }) {
-  const serverUrl = `https://retailgo-production.up.railway.app/store/${store_id}/pos/checkout`;
+  const serverUrl = `${config.serverURL}/store/${store_id}/pos/checkout`;
 
   console.log(lineItems);
   console.log(`attempting to create checkout for store: ${store_id}`);

@@ -7,18 +7,23 @@ dotenv.config({ path: "../../../.env.local" });
 // http://localhost:8080/
 // https://retailgo-production.up.railway.app/
 
-const env: string = process.env.NODE_ENV;
+let env: string = process.env.NODE_ENV;
 
 let config: ClassDictionary;
 
+// env = "production";
+// console.log(env)
+
 if (env === "development") {
   config = {
-    serverURL: "http://localhost:8080/",
+    serverURL: "http://localhost:8080",
   };
 } else if (env === "production") {
   config = {
-    serverURL: "https://retailgo-production.up.railway.app/",
+    serverURL: "https://retailgo-production.up.railway.app",
   };
 }
+
+// console.log(serverURL);
 
 export { config };

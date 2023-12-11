@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 import { Navigation } from "./sidebar";
+import StoreSelector from "./store-selector";
 import {
   Sheet,
   SheetContent,
@@ -12,8 +13,8 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
+
 import type { StoreMetadata } from "@/app/(app-page)/store/layout";
-import StoreSelector from "./store-selector";
 
 export default function MobileNav({ stores }: { stores: StoreMetadata[] }) {
   return (

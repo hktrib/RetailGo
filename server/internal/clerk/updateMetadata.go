@@ -14,19 +14,16 @@ import (
 	"github.com/hktrib/RetailGo/internal/ent"
 )
 
-
-
 type ClerkUserMetadata struct {
 	// Empty map to allow any type of data for public metadata
 	PublicMetadata map[string]interface{} `json:"public_metadata"`
-	
+
 	// Empty map to allow any type of data for private metadata
 	PrivateMetadata map[string]interface{} `json:"private_metadata"`
-	
+
 	// Empty map to allow any type of data for unsafe metadata
 	UnsafeMetadata map[string]interface{} `json:"unsafe_metadata"`
 }
-
 
 func (cs ClerkStorage) NewClerkUserMetadata() (*ClerkUserMetadata, error) {
 	cum := &ClerkUserMetadata{}
@@ -37,10 +34,10 @@ func (cs ClerkStorage) NewClerkUserMetadata() (*ClerkUserMetadata, error) {
 		if ok {
 			cum.PublicMetadata = v
 		} else {
-			cum.PublicMetadata = make(map[string]interface{})	
+			cum.PublicMetadata = make(map[string]interface{})
 		}
 
-	default: 
+	default:
 		return nil, errors.New("something went wrong terribly wrong creating PublicMetadata")
 	}
 
@@ -54,29 +51,28 @@ func (cs ClerkStorage) NewClerkUserMetadata() (*ClerkUserMetadata, error) {
 			cum.PublicMetadata = make(map[string]interface{})
 		}
 
-	default: 
+	default:
 		return nil, errors.New("something went wrong terribly wrong creating PrivateMetadata")
 	}
 
 	switch cs.user.UnsafeMetadata.(type) {
 	case map[string]interface{}:
 		log.Debug().Msg("PublicMetadata Case: map[interface{}]interface{}")
-		v, ok:= cs.user.PublicMetadata.(map[string]interface{})
+		v, ok := cs.user.PublicMetadata.(map[string]interface{})
 		if ok {
 			cum.PublicMetadata = v
 		} else {
 			cum.PublicMetadata = make(map[string]interface{})
 		}
 
-	default: 
+	default:
 		return nil, errors.New("something went wrong terribly wrong creating UnsafeMetadata")
 	}
 	return cum, nil
 }
 
-
 func (cs ClerkStorage) addStoreToPublicMetadata(user *clerk.User, uts *ent.UserToStore) (*ClerkUserMetadata, error) {
-	
+
 	metadata, err := cs.NewClerkUserMetadata()
 	if err != nil {
 		return nil, err
@@ -85,21 +81,30 @@ func (cs ClerkStorage) addStoreToPublicMetadata(user *clerk.User, uts *ent.UserT
 	stores, ok := metadata.PublicMetadata["stores"].([]interface{})
 	if !ok {
 		metadata.PublicMetadata["stores"] = []storeData{{
-			StoreID : uts.StoreID, 
-			Name : uts.StoreName, 
-			PermissionLevel : uts.PermissionLevel, 
+			StoreID:         uts.StoreID,
+			Name:            uts.StoreName,
+			PermissionLevel: uts.PermissionLevel,
 		}}
 	} else {
-		metadata.PublicMetadata["stores"] = append(stores, storeData{
-			StoreID : uts.StoreID,
-			Name: uts.StoreName,
-			PermissionLevel : uts.PermissionLevel,
-		})
+		newStoreData := storeData{
+			StoreID:         uts.StoreID,
+			Name:            uts.StoreName,
+			PermissionLevel: uts.PermissionLevel,
+		}
+
+		for _, data := range stores {
+			store, ok := data.(storeData)
+			if !ok {
+				return nil, fmt.Errorf("malformed data, %v", data)
+			}
+			if Equal(store, newStoreData) {
+				return metadata, nil
+			}
+		}
+		metadata.PublicMetadata["stores"] = append(stores, newStoreData)
 	}
 	return metadata, nil
 }
-
-
 
 func (cs ClerkStorage) removeStoreFromPublicMetadata(user *clerk.User, uts *ent.UserToStore) (*ClerkUserMetadata, error) {
 
@@ -108,19 +113,19 @@ func (cs ClerkStorage) removeStoreFromPublicMetadata(user *clerk.User, uts *ent.
 		return nil, err
 	}
 
-	stores, ok := metadata.PublicMetadata["stores"].([]storeData) 
+	stores, ok := metadata.PublicMetadata["stores"].([]storeData)
 	if !ok {
 		return nil, fmt.Errorf("no Clerk Metadata! Something went wrong")
 	} else {
 		storeDataToDelete := storeData{
-			StoreID: uts.StoreID,
-			Name: uts.StoreName,
-			PermissionLevel : uts.PermissionLevel, 
+			StoreID:         uts.StoreID,
+			Name:            uts.StoreName,
+			PermissionLevel: uts.PermissionLevel,
 		}
 
 		storeIndexToDelete := -1
 		for index, store := range stores {
-			if store == storeDataToDelete {
+			if Equal(store, storeDataToDelete) {
 				storeIndexToDelete = index
 				break
 			}
@@ -129,10 +134,10 @@ func (cs ClerkStorage) removeStoreFromPublicMetadata(user *clerk.User, uts *ent.
 		if storeIndexToDelete != -1 {
 			if storeIndexToDelete == 0 {
 				metadata.PublicMetadata["stores"] = stores[:1]
-			} else if storeIndexToDelete == len(stores) - 1 {
+			} else if storeIndexToDelete == len(stores)-1 {
 				metadata.PublicMetadata["stores"] = stores[len(stores)-1:]
 			} else {
-				metadata.PublicMetadata["stores"] = append(stores[:storeIndexToDelete], stores[storeIndexToDelete + 1:]...)
+				metadata.PublicMetadata["stores"] = append(stores[:storeIndexToDelete], stores[storeIndexToDelete+1:]...)
 			}
 		} else {
 			log.Debug().Msg(fmt.Sprintf("Stores: %v | UserToStore", stores))
@@ -149,13 +154,12 @@ func (cs ClerkStorage) updateMetadata(c ClerkUserMetadata) (*clerk.User, error) 
 	b, _ := json.Marshal(c)
 	req, _ := http.NewRequest("PATCH", url, bytes.NewBuffer(b))
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+ cs.Config.CLERK_SK)
-
+	req.Header.Set("Authorization", "Bearer "+cs.Config.CLERK_SK)
 
 	var user clerk.User
 
 	client := &http.Client{}
-	
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, errors.New("failed to send request")
