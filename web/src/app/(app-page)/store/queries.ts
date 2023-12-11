@@ -123,7 +123,7 @@ export const getPOSData = async ({ store_id }: { store_id: string }) => {
 
 // Employee Items
 export const GetStaffByStore = async ({ store_id }: { store_id: string }) => {
-  const fetchUrl = `https://retailgo-production.up.railway.app/store/${store_id}/staff`;
+  const fetchUrl = `${config.serverURL}/store/${store_id}/staff`;
   console.log(`fetching employees: ${fetchUrl}`);
 
   const { sessionId } = auth();
