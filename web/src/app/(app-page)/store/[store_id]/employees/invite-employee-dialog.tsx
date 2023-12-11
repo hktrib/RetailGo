@@ -24,6 +24,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function InviteEmployee() {
   const [isDialogOpen, setDialogOpen] = useState(false); // State to control the dialog
@@ -52,20 +53,20 @@ export default function InviteEmployee() {
     <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         <button
-          className="rounded-md bg-blue-500 px-4 py-1.5 text-sm font-medium text-white dark:bg-gradient-to-r dark:from-blue-600 dark:to-indigo-600"
+          className="rounded-md bg-sky-500 px-4 py-1.5 text-sm font-medium text-white dark:bg-gradient-to-r dark:from-blue-600 dark:to-indigo-600"
           onClick={() => setDialogOpen(true)}
         >
           Invite
         </button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="dark:border-zinc-900 dark:bg-zinc-950">
         <DialogHeader>
           <DialogTitle>Invite employee</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={onSubmit} {...form}>
+          <form onSubmit={onSubmit} {...form} className="space-y-2">
             <FormField
               control={form.control}
               name="name"
@@ -73,7 +74,11 @@ export default function InviteEmployee() {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Bob Jones" />
+                    <Input
+                      {...field}
+                      placeholder="Bob Jones"
+                      className="dark:border-zinc-800 dark:focus:ring-zinc-700"
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -86,19 +91,18 @@ export default function InviteEmployee() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="person@google.com" />
+                    <Input
+                      {...field}
+                      placeholder="person@google.com"
+                      className="dark:border-zinc-800 dark:focus:ring-zinc-700"
+                    />
                   </FormControl>
                 </FormItem>
               )}
             />
 
-            <DialogFooter>
-              <button
-                type="submit"
-                className="mt-5 rounded-md bg-blue-500 px-3 py-1.5 text-sm font-medium text-white"
-              >
-                Invite
-              </button>
+            <DialogFooter className="pt-2">
+              <Button type="submit">Invite</Button>
             </DialogFooter>
           </form>
         </Form>

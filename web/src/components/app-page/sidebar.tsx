@@ -30,8 +30,8 @@ export default function Sidebar({ stores }: { stores: StoreMetadata[] }) {
 
   return (
     <div className="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-64 xl:flex-col">
-      <div className="flex grow flex-col border-r px-6 dark:border-zinc-700">
-        <div className="flex items-center justify-between py-5">
+      <div className="flex grow flex-col px-6 dark:border-zinc-700">
+        <div className="flex items-center justify-between pb-3.5 pt-7">
           <Link href="/store" className="text-lg font-semibold">
             RetailGo
           </Link>
@@ -85,7 +85,7 @@ export const Navigation = ({
                           !pathname.endsWith("/employees") &&
                           !pathname.endsWith("/inventory") &&
                           !pathname.endsWith("/pos"))
-                        ? "bg-gray-100 font-medium text-gray-900 shadow-sm transition duration-150 ease-in-out dark:bg-zinc-700 dark:text-white"
+                        ? "bg-gray-100 font-medium text-gray-900 shadow-inner shadow-zinc-100 dark:bg-zinc-700 dark:text-white dark:shadow-zinc-600"
                         : "text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 dark:text-zinc-300 dark:hover:bg-zinc-700",
                     )}
                   >

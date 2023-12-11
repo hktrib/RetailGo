@@ -93,7 +93,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center justify-between py-4">
+      <div className="flex items-center justify-between pb-4">
         <Input
           placeholder="Search employees..."
           value={

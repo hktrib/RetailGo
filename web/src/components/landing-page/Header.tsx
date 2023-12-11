@@ -13,7 +13,7 @@ export default function Header() {
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5">
             <span className="sr-only">RetailGo</span>
-            <span className="font-bold tracking-wide">RetailGo</span>
+            <span className="text-lg font-bold tracking-wide">RetailGo</span>
           </Link>
         </div>
 
@@ -22,16 +22,16 @@ export default function Header() {
             <>
               <Link
                 href="/store"
-                className="rounded-md bg-amber-500 px-3 py-1.5 text-sm font-medium text-white"
+                className="rounded-md bg-sky-500 px-3 py-1.5 text-sm font-medium text-white"
               >
                 My stores
               </Link>
-              <Link
+              {/* <Link
                 href="/register-store"
                 className="rounded-md bg-amber-600 px-3 py-1.5 text-sm font-medium text-white"
               >
                 Add Store
-              </Link>
+              </Link> */}
               <UserButton afterSignOutUrl="/" />
             </>
           ) : (

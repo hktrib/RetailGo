@@ -1,6 +1,8 @@
+import { GetStaffByStore } from "../../queries";
+
 import EmployeeTable from "./employee-table";
 import InviteEmployeeDialog from "./invite-employee-dialog";
-import { GetStaffByStore } from "../../queries";
+import { Users2 } from "lucide-react";
 
 export default async function Employees({
   params,
@@ -14,20 +16,19 @@ export default async function Employees({
   }
 
   return (
-    <main className="h-full flex-grow bg-gray-50 dark:bg-zinc-900">
-      <div className="mx-auto max-w-6xl px-6 py-6 md:px-8 lg:ml-0">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold tracking-wide dark:text-white">
-            Employees
-          </h1>
-
-          <>
-            <InviteEmployeeDialog />
-          </>
+    <main className="h-full flex-grow">
+      <div className="flex h-16 items-center justify-between px-4 py-5 md:px-6 xl:px-8">
+        <div className="mt-1 flex items-center gap-x-3">
+          <Users2 className="h-5 w-5 text-gray-800 dark:text-zinc-200" />
+          <h1 className="text-xl font-medium tracking-wide">Employees</h1>
         </div>
 
-        <hr className="my-4 dark:border-zinc-800" />
+        <InviteEmployeeDialog />
+      </div>
 
+      <hr className="mb-4 border-gray-100 dark:border-zinc-800" />
+
+      <div className="px-4 md:px-6 xl:px-8">
         <div className="mt-6">
           <EmployeeTable employees={employees} />
         </div>
