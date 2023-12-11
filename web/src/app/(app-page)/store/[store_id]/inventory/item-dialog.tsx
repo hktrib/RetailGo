@@ -102,13 +102,13 @@ export default function ItemDialog({
             <PencilIcon className="h-5 w-5 p-0 text-amber-500" />
           </button>
         ) : (
-          <button className="rounded-md bg-amber-500 px-4 py-1.5 text-sm font-medium text-white shadow-sm dark:bg-gradient-to-r dark:from-blue-600 dark:to-indigo-600">
+          <button className="rounded-md bg-sky-500 px-4 py-1.5 text-sm font-medium text-white shadow-sm dark:bg-gradient-to-r dark:from-blue-600 dark:to-indigo-600">
             Add item
           </button>
         )}
       </DialogTrigger>
 
-      <DialogContent className="dark:border-zinc-800">
+      <DialogContent className="dark:border-zinc-900 dark:bg-zinc-950">
         <DialogHeader>
           <DialogTitle>{mode === "edit" ? "Edit" : "Add"} Item</DialogTitle>
         </DialogHeader>
@@ -190,7 +190,7 @@ export default function ItemDialog({
                       </FormControl>
                     </PopoverTrigger>
 
-                    <PopoverContent className="w-72 p-2 dark:border-zinc-800">
+                    <PopoverContent className="w-72 p-2 dark:border-zinc-800 dark:bg-zinc-900">
                       <Input
                         {...field}
                         placeholder="Enter a category"

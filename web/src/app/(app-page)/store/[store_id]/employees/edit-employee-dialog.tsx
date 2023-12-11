@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import router from "next/router";
 import { useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,6 +23,7 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PencilIcon } from "lucide-react";
 
@@ -36,7 +36,7 @@ const formSchema = z.object({
   email: z.string().regex(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/),
 });
 
-export default function EmployeeDialog({
+export default function EditEmployeeDialog({
   employeeData,
 }: {
   employeeData: EmployeeData;
@@ -83,13 +83,13 @@ export default function EmployeeDialog({
         </button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="dark:border-zinc-900 dark:bg-zinc-950">
         <DialogHeader>
           <DialogTitle>Edit Employee</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-1">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
             <FormField
               control={form.control}
               name="first_name"
@@ -97,7 +97,11 @@ export default function EmployeeDialog({
                 <FormItem>
                   <FormLabel>First Name</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input
+                      {...field}
+                      placeholder="First name"
+                      className="dark:border-zinc-800 dark:focus:ring-zinc-700"
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -110,7 +114,11 @@ export default function EmployeeDialog({
                 <FormItem>
                   <FormLabel>Last Name</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input
+                      {...field}
+                      placeholder="Last name"
+                      className="dark:border-zinc-800 dark:focus:ring-zinc-700"
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -123,14 +131,19 @@ export default function EmployeeDialog({
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input {...field} type="email" disabled={true} />
+                    <Input
+                      {...field}
+                      type="email"
+                      disabled={true}
+                      className="dark:border-zinc-800 dark:focus:ring-zinc-700"
+                    />
                   </FormControl>
                 </FormItem>
               )}
             />
 
-            <DialogFooter>
-              <button type="submit">Update</button>
+            <DialogFooter className="pt-2">
+              <Button type="submit">Update</Button>
             </DialogFooter>
           </form>
         </Form>

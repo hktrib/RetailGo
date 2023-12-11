@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 
-import POSCategories from "./categories";
-import POSProducts from "./products";
-import POSOrderSummary from "./order-summary";
+import POSCategories from "./pos-categories";
+import POSProducts from "./pos-products";
+import POSOrderSummary from "./pos-order-summary";
 import { Input } from "@/components/ui/input";
 
 const TAX_RATE = 1;
@@ -62,7 +62,7 @@ const POSController = ({
   };
 
   return (
-    <div className="mx-auto flex h-full w-full max-w-2xl flex-grow flex-col items-center px-8 py-5 lg:max-w-7xl lg:items-start">
+    <div className="mx-auto flex h-full w-full max-w-2xl flex-grow flex-col items-center px-4 md:px-6 lg:max-w-7xl lg:items-start xl:px-8">
       <div className="w-full lg:w-auto">
         <Input
           placeholder="Search items..."
@@ -92,7 +92,6 @@ const POSController = ({
             visibleProducts={visibleProducts}
             cart={cart}
             setCart={setCart}
-            fetchCategoryById={fetchCategoryById}
           />
         </div>
       </div>

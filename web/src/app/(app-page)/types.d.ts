@@ -33,3 +33,10 @@ type Employee = {
   hireDate: string;
   location: string;
 };
+
+type ItemRecommendation = {
+  imageURL: string;
+  price: number;
+  name: string;
+  categoryName: string;
+};

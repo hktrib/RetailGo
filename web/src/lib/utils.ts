@@ -13,7 +13,7 @@ export function useFetch() {
     url: string | Request,
     init?: RequestInit,
     headers?: any,
-    toJSON?: boolean
+    toJSON?: boolean,
   ) => {
     const fetchHeaders =
       headers !== undefined

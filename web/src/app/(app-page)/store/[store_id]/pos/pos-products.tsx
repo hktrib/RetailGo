@@ -6,7 +6,6 @@ const POSProducts = ({
   visibleProducts,
   cart,
   setCart,
-  fetchCategoryById,
 }: {
   products: Item[];
   visibleProducts: Item[];
@@ -14,10 +13,8 @@ const POSProducts = ({
   setCart: React.Dispatch<
     React.SetStateAction<(Item & { quantityAdded: number })[]>
   >;
-  fetchCategoryById: (categoryId: number) => string;
 }) => {
   const addItemToCart = (pid: number) => {
-    console.log(pid, cart);
     // update qty
     if (cart.some((product) => product.id === pid)) {
       const i = cart.findIndex((i) => i.id === pid);
@@ -115,6 +112,7 @@ const ProductCard = ({
 
       <div className="mt-3 flex items-center justify-end gap-x-2">
         <Button
+          type="button"
           variant="outline"
           className="h-8 px-2 dark:border-zinc-700 dark:hover:bg-zinc-700"
           onClick={() => removeItem(id)}
@@ -123,6 +121,7 @@ const ProductCard = ({
         </Button>
         <span>{qty}</span>
         <Button
+          type="button"
           variant="outline"
           className="h-8 px-2 dark:border-zinc-700 dark:hover:bg-zinc-700"
           onClick={() => addItem(id)}

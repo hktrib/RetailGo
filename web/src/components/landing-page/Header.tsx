@@ -13,27 +13,26 @@ export default function Header() {
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5">
             <span className="sr-only">RetailGo</span>
-            <span className="font-bold tracking-wide">RetailGo</span>
+            <span className="text-lg font-bold tracking-wide">RetailGo</span>
           </Link>
         </div>
 
-        <div className="hidden lg:flex lg:flex-1 lg:justify-end items-center space-x-4">
+        <div className="hidden items-center space-x-4 lg:flex lg:flex-1 lg:justify-end">
           {userId ? (
             <>
               <Link
                 href="/store"
-                className="bg-amber-500 text-white font-medium px-3 py-1.5 rounded-md text-sm"
+                className="rounded-md bg-sky-500 px-3 py-1.5 text-sm font-medium text-white"
               >
                 My stores
               </Link>
-              <Link
-                href="/registrationForm"
-                className="bg-amber-600 text-white font-medium px-3 py-1.5 rounded-md text-sm"
+              {/* <Link
+                href="/register-store"
+                className="rounded-md bg-amber-600 px-3 py-1.5 text-sm font-medium text-white"
               >
                 Add Store
-              </Link>
+              </Link> */}
               <UserButton afterSignOutUrl="/" />
-
             </>
           ) : (
             <>
@@ -45,7 +44,7 @@ export default function Header() {
               </Link>
               <Link
                 href="/sign-up"
-                className="bg-amber-500 text-white font-medium px-3 py-1.5 rounded-md text-sm"
+                className="rounded-md bg-amber-500 px-3 py-1.5 text-sm font-medium text-white"
               >
                 Get started <span aria-hidden="true">&rarr;</span>
               </Link>

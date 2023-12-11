@@ -1,21 +1,13 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useFetch } from "@/lib/utils";
-import { useUser } from "@clerk/nextjs";
-import { useRouter } from 'next/navigation'
-import {config} from "@/lib/hooks/config";
-import {createStore} from "./actions"
+import { createStore } from "./actions";
 
-// type Member = {
-//   firstName: string;
-//   lastName: string;
-//   email: string;
-//   role: string;
-// }
-
+import { toast } from "react-toastify";
 import {
   Form,
   FormControl,
@@ -33,8 +25,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Router } from "next/router";
-import { toast } from "react-toastify";
+import { Store } from "lucide-react";
 
 const formSchema = z.object({
   storeName: z.string().min(0),
@@ -55,46 +46,40 @@ const businessTypes = [
 
 export default function RegistrationForm() {
   const { user } = useUser();
-  const router = useRouter()
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
-  console.log(config.serverURL)
-
+  // not doing anything with `address2` yet
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    // not doing anything with `address2` yet
-
     const { storeName, phoneNumber, address1, address2, businessType } = values;
 
-    // data to be sent in POST request body
     const postData = {
-      store_name: storeName || "",
-      store_phone: phoneNumber || "",
-      store_address: address1 || "",
-      store_type: businessType || "",
+      store_name: storeName,
+      store_phone: phoneNumber,
+      store_address: address1,
+      store_type: businessType,
       owner_email: user?.emailAddresses[0]?.emailAddress || "",
     };
 
     try {
-      let response : Boolean = await createStore({postData});
+      let response: Boolean = await createStore({ postData });
 
       if (response === true) {
-        // router.refresh()
         toast.success("Store created successfully!", {
           position: toast.POSITION.TOP_RIGHT,
           autoClose: 10000,
         });
-        router.push("/store") 
+        router.push("/store");
       } else {
         toast.error("Error creating store!", {
           position: toast.POSITION.TOP_RIGHT,
           autoClose: 10000,
         });
-        throw "Failed to create store"
+        throw "Failed to create store";
       }
-
     } catch (error) {
       toast.error("Error creating store!", {
         position: toast.POSITION.TOP_RIGHT,
@@ -105,16 +90,86 @@ export default function RegistrationForm() {
   };
 
   return (
-    <div className="relative isolate px-6 pt-14 lg:px-8 flex-1 flex flex-col justify-center items-center">
-      <div className="mx-auto max-w-2xl w-full bg-gray-50 py-16 px-12 rounded-xl">
-        <h1 className="text-center font-bold text-3xl">
-          Register your business
-        </h1>
+    <div className="relative isolate flex flex-1 flex-col items-center justify-center px-6 pt-14 lg:px-8">
+      <div className="absolute left-1/2 top-4 -z-10 h-[1026px] w-[1026px] -translate-x-1/2 stroke-gray-300/70 [mask-image:linear-gradient(to_bottom,white_20%,transparent_75%)] sm:top-16 lg:-top-16 xl:top-8 xl:ml-0">
+        <svg
+          viewBox="0 0 1026 1026"
+          fill="none"
+          aria-hidden="true"
+          className="animate-spin-slow absolute inset-0 h-full w-full"
+        >
+          <path
+            d="M1025 513c0 282.77-229.23 512-512 512S1 795.77 1 513 230.23 1 513 1s512 229.23 512 512Z"
+            stroke="#D4D4D4"
+            stroke-opacity="0.7"
+          />
+          <path
+            d="M513 1025C230.23 1025 1 795.77 1 513"
+            stroke="url(#:S2:-gradient-1)"
+            stroke-linecap="round"
+          />
+          <defs>
+            <linearGradient
+              id=":S2:-gradient-1"
+              x1="1"
+              y1="513"
+              x2="1"
+              y2="1025"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop stop-color="#06b6d4"></stop>
+              <stop offset="1" stop-color="#06b6d4" stop-opacity="0"></stop>
+            </linearGradient>
+          </defs>
+        </svg>
+        <svg
+          viewBox="0 0 1026 1026"
+          fill="none"
+          aria-hidden="true"
+          className="animate-spin-reverse-slower absolute inset-0 h-full w-full"
+        >
+          <path
+            d="M913 513c0 220.914-179.086 400-400 400S113 733.914 113 513s179.086-400 400-400 400 179.086 400 400Z"
+            stroke="#D4D4D4"
+            stroke-opacity="0.7"
+          />
+          <path
+            d="M913 513c0 220.914-179.086 400-400 400"
+            stroke="url(#:S2:-gradient-2)"
+            stroke-linecap="round"
+          />
+          <defs>
+            <linearGradient
+              id=":S2:-gradient-2"
+              x1="913"
+              y1="513"
+              x2="913"
+              y2="913"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop stop-color="#06b6d4"></stop>
+              <stop offset="1" stop-color="#06b6d4" stop-opacity="0"></stop>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <div className="mx-auto w-full max-w-xl rounded-3xl bg-gray-50 px-12 py-16 shadow md:px-16">
+        <div className="flex flex-col items-center">
+          <Store className="h-8 w-8" />
+
+          <div className="mt-4 text-center">
+            <h1 className="text-2xl font-semibold">Register your business</h1>
+            <p className="mt-0.5 leading-6 text-gray-700">
+              Stay ahead of the curve
+            </p>
+          </div>
+        </div>
 
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-8 mt-12"
+            className="mt-4 space-y-6"
           >
             <FormField
               control={form.control}
@@ -125,9 +180,6 @@ export default function RegistrationForm() {
                   <FormControl>
                     <Input placeholder="Store name" {...field} />
                   </FormControl>
-                  {/* <FormDescription>
-                This is your public display name.
-              </FormDescription> */}
                   <FormMessage />
                 </FormItem>
               )}

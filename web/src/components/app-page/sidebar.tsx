@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
+
 import { cx } from "class-variance-authority";
 import StoreSelector from "./store-selector";
+import ThemeSwitcher from "./theme-switcher";
 import {
   HelpCircle,
   HomeIcon,
@@ -12,13 +14,9 @@ import {
   Settings,
   Users2,
   ShoppingBag,
-  Sun,
-  Moon,
 } from "lucide-react";
 
 import type { StoreMetadata } from "@/app/(app-page)/store/layout";
-import { useTheme } from "next-themes";
-import { Button } from "../ui/button";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon },
@@ -32,11 +30,12 @@ export default function Sidebar({ stores }: { stores: StoreMetadata[] }) {
 
   return (
     <div className="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-64 xl:flex-col">
-      <div className="flex grow flex-col border-r px-6 dark:border-zinc-700">
-        <div className="flex items-center justify-between py-5">
+      <div className="flex grow flex-col px-6 dark:border-zinc-700">
+        <div className="flex items-center justify-between pb-3.5 pt-7">
           <Link href="/store" className="text-lg font-semibold">
             RetailGo
           </Link>
+
           <div className="flex items-center">
             <UserButton afterSignOutUrl="/" appearance={{}} />
           </div>
@@ -58,7 +57,6 @@ export const Navigation = ({
   currentStoreId: string;
 }) => {
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
 
   const buildUrl = (href: string) => {
     if (!currentStoreId) return "/store";
@@ -87,7 +85,7 @@ export const Navigation = ({
                           !pathname.endsWith("/employees") &&
                           !pathname.endsWith("/inventory") &&
                           !pathname.endsWith("/pos"))
-                        ? "bg-gray-100 font-medium text-gray-900 shadow-sm transition duration-150 ease-in-out dark:bg-zinc-700 dark:text-white"
+                        ? "bg-gray-100 font-medium text-gray-900 shadow-inner shadow-zinc-100 dark:bg-zinc-700 dark:text-white dark:shadow-zinc-600"
                         : "text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 dark:text-zinc-300 dark:hover:bg-zinc-700",
                     )}
                   >
@@ -102,27 +100,7 @@ export const Navigation = ({
 
         <li className="mt-auto pb-14 xl:pb-4">
           <ul role="list" className="space-y-1.5">
-            <li className="px-1">
-              {theme === "light" ? (
-                <Button
-                  type="button"
-                  onClick={() => setTheme("dark")}
-                  variant="ghost"
-                  className="px-2"
-                >
-                  <Sun className="h-4 w-4" />
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  onClick={() => setTheme("light")}
-                  variant="ghost"
-                  className="px-2 hover:bg-zinc-900"
-                >
-                  <Moon className="h-4 w-4" />
-                </Button>
-              )}
-            </li>
+            <ThemeSwitcher />
 
             <li className="flex items-center gap-x-3 px-3 py-1.5 text-gray-700 dark:text-zinc-300">
               <Settings className="h-4 w-4" aria-hidden="true" />

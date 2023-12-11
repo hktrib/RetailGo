@@ -56,12 +56,12 @@ const CategoryCard = ({
     <article
       className={cx(
         "cursor-pointer rounded-lg bg-gray-100 p-4 shadow-sm dark:bg-zinc-800",
-        selected && "ring-2 ring-blue-200 dark:ring-blue-500",
+        selected && "ring-2 ring-sky-300 dark:ring-blue-500",
       )}
       onClick={() => setSelectedCategory(name)}
     >
       <div className="text-xl font-medium">{displayName}</div>
-      <div className="text-sm leading-6 text-gray-600">
+      <div className="text-sm leading-6 text-gray-600 dark:text-zinc-300">
         {items} <span>{items === 1 ? "item" : "items"}</span>
       </div>
     </article>

@@ -52,7 +52,7 @@ func TestInvCreate(tst *testing.T) {
 		Photo:    "uhsrgouhsrgouhsrgoushrg",
 		Quantity: 15,
 		Price:    120.9,
-		StoreID:  1391,
+		StoreID:  141,
 	}
 
 	invItemBytes, err := json.Marshal(invItem)
@@ -62,7 +62,7 @@ func TestInvCreate(tst *testing.T) {
 		tst.Error(err)
 	}
 
-	req, _ := http.NewRequest("POST", "/store/1391/inventory/create", bytes)
+	req, _ := http.NewRequest("POST", "/store/141/inventory/create", bytes)
 
 	rr := executeRequest(req, srv)
 	checkResponseCode(tst, http.StatusCreated, rr.Code)
@@ -137,6 +137,68 @@ func TestInvDelete(tst *testing.T) {
 		tst.Logf("Item Name: %v, Item ID: %v", checkInvItem.Name, checkInvItem.ID)
 		tst.Error("Error: Item not Deleted")
 	}
+}
+
+func TestGeneratingData(tst *testing.T) {
+	/*srv := setupServer()
+
+	// Create the store as you do currently
+	store := ent.Store{
+		StoreName:    "Gourmet Pantry Delights!",
+		OwnerEmail:   "retailgoco@gmail.com",
+		StoreAddress: "1234 Main St, Santa Cruz, CA 95060",
+		StorePhone:   "831-555-5555",
+		StoreType:    "Grocery",
+	}
+
+	storeBytes, err := json.Marshal(store)
+	if err != nil {
+		log.Fatal(err)
+		tst.Error(err)
+		return
+	}
+
+	req, _ := http.NewRequest("POST", "/create/store", bytes.NewBuffer(storeBytes))
+	rr := executeRequest(req, srv)
+	checkResponseCode(tst, http.StatusCreated, rr.Code)
+
+	// Extract store ID from the response
+	var createdStore ent.Store
+	if err := json.Unmarshal(rr.Body.Bytes(), &createdStore); err != nil {
+		tst.Error("Failed to unmarshal response to get store ID")
+		return
+	}
+	storeID := createdStore.ID // Assuming ID is a field in your Store struct
+
+	// Generate Dummy Inventory Data
+	numberOfItems := 4          // Total number of dummy items to create
+	categoryChangeInterval := 2 // Change category every 5 items
+	var currentCategory string
+
+	for i := 0; i < numberOfItems; i++ {
+		// Generate new category name every 5 items
+		if i%categoryChangeInterval == 0 {
+			currentCategory = gofakeit.BeerStyle() // Using BeerStyle as an example category
+		}
+
+		item := ent.Item{
+			Name:         gofakeit.BeerName(),
+			Photo:        "https://example.com/photo.jpg", // Placeholder
+			Quantity:     gofakeit.Number(1, 100),
+			Price:        gofakeit.Price(1.00, 1000.00),
+			CategoryName: currentCategory,
+			StoreID:      storeID,
+		}
+		itemBytes, err := json.Marshal(item)
+		if err != nil {
+			tst.Error("Failed to marshal item")
+			continue
+		}
+
+		itemReq, _ := http.NewRequest("POST", fmt.Sprintf("/store/%d/inventory/create", storeID), bytes.NewBuffer(itemBytes))
+		itemRr := executeRequest(itemReq, srv)
+		checkResponseCode(tst, http.StatusCreated, itemRr.Code)
+	}*/
 }
 
 // executeRequest, creates a new ResponseRecorder

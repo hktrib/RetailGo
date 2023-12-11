@@ -40,14 +40,26 @@ func (srv *Server) CreateStore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = transactions.StoreAndOwnerCreationTx(ctx, reqStore, reqUser, srv.DBClient, clerkStore)
+	err, nStore, nUser := transactions.StoreAndOwnerCreationTx(ctx, reqStore, reqUser, srv.DBClient, clerkStore)
+	// this is bad
+	err = SendOnboardingEmail(nStore, nUser)
+	if err != nil {
+		log.Debug().Err(err).Msg("CreateStore: unable to send onboarding email")
+		return
+	}
+
 	if err != nil {
 		log.Debug().Err(err).Msg("CreateStore: could not executed Store|Owner Transaction ")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+
+	if err != nil {
+		log.Debug().Err(err).Msg("CreateStore: unable to send onboarding email")
+		return
+	}
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("Created!"))
+	w.Write([]byte(strconv.Itoa(nStore.ID)))
 }
 
 /*
