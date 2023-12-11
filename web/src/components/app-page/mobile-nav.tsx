@@ -18,12 +18,12 @@ import type { StoreMetadata } from "@/app/(app-page)/store/layout";
 
 export default function MobileNav({ stores }: { stores: StoreMetadata[] }) {
   return (
-    <div className="xl:hidden block bg-white/75 border-b">
-      <div className="px-6 md:px-8 h-12 flex items-center justify-between">
+    <div className="block border-b bg-white/75 dark:border-zinc-700 dark:bg-zinc-800/90 xl:hidden">
+      <div className="mx-auto -ml-0 flex h-12 max-w-6xl items-center justify-between px-6 md:px-8">
         <div className="flex items-center gap-x-2">
           <SidebarNav stores={stores} />
 
-          <Link href="/store" className="font-semibold text-lg">
+          <Link href="/store" className="text-lg font-semibold">
             RetailGo
           </Link>
         </div>
@@ -47,7 +47,7 @@ const SidebarNav = ({ stores }: { stores: StoreMetadata[] }) => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" className="p-1 -ml-2 w-fit h-fit">
+        <Button variant="ghost" className="-ml-2 h-fit w-fit p-1">
           <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>

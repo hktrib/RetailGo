@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { DeleteUser } from "@/lib/hooks/user";
-
+import { deleteUser } from "@/app/(app-page)/store/[store_id]/employees/actions";
 import { toast } from "react-toastify";
 import {
   ColumnDef,
@@ -34,10 +33,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown";
 import EmployeeDialog from "../employee-dialog";
-import { PencilIcon, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 import type { EmployeeData } from "./columns";
-import { deleteUser } from "@/app/(app-page)/store/[store_id]/employees/actions";
 
 interface DataTableProps<TData extends EmployeeData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -101,12 +99,16 @@ export function DataTable<TData extends EmployeeData, TValue>({
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="max-w-sm dark:border-zinc-800 dark:focus:ring-zinc-700"
         />
+
         <div className="flex items-center space-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
+              <Button
+                variant="outline"
+                className="ml-auto dark:border-zinc-800 dark:hover:bg-zinc-800"
+              >
                 Customize
               </Button>
             </DropdownMenuTrigger>
@@ -133,11 +135,14 @@ export function DataTable<TData extends EmployeeData, TValue>({
         </div>
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-md border dark:border-zinc-800">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow
+                key={headerGroup.id}
+                className="dark:border-zinc-800 dark:hover:bg-zinc-800"
+              >
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id}>
@@ -145,7 +150,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
@@ -159,17 +164,18 @@ export function DataTable<TData extends EmployeeData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="dark:hover:bg-zinc-800"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
                   <TableCell>
-                    <div className="text-right flex flex-row space-x-2 h-8 w-8 p-0">
+                    <div className="flex h-8 w-8 flex-row space-x-2 p-0 text-right">
                       <EmployeeDialog employeeData={row.original} />
                       <button
                         onClick={() => onDelete(row.original.id.toString())}
@@ -203,6 +209,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
           size="sm"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
+          className="dark:border-zinc-800"
         >
           Previous
         </Button>
@@ -211,6 +218,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
           size="sm"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
+          className="dark:border-zinc-800"
         >
           Next
         </Button>

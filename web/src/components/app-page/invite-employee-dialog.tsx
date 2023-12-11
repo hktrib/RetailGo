@@ -52,7 +52,7 @@ export default function InviteEmployee() {
     <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         <button
-          className="bg-blue-500 text-sm px-3 py-1.5 text-white font-medium rounded-md"
+          className="rounded-md bg-blue-500 px-4 py-1.5 text-sm font-medium text-white dark:bg-gradient-to-r dark:from-blue-600 dark:to-indigo-600"
           onClick={() => setDialogOpen(true)}
         >
           Invite
@@ -95,7 +95,7 @@ export default function InviteEmployee() {
             <DialogFooter>
               <button
                 type="submit"
-                className="bg-blue-500 text-sm px-3 py-1.5 text-white font-medium rounded-md mt-5"
+                className="mt-5 rounded-md bg-blue-500 px-3 py-1.5 text-sm font-medium text-white"
               >
                 Invite
               </button>
