@@ -20,12 +20,14 @@ export default function StoreViewPage() {
   const searchParam = useSearchParams();
 
   // Reloades Clerk Metadata
-  user?.reload();
   
   if (!isLoaded) {
     return <p>Loading...</p>;
   }
 
+  if(user) {
+    user.reload();
+  }
 
   // Stall til not Loaded
   if (!user || !user.publicMetadata)
@@ -35,6 +37,7 @@ export default function StoreViewPage() {
     stores?: StoreMetadata[];
   };
   if (!publicMetadata.stores) redirect("/registrationForm");
+
 
   return (
     <main className="bg-gray-50 h-full flex-grow flex">

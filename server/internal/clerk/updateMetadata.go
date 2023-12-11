@@ -98,22 +98,22 @@ func (cs ClerkStorage) addStoreToPublicMetadata(user *clerk.User, uts *ent.UserT
 			return nil, errors.New("failed to marshal")
 		}
 
-		storeData := []storeData{}
+		userToStoresRelations := []storeData{}
 
-		err = json.NewDecoder(bytes.NewBuffer(storesBytes)).Decode(&storeData)
+		err = json.NewDecoder(bytes.NewBuffer(storesBytes)).Decode(&userToStoresRelations)
 		if err != nil {
 			return nil, errors.New("failed to decode store data")
 		}
 
-		for _, oldStoreData := range storeData {
+		for _, oldStoreData := range userToStoresRelations {
 			if Equal(oldStoreData, newStoreData) {
-				log.Debug().Msg(fmt.Sprintf("Old Store%v | New Store%v || NO NEED TO ADD", storeData, newStoreData))
+				log.Debug().Msg(fmt.Sprintf("Old Store%v | New Store%v || NO NEED TO ADD", userToStoresRelations, newStoreData))
 				return metadata, nil
 			}
 		}
 
-		storeData = append(storeData, newStoreData)
-		metadata.PublicMetadata["stores"] = storeData
+		userToStoresRelations = append(userToStoresRelations, newStoreData)
+		metadata.PublicMetadata["stores"] = userToStoresRelations
 	}
 	return metadata, nil
 }
@@ -142,14 +142,14 @@ func (cs ClerkStorage) removeStoreFromPublicMetadata(user *clerk.User, uts *ent.
 		}
 
 		// Decoding raw bytes into []storeData for further processing
-		storeData := []storeData{}
-		err = json.NewDecoder(bytes.NewBuffer(storesBytes)).Decode(&storeData)
+		userToStoresRelations := []storeData{}
+		err = json.NewDecoder(bytes.NewBuffer(storesBytes)).Decode(&userToStoresRelations)
 		if err != nil {
 			return nil, errors.New("failed to decode store data")
 		}
 
 		storeIndexToDelete := -1
-		for index, store := range storeData {
+		for index, store := range userToStoresRelations {
 			if Equal(store, storeDataToDelete) {
 				storeIndexToDelete = index
 				break
@@ -158,18 +158,20 @@ func (cs ClerkStorage) removeStoreFromPublicMetadata(user *clerk.User, uts *ent.
 
 		// Deleting StoreData from user's Clerk Metadata
 		if storeIndexToDelete != -1 {
-			if storeIndexToDelete == 0 {
-				storeData = storeData[:1]
-				metadata.PublicMetadata["stores"] = storeData
-			} else if storeIndexToDelete == len(storeData)-1 {
-				storeData = storeData[len(stores)-1:]
-				metadata.PublicMetadata["stores"] = storeData
+			if len(userToStoresRelations) == 1 {
+				metadata.PublicMetadata["stores"] = []storeData{}
+			} else if storeIndexToDelete == 0 {
+				userToStoresRelations = userToStoresRelations[:1]
+				metadata.PublicMetadata["stores"] = userToStoresRelations
+			} else if storeIndexToDelete == len(userToStoresRelations)-1 {
+				userToStoresRelations = userToStoresRelations[storeIndexToDelete-1:]
+				metadata.PublicMetadata["stores"] = userToStoresRelations
 			} else {
-				storeData = append(storeData[:storeIndexToDelete], storeData[storeIndexToDelete+1:]...)
-				metadata.PublicMetadata["stores"] = storeData
+				userToStoresRelations = append(userToStoresRelations[:storeIndexToDelete], userToStoresRelations[storeIndexToDelete+1:]...)
+				metadata.PublicMetadata["stores"] = userToStoresRelations
 			}
 		} else {
-			log.Debug().Msg(fmt.Sprintf("Stores: %v | UserToStore %v", storeData, *uts))
+			log.Debug().Msg(fmt.Sprintf("Stores: %v | UserToStore %v", userToStoresRelations, *uts))
 			return nil, fmt.Errorf("store index %d not found", storeIndexToDelete)
 		}
 	}
