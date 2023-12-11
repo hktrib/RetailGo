@@ -67,3 +67,28 @@ export const updateItem = async ({
 
   revalidatePath("/store/[store]", "page");
 };
+
+export const deleteItem = async ({
+  storeId,
+  itemId,
+}: {
+  storeId: string;
+  itemId: number;
+}) => {
+  const serverUrl = `https://retailgo-production.up.railway.app/store/${storeId}/inventory?id=${itemId}`;
+
+  console.log(`attempting to delete item ${itemId} for store ${storeId}`);
+
+  try {
+    await fetch(serverUrl, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (err) {
+    console.error(`error deleting item ${itemId} for store ${storeId}: ${err}`);
+  }
+
+  revalidatePath("/store/[store]", "page");
+};
