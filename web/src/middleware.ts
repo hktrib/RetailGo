@@ -1,6 +1,5 @@
 import { authMiddleware, redirectToSignIn } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
-import { HasStore } from "./lib/hooks/user";
 
 // https://clerk.com/docs/references/nextjs/auth-middleware
 export default authMiddleware({
@@ -10,10 +9,10 @@ export default authMiddleware({
     if (
       auth.userId &&
       !auth.orgId &&
-      req.nextUrl.pathname !== "/registrationForm" &&
+      req.nextUrl.pathname !== "/register-store" &&
       false
     ) {
-      const orgSelection = new URL("/registrationForm", req.url);
+      const orgSelection = new URL("/register-store", req.url);
       return NextResponse.redirect(orgSelection);
     }
   },

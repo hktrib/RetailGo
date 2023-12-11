@@ -1,21 +1,13 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useFetch } from "@/lib/utils";
-import { useUser } from "@clerk/nextjs";
-import { useRouter } from 'next/navigation'
-import {config} from "@/lib/hooks/config";
-import {createStore} from "./actions"
+import { createStore } from "./actions";
 
-// type Member = {
-//   firstName: string;
-//   lastName: string;
-//   email: string;
-//   role: string;
-// }
-
+import { toast } from "react-toastify";
 import {
   Form,
   FormControl,
@@ -33,8 +25,6 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Router } from "next/router";
-import { toast } from "react-toastify";
 
 const formSchema = z.object({
   storeName: z.string().min(0),
@@ -55,46 +45,40 @@ const businessTypes = [
 
 export default function RegistrationForm() {
   const { user } = useUser();
-  const router = useRouter()
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
-  console.log(config.serverURL)
-
+  // not doing anything with `address2` yet
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    // not doing anything with `address2` yet
-
     const { storeName, phoneNumber, address1, address2, businessType } = values;
 
-    // data to be sent in POST request body
     const postData = {
-      store_name: storeName || "",
-      store_phone: phoneNumber || "",
-      store_address: address1 || "",
-      store_type: businessType || "",
+      store_name: storeName,
+      store_phone: phoneNumber,
+      store_address: address1,
+      store_type: businessType,
       owner_email: user?.emailAddresses[0]?.emailAddress || "",
     };
 
     try {
-      let response : Boolean = await createStore({postData});
+      let response: Boolean = await createStore({ postData });
 
       if (response === true) {
-        // router.refresh()
         toast.success("Store created successfully!", {
           position: toast.POSITION.TOP_RIGHT,
           autoClose: 10000,
         });
-        router.push("/store") 
+        router.push("/store");
       } else {
         toast.error("Error creating store!", {
           position: toast.POSITION.TOP_RIGHT,
           autoClose: 10000,
         });
-        throw "Failed to create store"
+        throw "Failed to create store";
       }
-
     } catch (error) {
       toast.error("Error creating store!", {
         position: toast.POSITION.TOP_RIGHT,
@@ -105,16 +89,16 @@ export default function RegistrationForm() {
   };
 
   return (
-    <div className="relative isolate px-6 pt-14 lg:px-8 flex-1 flex flex-col justify-center items-center">
-      <div className="mx-auto max-w-2xl w-full bg-gray-50 py-16 px-12 rounded-xl">
-        <h1 className="text-center font-bold text-3xl">
+    <div className="relative isolate flex flex-1 flex-col items-center justify-center px-6 pt-14 lg:px-8">
+      <div className="mx-auto w-full max-w-2xl rounded-xl bg-gray-50 px-12 py-16">
+        <h1 className="text-center text-3xl font-bold">
           Register your business
         </h1>
 
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-8 mt-12"
+            className="mt-12 space-y-8"
           >
             <FormField
               control={form.control}
@@ -125,9 +109,6 @@ export default function RegistrationForm() {
                   <FormControl>
                     <Input placeholder="Store name" {...field} />
                   </FormControl>
-                  {/* <FormDescription>
-                This is your public display name.
-              </FormDescription> */}
                   <FormMessage />
                 </FormItem>
               )}

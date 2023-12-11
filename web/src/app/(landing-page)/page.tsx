@@ -95,7 +95,7 @@ export default function Home() {
               {features.map((feature) => (
                 <div key={feature.name} className="flex flex-col">
                   <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900">
-                    <div className="rounded-lg flex items-center justify-center h-10 w-10 bg-amber-600">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-600">
                       <feature.icon
                         className="h-5 w-5 flex-none text-white"
                         aria-hidden="true"

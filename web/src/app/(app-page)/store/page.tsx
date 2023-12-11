@@ -23,12 +23,12 @@ export default function StoreViewPage() {
   }
 
   // Stall til not Loaded
-  if (!user || !user.publicMetadata) return redirect("/registrationForm");
+  if (!user || !user.publicMetadata) return redirect("/register-store");
 
   const publicMetadata = user.publicMetadata as {
     stores?: StoreMetadata[];
   };
-  if (!publicMetadata.stores) redirect("/registrationForm");
+  if (!publicMetadata.stores) redirect("/register-store");
 
   return (
     <main className="flex h-full flex-grow bg-gray-50 dark:bg-zinc-900">

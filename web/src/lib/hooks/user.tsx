@@ -1,16 +1,10 @@
-import { Item, ItemWithoutId } from "@/models/item";
 import { useFetch } from "../utils";
-import { auth } from "@clerk/nextjs";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { config } from './config';
-import { PostJoinStoreModel } from "@/models/user";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { config } from "./config";
 import router from "next/router";
 import { toast } from "react-toastify";
 
-
 const storeURL = config.serverURL + "/user/";
-
-
 
 export function HasStore() {
   // const queryClient = useQueryClient()
@@ -25,17 +19,16 @@ export function PostJoinStore(storeId: string) {
   const authFetch = useFetch();
   return useMutation({
     mutationFn: (clerkId: string) =>
-    authFetch(
-      `${storeURL}join`,
-      {
-        method: "POST",
-        body: JSON.stringify({"ClerkUserID": clerkId, "StoreId": storeId}),
-      },
-      {
-        "Content-Type": "application/json",
-      }
-      
-    ),
+      authFetch(
+        `${storeURL}join`,
+        {
+          method: "POST",
+          body: JSON.stringify({ ClerkUserID: clerkId, StoreId: storeId }),
+        },
+        {
+          "Content-Type": "application/json",
+        },
+      ),
     onError: (err, email) => {
       console.log("Error while sending invite to", email, ":", err);
     },
@@ -55,16 +48,16 @@ export function PutUser(user_id: string) {
   const authFetch = useFetch();
   return useMutation({
     mutationFn: (Employee) =>
-    authFetch(
-      `${storeURL}${user_id}`,
-      {
-        method: "PUT",
-        body: JSON.stringify(Employee),
-      },
-      {
-        "Content-Type": "application/json",
-      }
-    ),
+      authFetch(
+        `${storeURL}${user_id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(Employee),
+        },
+        {
+          "Content-Type": "application/json",
+        },
+      ),
     onError: (err, email, context) => {
       console.log("Error updating user", ":", err);
     },
@@ -79,15 +72,15 @@ export function DeleteUser() {
   const authFetch = useFetch();
   return useMutation({
     mutationFn: (user_id: string) =>
-    authFetch(
-      `${storeURL}${user_id}`,
-      {
-        method: "DELETE",
-      },
-      {
-        "Content-Type": "application/json",
-      }
-    ),
+      authFetch(
+        `${storeURL}${user_id}`,
+        {
+          method: "DELETE",
+        },
+        {
+          "Content-Type": "application/json",
+        },
+      ),
     onError: (err, email, context) => {
       console.log("Error deleting user", ":", err);
     },
@@ -98,6 +91,4 @@ export function DeleteUser() {
   });
 }
 
-
 export { config };
-

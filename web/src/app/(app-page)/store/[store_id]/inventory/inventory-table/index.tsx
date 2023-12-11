@@ -1,4 +1,5 @@
 "use client";
+
 import { InventoryItem, columns } from "./columns";
 import { DataTable } from "./data-table";
 

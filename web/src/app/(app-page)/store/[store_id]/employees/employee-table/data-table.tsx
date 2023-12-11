@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { deleteUser } from "@/app/(app-page)/store/[store_id]/employees/actions";
+import { deleteUser } from "../actions";
+
+import EditEmployeeDialog from "../edit-employee-dialog";
 import { toast } from "react-toastify";
 import {
   ColumnDef,
@@ -32,7 +34,6 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown";
-import EmployeeDialog from "../employee-dialog";
 import { Trash2 } from "lucide-react";
 
 import type { EmployeeData } from "./columns";
@@ -181,7 +182,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
                   ))}
                   <TableCell>
                     <div className="flex h-8 w-8 flex-row space-x-2 p-0 text-right">
-                      <EmployeeDialog employeeData={row.original} />
+                      <EditEmployeeDialog employeeData={row.original} />
                       <button
                         type="button"
                         onClick={() => onDelete(row.original.id.toString())}
