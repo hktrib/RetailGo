@@ -124,8 +124,9 @@ func (s *Server) MountHandlers() {
 					r.Post("/create", s.InvCreate) //
 					r.Delete("/", s.InvDelete)     //
 				})
-				r.Get("/", s.InvRead)          //
-				r.Post("/update", s.InvUpdate) //
+				r.Get("/", s.InvRead)                    //
+				r.Post("/update", s.InvUpdate)           //
+				r.Post("/updatephoto", s.InvUpdatePhoto) //
 			})
 			r.Route("/category", func(r chi.Router) {
 				r.Group(func(r chi.Router) {
