@@ -20,9 +20,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const publicMetadata = sessionClaims.publicMetadata as {
     stores?: StoreMetadata[];
   };
-  if (!publicMetadata.stores) {
-    console.log("No public metadata -> redirecting to register-store");
-    redirect("/register-store");
+  if (!publicMetadata.stores) { 
+    // Should work
+    console.log("No public metadata -> redirecting to main page");
+    redirect("/");
   }
 
   return (
