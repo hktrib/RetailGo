@@ -30,7 +30,7 @@ export const columns: ColumnDef<InventoryItem>[] = [
         <Button
           variant="ghost"
           size="sm"
-          className="-ml-3 h-8 data-[state=open]:bg-accent"
+          className="-ml-3 h-8 hover:bg-zinc-700 data-[state=open]:bg-accent"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Category
@@ -46,7 +46,7 @@ export const columns: ColumnDef<InventoryItem>[] = [
         <Button
           variant="ghost"
           size="sm"
-          className="-ml-3 h-8 data-[state=open]:bg-accent"
+          className="-ml-3 h-8 hover:bg-zinc-700 data-[state=open]:bg-accent"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Price
@@ -71,7 +71,7 @@ export const columns: ColumnDef<InventoryItem>[] = [
         <Button
           variant="ghost"
           size="sm"
-          className="-ml-3 h-8 data-[state=open]:bg-accent"
+          className="-ml-3 h-8 hover:bg-zinc-700 data-[state=open]:bg-accent"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Quantity

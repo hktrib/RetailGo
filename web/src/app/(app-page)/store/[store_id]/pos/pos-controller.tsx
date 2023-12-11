@@ -72,7 +72,7 @@ const POSController = ({
         />
       </div>
 
-      <div className="mx-auto mt-6 grid w-full max-w-2xl flex-grow grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+      <div className="mx-auto grid w-full max-w-2xl flex-grow grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 py-6 lg:mx-0 lg:max-w-none lg:grid-cols-3">
         <div className="lg:col-start-3 lg:row-end-1">
           <POSOrderSummary cart={cart} TAX_RATE={TAX_RATE} storeId={storeId} />
         </div>

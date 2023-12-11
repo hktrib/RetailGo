@@ -103,7 +103,7 @@ export function DataTable<TData extends InventoryItem, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="dark:hover:bg-zinc-800"
+                  className="dark:border-zinc-800 dark:hover:bg-zinc-800"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -160,7 +160,7 @@ export function DataTable<TData extends InventoryItem, TValue>({
           size="sm"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
-          className="dark:border-zinc-800"
+          className="hover:bg-zinc-700 dark:border-zinc-800"
         >
           Previous
         </Button>
@@ -169,7 +169,7 @@ export function DataTable<TData extends InventoryItem, TValue>({
           size="sm"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
-          className="dark:border-zinc-800"
+          className="hover:bg-zinc-700 dark:border-zinc-800"
         >
           Next
         </Button>

@@ -37,7 +37,7 @@ import {
 import { Trash2 } from "lucide-react";
 
 import type { EmployeeData } from "./columns";
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
 
 interface DataTableProps<TData extends EmployeeData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -83,7 +83,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 10000,
       });
-      router.refresh()
+      router.refresh();
     } else {
       console.log("Invite Mutations Failuire");
       toast.error("Error deleting user!", {
@@ -172,7 +172,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="dark:hover:bg-zinc-800"
+                  className="dark:border-zinc-800 dark:hover:bg-zinc-800"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -202,7 +202,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-24 text-center dark:border-zinc-800"
                 >
                   No results.
                 </TableCell>
@@ -218,7 +218,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
           size="sm"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
-          className="dark:border-zinc-800"
+          className="hover:bg-zinc-700 dark:border-zinc-800"
         >
           Previous
         </Button>
@@ -227,7 +227,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
           size="sm"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
-          className="dark:border-zinc-800"
+          className="hover:bg-zinc-700 dark:border-zinc-800"
         >
           Next
         </Button>
