@@ -100,7 +100,7 @@ External Package Calls:
 - webhook.ConstructEvent()
 - HandleTransSuccess(w, event, srv) [for specific event types]
 */
-func (srv *Server) StripeWebhookRouter(w http.ResponseWriter, r *http.Request) {
+func (srv *Server) StripeWebhookRouter(w http.ResponseWriter, r *http.Request, endpointSecret string) {
 
 	const MaxBodyBytes = int64(65536)
 	r.Body = http.MaxBytesReader(w, r.Body, MaxBodyBytes)
@@ -112,7 +112,7 @@ func (srv *Server) StripeWebhookRouter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// This is your Stripe CLI webhook secret for testing your endpoint locally.
-	endpointSecret := srv.Config.STRIPE_WEBHOOK_SECRET
+
 	// Pass the request body and Stripe-Signature header to ConstructEvent, along
 	// with the webhook signing key.
 	event, err := webhook.ConstructEvent(payload, r.Header.Get("Stripe-Signature"),

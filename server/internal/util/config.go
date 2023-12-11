@@ -16,12 +16,14 @@ type Config struct {
 	STRIPE_SK            string // `"STRIPE_SK"`
 	HOST                 string // `"HOST"`
 	WEAVIATE_HOSTNAME    string // `"WEAVIATE_HOSTNAME"`
-	WEAVIATE_SK    		 string // `"WEAVIATE_SK"`
+	WEAVIATE_SK          string // `"WEAVIATE_SK"`
 
-	SUPABASE_URL          string // `"SUPABASE_URL"`
-	SUPABASE_KEY          string // `"SUPABASE_KEY"`
+	SUPABASE_URL string // `"SUPABASE_URL"`
+	SUPABASE_KEY string // `"SUPABASE_KEY"`
 
-	STRIPE_WEBHOOK_SECRET string //
+	STRIPE_WEBHOOK_SECRET           string //
+	STRIPE_WEBHOOK_SECRET_CONNECTED string //
+
 }
 
 func LoadConfig() (config Config, err error) {
@@ -29,28 +31,28 @@ func LoadConfig() (config Config, err error) {
 	// Supabase
 	config.SUPABASE_URL = os.Getenv("SUPABASE_URL")
 	config.SUPABASE_KEY = os.Getenv("SUPABASE_KEY")
-	
+
 	// PostgresDB
 	config.DB_DRIVER = os.Getenv("DB_DRIVER")
 	config.DB_SOURCE = os.Getenv("DB_SOURCE")
-	
+
 	// Clerk
 	config.CLERK_SK = os.Getenv("CLERK_SK")
 	config.CLERK_WEBHOOK_SECRET = os.Getenv("CLERK_WEBHOOK_SECRET")
-	
+
 	// Redis
 	config.REDIS_HOSTNAME = os.Getenv("REDIS_HOSTNAME")
 	config.REDIS_PORT = os.Getenv("REDIS_PORT")
 	config.REDIS_PASSWORD = os.Getenv("REDIS_PASSWORD")
-	
+
 	// Weaviate
 	config.WEAVIATE_HOSTNAME = os.Getenv("WEAVIATE_HOSTNAME")
 	config.WEAVIATE_SK = os.Getenv("WEAVIATE_SK")
-	
+
 	// Stripe
 	config.STRIPE_SK = os.Getenv("STRIPE_SK")
 	config.STRIPE_WEBHOOK_SECRET = os.Getenv("STRIPE_WEBHOOK_SECRET")
-	
+	config.STRIPE_WEBHOOK_SECRET_CONNECTED = os.Getenv("STRIPE_WEBHOOK_SECRET_CONNECTED")
 	// Server Address
 	config.SERVER_ADDRESS = envPortOr("8080")
 	return

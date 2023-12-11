@@ -7,7 +7,7 @@ import { PostEmailInviteModel } from "@/models/staff";
 import { toast } from "react-toastify";
 
 
-const storeURL = config.serverURL + "store/";
+const storeURL = config.serverURL + "/store/";
 
 
 
