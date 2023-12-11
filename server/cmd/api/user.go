@@ -233,7 +233,7 @@ type UserUpdateRequest struct {
 func (srv *Server) userUpdate(w http.ResponseWriter, r *http.Request) {
 	// get item id from url query string
 	ctx := r.Context()
-	userID, err := strconv.Atoi(chi.URLParam(r, "userID"))
+	userID, err := strconv.Atoi(chi.URLParam(r, "user_id"))
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return

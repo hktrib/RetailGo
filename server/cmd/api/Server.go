@@ -160,6 +160,7 @@ func (s *Server) MountHandlers() {
 				r.Get("/", s.GetStoreUsers)
 			})
 		})
+		r.Get("/uuid/{uuid}", s.GetStoreByUUID) //
 	})
 
 	s.Router.Route("/user", func(r chi.Router) {

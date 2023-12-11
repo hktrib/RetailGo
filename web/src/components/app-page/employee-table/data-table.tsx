@@ -36,6 +36,7 @@ import EmployeeDialog from "../employee-dialog";
 import { Trash2 } from "lucide-react";
 
 import type { EmployeeData } from "./columns";
+import {useRouter} from "next/navigation";
 
 interface DataTableProps<TData extends EmployeeData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -49,7 +50,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-
+  const router = useRouter();
   const table = useReactTable({
     data,
     columns,
@@ -81,6 +82,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 10000,
       });
+      router.refresh()
     } else {
       console.log("Invite Mutations Failuire");
       toast.error("Error deleting user!", {
