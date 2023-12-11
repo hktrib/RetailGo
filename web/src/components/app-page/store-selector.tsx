@@ -59,7 +59,10 @@ export default function StoreSelector({
         )}
       </SelectTrigger>
 
-      <SelectContent sideOffset={5} className="dark:bg-zinc-900">
+      <SelectContent
+        sideOffset={5}
+        className="dark:border-zinc-800 dark:bg-zinc-900"
+      >
         <SelectGroup>
           <SelectLabel>My stores</SelectLabel>
           {stores.map((store) => (
