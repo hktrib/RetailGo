@@ -10,7 +10,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog/log"
 
-	clerkHelpers "github.com/hktrib/RetailGo/internal/clerk"
 	clerkstorage "github.com/hktrib/RetailGo/internal/clerk"
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/store"
@@ -50,7 +49,7 @@ func (srv *Server) UserCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Creating New Clerk Store instance of the given User
-	clerkStore, err := clerkHelpers.NewClerkStore(srv.ClerkClient, reqUser.ClerkUserID, srv.Config)
+	clerkStore, err := clerkstorage.NewClerkStore(srv.ClerkClient, reqUser.ClerkUserID, srv.Config)
 	if err != nil {
 		log.Debug().Err(err).Msg("NewClerkStore failed: Unable to create ClerkStore instance using clerk user id")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

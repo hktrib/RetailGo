@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useDeleteItem } from "@/lib/hooks/items";
 import { useParams } from "next/navigation";
+import { deleteItem } from "@/app/(app-page)/store/[store_id]/inventory/actions";
+
+import ItemDialog from "../item-dialog";
+
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -14,8 +17,6 @@ import {
   getSortedRowModel,
   getPaginationRowModel,
 } from "@tanstack/react-table";
-
-import ItemDialog from "../item-dialog";
 import {
   Table,
   TableBody,
@@ -27,7 +28,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import { InventoryItem } from "./columns";
+
+import type { InventoryItem } from "./columns";
 
 interface DataTableProps<TData extends InventoryItem, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -40,13 +42,10 @@ export function DataTable<TData extends InventoryItem, TValue>({
   data,
   categories,
 }: DataTableProps<TData, TValue>) {
+  const params = useParams();
+
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-
-
-  const params = useParams();
-  const id = params.store_id;
-  const deleteItemMutation = useDeleteItem(id.toString());
 
   const table = useReactTable({
     data,
@@ -126,7 +125,10 @@ export function DataTable<TData extends InventoryItem, TValue>({
                       />
                       <button
                         onClick={() =>
-                          deleteItemMutation.mutate(row.original.id)
+                          deleteItem({
+                            itemId: row.original.id,
+                            storeId: params.store_id as string,
+                          })
                         }
                       >
                         <Trash2 className="h-5 w-5 p-0 text-red-500" />

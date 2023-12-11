@@ -2,11 +2,13 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/go-chi/chi/v5"
+	. "github.com/hktrib/RetailGo/cmd/api/stripe-components"
+	"github.com/hktrib/RetailGo/internal/ent/store"
+	"github.com/rs/zerolog/log"
 	"net/http"
 	"strconv"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/rs/zerolog/log"
 
 	clerkstorage "github.com/hktrib/RetailGo/internal/clerk"
 	"github.com/hktrib/RetailGo/internal/ent"
@@ -18,7 +20,8 @@ import (
 CreateStore Brief:
 
 -> Creates a new store and its owner, utilizing transactions to ensure atomicity.
-   Creates a ClerkStore instance, then executes a transaction to create the store and its owner.
+
+	Creates a ClerkStore instance, then executes a transaction to create the store and its owner.
 
 External Package Calls:
 - clerkstorage.NewClerkStore()
@@ -34,7 +37,7 @@ func (srv *Server) CreateStore(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Debug().Err(err).Msg("CreateStore: NewClerkStore failed -> Unable to create ClerkStore instance using clerk user id:")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return	
+		return
 	}
 
 	err = transactions.StoreAndOwnerCreationTx(ctx, reqStore, reqUser, srv.DBClient, clerkStore)
@@ -51,7 +54,8 @@ func (srv *Server) CreateStore(w http.ResponseWriter, r *http.Request) {
 GetStoreUsers Brief:
 
 -> Retrieves users associated with a specific store by Store ID.
-   Fetches users related to the store and prepares a response containing relevant user information.
+
+	Fetches users related to the store and prepares a response containing relevant user information.
 
 External Package Calls:
 - srv.DBClient.User.Query()
@@ -69,14 +73,14 @@ func (srv *Server) GetStoreUsers(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Debug().Err(err).Msg("GetStoreUsers: server unable to fetch all store's users from database")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return	
+		return
 	}
 
 	resp, err := json.Marshal(Users)
 	if err != nil {
 		log.Debug().Err(err).Msg("GetStoreUsers: server unable to Marshal store's users")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return		
+		return
 	}
 
 	var userInfo []map[string]interface{}
@@ -97,9 +101,25 @@ func (srv *Server) GetStoreUsers(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Debug().Err(err).Msg("GetStoreUsers: server unable to Marshal store's userInfo response")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return		
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(resp)
+}
+func (srv *Server) HandleOnboarding(w http.ResponseWriter, r *http.Request) {
+	store_id := r.Context().Value("store_var").(int)
+	// Get store
+	store, err := ent.FromContext(r.Context()).Store.Query().Where(store.IDEQ(store_id)).Only(r.Context())
+	if err != nil {
+		log.Debug().Err(err).Msg("HandleOnboarding: unable to fetch store from database")
+		return
+	}
+	accLink, err := StartOnboarding(store.StripeAccountID)
+	if err != nil {
+		log.Debug().Err(err).Msg("HandleOnboarding: unable to start onboarding")
+		return
+	}
+	w.WriteHeader(302)
+	fmt.Fprintf(w, "%s", accLink.URL)
 }

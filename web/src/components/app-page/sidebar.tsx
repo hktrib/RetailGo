@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
+import { cx } from "class-variance-authority";
+import StoreSelector from "./store-selector";
 import {
   HelpCircle,
   HomeIcon,
@@ -11,9 +13,8 @@ import {
   Users2,
   ShoppingBag,
 } from "lucide-react";
+
 import type { StoreMetadata } from "@/app/(app-page)/store/layout";
-import StoreSelector from "./store-selector";
-import { cx } from "class-variance-authority";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon },
@@ -37,7 +38,6 @@ export default function Sidebar({ stores }: { stores: StoreMetadata[] }) {
 
         <div className="h-full pb-12">
           <StoreSelector stores={stores} currentStoreId={store_id as string} />
-
           <Navigation userStores={stores} currentStoreId={store_id as string} />
         </div>
       </div>
@@ -51,6 +51,8 @@ export const Navigation = ({
   userStores: StoreMetadata[];
   currentStoreId: string;
 }) => {
+  const pathname = usePathname();
+
   const buildUrl = (href: string) => {
     if (!currentStoreId) return "/store";
 
@@ -70,7 +72,16 @@ export const Navigation = ({
                   <Link
                     href={buildUrl(item.href)}
                     className={cx(
-                      "text-gray-900 hover:text-black flex items-center gap-x-3 px-3 py-1.5 rounded-md"
+                      "text-gray-900 hover:text-black flex items-center gap-x-3 px-3 py-1.5 rounded-md",
+                      pathname.endsWith(item.href)
+                        ? "bg-gray-100 font-medium"
+                        : "hover:bg-gray-100",
+                      item.href === "/" &&
+                        !pathname.endsWith("/employees") &&
+                        !pathname.endsWith("/inventory") &&
+                        !pathname.endsWith("/pos")
+                        ? "bg-gray-100 font-medium"
+                        : "hover:bg-gray-100"
                     )}
                   >
                     <item.icon className="w-4 h-4" aria-hidden="true" />
