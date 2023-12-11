@@ -1,9 +1,56 @@
-"use client";
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import isAuth from "@/components/isAuth";
+import { getItemRecommendations } from "../queries";
+import { isValid } from "zod";
 
-function DashboardPage() {
+async function RemoteImage({imageURL}: {imageURL: string}){
+  
+  // https://www.freecodecamp.org/news/check-if-a-javascript-string-is-a-url/
+  const isValidUrl = (urlString: string) => {
+    try { 
+      return Boolean(new URL(urlString)); 
+    }
+    catch(e){ 
+      return false; 
+    }
+}
+
+  if (isValidUrl(imageURL)){
+    return (<div className="w-full h-40 bg-gray-100">
+        <img src = {imageURL}/>
+      </div>)
+  }
+  else{
+    return (<div className="w-full h-40 bg-gray-100">
+    No Image Available.
+  </div>) 
+  }
+}
+
+async function ItemGrid({storeId}: {storeId: string}){
+  
+  const recommendedItems = await getItemRecommendations({store_id: storeId})
+
+  if (!recommendedItems.success){
+    return (<div className = "text-center">
+      Nothing to recommend for now!
+    </div>)
+  }
+
+  return (
+    recommendedItems.items.map(
+    (item: any) => (<div className="bg-gray-200 rounded-md col-span-2 row-span-2">
+      <article className="bg-white rounded-md shadow-sm w-52">
+        <RemoteImage imageURL = {item.imageURL}/>
+        <div className="p-4">
+          <span className="font-medium">{item.name} ({item.categoryName})</span>
+        </div>
+      </article>
+    </div>)
+  )
+  )
+}
+
+function DashboardPage({params}: {params: {store_id: string}}) {
   return (
     <main className="bg-gray-50 h-full flex-grow flex">
       <div className="py-6 px-6 md:px-8 max-w-6xl mx-auto lg:ml-0 flex-grow">
@@ -17,18 +64,7 @@ function DashboardPage() {
             <TabsTrigger value="activity">Activity</TabsTrigger>
           </TabsList>
           <TabsContent value="overview" className="pt-14 h-full -mt-10 pb-4">
-            <div className="grid grid-cols-4 grid-rows-4 grid-flow-row gap-4 h-full">
-              <div className="bg-gray-200 rounded-md col-span-2 row-span-2" />
-              <div className="bg-gray-200 rounded-md col-span-2 row-span-2" />
-
-              <div className="bg-gray-200 rounded-md col-span-1 row-span-1" />
-              <div className="bg-gray-200 rounded-md col-span-1 row-span-1" />
-              <div className="bg-gray-200 rounded-md col-span-1 row-span-1" />
-              <div className="bg-gray-200 rounded-md col-span-1 row-span-1" />
-
-              <div className="bg-gray-200 rounded-md col-span-2 row-span-2" />
-              <div className="bg-gray-200 rounded-md col-span-2 row-span-2" />
-            </div>
+            <ItemGrid storeId={String(params.store_id)}/>
           </TabsContent>
           <TabsContent value="activity">Activity</TabsContent>
         </Tabs>
@@ -37,4 +73,4 @@ function DashboardPage() {
   );
 }
 
-export default isAuth(DashboardPage);
+export default DashboardPage;
