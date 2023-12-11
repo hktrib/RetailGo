@@ -51,8 +51,13 @@ const SidebarNav = ({ stores }: { stores: StoreMetadata[] }) => {
           <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="h-full w-[300px]">
-        <SheetHeader className={`${store_id && "border-b pb-5"}`}>
+      <SheetContent
+        side="left"
+        className="h-full w-[300px] dark:border-zinc-900 dark:bg-zinc-950"
+      >
+        <SheetHeader
+          className={`${store_id && "border-b pb-5 dark:border-zinc-900"}`}
+        >
           <StoreSelector
             stores={stores}
             currentStoreId={store_id as string}

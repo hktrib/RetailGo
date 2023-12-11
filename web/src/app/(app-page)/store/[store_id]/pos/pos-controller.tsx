@@ -62,7 +62,7 @@ const POSController = ({
   };
 
   return (
-    <div className="mx-auto flex h-full w-full max-w-2xl flex-grow flex-col items-center px-8 py-5 lg:max-w-7xl lg:items-start">
+    <div className="mx-auto flex h-full w-full max-w-2xl flex-grow flex-col items-center px-4 md:px-6 lg:max-w-7xl lg:items-start xl:px-8">
       <div className="w-full lg:w-auto">
         <Input
           placeholder="Search items..."

@@ -1,16 +1,23 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getItemRecommendations } from "../queries";
 import Image from "next/image";
+import { getItemRecommendations } from "../queries";
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { HomeIcon } from "lucide-react";
 
 function DashboardPage({ params }: { params: { store_id: string } }) {
   return (
-    <main className="flex h-full flex-grow bg-gray-50 dark:bg-zinc-900">
-      <div className="mx-auto max-w-6xl flex-grow px-6 py-6 md:px-8 lg:ml-0">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold tracking-wide">Dashboard</h1>
+    <main className="h-full flex-grow">
+      <div className="flex h-16 items-center justify-between px-4 py-5 md:px-6 xl:px-8">
+        <div className="mt-1 flex items-center gap-x-3">
+          <HomeIcon className="h-5 w-5 text-gray-800 dark:text-zinc-200" />
+          <h1 className="text-xl font-medium tracking-wide">Dashboard</h1>
         </div>
+      </div>
 
-        <Tabs defaultValue="overview" className="-mt-2 h-full w-full pt-6">
+      <hr className="mb-4 border-gray-100 dark:border-zinc-800" />
+
+      <div className="px-4 md:px-6 xl:px-8">
+        <Tabs defaultValue="overview" className="-mt-2 h-full w-full pt-4">
           <TabsList className="dark:border-zinc-800">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="activity">Activity</TabsTrigger>
@@ -34,7 +41,7 @@ async function ItemRecommendations({ storeId }: { storeId: string }) {
 
   if (!recommendedItems.success || !recommendedItems.items) {
     return (
-      <p className="text-sm leading-6 text-gray-700">
+      <p className="text-sm leading-6 text-gray-700 dark:text-zinc-300">
         Nothing to recommend for now!
       </p>
     );

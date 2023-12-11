@@ -11,6 +11,8 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { cx } from "class-variance-authority";
+import Link from "next/link";
+import { Plus } from "lucide-react";
 
 export default function StoreSelector({
   stores,
@@ -75,6 +77,18 @@ export default function StoreSelector({
             </SelectItem>
           ))}
         </SelectGroup>
+
+        <div className="mt-0.5 px-0.5 py-1">
+          <Link
+            href="/register-store"
+            className="flex items-center justify-center gap-x-2 rounded-md bg-sky-500 py-2 pr-2 shadow-inner dark:bg-zinc-800 dark:shadow-zinc-700"
+          >
+            <Plus className="h-4 w-4 text-sky-50 dark:text-zinc-300" />
+            <span className="mr-2 text-sm font-medium text-white">
+              New store
+            </span>
+          </Link>
+        </div>
       </SelectContent>
     </Select>
   );
