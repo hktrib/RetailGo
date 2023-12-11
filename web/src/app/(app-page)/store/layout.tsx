@@ -21,13 +21,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     stores?: StoreMetadata[];
   };
   if (!publicMetadata.stores) {
-    console.log("No public metadata -> redirecting to main page")
-    redirect("/")
-  };
+    console.log("No public metadata -> redirecting to main page");
+    redirect("/");
+  }
 
   return (
     <Providers>
-      <div className="min-h-screen h-full flex flex-col">
+      <div className="min-h-screen h-full flex flex-col dark:bg-zinc-800">
         <MobileNav stores={publicMetadata.stores} />
         <Sidebar stores={publicMetadata.stores} />
         <div className="xl:pl-64 h-full flex-grow flex flex-col">

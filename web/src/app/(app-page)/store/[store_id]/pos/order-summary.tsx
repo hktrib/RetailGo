@@ -17,7 +17,7 @@ const POSOrderSummary = ({
 
   const subtotal = cart.reduce(
     (acc, val) => acc + parseFloat((val.price * val.quantityAdded).toFixed(2)),
-    0
+    0,
   );
 
   const total = parseFloat((subtotal * TAX_RATE).toFixed(2));
@@ -60,15 +60,17 @@ const POSOrderSummary = ({
         <div className="space-y-2">
           {cart.map((cartItem, idx) => (
             <div
-              key={cartItem.id}
-              className="flex items-center justify-between bg-gray-100 rounded-lg p-3"
+              key={`${cartItem.id}-x${cartItem.quantityAdded}`}
+              className="flex items-center justify-between rounded-lg bg-gray-100 p-3 dark:bg-zinc-800"
             >
               <div className="flex items-center gap-x-2 text-sm">
-                <div className="rounded-full bg-black text-gray-50 w-5 h-5 flex items-center justify-center">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-black text-gray-50 dark:bg-zinc-700">
                   <span className="text-xs">{idx + 1}</span>
                 </div>
                 <span>{cartItem.name}</span>
-                <span className="text-gray-600">x{cartItem.quantityAdded}</span>
+                <span className="text-gray-600 dark:text-zinc-300">
+                  x{cartItem.quantityAdded}
+                </span>
               </div>
 
               <div>
@@ -80,21 +82,27 @@ const POSOrderSummary = ({
           ))}
         </div>
       ) : (
-        <div className="bg-gray-100 rounded-lg p-3">
+        <div className="rounded-lg bg-gray-100 p-3 dark:bg-zinc-800">
           No items added to cart.
         </div>
       )}
 
-      <div className="mt-6 p-3 bg-gray-100 rounded-lg">
+      <div className="mt-6 rounded-lg bg-gray-100 p-3 dark:bg-zinc-800">
         <div>
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-700">Subtotal</span>
-            <span className="text-sm">${subtotal.toFixed(2)}</span>
+            <span className="text-sm text-gray-700 dark:text-zinc-300">
+              Subtotal
+            </span>
+            <span className="text-sm dark:text-zinc-200">
+              ${subtotal.toFixed(2)}
+            </span>
           </div>
 
-          <div className="flex items-center justify-between mt-1">
-            <span className="text-sm text-gray-700">Tax</span>
-            <span className="text-sm">
+          <div className="mt-1 flex items-center justify-between">
+            <span className="text-sm text-gray-700 dark:text-zinc-300">
+              Tax
+            </span>
+            <span className="text-sm dark:text-zinc-200">
               $
               {(
                 subtotal - parseFloat((subtotal * TAX_RATE).toFixed(2))
@@ -104,8 +112,8 @@ const POSOrderSummary = ({
 
           <hr className="my-3" />
 
-          <div className="flex items-center justify-between mt-1">
-            <span className="text-gray-700">Total</span>
+          <div className="mt-1 flex items-center justify-between">
+            <span className="text-gray-700 dark:text-zinc-200">Total</span>
             <span className="font-medium">${total.toFixed(2)}</span>
           </div>
 
@@ -114,7 +122,7 @@ const POSOrderSummary = ({
               type="submit"
               disabled={!cart.length}
               onClick={generateCheckoutEmbed}
-              className="rounded-full w-full py-5"
+              className="w-full rounded-full py-5"
             >
               Place order
             </Button>
