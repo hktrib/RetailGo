@@ -20,20 +20,20 @@ This project is a Python script to generate dummy data for retail go stores. It 
     ```
 
 ## Usage
-To run the script, execute the following command:
+    To run the script, execute the following command:
 ```bash
 python retail_go_tests.py
 ```
 
-When prompted, choose to create a new store or use an existing store ID.
+    When prompted, choose to create a new store or use an existing store ID.
 
-If creating a new store, enter a valid email address.
-If using an existing store, provide the store ID.
-Select the type of data you wish to generate (Fruits, Vegetables, Sushi, Spices).
+    If creating a new store, enter a valid email address.
+    If using an existing store, provide the store ID.
+    Select the type of data you wish to generate (Fruits, Vegetables, Sushi, Spices).
 
-Enter the number of items you want to generate for the chosen category.
+    Enter the number of items you want to generate for the chosen category.
 
-The script will then create these items and send them to the Retail Go server.
+    The script will then create these items and send them to the Retail Go server.
 
 ## Sample output:
     Welcome to the Fake Data Generator for RetailGo!
