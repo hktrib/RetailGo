@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/hktrib/RetailGo/internal/ent/categoryitem"
-	"github.com/hktrib/RetailGo/internal/ent/store"
 	"io"
 	"net/http"
 	"strconv"
@@ -16,7 +14,9 @@ import (
 	. "github.com/hktrib/RetailGo/cmd/api/stripe-components"
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/category"
+	"github.com/hktrib/RetailGo/internal/ent/categoryitem"
 	"github.com/hktrib/RetailGo/internal/ent/item"
+	"github.com/hktrib/RetailGo/internal/ent/store"
 	"github.com/hktrib/RetailGo/internal/weaviate"
 )
 
@@ -471,6 +471,37 @@ func (srv *Server) InvDelete(w http.ResponseWriter, r *http.Request) {
 		log.Debug().Err(err).Msg("InvDelete: weaviate failed to delete target item")
 		// Should Roll back delete - for now, naively, by just creating a new item -, but doesn't do this yet.
 		// _, _ = srv.DBClient.Item.Create().SetQuantity(originalItem.Quantity).SetPhoto(originalItem.Photo).SetName(originalItem.Name).SetPrice(originalItem.Price).SetCategoryName(originalItem.CategoryName).SetVectorized(originalItem.Vectorized).SetNumberSoldSinceUpdate(originalItem.NumberSoldSinceUpdate).SetDateLastSold(originalItem.DateLastSold).SetStore(originalItem.Edges.Store).Set.Save(r.Context())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
+}
+
+func (srv *Server) InvUpdatePhoto(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	type photoUpdate struct {
+		ID    int    `json:"id"`
+		Photo string `json:"photo"`
+	}
+
+	var req photoUpdate
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	_, err := srv.DBClient.Item.UpdateOneID(req.ID).
+		Where().
+		SetPhoto(req.Photo).
+		Save(ctx)
+
+	if err != nil {
+		log.Debug().Err(err).Msg("InvUpdatePhoto: Failed to update photo")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
