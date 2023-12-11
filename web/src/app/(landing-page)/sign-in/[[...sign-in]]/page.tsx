@@ -7,8 +7,8 @@ const SignInPage = () => {
         appearance={{
           elements: {
             formButtonPrimary:
-              "bg-amber-500 hover:bg-amber-400 focus:bg-amber-500",
-            footerActionLink: "text-amber-600",
+              "bg-sky-500 hover:bg-sky-400 focus:bg-sky-500",
+            footerActionLink: "text-sky-600",
           },
         }}
         afterSignUpUrl="/register-store" // Redirect to the store registration page after sign up
