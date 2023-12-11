@@ -6,7 +6,7 @@ import { config } from './config';
 import { PostJoinStoreModel } from "@/models/user";
 
 
-const storeURL = config.serverURL + "user/";
+const storeURL = config.serverURL + "/user/";
 
 
 export function HasStore() {
@@ -33,7 +33,7 @@ export function PostJoinStore(storeId: string) {
       }
       
     ),
-    onError: (err, email, context) => {
+    onError: (err, email) => {
       console.log("Error while sending invite to", email, ":", err);
     },
     onSuccess: (email) => {
