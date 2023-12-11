@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
+
 import { cx } from "class-variance-authority";
 import StoreSelector from "./store-selector";
+import ThemeSwitcher from "./theme-switcher";
 import {
   HelpCircle,
   HomeIcon,
@@ -12,13 +14,9 @@ import {
   Settings,
   Users2,
   ShoppingBag,
-  Sun,
-  Moon,
 } from "lucide-react";
 
 import type { StoreMetadata } from "@/app/(app-page)/store/layout";
-import { useTheme } from "next-themes";
-import { Button } from "../ui/button";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon },
@@ -37,6 +35,7 @@ export default function Sidebar({ stores }: { stores: StoreMetadata[] }) {
           <Link href="/store" className="text-lg font-semibold">
             RetailGo
           </Link>
+
           <div className="flex items-center">
             <UserButton afterSignOutUrl="/" appearance={{}} />
           </div>
@@ -58,7 +57,6 @@ export const Navigation = ({
   currentStoreId: string;
 }) => {
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
 
   const buildUrl = (href: string) => {
     if (!currentStoreId) return "/store";
@@ -102,27 +100,7 @@ export const Navigation = ({
 
         <li className="mt-auto pb-14 xl:pb-4">
           <ul role="list" className="space-y-1.5">
-            <li className="px-1">
-              {theme === "light" ? (
-                <Button
-                  type="button"
-                  onClick={() => setTheme("dark")}
-                  variant="ghost"
-                  className="px-2"
-                >
-                  <Sun className="h-4 w-4" />
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  onClick={() => setTheme("light")}
-                  variant="ghost"
-                  className="px-2 hover:bg-zinc-900"
-                >
-                  <Moon className="h-4 w-4" />
-                </Button>
-              )}
-            </li>
+            <ThemeSwitcher />
 
             <li className="flex items-center gap-x-3 px-3 py-1.5 text-gray-700 dark:text-zinc-300">
               <Settings className="h-4 w-4" aria-hidden="true" />

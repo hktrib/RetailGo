@@ -60,7 +60,7 @@ function DashboardPage({ params }: { params: { store_id: string } }) {
         </div>
 
         <Tabs defaultValue="overview" className="-mt-2 h-full w-full pt-6">
-          <TabsList>
+          <TabsList className="dark:border-zinc-800">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="activity">Activity</TabsTrigger>
           </TabsList>

@@ -95,9 +95,11 @@ export function DataTable<TData extends EmployeeData, TValue>({
       <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Search employees..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+          value={
+            (table.getColumn("first_name")?.getFilterValue() as string) ?? ""
+          }
           onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
+            table.getColumn("first_name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm dark:border-zinc-800 dark:focus:ring-zinc-700"
         />
@@ -112,7 +114,10 @@ export function DataTable<TData extends EmployeeData, TValue>({
                 Customize
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent
+              align="end"
+              className="dark:border-zinc-700 dark:bg-zinc-800"
+            >
               {table
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
@@ -120,7 +125,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
                   return (
                     <DropdownMenuCheckboxItem
                       key={column.id}
-                      className="capitalize"
+                      className="capitalize dark:hover:bg-zinc-700"
                       checked={column.getIsVisible()}
                       onCheckedChange={(value) =>
                         column.toggleVisibility(!!value)
@@ -178,12 +183,13 @@ export function DataTable<TData extends EmployeeData, TValue>({
                     <div className="flex h-8 w-8 flex-row space-x-2 p-0 text-right">
                       <EmployeeDialog employeeData={row.original} />
                       <button
+                        type="button"
                         onClick={() => onDelete(row.original.id.toString())}
                       >
                         <Trash2
                           style={{ color: "red" }}
                           className="h-5 w-5 p-0"
-                        ></Trash2>
+                        />
                       </button>
                     </div>
                   </TableCell>
