@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { useForm } from "react-hook-form";
+import * as z from "zod";
 import {
   createItem,
   updateItem,
@@ -99,16 +99,16 @@ export default function ItemDialog({
       <DialogTrigger asChild>
         {mode === "edit" ? (
           <button className="icon-button">
-            <PencilIcon className="text-amber-500 h-5 w-5 p-0" />
+            <PencilIcon className="h-5 w-5 p-0 text-amber-500" />
           </button>
         ) : (
-          <button className="bg-amber-500 text-sm px-3 py-1.5 text-white font-medium rounded-md">
+          <button className="rounded-md bg-amber-500 px-4 py-1.5 text-sm font-medium text-white shadow-sm dark:bg-gradient-to-r dark:from-blue-600 dark:to-indigo-600">
             Add item
           </button>
         )}
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="dark:border-zinc-800">
         <DialogHeader>
           <DialogTitle>{mode === "edit" ? "Edit" : "Add"} Item</DialogTitle>
         </DialogHeader>
@@ -122,7 +122,11 @@ export default function ItemDialog({
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Item name" />
+                    <Input
+                      {...field}
+                      placeholder="Item name"
+                      className="dark:border-zinc-800 dark:focus:ring-zinc-700"
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -135,7 +139,12 @@ export default function ItemDialog({
                 <FormItem>
                   <FormLabel>Price</FormLabel>
                   <FormControl>
-                    <Input {...field} type="number" placeholder="Item price" />
+                    <Input
+                      {...field}
+                      type="number"
+                      placeholder="Item price"
+                      className="dark:border-zinc-800 dark:focus:ring-zinc-700"
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -152,6 +161,7 @@ export default function ItemDialog({
                       {...field}
                       type="number"
                       placeholder="Item quantity"
+                      className="dark:border-zinc-800 dark:focus:ring-zinc-700"
                     />
                   </FormControl>
                 </FormItem>
@@ -170,8 +180,8 @@ export default function ItemDialog({
                           variant="outline"
                           role="combobox"
                           className={cn(
-                            "justify-between w-full",
-                            !field.value && "text-muted-foreground"
+                            "w-full justify-between dark:border-zinc-800 dark:hover:bg-zinc-800",
+                            !field.value && "text-muted-foreground",
                           )}
                         >
                           {displayCategory(field.value)}
@@ -180,8 +190,12 @@ export default function ItemDialog({
                       </FormControl>
                     </PopoverTrigger>
 
-                    <PopoverContent className="w-72 p-2">
-                      <Input {...field} placeholder="Enter a category" />
+                    <PopoverContent className="w-72 p-2 dark:border-zinc-800">
+                      <Input
+                        {...field}
+                        placeholder="Enter a category"
+                        className="dark:border-zinc-800 dark:focus:ring-zinc-700"
+                      />
 
                       {categories.length ? (
                         <div className="mt-4 flex flex-col space-y-0.5">
@@ -192,7 +206,7 @@ export default function ItemDialog({
                               value={category.name}
                               // @ts-ignore
                               onClick={(e) => field.onChange(e.target.value)}
-                              className="bg-white text-black shadow-none hover:text-black hover:bg-gray-100 text-left justify-start"
+                              className="justify-start bg-white text-left text-black shadow-none hover:bg-gray-100 hover:text-black dark:bg-zinc-800 dark:text-zinc-50"
                             >
                               {category.name}
                             </Button>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "next-themes";
 import SelectedStoreProvider from "../../components/storeprovider";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -17,8 +18,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <SelectedStoreProvider>{children}</SelectedStoreProvider>
-    </QueryClientProvider>
+    <ThemeProvider attribute="class">
+      <QueryClientProvider client={queryClient}>
+        <SelectedStoreProvider>{children}</SelectedStoreProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }

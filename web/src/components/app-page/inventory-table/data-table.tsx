@@ -71,15 +71,18 @@ export function DataTable<TData extends InventoryItem, TValue>({
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="max-w-sm dark:border-zinc-800 dark:focus:ring-zinc-700"
         />
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-md border dark:border-zinc-800">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow
+                key={headerGroup.id}
+                className="dark:border-zinc-800 dark:hover:bg-zinc-800"
+              >
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id}>
@@ -87,7 +90,7 @@ export function DataTable<TData extends InventoryItem, TValue>({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
@@ -101,17 +104,18 @@ export function DataTable<TData extends InventoryItem, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="dark:hover:bg-zinc-800"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
                   <TableCell>
-                    <div className="text-right flex flex-row space-x-2 h-8 w-8 p-0">
+                    <div className="flex h-8 w-8 flex-row space-x-2 p-0 text-right">
                       <ItemDialog
                         item={{
                           id: row.original.id,
@@ -157,6 +161,7 @@ export function DataTable<TData extends InventoryItem, TValue>({
           size="sm"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
+          className="dark:border-zinc-800"
         >
           Previous
         </Button>
@@ -165,6 +170,7 @@ export function DataTable<TData extends InventoryItem, TValue>({
           size="sm"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
+          className="dark:border-zinc-800"
         >
           Next
         </Button>
