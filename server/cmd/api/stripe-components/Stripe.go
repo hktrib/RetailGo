@@ -50,7 +50,7 @@ func CreateStripeItem(item *ent.Item, store *ent.Store) (*stripe.Product, error)
 		},
 	}
 
-	productParams.StripeAccount = stripe.String(store.StripeAccountID)
+	productParams.SetStripeAccount(store.StripeAccountID)
 	product, err := product.New(productParams)
 
 	if err != nil {
@@ -59,10 +59,11 @@ func CreateStripeItem(item *ent.Item, store *ent.Store) (*stripe.Product, error)
 	return product, nil
 }
 
-func UpdateStripeItem(item *ent.Item, name string) (*stripe.Product, error) {
+func UpdateStripeItem(item *ent.Item, name string, StoreStripeID string) (*stripe.Product, error) {
 
 	productParams := &stripe.ProductParams{}
 	productParams.Name = stripe.String(name)
+	productParams.SetStripeAccount(StoreStripeID)
 	product, err := product.Update(item.StripeProductID, productParams)
 
 	if err != nil {
@@ -77,14 +78,14 @@ func UpdateStripePrice(item *ent.Item, newPrice float64, StoreStripeID string) (
 		Currency:   stripe.String(string(stripe.CurrencyUSD)),
 		UnitAmount: stripe.Int64(int64(newPrice * 100)),
 	}
+	priceParams.SetStripeAccount(StoreStripeID)
 	priceId, err := price.New(priceParams)
 	if err != nil {
 		return nil, err
 	}
-	priceParams.StripeAccount = stripe.String(StoreStripeID)
 
 	productParams := &stripe.ProductParams{DefaultPrice: stripe.String(priceId.ID)}
-
+	productParams.SetStripeAccount(StoreStripeID)
 	_, err = product.Update(item.StripeProductID, productParams)
 	if err != nil {
 		return nil, err
@@ -115,7 +116,7 @@ func CreateCheckoutSession(items []CartItem, StoreStripeID string, w http.Respon
 		Mode:      stripe.String(string(stripe.CheckoutSessionModePayment)),
 		ReturnURL: stripe.String("https://retail-go.vercel.app/store"),
 	}
-	params.StripeAccount = stripe.String(StoreStripeID)
+	params.SetStripeAccount(StoreStripeID)
 
 	s, err := session.New(params)
 
