@@ -216,7 +216,7 @@ func (srv *Server) FulfillOrder(LineItemList *stripe.LineItemList) {
 	for i := range LineItemList.Data {
 		// update item quantity
 
-		LineItem, err := srv.DBClient.Item.Query().Where(item.StripeProductID(LineItemList.Data[i].ID)).Only(context.Background())
+		LineItem, err := srv.DBClient.Item.Query().Where(item.StripePriceID(LineItemList.Data[i].Price.ID)).Only(context.Background())
 		if err != nil {
 			log.Debug().Err(err).Msg("FulfillOrder: Unable to retrieve item")
 			fmt.Printf("%v+", LineItemList.Data[i].ID)
