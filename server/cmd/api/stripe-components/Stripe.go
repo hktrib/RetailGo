@@ -50,7 +50,6 @@ func CreateStripeItem(item *ent.Item, store *ent.Store) (*stripe.Product, error)
 		},
 	}
 
-	productParams.SetStripeAccount(store.StripeAccountID)
 	product, err := product.New(productParams)
 
 	if err != nil {
@@ -63,7 +62,6 @@ func UpdateStripeItem(item *ent.Item, name string, StoreStripeID string) (*strip
 
 	productParams := &stripe.ProductParams{}
 	productParams.Name = stripe.String(name)
-	productParams.SetStripeAccount(StoreStripeID)
 	product, err := product.Update(item.StripeProductID, productParams)
 
 	if err != nil {
@@ -78,14 +76,12 @@ func UpdateStripePrice(item *ent.Item, newPrice float64, StoreStripeID string) (
 		Currency:   stripe.String(string(stripe.CurrencyUSD)),
 		UnitAmount: stripe.Int64(int64(newPrice * 100)),
 	}
-	priceParams.SetStripeAccount(StoreStripeID)
 	priceId, err := price.New(priceParams)
 	if err != nil {
 		return nil, err
 	}
 
 	productParams := &stripe.ProductParams{DefaultPrice: stripe.String(priceId.ID)}
-	productParams.SetStripeAccount(StoreStripeID)
 	_, err = product.Update(item.StripeProductID, productParams)
 	if err != nil {
 		return nil, err
@@ -110,16 +106,19 @@ func CreateCheckoutSession(items []CartItem, StoreStripeID string, w http.Respon
 			"card",
 		}),
 		PaymentIntentData: &stripe.CheckoutSessionPaymentIntentDataParams{
+			TransferData: &stripe.CheckoutSessionPaymentIntentDataTransferDataParams{
+				Destination: stripe.String(StoreStripeID),
+			},
 			ApplicationFeeAmount: stripe.Int64(500),
 		},
+
 		LineItems: lineItems,
 		Mode:      stripe.String(string(stripe.CheckoutSessionModePayment)),
 		ReturnURL: stripe.String("https://retail-go.vercel.app/store"),
 	}
-	params.SetStripeAccount(StoreStripeID)
-
 
 	s, err := session.New(params)
+	fmt.Printf("session.New: %v", s)
 
 	if err != nil {
 		fmt.Printf("session.New: %v", err)

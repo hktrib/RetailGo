@@ -76,8 +76,17 @@ func (s *Server) MountHandlers() {
 		MaxAge:           299, // Maximum value not ignored by any of major browsers
 	}))
 
-	s.Router.Post("/webhook", func(writer http.ResponseWriter, request *http.Request) {
-		s.StripeWebhookRouter(writer, request)
+	s.Router.Route("/webhook/stripe", func(r chi.Router) {
+		r.Post("/", func(writer http.ResponseWriter, request *http.Request) {
+			sk := s.Config.STRIPE_WEBHOOK_SECRET
+			s.StripeWebhookRouter(writer, request, sk)
+		})
+		r.Post("/connect", func(writer http.ResponseWriter, request *http.Request) {
+			sk := s.Config.STRIPE_WEBHOOK_SECRET_CONNECTED
+
+			s.StripeWebhookRouter(writer, request, sk)
+		})
+
 	})
 	s.Router.Post("/clerkwebhook", webhook.HandleClerkWebhook)
 	s.Router.Get("/", func(w http.ResponseWriter, request *http.Request) {
@@ -105,8 +114,8 @@ func (s *Server) MountHandlers() {
 		r.Route("/{store_id}", func(r chi.Router) {
 			//	r.Use(s.ValidateStoreAccess) // add [Employee || Owner] validation
 			r.Group(func(r chi.Router) {
-				r.Use(s.ValidateStoreAccess)
-				r.Use(s.ValidateOwner)                   // add owner validation validation
+				//	r.Use(s.ValidateStoreAccess)
+				//	r.Use(s.ValidateOwner)                   // add owner validation validation
 				r.Get("/onboarding", s.HandleOnboarding) // Get a store by ID)
 			})
 			r.Route("/inventory", func(r chi.Router) {
