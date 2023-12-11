@@ -125,7 +125,7 @@ func (cs ClerkStorage) removeStoreFromPublicMetadata(user *clerk.User, uts *ent.
 		return nil, err
 	}
 
-	stores, ok := metadata.PublicMetadata["stores"].([]storeData)
+	stores, ok := metadata.PublicMetadata["stores"].([]interface{})
 	if !ok {
 		return nil, fmt.Errorf("no Clerk Metadata! cannot remove storeMetadata if it does not exist")
 	} else {
