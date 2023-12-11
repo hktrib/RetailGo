@@ -190,7 +190,12 @@ func HandleTransSuccess(w http.ResponseWriter, event stripe.Event, srv *Server) 
 	params.AddExpand("line_items")
 
 	// Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
-	sessionWithLineItems, _ := session.Get(CSession.ID, params)
+	sessionWithLineItems, err := session.Get(CSession.ID, params)
+	if err != nil {
+		log.Debug().Err(err).Msg("HandleTransSuccess: unable to retrieve session")
+		w.WriteHeader(http.StatusBadRequest)
+		return true
+	}
 	lineItems := sessionWithLineItems.LineItems
 	// Fulfill the purchase...
 	srv.FulfillOrder(lineItems)
@@ -213,7 +218,8 @@ func (srv *Server) FulfillOrder(LineItemList *stripe.LineItemList) {
 
 		LineItem, err := srv.DBClient.Item.Query().Where(item.StripeProductID(LineItemList.Data[i].ID)).Only(context.Background())
 		if err != nil {
-			panic(err)
+			log.Debug().Err(err).Msg("FulfillOrder: Unable to retrieve item")
+			fmt.Printf("%v+", LineItemList.Data[i].ID)
 		}
 		_, err = srv.DBClient.Item.
 			UpdateOne(LineItem).
