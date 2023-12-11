@@ -33,6 +33,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronsUpDown, PencilIcon } from "lucide-react";
+import { UploadDropzone } from "@/lib/uploadthing";
+import UploadButton from "@/components/app-page/upload-button";
 
 const formSchema = z.object({
   name: z.string(),
@@ -167,6 +169,12 @@ export default function ItemDialog({
                 </FormItem>
               )}
             />
+
+            <div className="pb-0.5 pt-2">
+              <div className="text-sm font-medium">Item image</div>
+
+              <UploadButton endpoint="storeItemImage" className="mt-1" />
+            </div>
 
             <FormField
               control={form.control}
