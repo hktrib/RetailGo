@@ -43,24 +43,9 @@ export default function InviteEmployee() {
 
   const onSubmit = form.handleSubmit((data: any) => {
     console.log(JSON.stringify(data));
+
     inviteMutation.mutate(data);
-    if (inviteMutation.isSuccess) {
-      console.log("Invite Mutations Success");
-      setDialogOpen(false);
-      toast.success("Invite sent successfully!", {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 10000,
-      });
-    } else if (inviteMutation.isError) {
-      console.log("Invite Mutations Failuire");
-      toast.error("Error sending invite!", {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 10000,
-      });
-      console.log(inviteMutation.error);
-    } else {
-      console.log("idk??");
-    }
+    setDialogOpen(false);
   });
 
   return (
