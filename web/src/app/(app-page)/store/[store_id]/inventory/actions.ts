@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath, revalidateTag } from "next/cache";
+import { config } from "@/lib/hooks/config";
 
 export const createItem = async ({
   item,
@@ -14,7 +15,7 @@ export const createItem = async ({
   };
   store_id: string;
 }) => {
-  const serverUrl = `https://retailgo-production.up.railway.app/store/${store_id}/inventory/create`;
+  const serverUrl = `${config.serverUrl}/store/${store_id}/inventory/create`;
 
   console.log(item);
   console.log(`attempting to create item for store ${store_id}`);
@@ -48,7 +49,7 @@ export const updateItem = async ({
   };
   store_id: string;
 }) => {
-  const serverUrl = `https://retailgo-production.up.railway.app/store/${store_id}/inventory/update`;
+  const serverUrl = `${config.serverUrl}/store/${store_id}/inventory/update`;
 
   console.log(item);
   console.log(`attempting to update item for store ${store_id}`);
@@ -75,7 +76,7 @@ export const deleteItem = async ({
   storeId: string;
   itemId: number;
 }) => {
-  const serverUrl = `https://retailgo-production.up.railway.app/store/${storeId}/inventory?id=${itemId}`;
+  const serverUrl = `${config.serverUrl}/store/${storeId}/inventory?id=${itemId}`;
 
   console.log(`attempting to delete item ${itemId} for store ${storeId}`);
 
