@@ -1,5 +1,5 @@
-import EmployeeTable from "@/components/app-page/employee-table";
-import InviteEmployeeDialog from "@/components/app-page/invite-employee-dialog";
+import EmployeeTable from "./employee-table";
+import InviteEmployeeDialog from "./invite-employee-dialog";
 import { GetStaffByStore } from "../../queries";
 
 export default async function Employees({

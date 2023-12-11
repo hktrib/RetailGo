@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 
-import POSCategories from "./categories";
-import POSProducts from "./products";
-import POSOrderSummary from "./order-summary";
+import POSCategories from "./pos-categories";
+import POSProducts from "./pos-products";
+import POSOrderSummary from "./pos-order-summary";
 import { Input } from "@/components/ui/input";
 
 const TAX_RATE = 1;
@@ -92,7 +92,6 @@ const POSController = ({
             visibleProducts={visibleProducts}
             cart={cart}
             setCart={setCart}
-            fetchCategoryById={fetchCategoryById}
           />
         </div>
       </div>

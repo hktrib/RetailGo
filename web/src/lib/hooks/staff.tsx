@@ -1,15 +1,10 @@
-import { Item, ItemWithoutId } from "@/models/item";
 import { useFetch } from "../utils";
-import { auth } from "@clerk/nextjs";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { config } from './config';
+import { useMutation } from "@tanstack/react-query";
+import { config } from "./config";
 import { PostEmailInviteModel } from "@/models/staff";
 import { toast } from "react-toastify";
 
-
 const storeURL = config.serverURL + "/store/";
-
-
 
 export function SendInvite(storeId: string) {
   const authFetch = useFetch();
@@ -23,8 +18,7 @@ export function SendInvite(storeId: string) {
         },
         {
           "Content-Type": "application/json",
-        }
-        
+        },
       ),
     onError: (err, email, context) => {
       console.log("Error while sending invite to", email, ":", err);
@@ -41,6 +35,5 @@ export function SendInvite(storeId: string) {
       });
       // You can add any additional logic you need on successful invite here
     },
-
   });
 }

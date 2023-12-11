@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { deleteItem } from "@/app/(app-page)/store/[store_id]/inventory/actions";
+import { deleteItem } from "../actions";
 
 import ItemDialog from "../item-dialog";
-
 import {
   ColumnDef,
   ColumnFiltersState,

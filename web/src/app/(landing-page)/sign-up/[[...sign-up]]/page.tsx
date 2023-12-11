@@ -2,7 +2,7 @@ import { SignUp } from "@clerk/nextjs";
 
 const SignUpPage = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="flex min-h-screen items-center justify-center">
       <SignUp
         appearance={{
           elements: {
@@ -11,7 +11,7 @@ const SignUpPage = () => {
             footerActionLink: "text-amber-600",
           },
         }}
-        afterSignUpUrl="/registrationForm" // Redirect to the store registration page after sign up
+        afterSignUpUrl="/register-store" // Redirect to the store registration page after sign up
       />
     </div>
   );

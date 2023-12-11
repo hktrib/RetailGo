@@ -1,5 +1,5 @@
 import { getPOSData } from "../../queries";
-import POSController from "./controller";
+import POSController from "./pos-controller";
 
 export default async function POSPage({
   params,

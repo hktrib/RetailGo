@@ -36,7 +36,7 @@ const formSchema = z.object({
   email: z.string().regex(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/),
 });
 
-export default function EmployeeDialog({
+export default function EditEmployeeDialog({
   employeeData,
 }: {
   employeeData: EmployeeData;

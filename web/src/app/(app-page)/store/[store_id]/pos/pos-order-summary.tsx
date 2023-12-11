@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { createCheckout } from "./actions";
-import { CheckoutDialog } from "@/components/app-page/checkout-dialog";
+
+import { CheckoutDialog } from "./checkout-dialog";
 import { Button } from "@/components/ui/button";
 
 const POSOrderSummary = ({
@@ -36,7 +37,7 @@ const POSOrderSummary = ({
     });
 
     if (!res) {
-      console.error("something went wrong...");
+      console.error("error creating checkout", res);
       return;
     }
 
@@ -82,7 +83,7 @@ const POSOrderSummary = ({
           ))}
         </div>
       ) : (
-        <div className="rounded-lg bg-gray-100 p-3 dark:bg-zinc-800">
+        <div className="rounded-lg bg-gray-100 p-3 text-sm dark:bg-zinc-800">
           No items added to cart.
         </div>
       )}

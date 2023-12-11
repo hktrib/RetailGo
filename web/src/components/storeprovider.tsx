@@ -1,22 +1,22 @@
-// SelectedStoreContext.tsx
-
-import { IStore } from '@/models/store';
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import isAuth from './isAuth';
+import { IStore } from "@/models/store";
+import React, { createContext, useContext, useState, ReactNode } from "react";
+import isAuth from "./isAuth";
 
 interface SelectedStoreContextType {
   selectedStore: IStore | null;
   selectStore: (store: IStore) => void;
 }
 
-const SelectedStoreContext = createContext<SelectedStoreContextType | undefined>(
-  undefined
-);
+const SelectedStoreContext = createContext<
+  SelectedStoreContextType | undefined
+>(undefined);
 
 export const useSelectedStore = (): SelectedStoreContextType => {
   const context = useContext(SelectedStoreContext);
   if (context === undefined) {
-    throw new Error('useSelectedStore must be used within a SelectedStoreProvider');
+    throw new Error(
+      "useSelectedStore must be used within a SelectedStoreProvider",
+    );
   }
   return context;
 };

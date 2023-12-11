@@ -1,5 +1,5 @@
-import InventoryTable from "@/components/app-page/inventory-table";
-import AddItemDialog from "@/components/app-page/item-dialog";
+import InventoryTable from "./inventory-table";
+import AddItemDialog from "./item-dialog";
 import { getStoreItemCategories, getStoreItems } from "../../queries";
 import { cx } from "class-variance-authority";
 
