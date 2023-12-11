@@ -35,7 +35,6 @@ type Employee = {
 };
 
 type ItemRecommendation = {
-  id: number;
   imageURL: string;
   price: number;
   name: string;
