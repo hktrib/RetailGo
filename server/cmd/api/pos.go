@@ -85,7 +85,7 @@ func (srv *Server) StoreCheckout(writer http.ResponseWriter, request *http.Reque
 	}
 
 	// Create a new Stripe Checkout Session
-	StripeHelper.CreateCheckoutSession(cart, targetStore.StripeAccountID, writer, request)
+	StripeHelper.CreateCheckoutSession(cart, targetStore.StripeAccountID, targetStore.ID, writer, request)
 
 }
 

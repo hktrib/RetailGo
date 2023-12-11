@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/hktrib/RetailGo/internal/ent/store"
 	"io"
 	"net/http"
 	"os"
@@ -93,6 +94,25 @@ func (srv *Server) ValidateOwner(next http.Handler) http.Handler {
 		}
 
 		next.ServeHTTP(w, r)
+	})
+}
+func (srv *Server) StoreExists(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		storeId, err := strconv.Atoi(chi.URLParam(r, "store_id"))
+		if err != nil {
+			log.Debug().Err(err).Msg("unable to parse store_id")
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		ctx := r.Context()
+		store, err := srv.DBClient.Store.Query().Where(store.ID(storeId)).Only(ctx)
+		if err != nil {
+			log.Debug().Err(err).Msg("unable to find store by id")
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		ctx = context.WithValue(ctx, Param("store"), store)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 

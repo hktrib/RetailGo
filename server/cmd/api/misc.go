@@ -16,21 +16,7 @@ func (i ClientItem) MarshalJSON() ([]byte, error) {
 
 // Overload for default json marshaller
 func MarshalItem(TargetItem ClientItem) ([]byte, error) {
-	/*
-		cats, err := temp.Category.Query().Where(category.HasItemsWith(item.ID(TargetItem.ID))).All(context.Background())
-		var catNames []string
-		if err != nil {
-			if ent.IsNotFound(err) {
-				catNames[0] = "Uncategorized"
-			} else {
-				return nil, err
-			}
-		}
-		for _, cat := range cats {
-			catNames = append(catNames, cat.Name)
-		}
 
-	*/
 	return json.Marshal(map[string]interface{}{
 		"id":                TargetItem.ID,
 		"name":              TargetItem.Name,
