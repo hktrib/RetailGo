@@ -52,6 +52,7 @@ class DB(object):
         ).with_additional(["id", "vector"]).with_limit(1).do()["data"]["Get"]["Store"]
 
         if len(store) == 0:
+            print("No such store", store_id, "exists on Weaviate as of now.")
             return None
 
         return store[0]["_additional"]
@@ -163,9 +164,11 @@ class DB(object):
     def retrieve_candidates_to_recommend(self, store_id):
 
         # Find the store's vector
+
         try:
             store = self.get_store(store_id)
-        except:
+        except Exception as error:
+            print("Failed to retrieve store object:", error)
             return None
 
         # If it doesn't exist, start with no preferences - reranking will improve these cold start recommendations
@@ -176,9 +179,11 @@ class DB(object):
             store_vector = store["vector"]
         
         # Search for nearby items, candidates to be recommended
+
         try:
             candidates = self.find_item_near_vector(store_vector)
-        except:
+        except Exception as error:
+            print("Failed to find nearby items:", error)
             return None
 
         return candidates["data"]["Get"]["Item"]
