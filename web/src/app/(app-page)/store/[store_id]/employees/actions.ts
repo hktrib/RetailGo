@@ -14,10 +14,10 @@ export const updateUser = async ({
   user_id: string;
 }) => {
 
-  let serverUrl = `${config.serverUrl}/user/${user_id}/`;
+  let serverUrl = `${config.serverURL}/user/${user_id}/`;
 
   console.log(`attempting to update user ${user_id}`);
-  
+
   try {
     let response = await fetch(serverUrl, {
       method: "PUT",

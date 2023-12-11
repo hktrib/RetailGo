@@ -9,7 +9,7 @@ export async function createCheckout({
   lineItems: { id: number; quantity: number }[];
   store_id: string;
 }) {
-  const serverUrl = `${config.serverUrl}/store/${store_id}/pos/checkout`;
+  const serverUrl = `${config.serverURL}/store/${store_id}/pos/checkout`;
 
   console.log(lineItems);
   console.log(`attempting to create checkout for store: ${store_id}`);

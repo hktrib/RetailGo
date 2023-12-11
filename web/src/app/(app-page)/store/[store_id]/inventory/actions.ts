@@ -15,8 +15,8 @@ export const createItem = async ({
   };
   store_id: string;
 }) => {
-  const serverUrl = `${config.serverUrl}/store/${store_id}/inventory/create`;
-
+  const serverUrl = `${config.serverURL}/store/${store_id}/inventory/create`;
+  console.log(serverUrl);
   console.log(item);
   console.log(`attempting to create item for store ${store_id}`);
 
@@ -49,7 +49,8 @@ export const updateItem = async ({
   };
   store_id: string;
 }) => {
-  const serverUrl = `${config.serverUrl}/store/${store_id}/inventory/update`;
+  const serverUrl = `${config.serverURL}/store/${store_id}/inventory/update`;
+  console.log(serverUrl);
 
   console.log(item);
   console.log(`attempting to update item for store ${store_id}`);
@@ -76,7 +77,8 @@ export const deleteItem = async ({
   storeId: string;
   itemId: number;
 }) => {
-  const serverUrl = `${config.serverUrl}/store/${storeId}/inventory?id=${itemId}`;
+  const serverUrl = `${config.serverURL}/store/${storeId}/inventory?id=${itemId}`;
+  console.log(serverUrl);
 
   console.log(`attempting to delete item ${itemId} for store ${storeId}`);
 

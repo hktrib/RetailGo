@@ -7,7 +7,8 @@ export const getStoreItemCategories = async ({
 }: {
   store_id: string;
 }) => {
-  const fetchUrl = `${config.serverUrl}/store/${store_id}/category`;
+  const fetchUrl = `${config.serverURL}/store/${store_id}/category`;
+  console.log(fetchUrl);
   console.log(`fetching categories for store ${store_id}`);
 
   const { sessionId } = auth();
@@ -36,7 +37,8 @@ export const getStoreItemCategories = async ({
 };
 
 export const getStoreItems = async ({ store_id }: { store_id: string }) => {
-  const fetchUrl = `${config.serverUrl}/store/${store_id}/inventory`;
+  const fetchUrl = `${config.serverURL}/store/${store_id}/inventory`;
+  console.log(fetchUrl);
   console.log(`fetching items for store ${store_id}`);
 
   const { sessionId } = auth();
@@ -94,7 +96,7 @@ export const GetStaffByStore = async ({
 }: {
   store_id: string;
 }) => {
-  const fetchUrl = `${config.serverUrl}/store/${store_id}/staff`;
+  const fetchUrl = `${config.serverURL}/store/${store_id}/staff`;
   console.log(`fetching employees: ${fetchUrl}`);
 
   const { sessionId } = auth();
