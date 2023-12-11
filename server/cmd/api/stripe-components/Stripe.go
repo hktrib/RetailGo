@@ -116,6 +116,8 @@ func CreateCheckoutSession(items []CartItem, StoreStripeID string, w http.Respon
 		Mode:      stripe.String(string(stripe.CheckoutSessionModePayment)),
 		ReturnURL: stripe.String("https://retail-go.vercel.app/store"),
 	}
+	params.SetStripeAccount(StoreStripeID)
+
 
 	s, err := session.New(params)
 
