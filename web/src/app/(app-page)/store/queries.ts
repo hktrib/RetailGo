@@ -2,6 +2,41 @@ import { auth } from "@clerk/nextjs";
 import { config } from "@/lib/hooks/config";
 
 
+// Dashboard:
+
+export const getItemRecommendations = async({
+  store_id
+}: {store_id: string}) => {
+  const fetchUrl = `https://recommendation-server-production.up.railway.app/recommend/${store_id}`;
+  console.log("FetchURL:", fetchUrl)
+  try{
+    const res = await fetch(fetchUrl,
+      {headers: {'Access-Control-Allow-Origin': "no-cors"}}
+      );
+
+    if (!res.ok) return {
+      items: [],
+      success: false
+    };
+
+    const items = JSON.parse(await res.text()) ?? [];
+    console.log("Fetched item recommendations:", items)
+    return {
+      items: items,
+      success: true
+    }
+  }
+  catch (err){
+    console.log("Failed to retrieve recommendations:", err)
+    return {
+      items: [],
+      success: false
+    }
+  }
+}
+
+// Inventory/POS Items
+
 export const getStoreItemCategories = async ({
   store_id,
 }: {
