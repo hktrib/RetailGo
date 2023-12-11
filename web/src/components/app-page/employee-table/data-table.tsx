@@ -37,6 +37,7 @@ import EmployeeDialog from "../employee-dialog";
 import { PencilIcon, Trash2 } from "lucide-react";
 
 import type { EmployeeData } from "./columns";
+import { deleteUser } from "@/app/(app-page)/store/[store_id]/employees/actions";
 
 interface DataTableProps<TData extends EmployeeData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -70,24 +71,24 @@ export function DataTable<TData extends EmployeeData, TValue>({
 
   const params = useParams();
   const id = params.store_id;
-  const deleteMutation = DeleteUser();
 
-  const onDelete = (userId: string) => {
+  const onDelete = async (userId: string) => {
     console.log("Deleting user with id:", id);
-    deleteMutation.mutate(userId);
-    if (deleteMutation.isSuccess) {
+    let response = await deleteUser({
+      user_id: userId,
+    });
+    if (response) {
       console.log("Invite Mutations Success");
       toast.success("Deleted user sucessfully!", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 10000,
       });
-    } else if (deleteMutation.isError) {
+    } else {
       console.log("Invite Mutations Failuire");
       toast.error("Error deleting user!", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 10000,
       });
-      console.log(deleteMutation.error);
     }
   };
 
