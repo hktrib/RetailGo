@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/hktrib/RetailGo/internal/ent/store"
+	"github.com/stripe/stripe-go/v76/checkout/session"
 	"io"
 	"net/http"
 	"os"
@@ -177,8 +178,8 @@ External Package Calls:
 */
 func HandleTransSuccess(w http.ResponseWriter, event stripe.Event, srv *Server) bool {
 
-	var session stripe.CheckoutSession
-	err := json.Unmarshal(event.Data.Raw, &session)
+	var CSession stripe.CheckoutSession
+	err := json.Unmarshal(event.Data.Raw, &CSession)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error parsing webhook JSON: %v\n", err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -189,7 +190,8 @@ func HandleTransSuccess(w http.ResponseWriter, event stripe.Event, srv *Server) 
 	params.AddExpand("line_items")
 
 	// Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
-	lineItems := session.LineItems
+	sessionWithLineItems, _ := session.Get(CSession.ID, params)
+	lineItems := sessionWithLineItems.LineItems
 	// Fulfill the purchase...
 	srv.FulfillOrder(lineItems)
 
