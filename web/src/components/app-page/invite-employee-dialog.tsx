@@ -43,31 +43,16 @@ export default function InviteEmployee() {
 
   const onSubmit = form.handleSubmit((data: any) => {
     console.log(JSON.stringify(data));
+
     inviteMutation.mutate(data);
-    if (inviteMutation.isSuccess) {
-      console.log("Invite Mutations Success");
-      setDialogOpen(false);
-      toast.success("Invite sent successfully!", {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 10000,
-      });
-    } else if (inviteMutation.isError) {
-      console.log("Invite Mutations Failuire");
-      toast.error("Error sending invite!", {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 10000,
-      });
-      console.log(inviteMutation.error);
-    } else {
-      console.log("idk??");
-    }
+    setDialogOpen(false);
   });
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         <button
-          className="bg-blue-500 text-sm px-3 py-1.5 text-white font-medium rounded-md"
+          className="rounded-md bg-blue-500 px-4 py-1.5 text-sm font-medium text-white dark:bg-gradient-to-r dark:from-blue-600 dark:to-indigo-600"
           onClick={() => setDialogOpen(true)}
         >
           Invite
@@ -110,7 +95,7 @@ export default function InviteEmployee() {
             <DialogFooter>
               <button
                 type="submit"
-                className="bg-blue-500 text-sm px-3 py-1.5 text-white font-medium rounded-md mt-5"
+                className="mt-5 rounded-md bg-blue-500 px-3 py-1.5 text-sm font-medium text-white"
               >
                 Invite
               </button>

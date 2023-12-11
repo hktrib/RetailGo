@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
+
 import { cx } from "class-variance-authority";
 import StoreSelector from "./store-selector";
+import ThemeSwitcher from "./theme-switcher";
 import {
   HelpCircle,
   HomeIcon,
@@ -28,12 +30,15 @@ export default function Sidebar({ stores }: { stores: StoreMetadata[] }) {
 
   return (
     <div className="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-64 xl:flex-col">
-      <div className="flex grow flex-col px-6 border-r">
+      <div className="flex grow flex-col border-r px-6 dark:border-zinc-700">
         <div className="flex items-center justify-between py-5">
           <Link href="/store" className="text-lg font-semibold">
             RetailGo
           </Link>
-          <UserButton afterSignOutUrl="/" />
+
+          <div className="flex items-center">
+            <UserButton afterSignOutUrl="/" appearance={{}} />
+          </div>
         </div>
 
         <div className="h-full pb-12">
@@ -61,30 +66,30 @@ export const Navigation = ({
   };
 
   return (
-    <nav className="flex flex-1 flex-col h-full">
+    <nav className="flex h-full flex-1 flex-col">
       <ul role="list" className="flex flex-1 flex-col">
         {currentStoreId && (
           <li className="py-5">
-            <div className="text-xs text-gray-600 mb-2.5 px-3">Navigation</div>
+            <div className="mb-2.5 px-3 text-xs text-gray-600 dark:text-zinc-400">
+              Navigation
+            </div>
             <ul role="list" className="space-y-1.5">
               {navigation.map((item) => (
                 <li key={item.name} className="group">
                   <Link
                     href={buildUrl(item.href)}
                     className={cx(
-                      "text-gray-900 hover:text-black flex items-center gap-x-3 px-3 py-1.5 rounded-md",
-                      pathname.endsWith(item.href)
-                        ? "bg-gray-100 font-medium"
-                        : "hover:bg-gray-100",
-                      item.href === "/" &&
-                        !pathname.endsWith("/employees") &&
-                        !pathname.endsWith("/inventory") &&
-                        !pathname.endsWith("/pos")
-                        ? "bg-gray-100 font-medium"
-                        : "hover:bg-gray-100"
+                      "flex items-center gap-x-3 rounded-md px-3 py-1.5",
+                      pathname.endsWith(item.href) ||
+                        (item.href === "/" &&
+                          !pathname.endsWith("/employees") &&
+                          !pathname.endsWith("/inventory") &&
+                          !pathname.endsWith("/pos"))
+                        ? "bg-gray-100 font-medium text-gray-900 shadow-sm transition duration-150 ease-in-out dark:bg-zinc-700 dark:text-white"
+                        : "text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 dark:text-zinc-300 dark:hover:bg-zinc-700",
                     )}
                   >
-                    <item.icon className="w-4 h-4" aria-hidden="true" />
+                    <item.icon className="h-4 w-4" aria-hidden="true" />
                     <span className="text-sm">{item.name}</span>
                   </Link>
                 </li>
@@ -95,14 +100,16 @@ export const Navigation = ({
 
         <li className="mt-auto pb-14 xl:pb-4">
           <ul role="list" className="space-y-1.5">
-            <li className="flex items-center px-3 py-1.5 gap-x-3">
-              <Settings className="w-4 h-4" aria-hidden="true" />
-              <span className="text-sm text-gray-900">Settings</span>
+            <ThemeSwitcher />
+
+            <li className="flex items-center gap-x-3 px-3 py-1.5 text-gray-700 dark:text-zinc-300">
+              <Settings className="h-4 w-4" aria-hidden="true" />
+              <span className="text-sm">Settings</span>
             </li>
 
-            <li className="flex items-center px-3 py-1.5 gap-x-3">
-              <HelpCircle className="w-4 h-4" aria-hidden="true" />
-              <span className="text-sm text-gray-900">Help</span>
+            <li className="flex items-center gap-x-3 px-3 py-1.5 text-gray-700 dark:text-zinc-300">
+              <HelpCircle className="h-4 w-4" aria-hidden="true" />
+              <span className="text-sm">Help</span>
             </li>
           </ul>
         </li>

@@ -5,15 +5,14 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	. "github.com/hktrib/RetailGo/cmd/api/stripe-components"
+	clerkstorage "github.com/hktrib/RetailGo/internal/clerk"
+	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/store"
+	"github.com/hktrib/RetailGo/internal/ent/user"
+	"github.com/hktrib/RetailGo/internal/transactions"
 	"github.com/rs/zerolog/log"
 	"net/http"
 	"strconv"
-
-	clerkstorage "github.com/hktrib/RetailGo/internal/clerk"
-	"github.com/hktrib/RetailGo/internal/ent"
-	"github.com/hktrib/RetailGo/internal/ent/user"
-	"github.com/hktrib/RetailGo/internal/transactions"
 )
 
 /*
@@ -40,10 +39,22 @@ func (srv *Server) CreateStore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = transactions.StoreAndOwnerCreationTx(ctx, reqStore, reqUser, srv.DBClient, clerkStore)
+	err, nStore, nUser := transactions.StoreAndOwnerCreationTx(ctx, reqStore, reqUser, srv.DBClient, clerkStore)
+	// this is bad
+	err = SendOnboardingEmail(nStore, nUser)
+	if err != nil {
+		log.Debug().Err(err).Msg("CreateStore: unable to send onboarding email")
+		return
+	}
+
 	if err != nil {
 		log.Debug().Err(err).Msg("CreateStore: could not executed Store|Owner Transaction ")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	if err != nil {
+		log.Debug().Err(err).Msg("CreateStore: unable to send onboarding email")
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
@@ -108,9 +119,9 @@ func (srv *Server) GetStoreUsers(w http.ResponseWriter, r *http.Request) {
 	w.Write(resp)
 }
 func (srv *Server) HandleOnboarding(w http.ResponseWriter, r *http.Request) {
-	store_id := r.Context().Value("store_var").(int)
+	store_id := 133
 	// Get store
-	store, err := ent.FromContext(r.Context()).Store.Query().Where(store.IDEQ(store_id)).Only(r.Context())
+	store, err := srv.DBClient.Store.Query().Where(store.ID(store_id)).Only(r.Context())
 	if err != nil {
 		log.Debug().Err(err).Msg("HandleOnboarding: unable to fetch store from database")
 		return

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	StripeHelper "github.com/hktrib/RetailGo/cmd/api/stripe-components"
 	"html/template"
 	"log"
 	"net/http"
@@ -222,4 +223,67 @@ func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 	// Respond with success message
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Email sent successfully"))
+}
+func SendOnboardingEmail(StoreObj *ent.Store, UserObj *ent.User) error {
+
+	// Set up authentication information.
+	auth := smtp.PlainAuth(
+		"",
+		"retailgoco@gmail.com",
+		"hhqm pqgw lxmi weqb",
+		"smtp.gmail.com",
+	)
+
+	// Define email headers and HTML content
+	from := mail.Address{Name: "RetailGo Team", Address: "retailgoco@gmail.com"}
+	to := mail.Address{Name: UserObj.FirstName, Address: UserObj.Email}
+	subject := "You must complete onboarding to continue!"
+
+	// Message to be sent
+	headers := make(map[string]string)
+	headers["From"] = from.String()
+	headers["To"] = to.String()
+	headers["Subject"] = subject
+	headers["MIME-Version"] = "1.0"
+	headers["Content-Type"] = `text/html; charset="UTF-8"`
+
+	// HTML message
+
+	tmpl := template.Must(template.ParseGlob("./cmd/templates/*"))
+
+	url, err := StripeHelper.StartOnboarding(StoreObj.StripeAccountID)
+	if err != nil {
+		return fmt.Errorf("failed to start onboarding: %w", err)
+	}
+
+	htmlBody := new(bytes.Buffer)
+	templateData := HtmlTemplate{
+		Email:       UserObj.Email,
+		Name:        UserObj.FirstName,
+		Store_name:  StoreObj.StoreName,
+		Sender_name: UserObj.FirstName + " " + UserObj.LastName,
+		Action_url:  url.URL,
+	}
+
+	err = tmpl.ExecuteTemplate(htmlBody, "email_invitation.html", templateData)
+	if err != nil {
+		return fmt.Errorf("failed to read email template: %w", err)
+	}
+
+	// Combine headers and HTML content
+	message := ""
+	for k, v := range headers {
+		message += fmt.Sprintf("%s: %s\r\n", k, v)
+	}
+	message += "\r\n" + htmlBody.String()
+
+	// Convert to and from to slice of strings
+	toAddresses := []string{to.Address}
+
+	// Send the email
+	err = smtp.SendMail("smtp.gmail.com:587", auth, from.Address, toAddresses, []byte(message))
+	if err != nil {
+		return fmt.Errorf("failed to send email: %w", err)
+	}
+	return nil
 }

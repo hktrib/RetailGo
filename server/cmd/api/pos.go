@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/hktrib/RetailGo/internal/ent/store"
+	"github.com/stripe/stripe-go/v76/checkout/session"
 	"io"
 	"net/http"
 	"os"
@@ -100,7 +101,7 @@ External Package Calls:
 - webhook.ConstructEvent()
 - HandleTransSuccess(w, event, srv) [for specific event types]
 */
-func (srv *Server) StripeWebhookRouter(w http.ResponseWriter, r *http.Request) {
+func (srv *Server) StripeWebhookRouter(w http.ResponseWriter, r *http.Request, endpointSecret string) {
 
 	const MaxBodyBytes = int64(65536)
 	r.Body = http.MaxBytesReader(w, r.Body, MaxBodyBytes)
@@ -112,7 +113,7 @@ func (srv *Server) StripeWebhookRouter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// This is your Stripe CLI webhook secret for testing your endpoint locally.
-	endpointSecret := srv.Config.STRIPE_WEBHOOK_SECRET
+
 	// Pass the request body and Stripe-Signature header to ConstructEvent, along
 	// with the webhook signing key.
 	event, err := webhook.ConstructEvent(payload, r.Header.Get("Stripe-Signature"),
@@ -177,8 +178,8 @@ External Package Calls:
 */
 func HandleTransSuccess(w http.ResponseWriter, event stripe.Event, srv *Server) bool {
 
-	var session stripe.CheckoutSession
-	err := json.Unmarshal(event.Data.Raw, &session)
+	var CSession stripe.CheckoutSession
+	err := json.Unmarshal(event.Data.Raw, &CSession)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error parsing webhook JSON: %v\n", err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -189,7 +190,13 @@ func HandleTransSuccess(w http.ResponseWriter, event stripe.Event, srv *Server) 
 	params.AddExpand("line_items")
 
 	// Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
-	lineItems := session.LineItems
+	sessionWithLineItems, err := session.Get(CSession.ID, params)
+	if err != nil {
+		log.Debug().Err(err).Msg("HandleTransSuccess: unable to retrieve session")
+		w.WriteHeader(http.StatusBadRequest)
+		return true
+	}
+	lineItems := sessionWithLineItems.LineItems
 	// Fulfill the purchase...
 	srv.FulfillOrder(lineItems)
 
@@ -209,9 +216,10 @@ func (srv *Server) FulfillOrder(LineItemList *stripe.LineItemList) {
 	for i := range LineItemList.Data {
 		// update item quantity
 
-		LineItem, err := srv.DBClient.Item.Query().Where(item.StripeProductID(LineItemList.Data[i].ID)).Only(context.Background())
+		LineItem, err := srv.DBClient.Item.Query().Where(item.StripePriceID(LineItemList.Data[i].Price.ID)).Only(context.Background())
 		if err != nil {
-			panic(err)
+			log.Debug().Err(err).Msg("FulfillOrder: Unable to retrieve item")
+			fmt.Printf("%v+", LineItemList.Data[i].ID)
 		}
 		_, err = srv.DBClient.Item.
 			UpdateOne(LineItem).

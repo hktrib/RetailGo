@@ -37,18 +37,18 @@ export default function StoreSelector({
 
   return (
     <Select value={currentStoreId} onValueChange={routeStore}>
-      <SelectTrigger className="shadow-none outline-none ring-0 border-none px-3 py-1.5 flex items-center gap-x-2 bg-gray-100 rounded-md relative">
+      <SelectTrigger className="relative flex items-center gap-x-2 rounded-md border-none bg-gray-100 px-3 py-1.5 shadow-sm outline-none ring-0 dark:bg-zinc-700 dark:focus:ring-0">
         {currentStore ? (
           <>
-            <div className="h-5 w-5 bg-white flex items-center justify-center rounded-md">
+            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-white dark:bg-zinc-800">
               <span className="text-xs font-medium">
                 {currentStore.storename.charAt(0)}
               </span>
             </div>
             <p
               className={cx(
-                "text-sm font-medium truncate text-left",
-                type === "mobile" ? "w-44" : "w-28"
+                "truncate text-left text-sm font-medium",
+                type === "mobile" ? "w-44" : "w-28",
               )}
             >
               {currentStore.storename}
@@ -59,11 +59,18 @@ export default function StoreSelector({
         )}
       </SelectTrigger>
 
-      <SelectContent sideOffset={5}>
+      <SelectContent
+        sideOffset={5}
+        className="dark:border-zinc-800 dark:bg-zinc-900"
+      >
         <SelectGroup>
           <SelectLabel>My stores</SelectLabel>
           {stores.map((store) => (
-            <SelectItem key={store.id} value={store.id.toString()}>
+            <SelectItem
+              key={store.id}
+              value={store.id.toString()}
+              className="dark:focus:bg-zinc-800"
+            >
               {store.storename}
             </SelectItem>
           ))}

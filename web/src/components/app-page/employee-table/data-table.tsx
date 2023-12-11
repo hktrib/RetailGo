@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { DeleteUser } from "@/lib/hooks/user";
-
+import { deleteUser } from "@/app/(app-page)/store/[store_id]/employees/actions";
 import { toast } from "react-toastify";
 import {
   ColumnDef,
@@ -34,7 +33,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown";
 import EmployeeDialog from "../employee-dialog";
-import { PencilIcon, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 import type { EmployeeData } from "./columns";
 
@@ -70,24 +69,24 @@ export function DataTable<TData extends EmployeeData, TValue>({
 
   const params = useParams();
   const id = params.store_id;
-  const deleteMutation = DeleteUser();
 
-  const onDelete = (userId: string) => {
+  const onDelete = async (userId: string) => {
     console.log("Deleting user with id:", id);
-    deleteMutation.mutate(userId);
-    if (deleteMutation.isSuccess) {
+    let response = await deleteUser({
+      user_id: userId,
+    });
+    if (response) {
       console.log("Invite Mutations Success");
       toast.success("Deleted user sucessfully!", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 10000,
       });
-    } else if (deleteMutation.isError) {
+    } else {
       console.log("Invite Mutations Failuire");
       toast.error("Error deleting user!", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 10000,
       });
-      console.log(deleteMutation.error);
     }
   };
 
@@ -96,20 +95,29 @@ export function DataTable<TData extends EmployeeData, TValue>({
       <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Search employees..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
+          value={
+            (table.getColumn("first_name")?.getFilterValue() as string) ?? ""
           }
-          className="max-w-sm"
+          onChange={(event) =>
+            table.getColumn("first_name")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm dark:border-zinc-800 dark:focus:ring-zinc-700"
         />
+
         <div className="flex items-center space-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
+              <Button
+                variant="outline"
+                className="ml-auto dark:border-zinc-800 dark:hover:bg-zinc-800"
+              >
                 Customize
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent
+              align="end"
+              className="dark:border-zinc-700 dark:bg-zinc-800"
+            >
               {table
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
@@ -117,7 +125,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
                   return (
                     <DropdownMenuCheckboxItem
                       key={column.id}
-                      className="capitalize"
+                      className="capitalize dark:hover:bg-zinc-700"
                       checked={column.getIsVisible()}
                       onCheckedChange={(value) =>
                         column.toggleVisibility(!!value)
@@ -132,11 +140,14 @@ export function DataTable<TData extends EmployeeData, TValue>({
         </div>
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-md border dark:border-zinc-800">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow
+                key={headerGroup.id}
+                className="dark:border-zinc-800 dark:hover:bg-zinc-800"
+              >
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id}>
@@ -144,7 +155,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
@@ -158,25 +169,27 @@ export function DataTable<TData extends EmployeeData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="dark:hover:bg-zinc-800"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
                   <TableCell>
-                    <div className="text-right flex flex-row space-x-2 h-8 w-8 p-0">
+                    <div className="flex h-8 w-8 flex-row space-x-2 p-0 text-right">
                       <EmployeeDialog employeeData={row.original} />
                       <button
+                        type="button"
                         onClick={() => onDelete(row.original.id.toString())}
                       >
                         <Trash2
                           style={{ color: "red" }}
                           className="h-5 w-5 p-0"
-                        ></Trash2>
+                        />
                       </button>
                     </div>
                   </TableCell>
@@ -202,6 +215,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
           size="sm"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
+          className="dark:border-zinc-800"
         >
           Previous
         </Button>
@@ -210,6 +224,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
           size="sm"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
+          className="dark:border-zinc-800"
         >
           Next
         </Button>

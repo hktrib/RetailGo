@@ -1,3 +1,5 @@
+import { cx } from "class-variance-authority";
+
 const POSCategories = ({
   items,
   categories,
@@ -14,7 +16,7 @@ const POSCategories = ({
   };
 
   return (
-    <section className="grid lg:grid-cols-3 gap-3">
+    <section className="grid gap-3 lg:grid-cols-3">
       <CategoryCard
         name="-1"
         displayName="All"
@@ -52,13 +54,14 @@ const CategoryCard = ({
 }) => {
   return (
     <article
-      className={`bg-gray-100 p-4 rounded-lg cursor-pointer ${
-        selected && "ring ring-blue-200"
-      }`}
+      className={cx(
+        "cursor-pointer rounded-lg bg-gray-100 p-4 shadow-sm dark:bg-zinc-800",
+        selected && "ring-2 ring-blue-200 dark:ring-blue-500",
+      )}
       onClick={() => setSelectedCategory(name)}
     >
       <div className="text-xl font-medium">{displayName}</div>
-      <div className="text-sm text-gray-600 leading-6">
+      <div className="text-sm leading-6 text-gray-600">
         {items} <span>{items === 1 ? "item" : "items"}</span>
       </div>
     </article>

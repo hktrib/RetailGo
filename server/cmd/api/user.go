@@ -173,7 +173,7 @@ func (srv *Server) UserQuery(w http.ResponseWriter, r *http.Request) {
 	res, err := json.MarshalIndent(user_data, "", "")
 
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -233,9 +233,9 @@ type UserUpdateRequest struct {
 func (srv *Server) userUpdate(w http.ResponseWriter, r *http.Request) {
 	// get item id from url query string
 	ctx := r.Context()
-	userID, err := strconv.Atoi(chi.URLParam(r, "userID"))
+	userID, err := strconv.Atoi(chi.URLParam(r, "user_id"))
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, http.StatusText(http.StatusBadRequest)+": "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -245,14 +245,14 @@ func (srv *Server) userUpdate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusNotFound)+": user not found", http.StatusNotFound)
 		return
 	} else if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// Decode the request body
 	var req UserUpdateRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, http.StatusText(http.StatusBadRequest)+": "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -270,7 +270,7 @@ func (srv *Server) userUpdate(w http.ResponseWriter, r *http.Request) {
 
 	// Save the changes
 	if _, err := update.Save(ctx); err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -300,7 +300,7 @@ func (srv *Server) UserHasStore(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("false"))
 		return
 	} else if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 

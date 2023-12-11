@@ -80,6 +80,7 @@ func (cs ClerkStorage) addStoreToPublicMetadata(user *clerk.User, uts *ent.UserT
 
 	stores, ok := metadata.PublicMetadata["stores"].([]interface{})
 	if !ok {
+		log.Debug().Msg("'stores' doesn't refer to []storeData")
 		metadata.PublicMetadata["stores"] = []storeData{{
 			StoreID:         uts.StoreID,
 			Name:            uts.StoreName,
@@ -92,16 +93,27 @@ func (cs ClerkStorage) addStoreToPublicMetadata(user *clerk.User, uts *ent.UserT
 			PermissionLevel: uts.PermissionLevel,
 		}
 
-		for _, data := range stores {
-			store, ok := data.(storeData)
-			if !ok {
-				return nil, fmt.Errorf("malformed data, %v", data)
-			}
-			if Equal(store, newStoreData) {
+		storesBytes, err := json.Marshal(stores)
+		if err != nil {
+			return nil, errors.New("failed to marshal")
+		}
+
+		userToStoresRelations := []storeData{}
+
+		err = json.NewDecoder(bytes.NewBuffer(storesBytes)).Decode(&userToStoresRelations)
+		if err != nil {
+			return nil, errors.New("failed to decode store data")
+		}
+
+		for _, oldStoreData := range userToStoresRelations {
+			if Equal(oldStoreData, newStoreData) {
+				log.Debug().Msg(fmt.Sprintf("Old Store%v | New Store%v || NO NEED TO ADD", userToStoresRelations, newStoreData))
 				return metadata, nil
 			}
 		}
-		metadata.PublicMetadata["stores"] = append(stores, newStoreData)
+
+		userToStoresRelations = append(userToStoresRelations, newStoreData)
+		metadata.PublicMetadata["stores"] = userToStoresRelations
 	}
 	return metadata, nil
 }
@@ -113,9 +125,9 @@ func (cs ClerkStorage) removeStoreFromPublicMetadata(user *clerk.User, uts *ent.
 		return nil, err
 	}
 
-	stores, ok := metadata.PublicMetadata["stores"].([]storeData)
+	stores, ok := metadata.PublicMetadata["stores"].([]interface{})
 	if !ok {
-		return nil, fmt.Errorf("no Clerk Metadata! Something went wrong")
+		return nil, fmt.Errorf("no Clerk Metadata! cannot remove storeMetadata if it does not exist")
 	} else {
 		storeDataToDelete := storeData{
 			StoreID:         uts.StoreID,
@@ -123,24 +135,43 @@ func (cs ClerkStorage) removeStoreFromPublicMetadata(user *clerk.User, uts *ent.
 			PermissionLevel: uts.PermissionLevel,
 		}
 
+		// Marshalling stores to bytes
+		storesBytes, err := json.Marshal(stores)
+		if err != nil {
+			return nil, errors.New("failed to marshal")
+		}
+
+		// Decoding raw bytes into []storeData for further processing
+		userToStoresRelations := []storeData{}
+		err = json.NewDecoder(bytes.NewBuffer(storesBytes)).Decode(&userToStoresRelations)
+		if err != nil {
+			return nil, errors.New("failed to decode store data")
+		}
+
 		storeIndexToDelete := -1
-		for index, store := range stores {
+		for index, store := range userToStoresRelations {
 			if Equal(store, storeDataToDelete) {
 				storeIndexToDelete = index
 				break
 			}
 		}
 
+		// Deleting StoreData from user's Clerk Metadata
 		if storeIndexToDelete != -1 {
-			if storeIndexToDelete == 0 {
-				metadata.PublicMetadata["stores"] = stores[:1]
-			} else if storeIndexToDelete == len(stores)-1 {
-				metadata.PublicMetadata["stores"] = stores[len(stores)-1:]
+			if len(userToStoresRelations) == 1 {
+				metadata.PublicMetadata["stores"] = []storeData{}
+			} else if storeIndexToDelete == 0 {
+				userToStoresRelations = userToStoresRelations[:1]
+				metadata.PublicMetadata["stores"] = userToStoresRelations
+			} else if storeIndexToDelete == len(userToStoresRelations)-1 {
+				userToStoresRelations = userToStoresRelations[storeIndexToDelete-1:]
+				metadata.PublicMetadata["stores"] = userToStoresRelations
 			} else {
-				metadata.PublicMetadata["stores"] = append(stores[:storeIndexToDelete], stores[storeIndexToDelete+1:]...)
+				userToStoresRelations = append(userToStoresRelations[:storeIndexToDelete], userToStoresRelations[storeIndexToDelete+1:]...)
+				metadata.PublicMetadata["stores"] = userToStoresRelations
 			}
 		} else {
-			log.Debug().Msg(fmt.Sprintf("Stores: %v | UserToStore", stores))
+			log.Debug().Msg(fmt.Sprintf("Stores: %v | UserToStore %v", userToStoresRelations, *uts))
 			return nil, fmt.Errorf("store index %d not found", storeIndexToDelete)
 		}
 	}

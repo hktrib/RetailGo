@@ -11,10 +11,10 @@ import (
 	"github.com/hktrib/RetailGo/internal/ent/usertostore"
 )
 
-func StoreAndOwnerCreationTx(ctx context.Context, reqStore *ent.Store, reqUser *ent.User, DB *ent.Client, clerkStore *clerkstorage.ClerkStorage) error {
+func StoreAndOwnerCreationTx(ctx context.Context, reqStore *ent.Store, reqUser *ent.User, DB *ent.Client, clerkStore *clerkstorage.ClerkStorage) (error, *ent.Store, *ent.User) {
 	tx, err := DB.Tx(ctx)
 	if err != nil {
-		return rollback(tx, fmt.Errorf("tx_error: starting a transaction: %w", err))
+		return rollback(tx, fmt.Errorf("tx_error: starting a transaction: %w", err)), nil, nil
 	}
 
 	// Generating uuid for store and converting to string
@@ -22,7 +22,7 @@ func StoreAndOwnerCreationTx(ctx context.Context, reqStore *ent.Store, reqUser *
 	// Creating Stripe Connected Account
 	stripeAccount, err := CreateConnectedAccount()
 	if err != nil {
-		return rollback(tx, fmt.Errorf("tx_error: Unable to create stripe account: %w", err))
+		return rollback(tx, fmt.Errorf("tx_error: Unable to create stripe account: %w", err)), nil, nil
 	}
 
 	newStore, err := tx.Store.Create().
@@ -36,7 +36,7 @@ func StoreAndOwnerCreationTx(ctx context.Context, reqStore *ent.Store, reqUser *
 		Save(ctx)
 
 	if err != nil {
-		return rollback(tx, fmt.Errorf("tx_error: Unable to create store: %w", err))
+		return rollback(tx, fmt.Errorf("tx_error: Unable to create store: %w", err)), nil, nil
 	}
 
 	newUser, err := tx.User.Create().
@@ -48,7 +48,7 @@ func StoreAndOwnerCreationTx(ctx context.Context, reqStore *ent.Store, reqUser *
 		SetStoreID(newStore.ID).AddStoreIDs(newStore.ID).
 		Save(ctx)
 	if err != nil {
-		return rollback(tx, fmt.Errorf("tx_error: Unable to create owner: %w", err))
+		return rollback(tx, fmt.Errorf("tx_error: Unable to create owner: %w", err)), nil, nil
 	}
 
 	_, err = tx.UserToStore.Update().
@@ -58,18 +58,19 @@ func StoreAndOwnerCreationTx(ctx context.Context, reqStore *ent.Store, reqUser *
 		SetStoreName(newStore.StoreName).
 		Save(ctx)
 	if err != nil {
-		return rollback(tx, fmt.Errorf("tx_error: Unable to Update UserToStore Junction table: %w", err))
+		return rollback(tx, fmt.Errorf("tx_error: Unable to Update UserToStore Junction table: %w", err)), nil, nil
 	}
 
 	newUTS, err := tx.UserToStore.Query().
 		Where(usertostore.StoreID(newStore.ID), usertostore.UserID(newUser.ID)).
 		Only(ctx)
 	if err != nil {
-		return rollback(tx, fmt.Errorf("tx_error: Unable to get query user to store table: %w", err))
+		return rollback(tx, fmt.Errorf("tx_error: Unable to get query user to store table: %w", err)), nil, nil
 	}
 	err = clerkStore.AddMetadata(newUTS)
 	if err != nil {
-		return rollback(tx, fmt.Errorf("tx_error: Unable to user metadata to Clerk Store: %w", err))
+		return rollback(tx, fmt.Errorf("tx_error: Unable to user metadata to Clerk Store: %w", err)), nil, nil
 	}
-	return tx.Commit()
+
+	return tx.Commit(), newStore, newUser
 }
