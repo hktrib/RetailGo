@@ -73,7 +73,7 @@ const POSProducts = ({
   };
 
   return (
-    <section className="grid xl:grid-cols-3 gap-3">
+    <section className="grid gap-3 xl:grid-cols-3">
       {visibleProducts.map((product) => (
         <ProductCard
           key={product.id}
@@ -106,26 +106,28 @@ const ProductCard = ({
   const { id, name, price, category } = productData;
 
   return (
-    <article className="bg-gray-100 p-4 rounded-lg">
-      <div className="text-xs text-gray-500">{category}</div>
-      <div className="text-lg font-medium mt-1 leading-6">{name}</div>
-      <div className="text-sm text-gray-600">${price}</div>
+    <article className="rounded-lg bg-gray-100 p-4 shadow-sm dark:bg-zinc-800">
+      <div className="text-xs text-gray-500 dark:text-zinc-400">{category}</div>
+      <div className="mt-0.5 text-lg font-medium leading-6">{name}</div>
+      <div className="text-sm leading-6 text-gray-600 dark:text-zinc-300">
+        ${price}
+      </div>
 
-      <div className="flex items-center justify-end mt-3 gap-x-2">
+      <div className="mt-3 flex items-center justify-end gap-x-2">
         <Button
           variant="outline"
-          className="px-2 h-8"
+          className="h-8 px-2 dark:border-zinc-700 dark:hover:bg-zinc-700"
           onClick={() => removeItem(id)}
         >
-          <Minus className="w-4 h-4" />
+          <Minus className="h-4 w-4" />
         </Button>
         <span>{qty}</span>
         <Button
           variant="outline"
-          className="px-2 h-8"
+          className="h-8 px-2 dark:border-zinc-700 dark:hover:bg-zinc-700"
           onClick={() => addItem(id)}
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="h-4 w-4" />
         </Button>
       </div>
     </article>
