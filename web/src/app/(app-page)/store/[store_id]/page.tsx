@@ -2,55 +2,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getItemRecommendations } from "../queries";
 import Image from "next/image";
 
-async function RemoteImage({ imageURL }: { imageURL: string }) {
-  // https://www.freecodecamp.org/news/check-if-a-javascript-string-is-a-url/
-  const isValidUrl = (urlString: string) => {
-    try {
-      return Boolean(new URL(urlString));
-    } catch (e) {
-      return false;
-    }
-  };
-
-  if (isValidUrl(imageURL)) {
-    return (
-      <div className="h-40 w-full bg-gray-100 dark:bg-zinc-700">
-        <Image src={imageURL} alt={imageURL} />
-      </div>
-    );
-  }
-
-  return (
-    <div className="h-40 w-full bg-gray-100 text-center dark:bg-zinc-700">
-      No Image Available.
-    </div>
-  );
-}
-
-async function ItemGrid({ storeId }: { storeId: string }) {
-  const recommendedItems = await getItemRecommendations({ store_id: storeId });
-
-  if (!recommendedItems.success) {
-    return <div>Nothing to recommend for now!</div>;
-  }
-
-  return await recommendedItems.items.map((item: any) => (
-    <div
-      className="col-span-2 row-span-2 rounded-md bg-gray-200 dark:bg-zinc-800"
-      key={item.id}
-    >
-      <article className="w-52 rounded-md bg-white shadow-sm dark:bg-zinc-600">
-        <RemoteImage imageURL={item.imageURL} key={item.id} />
-        <div className="p-4">
-          <span className="font-medium">
-            {item.name} ({item.categoryName})
-          </span>
-        </div>
-      </article>
-    </div>
-  ));
-}
-
 function DashboardPage({ params }: { params: { store_id: string } }) {
   return (
     <main className="flex h-full flex-grow bg-gray-50 dark:bg-zinc-900">
@@ -64,14 +15,72 @@ function DashboardPage({ params }: { params: { store_id: string } }) {
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="activity">Activity</TabsTrigger>
           </TabsList>
-          <TabsContent value="overview" className="-mt-10 h-full pb-4 pt-14">
-            @ts-expect-error Async Server Component
-            <ItemGrid storeId={String(params.store_id)} />
+          <TabsContent value="overview" className="mt-6">
+            <h2 className="text-lg font-medium dark:text-zinc-300">
+              Recommended Items
+            </h2>
+            <ItemRecommendations storeId={String(params.store_id)} />
           </TabsContent>
+
           <TabsContent value="activity">Activity</TabsContent>
         </Tabs>
       </div>
     </main>
+  );
+}
+
+async function ItemRecommendations({ storeId }: { storeId: string }) {
+  const recommendedItems = await getItemRecommendations({ store_id: storeId });
+
+  if (!recommendedItems.success || !recommendedItems.items) {
+    return (
+      <p className="text-sm leading-6 text-gray-700">
+        Nothing to recommend for now!
+      </p>
+    );
+  }
+
+  return (
+    <section className="mt-2 flex flex-row flex-wrap gap-4">
+      {recommendedItems.items.map((item: ItemRecommendation) => (
+        <article
+          className="rounded-md bg-gray-200 shadow-sm dark:bg-zinc-800"
+          key={item.id}
+        >
+          <div className="w-52 rounded-md bg-white shadow-sm dark:bg-zinc-800">
+            <RemoteImage imageURL={item.imageURL} />
+
+            <div className="flex flex-col p-4">
+              <p className="text-sm font-medium">{item.name}</p>
+              <p className="mt-0.5 text-xs dark:text-zinc-300">
+                {item.categoryName}
+              </p>
+            </div>
+          </div>
+        </article>
+      ))}
+    </section>
+  );
+}
+
+async function RemoteImage({ imageURL }: { imageURL: string }) {
+  // https://www.freecodecamp.org/news/check-if-a-javascript-string-is-a-url/
+  const isValidUrl = (urlString: string) => {
+    try {
+      return Boolean(new URL(urlString));
+    } catch (e) {
+      return false;
+    }
+  };
+
+  return (
+    <div className="flex h-40 w-full items-center justify-center rounded-t-md bg-gray-100 dark:bg-zinc-700">
+      {isValidUrl(imageURL) ? (
+        <Image src={imageURL} alt={imageURL} />
+      ) : (
+        <span className="text-xs dark:text-zinc-300">No image available.</span>
+      )}
+    </div>
   );
 }
 
