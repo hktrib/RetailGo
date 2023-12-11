@@ -45,7 +45,7 @@ async function ItemRecommendations({ storeId }: { storeId: string }) {
       {recommendedItems.items.map((item: ItemRecommendation) => (
         <article
           className="rounded-md bg-gray-200 shadow-sm dark:bg-zinc-800"
-          key={item.id}
+          key={item.name}
         >
           <div className="w-52 rounded-md bg-white shadow-sm dark:bg-zinc-800">
             <RemoteImage imageURL={item.imageURL} />
