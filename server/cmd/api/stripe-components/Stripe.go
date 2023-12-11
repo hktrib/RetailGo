@@ -89,7 +89,7 @@ func UpdateStripePrice(item *ent.Item, newPrice float64, StoreStripeID string) (
 	return priceId, nil
 }
 
-func CreateCheckoutSession(items []CartItem, StoreStripeID string, w http.ResponseWriter, r *http.Request) {
+func CreateCheckoutSession(items []CartItem, StoreStripeID string, StoreId int, w http.ResponseWriter, r *http.Request) {
 	//TODO: ADD ENVIRONMENT VARIABLE FOR SERVER ADDRESS
 	var lineItems []*stripe.CheckoutSessionLineItemParams
 
@@ -114,7 +114,7 @@ func CreateCheckoutSession(items []CartItem, StoreStripeID string, w http.Respon
 
 		LineItems: lineItems,
 		Mode:      stripe.String(string(stripe.CheckoutSessionModePayment)),
-		ReturnURL: stripe.String("https://retail-go.vercel.app/store"),
+		ReturnURL: stripe.String(fmt.Sprintf("https://retail-go.vercel.app/store/%d/pos", StoreId)),
 	}
 
 	s, err := session.New(params)
