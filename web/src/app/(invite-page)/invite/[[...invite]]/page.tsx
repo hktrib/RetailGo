@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { PostJoinStore } from "@/lib/hooks/user";
 import { RedirectToSignIn, SignIn, SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
+import { join } from "path";
 
 const InvitePage = () => {
   const router = useRouter();

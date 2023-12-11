@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 
 
 const storeURL = config.serverURL + "/user/";
-const sleep = (delay: number | undefined) => new Promise((resolve) => setTimeout(resolve, delay))
+
 
 
 export function HasStore() {
@@ -36,7 +36,7 @@ export function PostJoinStore(storeId: string) {
       }
       
     ),
-    onError: (err, email, context) => {
+    onError: (err, email) => {
       console.log("Error while sending invite to", email, ":", err);
     },
     onSuccess: (email) => {

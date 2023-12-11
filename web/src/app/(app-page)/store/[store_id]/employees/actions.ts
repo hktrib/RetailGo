@@ -19,6 +19,7 @@ export const updateUser = async ({
 
   console.log(`attempting to update user ${user_id}`);
 
+  console.log("sending PUT request to " + serverUrl + " with body: " + JSON.stringify(user));
   try {
     let response = await fetch(serverUrl, {
       method: "PUT",
