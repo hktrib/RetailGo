@@ -308,6 +308,7 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		SetPrice(reqItem.Price).
 		SetCategoryName(reqItem.CategoryName).
 		SetVectorized(originalItem.Vectorized && !(weaviate.ChangesVectorizedProperties(fieldsUpdated))).
+		SetNumberSoldSinceUpdate(originalItem.NumberSoldSinceUpdate).
 		Save(r.Context())
 	if err != nil {
 		log.Debug().Err(err).Msg("InvUpdate: unable to update item in database")
