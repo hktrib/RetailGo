@@ -1,5 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getItemRecommendations } from "../queries";
+import Image from "next/image"
 
 async function RemoteImage({imageURL}: {imageURL: string}){
   
@@ -15,7 +16,7 @@ async function RemoteImage({imageURL}: {imageURL: string}){
 
   if (isValidUrl(imageURL)){
     return (<div className="w-full h-40 bg-gray-100">
-        <img src = {imageURL} />
+        <Image src = {imageURL} alt = {imageURL}/>
       </div>)
   }
   return (
@@ -36,7 +37,7 @@ async function ItemGrid({storeId}: {storeId: string}){
   }
 
   return (
-    recommendedItems.items.map(
+    await recommendedItems.items.map(
     (item: any) => (
     <div className="bg-gray-200 rounded-md col-span-2 row-span-2" key = {item.id}>
       <article className="bg-white rounded-md shadow-sm w-52">
@@ -64,6 +65,7 @@ function DashboardPage({params}: {params: {store_id: string}}) {
             <TabsTrigger value="activity">Activity</TabsTrigger>
           </TabsList>
           <TabsContent value="overview" className="pt-14 h-full -mt-10 pb-4">
+            @ts-expect-error Async Server Component
             <ItemGrid storeId={String(params.store_id)}/>
           </TabsContent>
           <TabsContent value="activity">Activity</TabsContent>
