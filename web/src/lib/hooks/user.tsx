@@ -1,6 +1,8 @@
 import { useFetch } from "../utils";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { config } from "./config";
+import { auth } from "@clerk/nextjs";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { config } from './config';
+import { useRouter } from "next/navigation";
 import router from "next/router";
 import { toast } from "react-toastify";
 
@@ -16,6 +18,7 @@ export function HasStore() {
 }
 
 export function PostJoinStore(storeId: string) {
+  const router = useRouter()
   const authFetch = useFetch();
   return useMutation({
     mutationFn: (clerkId: string) =>

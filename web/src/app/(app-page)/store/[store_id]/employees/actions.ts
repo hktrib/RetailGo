@@ -20,8 +20,10 @@ export const updateUser = async ({
   console.log(
     `attempting to update user ${user_id} with body ${JSON.stringify(user)}`,
   );
+  console.log(`serverUrl: ${serverUrl}`)
 
   try {
+    console.log("Body is: " + JSON.stringify(user));
     let response = await fetch(serverUrl, {
       method: "PUT",
       headers: {
@@ -36,6 +38,7 @@ export const updateUser = async ({
       response.status === 201 ||
       response.status === 202
     ) {
+      console.log(`successfully updated user ${user_id}`);
       revalidatePath("/user/[user]", "page");
       return true;
     }

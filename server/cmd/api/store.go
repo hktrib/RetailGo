@@ -119,6 +119,31 @@ func (srv *Server) GetStoreUsers(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(resp)
 }
+func (srv *Server) GetStoreByUUID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	uuid := chi.URLParam(r, "uuid")
+	// Query the store by UUID
+	store, err := srv.DBClient.Store.Query().Where(store.UUID(uuid)).Only(ctx)
+	if err != nil {
+		log.Debug().Err(err).Msg("GetStoreByUUID: server unable to fetch the store from database")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	// Marshalling the store data
+	resp, err := json.Marshal(PruneStore(store))
+	if err != nil {
+		log.Debug().Err(err).Msg("GetStoreByUUID: server unable to Marshal the store")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	// Writing the response
+	w.WriteHeader(http.StatusOK)
+	w.Write(resp)
+}
+
 func (srv *Server) HandleOnboarding(w http.ResponseWriter, r *http.Request) {
 	store_id := 133
 	// Get store
