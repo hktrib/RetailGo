@@ -21,8 +21,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     stores?: StoreMetadata[];
   };
   if (!publicMetadata.stores) {
-    console.log("No public metadata -> redirecting to main page");
-    redirect("/");
+    console.log("No public metadata -> redirecting to register-store");
+    redirect("/register-store");
   }
 
   return (

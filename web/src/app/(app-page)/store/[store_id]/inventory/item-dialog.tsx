@@ -170,11 +170,11 @@ export default function ItemDialog({
               )}
             />
 
-            <div className="pb-0.5 pt-2">
+            {/* <div className="pb-0.5 pt-2">
               <div className="text-sm font-medium">Item image</div>
 
               <UploadButton endpoint="storeItemImage" className="mt-1" />
-            </div>
+            </div> */}
 
             <FormField
               control={form.control}
