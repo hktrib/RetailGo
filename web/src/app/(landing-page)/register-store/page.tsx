@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { createStore } from "./actions";
 
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import {
   Form,
   FormControl,
@@ -68,24 +68,15 @@ export default function RegistrationForm() {
       let response: Boolean = await createStore({ postData });
 
       if (response === true) {
-        toast.success("Store created successfully!", {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 10000,
-        });
+        toast.success(`Successfully created ${storeName}!`);
         router.push("/store");
       } else {
-        toast.error("Error creating store!", {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 10000,
-        });
+        toast.error("Error creating store!");
         throw "Failed to create store";
       }
     } catch (error) {
-      toast.error("Error creating store!", {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 10000,
-      });
-      console.error("Error making create store request:", error);
+      toast.error("Error creating store!");
+      console.error("Create store request error:", error);
     }
   };
 
