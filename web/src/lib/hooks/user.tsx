@@ -1,10 +1,10 @@
 import { useFetch } from "../utils";
 import { auth } from "@clerk/nextjs";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { config } from './config';
+import { config } from "./config";
 import { useRouter } from "next/navigation";
 import router from "next/router";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 const storeURL = config.serverURL + "/user/";
 
@@ -18,7 +18,7 @@ export function HasStore() {
 }
 
 export function PostJoinStore(storeId: string) {
-  const router = useRouter()
+  const router = useRouter();
   const authFetch = useFetch();
   return useMutation({
     mutationFn: (clerkId: string) =>
@@ -36,10 +36,7 @@ export function PostJoinStore(storeId: string) {
       console.log("Error while sending invite to", email, ":", err);
     },
     onSuccess: (email) => {
-      toast.success("Successfully! joined store", {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 10000,
-      });
+      toast.success("Successfully joined store!");
       console.log("Invite sent successfully to", email);
       router.push("/store");
       // You can add any additional logic you need on successful invite here
