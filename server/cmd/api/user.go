@@ -95,7 +95,6 @@ func (srv *Server) UserDelete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Debug().Err(err).Msg("Unable to fetch user from database")
 		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
-		//		if(err.Error() == "Unable to query entry in userToStore table") {
 		return
 	}
 
@@ -396,7 +395,7 @@ func (srv *Server) UserJoinStore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, user_store_error := srv.DBClient.UserToStore.Update().
+	_, user_store_error := srv.DBClient.UserToStore.Create().
 		SetStoreID(store.ID).
 		SetStoreName(store.StoreName).
 		SetClerkUserID(clerkUser.ID).
