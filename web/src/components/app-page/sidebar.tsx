@@ -7,6 +7,7 @@ import { UserButton } from "@clerk/nextjs";
 import { cx } from "class-variance-authority";
 import StoreSelector from "./store-selector";
 import ThemeSwitcher from "./theme-switcher";
+import {useUser} from "@clerk/nextjs"
 import {
   HelpCircle,
   HomeIcon,
@@ -14,6 +15,7 @@ import {
   Settings,
   Users2,
   ShoppingBag,
+  Store,
 } from "lucide-react";
 
 import type { StoreMetadata } from "@/app/(app-page)/store/layout";
@@ -24,10 +26,19 @@ const navigation = [
   { name: "Inventory", href: "/inventory", icon: Package2 },
   { name: "POS", href: "/pos", icon: ShoppingBag },
 ];
+var storesData: StoreMetadata[] = [];
 
 export default function Sidebar({ stores }: { stores: StoreMetadata[] }) {
   const { store_id } = useParams();
-
+  const { user } = useUser();
+  if(user){
+    console.log(user.publicMetadata.stores)
+    user.reload();
+    const publicMetadata = user.publicMetadata as {
+      stores?: StoreMetadata[];
+    };   
+    storesData = publicMetadata.stores as StoreMetadata[]; 
+  }
   return (
     <div className="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-64 xl:flex-col">
       <div className="flex grow flex-col px-6 dark:border-zinc-700">
@@ -42,8 +53,8 @@ export default function Sidebar({ stores }: { stores: StoreMetadata[] }) {
         </div>
 
         <div className="h-full pb-12">
-          <StoreSelector stores={stores} currentStoreId={store_id as string} />
-          <Navigation userStores={stores} currentStoreId={store_id as string} />
+          <StoreSelector stores={storesData} currentStoreId={store_id as string} />
+          <Navigation userStores={storesData} currentStoreId={store_id as string} />
         </div>
       </div>
     </div>
