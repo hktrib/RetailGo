@@ -37,6 +37,7 @@ import {
 import { Trash2 } from "lucide-react";
 
 import type { EmployeeData } from "./columns";
+import { useUser } from '@clerk/nextjs';
 
 interface DataTableProps<TData extends EmployeeData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -70,6 +71,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
 
   const params = useParams();
   const id = params.store_id;
+  const { user } = useUser();
 
   const onDelete = async (userId: string) => {
     console.log("Deleting user with id:", id);
@@ -83,6 +85,8 @@ export function DataTable<TData extends EmployeeData, TValue>({
       console.error("Error deleting user:", response);
       toast.error("Error deleting user!");
     }
+    if(user)
+      user.reload();
   };
 
   return (
@@ -122,7 +126,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
                       key={column.id}
                       className="capitalize dark:hover:bg-zinc-700"
                       checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
+                      onCheckedChange={(value: any) =>
                         column.toggleVisibility(!!value)
                       }
                     >
