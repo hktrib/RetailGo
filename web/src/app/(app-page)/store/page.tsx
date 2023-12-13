@@ -16,11 +16,14 @@ export default function StoreViewPage() {
 
   // Reloades Clerk Metadata
   if (!isLoaded) {
+    console.log("Loading...");
     return <p>Loading...</p>;
   }
 
   if (user) {
+    console.log("Reloading user data...");
     user.reload();
+    console.log("Reloading user data...");
   }
 
   // Stall til not Loaded

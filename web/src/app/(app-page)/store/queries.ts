@@ -7,7 +7,7 @@ export const getItemRecommendations = async ({
 }: {
   store_id: string;
 }) => {
-  const fetchUrl = `https://recommendation-server-production.up.railway.app/recommend/${store_id}`;
+  const fetchUrl = `${config.serverURL}/recommend/${store_id}`;
   console.log(`Fetching item recommendations with url:${fetchUrl}`);
 
   try {
@@ -42,7 +42,7 @@ export const getStoreItemCategories = async ({
 }: {
   store_id: string;
 }) => {
-  const fetchUrl = `https://retailgo-production.up.railway.app/store/${store_id}/category`;
+  const fetchUrl = `${config.serverURL}/store/${store_id}/category`;
   console.log(fetchUrl);
   console.log(`fetching categories for store ${store_id}`);
 
@@ -72,7 +72,7 @@ export const getStoreItemCategories = async ({
 };
 
 export const getStoreItems = async ({ store_id }: { store_id: string }) => {
-  const fetchUrl = `https://retailgo-production.up.railway.app/store/${store_id}/inventory`;
+  const fetchUrl = `${config.serverURL}/store/${store_id}/inventory`;
   console.log(fetchUrl);
   console.log(`fetching items for store ${store_id}`);
 
