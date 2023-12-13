@@ -15,16 +15,11 @@ export default function StoreViewPage() {
   const { isLoaded, user } = useUser();
 
   // Reloades Clerk Metadata
-  if (!isLoaded) {
-    console.log("Loading...");
-    return <p>Loading...</p>;
-  }
+  if (!isLoaded) return <p>Loading...</p>;
 
-  if (user) {
-    console.log("Reloading user data...");
-    user.reload();
-    console.log("Reloading user data...");
-  }
+  // if (user) {
+  //   user.reload();
+  // }
 
   // Stall til not Loaded
   if (!user || !user.publicMetadata) return redirect("/register-store");

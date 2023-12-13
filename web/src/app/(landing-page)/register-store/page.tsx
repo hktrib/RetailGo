@@ -45,12 +45,13 @@ const businessTypes = [
 ];
 
 export default function RegistrationForm() {
-  const { user } = useUser();
-  const router = useRouter();
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
+
+  const router = useRouter();
+  const { user } = useUser();
+  if (!user) return null;
 
   // not doing anything with `address2` yet
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -67,8 +68,9 @@ export default function RegistrationForm() {
     try {
       let response: Boolean = await createStore({ postData });
 
-      if (response === true) {
+      if (response) {
         toast.success(`Successfully created ${storeName}!`);
+        user.reload();
         router.push("/store");
       } else {
         toast.error("Error creating store!");
@@ -81,7 +83,7 @@ export default function RegistrationForm() {
   };
 
   return (
-    <div className="relative isolate flex flex-1 flex-col items-center justify-center overflow-hidden px-6 pt-14 lg:px-8">
+    <main className="relative isolate flex h-full min-h-screen flex-1 flex-col items-center justify-center overflow-hidden px-6 lg:px-8">
       <div className="absolute left-1/2 top-4 -z-10 h-[1026px] w-[1026px] -translate-x-1/2 stroke-gray-300/70 [mask-image:linear-gradient(to_bottom,white_20%,transparent_75%)] sm:top-16 lg:-top-16 xl:top-8 xl:ml-0">
         <svg
           viewBox="0 0 1026 1026"
@@ -249,6 +251,6 @@ export default function RegistrationForm() {
           </form>
         </Form>
       </div>
-    </div>
+    </main>
   );
 }
