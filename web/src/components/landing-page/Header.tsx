@@ -26,12 +26,6 @@ export default function Header() {
               >
                 My stores
               </Link>
-              {/* <Link
-                href="/register-store"
-                className="rounded-md bg-amber-600 px-3 py-1.5 text-sm font-medium text-white"
-              >
-                Add Store
-              </Link> */}
               <UserButton afterSignOutUrl="/" />
             </>
           ) : (

@@ -30,5 +30,6 @@ export const createStore = async ({
   } catch (error) {
     console.error("Error making create store request:", error);
   }
+
   return false;
 };
