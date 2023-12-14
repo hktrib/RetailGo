@@ -1,26 +1,18 @@
 package server
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/hktrib/RetailGo/internal/ent/store"
-	"github.com/stripe/stripe-go/v76/checkout/session"
-	"io"
-	"net/http"
-	"os"
-	"strconv"
-	"time"
-
 	"github.com/go-chi/chi/v5"
-	"github.com/rs/zerolog/log"
-	"github.com/stripe/stripe-go/v76"
-	"github.com/stripe/stripe-go/v76/webhook"
-
 	StripeHelper "github.com/hktrib/RetailGo/cmd/api/stripe-components"
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/category"
 	"github.com/hktrib/RetailGo/internal/ent/item"
+	"github.com/hktrib/RetailGo/internal/ent/store"
+	"github.com/rs/zerolog/log"
+	"io"
+	"net/http"
+	"strconv"
 )
 
 /*
@@ -64,15 +56,15 @@ func (srv *Server) StoreCheckout(writer http.ResponseWriter, request *http.Reque
 		cart[i].Item = LineItem
 
 	}
-	// get store id from url query string
-	store_id, id_err := strconv.Atoi(chi.URLParam(request, "store_id"))
-	if id_err != nil {
-		log.Debug().Err(err).Msg("StoreCheckout: unable to parse store_id")
+	// get store id from url
+	storeId, err := strconv.Atoi(chi.URLParam(request, "storeId"))
+	if err != nil {
+		log.Debug().Err(err).Msg("StoreCheckout: unable to parse storeId")
 		http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 	// get store
-	targetStore, err := srv.DBClient.Store.Query().Where(store.ID(store_id)).Only(request.Context())
+	targetStore, err := srv.DBClient.Store.Query().Where(store.ID(storeId)).Only(request.Context())
 	if ent.IsNotFound(err) {
 		log.Debug().Err(err).Msg("StoreCheckout: ent didn't find the store in the database")
 		http.Error(writer, http.StatusText(http.StatusNotFound), http.StatusNotFound)
@@ -87,151 +79,6 @@ func (srv *Server) StoreCheckout(writer http.ResponseWriter, request *http.Reque
 	// Create a new Stripe Checkout Session
 	StripeHelper.CreateCheckoutSession(cart, targetStore.StripeAccountID, targetStore.ID, writer, request)
 
-}
-
-/*
-StripeWebhookRouter Brief:
-
--> Handles incoming webhook events from Stripe and routes them based on event types.
-
-	Verifies the webhook signature, constructs the event, and routes it to respective
-	functions based on event types such as account updates, payment successes/failures, etc.
-
-External Package Calls:
-- webhook.ConstructEvent()
-- HandleTransSuccess(w, event, srv) [for specific event types]
-*/
-func (srv *Server) StripeWebhookRouter(w http.ResponseWriter, r *http.Request, endpointSecret string) {
-
-	const MaxBodyBytes = int64(65536)
-	r.Body = http.MaxBytesReader(w, r.Body, MaxBodyBytes)
-	payload, err := io.ReadAll(r.Body)
-	if err != nil {
-		log.Debug().Err(err).Msg("StripeWebhookRouter: server failed to read request body")
-		w.WriteHeader(http.StatusServiceUnavailable)
-		return
-	}
-
-	// This is your Stripe CLI webhook secret for testing your endpoint locally.
-
-	// Pass the request body and Stripe-Signature header to ConstructEvent, along
-	// with the webhook signing key.
-	event, err := webhook.ConstructEvent(payload, r.Header.Get("Stripe-Signature"),
-		endpointSecret)
-
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error verifying webhook signature: %v\n", err)
-		w.WriteHeader(http.StatusBadRequest) // Return a 400 error on a bad signature
-		return
-	}
-
-	// Unmarshal the event data into an appropriate struct depending on its Type
-	switch event.Type {
-	case "account.updated":
-		// Then define and call a function to handle the event account.updated
-	case "account.application.authorized":
-		// Then define and call a function to handle the event account.application.authorized
-	case "account.application.deauthorized":
-		// Then define and call a function to handle the event account.application.deauthorized
-	case "account.external_account.created":
-		// Then define and call a function to handle the event account.external_account.created
-	case "account.external_account.deleted":
-		// Then define and call a function to handle the event account.external_account.deleted
-	case "account.external_account.updated":
-		// Then define and call a function to handle the event account.external_account.updated
-	case "checkout.session.async_payment_failed":
-		// Then define and call a function to handle the event checkout.session.async_payment_failed
-	case "checkout.session.async_payment_succeeded":
-		// Then define and call a function to handle the event checkout.session.async_payment_succeeded
-		HandleTransSuccess(w, event, srv)
-
-	case "checkout.session.completed":
-		HandleTransSuccess(w, event, srv)
-		// Then define and call a function to handle the event checkout.session.expired
-	case "product.created":
-		// Then define and call a function to handle the event product.created
-	case "product.deleted":
-		// Then define and call a function to handle the event product.deleted
-	case "product.updated":
-		// Then define and call a function to handle the event product.updated
-	// ... handle other event types
-	default:
-		fmt.Fprintf(os.Stderr, "Unhandled event type: %s\n", event.Type)
-		w.WriteHeader(http.StatusNotImplemented)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-
-}
-
-/*
-HandleTransSuccess Brief:
-
--> Handles successful transaction events from Stripe webhook.
-
-	Parses the webhook JSON, retrieves line items from the session, and fulfills orders by updating
-	item quantities using srv.FulfillOrder(LineItemList).
-
-External Package Calls:
-- json.Unmarshal()
-- srv.FulfillOrder()
-*/
-func HandleTransSuccess(w http.ResponseWriter, event stripe.Event, srv *Server) bool {
-
-	var CSession stripe.CheckoutSession
-	err := json.Unmarshal(event.Data.Raw, &CSession)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error parsing webhook JSON: %v\n", err)
-		w.WriteHeader(http.StatusBadRequest)
-		return true
-	}
-
-	params := &stripe.CheckoutSessionParams{}
-	params.AddExpand("line_items")
-
-	// Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
-	sessionWithLineItems, err := session.Get(CSession.ID, params)
-	if err != nil {
-		log.Debug().Err(err).Msg("HandleTransSuccess: unable to retrieve session")
-		w.WriteHeader(http.StatusBadRequest)
-		return true
-	}
-	lineItems := sessionWithLineItems.LineItems
-	// Fulfill the purchase...
-	srv.FulfillOrder(lineItems)
-
-	return false
-}
-
-/*
-FulfillOrder Brief:
-
--> Updates item quantities based on the provided LineItemList from Stripe.
-
-External Package Calls:
-- srv.DBClient.Item.Query()
-- srv.DBClient.Item.UpdateOne()
-*/
-func (srv *Server) FulfillOrder(LineItemList *stripe.LineItemList) {
-	for i := range LineItemList.Data {
-		// update item quantity
-
-		LineItem, err := srv.DBClient.Item.Query().Where(item.StripePriceID(LineItemList.Data[i].Price.ID)).Only(context.Background())
-		if err != nil {
-			log.Debug().Err(err).Msg("FulfillOrder: Unable to retrieve item")
-			fmt.Printf("%v+", LineItemList.Data[i].ID)
-		}
-		_, err = srv.DBClient.Item.
-			UpdateOne(LineItem).
-			SetQuantity(LineItem.Quantity - int(LineItemList.Data[i].Quantity)).
-			AddNumberSoldSinceUpdate(int(LineItemList.Data[i].Quantity)).
-			SetDateLastSold(time.Now().Format("2006-01-02")).
-			Save(context.Background())
-
-		if err != nil {
-			log.Debug().Err(err).Msg("FulfillOrder: Unable to update item")
-		}
-	}
 }
 
 /*
@@ -256,9 +103,9 @@ func (srv *Server) GetPosInfo(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Debug().Err(err).Msg("GetPosInfo failed")
 	}
-	response := make(map[string][]interface{}, 1)
+	response := make(map[string][]interface{}, 2)
 	response["categories"] = make([]interface{}, 0)
-	response["items"] = make([]interface{}, 0)
+	response["items"] = make([]interface{}, 5)
 	for i, cat := range categories {
 		// get items for each category
 		c, _ := json.Marshal(cat) // marshal the category into a map
@@ -267,8 +114,8 @@ func (srv *Server) GetPosInfo(w http.ResponseWriter, r *http.Request) {
 		response["categories"] = append(response["categories"], catInfo)
 		delete(response["categories"][i].(map[string]interface{}), "edges") // the edges field is not needed in the response
 		items, _ := srv.DBClient.Item.Query().Where(item.HasCategoryWith(category.ID(cat.ID))).All(ctx)
-		pitems := PruneItems(items...)
-		for _, item1 := range pitems {
+		prunedItems := PruneItems(items...)
+		for _, item1 := range prunedItems {
 			response["items"] = append(response["items"], item1)
 		}
 	}
