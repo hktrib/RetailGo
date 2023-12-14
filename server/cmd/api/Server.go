@@ -121,7 +121,7 @@ func (s *Server) MountHandlers() {
 				r.Use(s.IsOwnerCreateHandle)
 
 				// POST | Creates a new user
-				r.Post("/user", s.UserCreate)
+				r.Post("/owner", s.UserCreate)
 
 			})
 
