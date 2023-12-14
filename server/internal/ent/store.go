@@ -32,6 +32,8 @@ type Store struct {
 	StripeAccountID string `json:"stripe_account_id,omitempty"`
 	// StoreType holds the value of the "store_type" field.
 	StoreType string `json:"store_type,omitempty"`
+	// IsAuthorized holds the value of the "is_authorized" field.
+	IsAuthorized bool `json:"is_authorized,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the StoreQuery when eager-loading is set.
 	Edges        StoreEdges `json:"edges"`
@@ -94,6 +96,8 @@ func (*Store) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case store.FieldIsAuthorized:
+			values[i] = new(sql.NullBool)
 		case store.FieldID:
 			values[i] = new(sql.NullInt64)
 		case store.FieldUUID, store.FieldStoreName, store.FieldCreatedBy, store.FieldOwnerEmail, store.FieldStoreAddress, store.FieldStorePhone, store.FieldStripeAccountID, store.FieldStoreType:
@@ -166,6 +170,12 @@ func (s *Store) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field store_type", values[i])
 			} else if value.Valid {
 				s.StoreType = value.String
+			}
+		case store.FieldIsAuthorized:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_authorized", values[i])
+			} else if value.Valid {
+				s.IsAuthorized = value.Bool
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
@@ -246,6 +256,9 @@ func (s *Store) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("store_type=")
 	builder.WriteString(s.StoreType)
+	builder.WriteString(", ")
+	builder.WriteString("is_authorized=")
+	builder.WriteString(fmt.Sprintf("%v", s.IsAuthorized))
 	builder.WriteByte(')')
 	return builder.String()
 }

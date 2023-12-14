@@ -93,6 +93,11 @@ func StoreType(v string) predicate.Store {
 	return predicate.Store(sql.FieldEQ(FieldStoreType, v))
 }
 
+// IsAuthorized applies equality check predicate on the "is_authorized" field. It's identical to IsAuthorizedEQ.
+func IsAuthorized(v bool) predicate.Store {
+	return predicate.Store(sql.FieldEQ(FieldIsAuthorized, v))
+}
+
 // UUIDEQ applies the EQ predicate on the "uuid" field.
 func UUIDEQ(v string) predicate.Store {
 	return predicate.Store(sql.FieldEQ(FieldUUID, v))
@@ -661,6 +666,26 @@ func StoreTypeEqualFold(v string) predicate.Store {
 // StoreTypeContainsFold applies the ContainsFold predicate on the "store_type" field.
 func StoreTypeContainsFold(v string) predicate.Store {
 	return predicate.Store(sql.FieldContainsFold(FieldStoreType, v))
+}
+
+// IsAuthorizedEQ applies the EQ predicate on the "is_authorized" field.
+func IsAuthorizedEQ(v bool) predicate.Store {
+	return predicate.Store(sql.FieldEQ(FieldIsAuthorized, v))
+}
+
+// IsAuthorizedNEQ applies the NEQ predicate on the "is_authorized" field.
+func IsAuthorizedNEQ(v bool) predicate.Store {
+	return predicate.Store(sql.FieldNEQ(FieldIsAuthorized, v))
+}
+
+// IsAuthorizedIsNil applies the IsNil predicate on the "is_authorized" field.
+func IsAuthorizedIsNil() predicate.Store {
+	return predicate.Store(sql.FieldIsNull(FieldIsAuthorized))
+}
+
+// IsAuthorizedNotNil applies the NotNil predicate on the "is_authorized" field.
+func IsAuthorizedNotNil() predicate.Store {
+	return predicate.Store(sql.FieldNotNull(FieldIsAuthorized))
 }
 
 // HasItems applies the HasEdge predicate on the "items" edge.

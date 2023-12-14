@@ -24,6 +24,7 @@ func (Store) Fields() []ent.Field {
 		field.String("store_phone").Optional(),
 		field.String("stripe_account_id").Optional(),
 		field.String("store_type").Optional(),
+		field.Bool("is_authorized").Optional().Default(false),
 	}
 }
 

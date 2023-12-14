@@ -28,6 +28,8 @@ const (
 	FieldStripeAccountID = "stripe_account_id"
 	// FieldStoreType holds the string denoting the store_type field in the database.
 	FieldStoreType = "store_type"
+	// FieldIsAuthorized holds the string denoting the is_authorized field in the database.
+	FieldIsAuthorized = "is_authorized"
 	// EdgeItems holds the string denoting the items edge name in mutations.
 	EdgeItems = "items"
 	// EdgeCategories holds the string denoting the categories edge name in mutations.
@@ -77,6 +79,7 @@ var Columns = []string{
 	FieldStorePhone,
 	FieldStripeAccountID,
 	FieldStoreType,
+	FieldIsAuthorized,
 }
 
 var (
@@ -94,6 +97,11 @@ func ValidColumn(column string) bool {
 	}
 	return false
 }
+
+var (
+	// DefaultIsAuthorized holds the default value on creation for the "is_authorized" field.
+	DefaultIsAuthorized bool
+)
 
 // OrderOption defines the ordering options for the Store queries.
 type OrderOption func(*sql.Selector)
@@ -141,6 +149,11 @@ func ByStripeAccountID(opts ...sql.OrderTermOption) OrderOption {
 // ByStoreType orders the results by the store_type field.
 func ByStoreType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStoreType, opts...).ToFunc()
+}
+
+// ByIsAuthorized orders the results by the is_authorized field.
+func ByIsAuthorized(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsAuthorized, opts...).ToFunc()
 }
 
 // ByItemsCount orders the results by items count.

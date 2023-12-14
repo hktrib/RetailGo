@@ -172,6 +172,26 @@ func (su *StoreUpdate) ClearStoreType() *StoreUpdate {
 	return su
 }
 
+// SetIsAuthorized sets the "is_authorized" field.
+func (su *StoreUpdate) SetIsAuthorized(b bool) *StoreUpdate {
+	su.mutation.SetIsAuthorized(b)
+	return su
+}
+
+// SetNillableIsAuthorized sets the "is_authorized" field if the given value is not nil.
+func (su *StoreUpdate) SetNillableIsAuthorized(b *bool) *StoreUpdate {
+	if b != nil {
+		su.SetIsAuthorized(*b)
+	}
+	return su
+}
+
+// ClearIsAuthorized clears the value of the "is_authorized" field.
+func (su *StoreUpdate) ClearIsAuthorized() *StoreUpdate {
+	su.mutation.ClearIsAuthorized()
+	return su
+}
+
 // AddItemIDs adds the "items" edge to the Item entity by IDs.
 func (su *StoreUpdate) AddItemIDs(ids ...int) *StoreUpdate {
 	su.mutation.AddItemIDs(ids...)
@@ -359,6 +379,12 @@ func (su *StoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if su.mutation.StoreTypeCleared() {
 		_spec.ClearField(store.FieldStoreType, field.TypeString)
+	}
+	if value, ok := su.mutation.IsAuthorized(); ok {
+		_spec.SetField(store.FieldIsAuthorized, field.TypeBool, value)
+	}
+	if su.mutation.IsAuthorizedCleared() {
+		_spec.ClearField(store.FieldIsAuthorized, field.TypeBool)
 	}
 	if su.mutation.ItemsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -657,6 +683,26 @@ func (suo *StoreUpdateOne) ClearStoreType() *StoreUpdateOne {
 	return suo
 }
 
+// SetIsAuthorized sets the "is_authorized" field.
+func (suo *StoreUpdateOne) SetIsAuthorized(b bool) *StoreUpdateOne {
+	suo.mutation.SetIsAuthorized(b)
+	return suo
+}
+
+// SetNillableIsAuthorized sets the "is_authorized" field if the given value is not nil.
+func (suo *StoreUpdateOne) SetNillableIsAuthorized(b *bool) *StoreUpdateOne {
+	if b != nil {
+		suo.SetIsAuthorized(*b)
+	}
+	return suo
+}
+
+// ClearIsAuthorized clears the value of the "is_authorized" field.
+func (suo *StoreUpdateOne) ClearIsAuthorized() *StoreUpdateOne {
+	suo.mutation.ClearIsAuthorized()
+	return suo
+}
+
 // AddItemIDs adds the "items" edge to the Item entity by IDs.
 func (suo *StoreUpdateOne) AddItemIDs(ids ...int) *StoreUpdateOne {
 	suo.mutation.AddItemIDs(ids...)
@@ -874,6 +920,12 @@ func (suo *StoreUpdateOne) sqlSave(ctx context.Context) (_node *Store, err error
 	}
 	if suo.mutation.StoreTypeCleared() {
 		_spec.ClearField(store.FieldStoreType, field.TypeString)
+	}
+	if value, ok := suo.mutation.IsAuthorized(); ok {
+		_spec.SetField(store.FieldIsAuthorized, field.TypeBool, value)
+	}
+	if suo.mutation.IsAuthorizedCleared() {
+		_spec.ClearField(store.FieldIsAuthorized, field.TypeBool)
 	}
 	if suo.mutation.ItemsCleared() {
 		edge := &sqlgraph.EdgeSpec{
