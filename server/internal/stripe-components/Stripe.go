@@ -130,15 +130,15 @@ func CreateCheckoutSession(items []CartItem, StoreStripeID string, StoreId int, 
 	resp, _ := json.Marshal(res)
 	w.Write(resp)
 }
-func StartOnboarding(accountId string) (*stripe.AccountLink, error) {
+func StartOnboarding(accountId string, storeID int) (*stripe.AccountLink, error) {
 
 	// Set your secret key. Remember to switch to your live secret key in production.
 	// See your keys here: https://dashboard.stripe.com/apikeys
 
 	params := &stripe.AccountLinkParams{
 		Account:    stripe.String(accountId),
-		RefreshURL: stripe.String("https://example.com/reauth"),
-		ReturnURL:  stripe.String("https://example.com/return"),
+		RefreshURL: stripe.String(fmt.Sprintf("https://retailgo-production.up.railway.app/store/%d/onboarding", storeID)),
+		ReturnURL:  stripe.String("https://retailgo-production.up.railway.app/store/"),
 		Type:       stripe.String("account_onboarding"),
 		Collect:    stripe.String("eventually_due"),
 	}

@@ -256,7 +256,7 @@ func SendOnboardingEmail(StoreObj *ent.Store, UserObj *ent.User) error {
 
 	tmpl := template.Must(template.ParseGlob("./cmd/templates/*"))
 
-	url, err := StripeHelper.StartOnboarding(StoreObj.StripeAccountID)
+	url, err := StripeHelper.StartOnboarding(StoreObj.StripeAccountID, StoreObj.ID)
 	if err != nil {
 		return fmt.Errorf("failed to start onboarding: %w", err)
 	}
