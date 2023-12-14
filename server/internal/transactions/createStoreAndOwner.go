@@ -3,7 +3,7 @@ package transactions
 import (
 	"context"
 	"fmt"
-	. "github.com/hktrib/RetailGo/cmd/api/stripe-components"
+	. "github.com/hktrib/RetailGo/internal/stripe-components"
 
 	"github.com/google/uuid"
 	clerkstorage "github.com/hktrib/RetailGo/internal/clerk"

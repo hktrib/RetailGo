@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	. "github.com/hktrib/RetailGo/internal/stripe-components"
 	"io"
 	"net/http"
 	"strconv"
@@ -11,7 +12,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog/log"
 
-	. "github.com/hktrib/RetailGo/cmd/api/stripe-components"
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/category"
 	"github.com/hktrib/RetailGo/internal/ent/categoryitem"
@@ -354,6 +354,12 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 		reqItem.StripePriceID = p.ID
 	}
+	if reqItem.StripeProductID == "" {
+		reqItem.StripeProductID = targetItem.StripeProductID
+	}
+	if reqItem.StripePriceID == "" {
+		reqItem.StripePriceID = targetItem.StripePriceID
+	}
 
 	originalItem := ent.Item{
 		Name:         targetItem.Name,
@@ -385,6 +391,8 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		SetCategoryName(reqItem.CategoryName).
 		SetVectorized(originalItem.Vectorized && !(weaviate.ChangesVectorizedProperties(fieldsUpdated))).
 		SetNumberSoldSinceUpdate(originalItem.NumberSoldSinceUpdate).
+		SetStripeProductID(reqItem.StripeProductID).
+		SetStripePriceID(reqItem.StripePriceID).
 		Save(r.Context())
 	if err != nil {
 		log.Debug().Err(err).Msg("InvUpdate: unable to update item in database")

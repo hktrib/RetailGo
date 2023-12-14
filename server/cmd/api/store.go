@@ -3,11 +3,11 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	. "github.com/hktrib/RetailGo/internal/stripe-components"
 	"net/http"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	. "github.com/hktrib/RetailGo/cmd/api/stripe-components"
 	clerkstorage "github.com/hktrib/RetailGo/internal/clerk"
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/store"
