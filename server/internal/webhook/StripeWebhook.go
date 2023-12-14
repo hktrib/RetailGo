@@ -196,6 +196,7 @@ func FulfillOrder(LineItemList *stripe.LineItemList, DBClient *ent.Client) {
 		}
 	}
 }
+
 func SendSuccessEmail(StoreObj *ent.Store) error {
 	// Set up authentication information.
 	auth := smtp.PlainAuth(

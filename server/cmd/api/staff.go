@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	StripeHelper "github.com/hktrib/RetailGo/internal/stripe-components"
 	"html/template"
 	"log"
 	"net/http"
@@ -14,8 +15,6 @@ import (
 	"net/smtp"
 	"os"
 	"strconv"
-
-	StripeHelper "github.com/hktrib/RetailGo/cmd/api/stripe-components"
 
 	"github.com/go-chi/chi/v5"
 
