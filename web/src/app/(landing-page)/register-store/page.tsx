@@ -173,7 +173,7 @@ export default function RegistrationForm() {
                 <FormItem>
                   <FormLabel className="text-gray-600">Store name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Store name" {...field} />
+                    <Input className="text-gray-600" placeholder="Store name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -186,7 +186,7 @@ export default function RegistrationForm() {
                 <FormItem>
                   <FormLabel className="text-gray-600">Phone number</FormLabel>
                   <FormControl>
-                    <Input placeholder="Store phone number" {...field} />
+                    <Input className="text-gray-600" placeholder="Store phone number" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -201,7 +201,7 @@ export default function RegistrationForm() {
                     Address line 1
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Address line 1" {...field} />
+                    <Input className="text-gray-600" placeholder="Address line 1" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -216,7 +216,7 @@ export default function RegistrationForm() {
                     Address line 2
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Address line 2" {...field} />
+                    <Input className="text-gray-600" placeholder="Address line 2" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
