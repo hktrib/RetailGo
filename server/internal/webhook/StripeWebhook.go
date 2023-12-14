@@ -73,10 +73,9 @@ func StripeWebhookRouter(w http.ResponseWriter, r *http.Request, endpointSecret 
 	case "account.updated":
 		// Then define and call a function to handle the event account.updated
 	case "account.application.authorized":
-		AuthorizeUser(w, event, DBClient)
 		// Then define and call a function to handle the event account.application.deauthorized
 	case "account.external_account.created":
-		// Then define and call a function to handle the event account.external_account.created
+		AuthorizeUser(w, event, DBClient)
 	case "account.external_account.deleted":
 		// Then define and call a function to handle the event account.external_account.deleted
 	case "account.external_account.updated":

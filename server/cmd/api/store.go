@@ -190,7 +190,7 @@ func (srv *Server) HandleOnboarding(w http.ResponseWriter, r *http.Request) {
 		log.Debug().Err(err).Msg("HandleOnboarding: unable to fetch store from database")
 		return
 	}
-	accLink, err := StartOnboarding(store.StripeAccountID)
+	accLink, err := StartOnboarding(store.StripeAccountID, store_id)
 	if err != nil {
 		log.Debug().Err(err).Msg("HandleOnboarding: unable to start onboarding")
 		return
