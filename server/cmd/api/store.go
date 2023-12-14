@@ -145,7 +145,8 @@ func (srv *Server) GetStoreByUUID(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) HandleOnboarding(w http.ResponseWriter, r *http.Request) {
-	store_id := 133
+	store_id, _ := strconv.Atoi(chi.URLParam(r, "store_id"))
+
 	// Get store
 	store, err := srv.DBClient.Store.Query().Where(store.ID(store_id)).Only(r.Context())
 	if err != nil {

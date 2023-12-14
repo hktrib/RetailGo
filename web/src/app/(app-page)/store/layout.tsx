@@ -1,10 +1,10 @@
+import { auth } from "@clerk/nextjs";
+import { notFound, redirect } from "next/navigation";
+
+import { Toaster } from "react-hot-toast";
 import MobileNav from "@/components/app-page/mobile-nav";
 import Sidebar from "@/components/app-page/sidebar";
 import Providers from "../providers";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { auth } from "@clerk/nextjs";
-import { notFound, redirect } from "next/navigation";
 
 export type StoreMetadata = {
   Permission_level: number;
@@ -40,7 +40,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      <ToastContainer />
+      <Toaster position="bottom-right" reverseOrder={false} />
     </Providers>
   );
 }

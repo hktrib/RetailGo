@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { deleteUser } from "../actions";
 
 import EditEmployeeDialog from "../edit-employee-dialog";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -37,7 +37,7 @@ import {
 import { Trash2 } from "lucide-react";
 
 import type { EmployeeData } from "./columns";
-import { useRouter } from "next/navigation";
+import { useUser } from '@clerk/nextjs';
 
 interface DataTableProps<TData extends EmployeeData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -71,6 +71,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
 
   const params = useParams();
   const id = params.store_id;
+  const { user } = useUser();
 
   const onDelete = async (userId: string) => {
     console.log("Deleting user with id:", id);
@@ -78,19 +79,14 @@ export function DataTable<TData extends EmployeeData, TValue>({
       user_id: userId,
     });
     if (response) {
-      console.log("Invite Mutations Success");
-      toast.success("Deleted user sucessfully!", {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 10000,
-      });
+      toast.success("Successfully deleted user!");
       router.refresh();
     } else {
-      console.log("Invite Mutations Failuire");
-      toast.error("Error deleting user!", {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 10000,
-      });
+      console.error("Error deleting user:", response);
+      toast.error("Error deleting user!");
     }
+    if(user)
+      user.reload();
   };
 
   return (
@@ -130,7 +126,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
                       key={column.id}
                       className="capitalize dark:hover:bg-zinc-700"
                       checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
+                      onCheckedChange={(value: any) =>
                         column.toggleVisibility(!!value)
                       }
                     >

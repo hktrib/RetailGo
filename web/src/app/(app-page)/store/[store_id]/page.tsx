@@ -16,7 +16,7 @@ function DashboardPage({ params }: { params: { store_id: string } }) {
 
       <hr className="mb-4 border-gray-100 dark:border-zinc-800" />
 
-      <div className="px-4 md:px-6 xl:px-8">
+      <div className="px-4 pb-6 md:px-6 xl:px-8">
         <Tabs defaultValue="overview" className="-mt-2 h-full w-full pt-4">
           <TabsList className="dark:border-zinc-800">
             <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -54,7 +54,7 @@ async function ItemRecommendations({ storeId }: { storeId: string }) {
           className="rounded-md bg-gray-200 shadow-sm dark:bg-zinc-800"
           key={item.name}
         >
-          <div className="w-52 rounded-md bg-white shadow-sm dark:bg-zinc-800">
+          <div className="w-52 rounded-md bg-gray-50 shadow-sm dark:bg-zinc-800">
             <RemoteImage imageURL={item.imageURL} />
 
             <div className="flex flex-col p-4">
@@ -81,9 +81,15 @@ async function RemoteImage({ imageURL }: { imageURL: string }) {
   };
 
   return (
-    <div className="flex h-40 w-full items-center justify-center rounded-t-md bg-gray-100 dark:bg-zinc-700">
+    <div className="flex h-40 w-full items-center justify-center overflow-hidden rounded-t-md bg-gray-100 dark:bg-zinc-700">
       {isValidUrl(imageURL) ? (
-        <Image src={imageURL} alt={imageURL} />
+        <Image
+          src={imageURL}
+          alt={imageURL}
+          width={250}
+          height={250}
+          className="object-cover"
+        />
       ) : (
         <span className="text-xs dark:text-zinc-300">No image available.</span>
       )}

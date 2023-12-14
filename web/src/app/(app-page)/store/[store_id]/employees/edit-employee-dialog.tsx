@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { updateUser } from "@/app/(app-page)/store/[store_id]/employees/actions";
 
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import {
   Dialog,
   DialogContent,
@@ -63,15 +63,9 @@ export default function EditEmployeeDialog({
 
     if (response) {
       setDialogOpen(false);
-      toast.success("Employee updated successfully!", {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 10000,
-      });
+      toast.success("Employee updated successfully!");
     } else {
-      toast.error("Error updating employee!", {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 10000,
-      });
+      toast.error("Error updating employee!");
     }
   };
 
