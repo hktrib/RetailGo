@@ -2,7 +2,7 @@ from fastapi import FastAPI, status, Response, HTTPException
 from data_models import Item, ItemBatch
 from vdb import DB
 from recsys import Recommender
-from models import DefaultWord2VecModel, DefaultGloveModel
+from models import DefaultWord2VecModel, DefaultGloveModel, ProductFastTextModel
 import uvicorn
 import os
 
@@ -10,7 +10,7 @@ app = FastAPI()
 
 # A Recommender Class that does embedding, ranking and reranking.
 try:
-    default_w2v = DefaultGloveModel()
+    default_w2v = DefaultWord2VecModel(model_file = "./models/Product Word2Vec/word2vec_product_descriptions_10000-25-5-5.model")
     recommender = Recommender(default_w2v)
 except Exception as error:
     print("Initialization failed:", error)
