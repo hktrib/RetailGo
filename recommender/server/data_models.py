@@ -4,7 +4,7 @@ from typing import List, Optional
 class Item(BaseModel):
     id: int
     weaviate_id: str
-    photo: Optional[str]
+    photo: Optional[str] = Field(default = "")
     name: str
     store_id: int
     number_sold_since_update: Optional[int] = Field(default = 0)
