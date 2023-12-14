@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 
 const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
 );
 
 export function CheckoutDialog({
@@ -32,8 +32,13 @@ export function CheckoutDialog({
   if (!clientSecret) return null;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="overflow-y-scroll h-full">
+    <Dialog
+      open={clientSecret.length > 0}
+      onOpenChange={(openState) => {
+        if (openState === false) setClientSecret("");
+      }}
+    >
+      <DialogContent className="h-full overflow-y-scroll">
         <DialogHeader>
           <DialogTitle>Checkout</DialogTitle>
         </DialogHeader>
