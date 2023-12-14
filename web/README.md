@@ -1,11 +1,10 @@
-### Getting Started with the Front End!
+# Web
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
 
 We're using [pnpm](https://pnpm.io/) as the package manager for this application. **Please** download if the following commands don't work:
-
 
 Create a .env file with the following values:
 
