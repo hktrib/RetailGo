@@ -22,12 +22,17 @@ CatDelete Brief:
 
 -> Deletes category given category id specified in Query Parameters (Ex: ?category=10)
 
-External Package Calls:
+Response:
 
-	DBClient.Category.DeleteOneID
+-> On success, returns 200.
+-> If no category supplied, 400.
+-> If the specified category is not found, 404.
+
 */
+
 func (srv *Server) CatDelete(w http.ResponseWriter, r *http.Request) {
 
+	// Read category parameter
 	catId, err := strconv.Atoi(r.URL.Query().Get("category"))
 	if err != nil {
 
@@ -36,6 +41,7 @@ func (srv *Server) CatDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Delete the category with this id in the database.
 	err = srv.DBClient.
 		Category.DeleteOneID(catId).
 		Exec(r.Context())
@@ -58,18 +64,26 @@ CatCreate Brief:
 
 	________________________________________
 
--> Creates category given category id specified in Query Parameters (Ex: ?category=10)
+-> Creates category given store_id specified in query parameters (ex: ?store_id=10), and at least one of the category's name and its attached photo in the request body.
 
-External Package Calls:
+Response:
 
-	DBClient.Category.Create()
+-> On success, returns 201.
+-> If no store_id in URL or no category supplied (requires at least photo or name) in Body, 400.
+
 */
-func (srv *Server) CatCreate(w http.ResponseWriter, r *http.Request) {
-	// name, photo, quantity, store_id, category
 
+func (srv *Server) CatCreate(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+
+	// Read store_id parameter
 	store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
-	// Load store_id first
+
+	if err != nil {
+		log.Debug().Err(err).Msg("CatCreate: no store id provided")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
 
 	// Load the message parameters (Name, Photo, Quantity, Category)
 	req_body, err := io.ReadAll(r.Body)
@@ -80,6 +94,7 @@ func (srv *Server) CatCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Parse requested category.
 	req := ent.Category{}
 	body_parse_err := json.Unmarshal(req_body, &req)
 
@@ -89,6 +104,7 @@ func (srv *Server) CatCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Create new category with provided name, photo and attached to the provided store id.
 	cat, err := srv.DBClient.Category.Create().SetName(req.Name).SetPhoto(req.Photo).SetStoreID(store_id).Save(ctx)
 	if err != nil {
 		log.Debug().Err(err).Msg("CatCreate: server failed to create category")
@@ -96,6 +112,7 @@ func (srv *Server) CatCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Response as JSON with the id of the newly created category.
 	responseBody, _ := json.Marshal(map[string]interface{}{
 		"id": cat.ID,
 	})
@@ -107,40 +124,47 @@ func (srv *Server) CatCreate(w http.ResponseWriter, r *http.Request) {
 /*
 CatItemRead Brief:
 
--> Retrieves items belonging to a specified category by category ID from Query Parameters (Ex: ?category_id=15)
+-> Retrieves items belonging to a specified category by category id in Query Parameters (Ex: ?category_id=15)
 
-External Package Calls:
-- DBClient.Category.Query()
-- srv.DBClient.Item.Query()
+Response:
+
+-> On success, returns a 200, with a list of items in body.
+-> If no category id or an invalid category id is provided, returns 400.
+
 */
+
 func (srv *Server) CatItemRead(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
+	// Read category id parameter
 	category_id, err := strconv.Atoi(chi.URLParam(r, "category_id"))
 	if err != nil {
-		log.Debug().Err(err).Msg("CatItemRead: Invalid Store ID")
+		log.Debug().Err(err).Msg("CatItemRead: Invalid category ID")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
+
+	// Query for the specified category.
 	targetCategory, err := srv.DBClient.Category.Query().Where(category.ID(category_id)).Only(ctx)
 	if err != nil {
 		log.Debug().Err(err).Msg("CatItemRead: Unable to Query for Category")
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	// send json response
+
 	response := make(map[string][]*ent.Item)
 
-	// get items for each targetCategory
+	// get items for the target category
 	items, err := srv.DBClient.Item.Query().Where(item.HasCategoryWith(category.ID(targetCategory.ID))).All(ctx)
 	if err != nil {
 		log.Debug().Err(err).Msg("CatItemRead: unable to query for all items in category")
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
 	response[targetCategory.Name] = append(response[targetCategory.Name], items...)
 
+	// send json response
 	responseBody, _ := json.Marshal(response)
 	w.WriteHeader(http.StatusOK)
 	w.Write(responseBody)
@@ -149,15 +173,22 @@ func (srv *Server) CatItemRead(w http.ResponseWriter, r *http.Request) {
 /*
 CatItemAdd Brief:
 
--> Adds items to a category specified by category ID from the URL parameters.
+-> Adds items (provided as ids) from the request body to the category specified by category id from the URL parameters (Example: /?category_id=10).
+Note: Adds edges, DOES NOT SET CATEGORY NAME.
 
-External Package Calls:
-- srv.DBClient.Category.UpdateOneID()
+Response:
+
+-> On success, returns 200.
+-> If an invalid category id is provided, return 400.
+-> If the category doesn't exist, return 404.
+
 */
+
 func (srv *Server) CatItemAdd(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 
+	// Read category id parameter.
 	cat_id, err := strconv.Atoi(chi.URLParam(r, "category_id"))
 
 	if err != nil {
@@ -165,8 +196,9 @@ func (srv *Server) CatItemAdd(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	// Load the message parameters (Name, Photo, Quantity, Category)
-	req_body, err := io.ReadAll(r.Body)
+
+	// Load the message parameters (List of Item ids)
+	reqBody, err := io.ReadAll(r.Body)
 
 	if err != nil {
 		log.Debug().Err(err).Msg("CatItemAdd: server failed to read message body")
@@ -176,18 +208,20 @@ func (srv *Server) CatItemAdd(w http.ResponseWriter, r *http.Request) {
 
 	var itemIDs []int
 
-	body_parse_err := json.Unmarshal(req_body, &itemIDs)
+	// Load all supplied item ids
+	body_parse_err := json.Unmarshal(reqBody, &itemIDs)
 
 	if body_parse_err != nil {
 		log.Debug().Err(body_parse_err).Msg("CatItemAdd: server failed to read message body")
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
+	// Add Item ids in batch to the category in the database, by linking the category and these items.
 	err = srv.DBClient.Category.UpdateOneID(cat_id).AddItemIDs(itemIDs...).Exec(ctx)
 	if ent.IsNotFound(err) {
 		log.Debug().Err(body_parse_err).Msg("CatItemAdd: server query of cat_id database")
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
@@ -201,9 +235,22 @@ func (srv *Server) CatItemAdd(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("OK"))
 }
 
+/*
+CatItemList Brief:
+
+-> Provides list of all categories for the store specified by store_id url parameter (Example: /category/10)
+
+Response:
+
+-> On Success, returns 200, with list of categories ({"id": _, "name": _}) in the message body.
+-> If invalid store id, return 400.
+
+*/
+
 func (srv *Server) CatItemList(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
+	// Read store id parameter.
 	store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
 	if err != nil {
 		fmt.Println("CatItemList: Invalid store id:", err)
@@ -211,12 +258,16 @@ func (srv *Server) CatItemList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Query all categories for this store.
 	categories, err := srv.DBClient.Category.Query().Where(category.StoreID(store_id)).All(ctx)
 	if err != nil {
 		log.Debug().Err(err).Msg("CatItemList: Unable to Query for Category Item list")
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+
+	// JSON response with list of categories, {"id": _, "name": _}.
+
 	response := make([]map[string]interface{}, 0)
 
 	for _, cat := range categories {
