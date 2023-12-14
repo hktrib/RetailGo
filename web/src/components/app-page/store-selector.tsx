@@ -67,7 +67,7 @@ export default function StoreSelector({
       >
         <SelectGroup>
           <SelectLabel>My stores</SelectLabel>
-          {stores.map((store) => (
+          {stores?.map((store) => (
             <SelectItem
               key={store.id}
               value={store.id.toString()}

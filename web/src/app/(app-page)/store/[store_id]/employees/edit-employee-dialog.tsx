@@ -1,3 +1,4 @@
+// Importing necessary dependencies
 "use client";
 
 import { useState } from "react";
@@ -36,11 +37,13 @@ const formSchema = z.object({
   email: z.string().regex(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/),
 });
 
+// Function component for editing an employee
 export default function EditEmployeeDialog({
   employeeData,
 }: {
   employeeData: EmployeeData;
 }) {
+  // Initializing form using react-hook-form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,17 +53,21 @@ export default function EditEmployeeDialog({
     },
   });
 
+  // State for dialog open/close
   const [isDialogOpen, setDialogOpen] = useState(false);
   const params = useParams();
 
+  // Function to handle form submission
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!params.store_id) return;
 
+    // Calling the updateUser action to update the employee
     let response = await updateUser({
       user: values,
       user_id: employeeData.id.toString(),
     });
 
+    // Checking the response and displaying appropriate toast message
     if (response) {
       setDialogOpen(false);
       toast.success("Employee updated successfully!");

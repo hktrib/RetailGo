@@ -8,8 +8,16 @@ import toast from "react-hot-toast";
 
 const storeURL = config.serverURL + "/user/";
 
+/**
+ * Custom hook to check if the user has a store.
+ * 
+ * @returns {Object} - The result of the query.
+ *   - isLoading: boolean - Indicates if the query is in progress.
+ *   - isError: boolean - Indicates if an error occurred during the query.
+ *   - data: any - The data returned from the query.
+ *   - error: any - The error object if an error occurred.
+ */
 export function HasStore() {
-  // const queryClient = useQueryClient()
   const authFetch = useFetch();
   return useQuery({
     queryKey: ["hasStore"],
@@ -17,6 +25,18 @@ export function HasStore() {
   });
 }
 
+/**
+ * Mutation function to join a store.
+ * 
+ * @param {string} storeId - The ID of the store to join.
+ * 
+ * @returns {Object} - The result of the mutation.
+ *   - mutate: function - Function to trigger the mutation.
+ *   - isLoading: boolean - Indicates if the mutation is in progress.
+ *   - isError: boolean - Indicates if an error occurred during the mutation.
+ *   - error: any - The error object if an error occurred.
+ *   - reset: function - Function to reset the mutation state.
+ */
 export function PostJoinStore(storeId: string) {
   const router = useRouter();
   const authFetch = useFetch();
@@ -44,6 +64,18 @@ export function PostJoinStore(storeId: string) {
   });
 }
 
+/**
+ * Mutation function to update a user.
+ * 
+ * @param {string} user_id - The ID of the user to update.
+ * 
+ * @returns {Object} - The result of the mutation.
+ *   - mutate: function - Function to trigger the mutation.
+ *   - isLoading: boolean - Indicates if the mutation is in progress.
+ *   - isError: boolean - Indicates if an error occurred during the mutation.
+ *   - error: any - The error object if an error occurred.
+ *   - reset: function - Function to reset the mutation state.
+ */
 export function PutUser(user_id: string) {
   const authFetch = useFetch();
   return useMutation({
@@ -68,6 +100,16 @@ export function PutUser(user_id: string) {
   });
 }
 
+/**
+ * Mutation function to delete a user.
+ * 
+ * @returns {Object} - The result of the mutation.
+ *   - mutate: function - Function to trigger the mutation.
+ *   - isLoading: boolean - Indicates if the mutation is in progress.
+ *   - isError: boolean - Indicates if an error occurred during the mutation.
+ *   - error: any - The error object if an error occurred.
+ *   - reset: function - Function to reset the mutation state.
+ */
 export function DeleteUser() {
   const authFetch = useFetch();
   return useMutation({

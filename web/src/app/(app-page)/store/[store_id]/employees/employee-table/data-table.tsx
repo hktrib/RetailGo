@@ -166,7 +166,7 @@ export function DataTable<TData extends EmployeeData, TValue>({
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
-                  key={row.id}
+                  key={row.original.id}
                   data-state={row.getIsSelected() && "selected"}
                   className="dark:border-zinc-800 dark:hover:bg-zinc-800"
                 >

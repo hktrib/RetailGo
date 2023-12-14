@@ -12,6 +12,7 @@ import (
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/store"
 	"github.com/hktrib/RetailGo/internal/ent/user"
+	"github.com/hktrib/RetailGo/internal/ent/usertostore"
 	"github.com/hktrib/RetailGo/internal/transactions"
 	"github.com/rs/zerolog/log"
 )
@@ -41,7 +42,7 @@ func (srv *Server) CreateStore(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err, nStore, nUser := transactions.StoreAndOwnerCreationTx(ctx, reqStore, reqUser, srv.DBClient, clerkStore)
-	// this is bad
+	fmt.Println("nUser: ", nUser)
 	err = SendOnboardingEmail(nStore, nUser)
 	if err != nil {
 		log.Debug().Err(err).Msg("CreateStore: unable to send onboarding email")
@@ -136,6 +137,43 @@ func (srv *Server) GetStoreByUUID(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Debug().Err(err).Msg("GetStoreByUUID: server unable to Marshal the store")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	// Writing the response
+	w.WriteHeader(http.StatusOK)
+	w.Write(resp)
+}
+
+/*
+GetStoresByClerkId Brief:
+
+-> Retrieves stores associated with a specific clerk by Clerk user ID.
+*/
+func (srv *Server) GetStoresByClerkId(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	// Verify user credentials using clerk
+	clerkUser, clerkErr := VerifyUserCredentials(r)
+	if clerkErr != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+clerkErr.Error(), http.StatusInternalServerError)
+		w.Write([]byte("Unauthorized"))
+		return
+	}
+
+	// Query the store by UUID
+	stores, err := srv.DBClient.UserToStore.Query().Where(usertostore.ClerkUserID(clerkUser.ID)).All(ctx)
+	if err != nil {
+		log.Debug().Err(err).Msg("GetStoresByClerkId: server unable to fetch the stores from database")
+		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Marshalling the store data
+	resp, err := json.Marshal(PruneUserStore(stores...))
+	if err != nil {
+		log.Debug().Err(err).Msg("GetStoresByClerkId: server unable to Marshal the store")
+		http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 

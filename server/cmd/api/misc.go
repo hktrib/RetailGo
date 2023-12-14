@@ -9,8 +9,9 @@ import (
 // Item with only the feilds the client should see
 type ClientItem ent.Item
 type ClientStore ent.Store
+type ClientUserStore ent.UserToStore
 
-// Overload for default json marshaller
+// MarshalJSON Overload for default json marshaller
 func (i ClientItem) MarshalJSON() ([]byte, error) {
 	return MarshalItem(i)
 }
@@ -18,8 +19,11 @@ func (i ClientItem) MarshalJSON() ([]byte, error) {
 func (i ClientStore) MarshalJSON() ([]byte, error) {
 	return MarshalStore(i)
 }
+func (i ClientUserStore) MarshalJSON() ([]byte, error) {
+	return MarshelUserStore(i)
+}
 
-// Overload for default json marshaller
+// MarshalItem Overload for default json marshaller
 func MarshalItem(TargetItem ClientItem) ([]byte, error) {
 
 	return json.Marshal(map[string]interface{}{
@@ -46,7 +50,7 @@ func PruneItems(TargetItems ...*ent.Item) []ClientItem {
 
 }
 
-// Overload for default json marshaller
+// MarshalStore Overload for default json marshaller
 func MarshalStore(TargetItem ClientStore) ([]byte, error) {
 	/*
 		cats, err := temp.Category.Query().Where(category.HasItemsWith(item.ID(TargetItem.ID))).All(context.Background())
@@ -73,5 +77,27 @@ func PruneStore(TargetItem *ent.Store) ClientStore {
 	var store ClientStore
 	store = ClientStore(*TargetItem)
 	return store
+
+}
+
+// Overload for default json marshaller
+func MarshelUserStore(TargetItem ClientUserStore) ([]byte, error) {
+	return json.Marshal(map[string]interface{}{
+		"user_id":          TargetItem.UserID,
+		"id":               TargetItem.StoreID,
+		"Permission_level": TargetItem.PermissionLevel,
+		"storename":        TargetItem.StoreName,
+	})
+}
+func PruneUserStore(targetItems ...*ent.UserToStore) []ClientUserStore {
+	var clientUserStores []ClientUserStore
+
+	for _, item := range targetItems {
+		clientUserStores = append(clientUserStores, ClientUserStore(*item))
+	}
+	if clientUserStores == nil {
+		clientUserStores = make([]ClientUserStore, 0)
+	}
+	return clientUserStores
 
 }

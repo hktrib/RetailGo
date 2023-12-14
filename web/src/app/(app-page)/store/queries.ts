@@ -11,9 +11,7 @@ export const getItemRecommendations = async ({
   console.log(`Fetching item recommendations with url:${fetchUrl}`);
 
   try {
-    const res = await fetch(fetchUrl, {
-      headers: { "Access-Control-Allow-Origin": "no-cors" },
-    });
+    const res = await fetch(fetchUrl, {});
 
     if (!res.ok)
       return {
@@ -139,7 +137,7 @@ export const GetStaffByStore = async ({ store_id }: { store_id: string }) => {
     if (!res.ok) return { success: false, employees: [] };
 
     const data = JSON.parse(await res.text()) ?? [];
-    console.log("fetched employee data:", data);
+    //console.log("fetched employee data:", data);
 
     return {
       success: true,
@@ -149,5 +147,35 @@ export const GetStaffByStore = async ({ store_id }: { store_id: string }) => {
     console.error("error fetching store employees");
 
     return { success: false, employees: [] };
+  }
+};
+
+// Employee Items
+export const GetStoresByClerkId = async () => {
+  const fetchUrl = `${config.serverURL}/store/`;
+  console.log(`fetching employees: ${fetchUrl}`);
+
+  const { sessionId, getToken } = auth();
+  try {
+    const res = await fetch(fetchUrl, {
+      cache: "force-cache",
+      headers: {
+        Authorization: `Bearer ${await getToken()}`,
+      },
+      next: { tags: ["user_stores"] },
+    });
+    console.log("fetching stores data:");
+    console.log("res is:" + res.status);
+    if (!res.ok) return { success: false, stores: [] };
+    const text = await res.text();
+    const data = JSON.parse(text) ?? [];
+    return {
+      success: true,
+      stores: data,
+    };
+  } catch (err) {
+    console.error("error fetching stores. Error is:" + err + "");
+
+    return { success: false, stores: [] };
   }
 };

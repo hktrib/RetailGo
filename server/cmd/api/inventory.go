@@ -25,11 +25,12 @@ InvRead Brief:
 
 	________________________________________
 
--> Read's all items from Specified Store's (Ex: store/{store_id}) Inventory
+-> Reads all items from specified store id given in URL (Ex: store/{store_id})
 
-External Package Calls:
+Response:
 
-	N/A
+-> On success, return 200 and a list of items in message body.
+-> If invalid store_id is provided, return 400.
 */
 func (srv *Server) InvRead(w http.ResponseWriter, r *http.Request) {
 
@@ -70,14 +71,15 @@ InvCreate Brief:
 
 	________________________________________
 
--> Creates an item in a specified store's inventory (Ex: store/{store_id}/inventory/create)
+-> Creates an item in a specified store's inventory (Ex: store/{store_id}/inventory/create), will create the category if it doesn't exist.
 
-External Package Calls:
+Response:
 
-	N/A
+-> On success, return 201.
+-> If an invalid store id or
 */
 func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
-	// name, photo, quantity, store_id, category
+	// name, photo, quantity, category name
 
 	ctx := r.Context()
 
@@ -91,7 +93,7 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Load the message parameters (Name, Photo, Quantity, Category)
+	// Load the message parameters (Name, Photo, Quantity, Category Name)
 	req_body, err := io.ReadAll(r.Body)
 
 	if err != nil {
@@ -104,23 +106,22 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 	reqItem.StoreID = store_id
 	body_parse_err := json.Unmarshal(req_body, &reqItem)
 
-	// If any are not present or not do not meet requirements (type for example), BadRequest
-
 	if body_parse_err != nil {
 		fmt.Println("Unmarshalling failed:", body_parse_err)
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
-
-	// Create item in database with name, photo, quantity, store_id, category
-	// get the stores stripe id
-	targetStore, err := srv.DBClient.Store.Query().Where(store.IDEQ(store_id)).Only(ctx)
-	if err != nil {
-		fmt.Println("Unable to find store:", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
+	// Create item in database with name, photo, quantity, store_id, category name.
+	// get the stores stripe id
+	targetStore, err := srv.DBClient.Store.Query().Where(store.IDEQ(store_id)).Only(ctx)
+	if err != nil {
+		fmt.Println("Unable to find store:", err)
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	// Create item in Stripe at the target store.
 	ProductId, err := CreateStripeItem(&reqItem, targetStore)
 	if err != nil {
 		fmt.Println("Stripe Create didn't work:", err)
@@ -128,7 +129,7 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// set all item parameters
+	// Create Item in Database
 	createdItem, create_err := srv.DBClient.
 		Item.Create().
 		SetPrice(float64(reqItem.Price)).
@@ -145,13 +146,17 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 		SetDateLastSold("").
 		Save(ctx)
 
-	// If this create doesn't work, InternalServerError
 	if create_err != nil {
 		fmt.Println("Create didn't work:", create_err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+
 	err = createOrUpdateCategory(reqItem.CategoryName, createdItem, ctx, srv)
+
+	if err != nil {
+
+	}
 
 	weaviateID, weaviateErr := srv.WeaviateClient.CreateItem(createdItem)
 
@@ -188,10 +193,22 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Created"))
 
 }
+
+/*
+	@Params
+		categoryName -> Category Name (string)
+		createdItem -> a created *ent.Item
+		ctx -> the request context
+		srv -> a server object
+
+	Creates category if the category name is blank,
+*/
+
 func createOrUpdateCategory(categoryName string, createdItem *ent.Item, ctx context.Context, srv *Server) error {
 	var cat *ent.Category
 	var err error
 
+	// If no categoryName provided, find the default "Uncategorized" category for this store. Otherwise, query for the category by name under the store.
 	if categoryName == "" {
 		cat, err = srv.DBClient.Category.Query().Where(category.Name("Uncategorized"), category.StoreID(createdItem.StoreID)).Only(ctx)
 	} else {
@@ -199,6 +216,7 @@ func createOrUpdateCategory(categoryName string, createdItem *ent.Item, ctx cont
 	}
 
 	if err != nil {
+		// If the category is not found, create the category and the item within it.
 		if ent.IsNotFound(err) {
 			return CreateCatWithItem(createdItem, categoryName, ctx, srv)
 		}
@@ -207,6 +225,7 @@ func createOrUpdateCategory(categoryName string, createdItem *ent.Item, ctx cont
 		return err
 	}
 
+	// Otherwise, add the createdItem to the category.
 	_, err = srv.DBClient.Category.UpdateOne(cat).AddItems(createdItem).Save(ctx)
 	return err
 }
