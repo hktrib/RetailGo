@@ -4,6 +4,8 @@ from data_models import Item
 import os
 import numpy as np
 
+RESULT_LIMIT = 10
+
 class DB(object):
     def __init__(self, discount_factor, dimension = 300):
         try:
@@ -32,9 +34,9 @@ class DB(object):
     def find_item_near_vector(self, vector, result_limit = 50):
 
         try:
-            nearby_items = self.client.query.get("item", ["name", "categoryName", "imageURL", "price"]).with_limit(result_limit).with_near_vector({
+            nearby_items = self.client.query.get("item", ["name", "categoryName", "imageURL", "price"]).with_near_vector({
                 'vector': vector
-            }).do()
+            }).with_limit(result_limit).with_additional(["distance"]).do()
 
             return nearby_items
 
@@ -181,7 +183,8 @@ class DB(object):
         # Search for nearby items, candidates to be recommended
 
         try:
-            candidates = self.find_item_near_vector(store_vector)
+            candidates = self.find_item_near_vector(store_vector, result_limit=RESULT_LIMIT)
+            candidates = sorted(candidates, lambda candidate: candidate["_additional"]["distance"])
         except Exception as error:
             print("Failed to find nearby items:", error)
             return None
