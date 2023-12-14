@@ -17,10 +17,12 @@ let config: ClassDictionary;
 if (env === "development") {
   config = {
     serverURL: "http://localhost:8080",
+    recServerURL: "http://recommendation-server-production.up.railway.app"
   };
 } else if (env === "production") {
   config = {
     serverURL: "https://retailgo-production.up.railway.app",
+    recServerURL: "http://recommendation-server-production.up.railway.app"
   };
 }
 
