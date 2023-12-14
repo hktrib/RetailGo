@@ -18,15 +18,22 @@ import (
 	"github.com/hktrib/RetailGo/internal/webhook"
 )
 
+type Param string
+
+// All Server operations are conducted using the following struct.
+
 /*
 	@Fields
 		Router -> Chi's Multiplexers
-		Client -> Ent's Database Client
+		ClerkClient -> Clerk's Client (Authentication)
+		DBClient -> Ent's Database Client
+		TaskQueueClient -> Asynq Client (Task queue for event-triggered jobs)
+		WeaviateClient -> A wrapper around Weaviate's Vector Database Client
+		Cache -> A wrapper for Redis Key-Value Store / Cache
+		TaskProducer -> An implementation of task producers for the task queue.
 		Config -> Config related stuff
-
+		Supabase -> A client for Supabase (used for image upload)
 */
-
-type Param string
 
 type Server struct {
 	Router          *chi.Mux
@@ -40,7 +47,7 @@ type Server struct {
 	Supabase        *supa.Client
 }
 
-// Define a type for Item-Change Requests (Create, Update, Delete)
+// Creates a new server.
 
 func NewServer(
 	clerkClient clerk.Client,
@@ -65,8 +72,12 @@ func NewServer(
 	return srv
 }
 
+// Mount all mappings from route to handler in the mux.
+
 func (s *Server) MountHandlers() {
+	// Log all requests
 	s.Router.Use(middleware.Logger)
+
 	s.Router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -76,6 +87,7 @@ func (s *Server) MountHandlers() {
 		MaxAge:           299, // Maximum value not ignored by any of major browsers
 	}))
 
+	// Route for Stripe webhook to handle transaction outcomes.
 	s.Router.Route("/webhook/stripe", func(r chi.Router) {
 		r.Post("/", func(writer http.ResponseWriter, request *http.Request) {
 			sk := s.Config.STRIPE_WEBHOOK_SECRET
@@ -88,6 +100,8 @@ func (s *Server) MountHandlers() {
 		})
 
 	})
+
+	// Route for Clerk Webhook.
 	s.Router.Post("/clerkwebhook", webhook.HandleClerkWebhook)
 	s.Router.Get("/", func(w http.ResponseWriter, request *http.Request) {
 		w.WriteHeader(http.StatusOK)
