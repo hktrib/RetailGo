@@ -83,7 +83,7 @@ async function RemoteImage({ imageURL }: { imageURL: string }) {
   return (
     <div className="flex h-40 w-full items-center justify-center rounded-t-md bg-gray-100 dark:bg-zinc-700">
       {isValidUrl(imageURL) ? (
-        <Image src={imageURL} alt={imageURL} />
+        <Image src={imageURL} alt = {imageURL} />
       ) : (
         <span className="text-xs dark:text-zinc-300">No image available.</span>
       )}
