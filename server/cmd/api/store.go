@@ -42,7 +42,7 @@ func (srv *Server) CreateStore(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err, nStore, nUser := transactions.StoreAndOwnerCreationTx(ctx, reqStore, reqUser, srv.DBClient, clerkStore)
-	// this is bad
+	fmt.Println("nUser: ", nUser)
 	err = SendOnboardingEmail(nStore, nUser)
 	if err != nil {
 		log.Debug().Err(err).Msg("CreateStore: unable to send onboarding email")
