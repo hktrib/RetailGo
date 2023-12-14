@@ -90,7 +90,7 @@ func (s *Server) MountHandlers() {
 	// Route for Stripe webhook to handle transaction outcomes.
 	s.Router.Route("/webhook/stripe", func(r chi.Router) {
 		r.Post("/", func(writer http.ResponseWriter, request *http.Request) {
-			webhook.StripeWebhookRouter(writer, request, s.Config.STRIPE_WEBHOOK_SECRET_CONNECTED, s.DBClient)
+			webhook.StripeWebhookRouter(writer, request, s.Config.STRIPE_WEBHOOK_SECRET, s.DBClient)
 		})
 		r.Post("/connect", func(writer http.ResponseWriter, request *http.Request) {
 			webhook.StripeWebhookRouter(writer, request, s.Config.STRIPE_WEBHOOK_SECRET_CONNECTED, s.DBClient)
@@ -98,8 +98,9 @@ func (s *Server) MountHandlers() {
 
 	})
 
-	// Route for Clerk Webhook.
+	// POST | Stages Clerk User Data via loopback to /IsOwnerCreateHandle
 	s.Router.Post("/clerkwebhook", webhook.HandleClerkWebhook)
+
 	s.Router.Get("/", func(w http.ResponseWriter, request *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write(([]byte)("OK"))

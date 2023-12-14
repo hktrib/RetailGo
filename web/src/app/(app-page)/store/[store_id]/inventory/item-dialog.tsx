@@ -36,6 +36,9 @@ import { ChevronsUpDown, PencilIcon } from "lucide-react";
 import { UploadDropzone } from "@/lib/uploadthing";
 import UploadButton from "@/components/app-page/upload-button";
 
+
+import toast from "react-hot-toast";
+
 // Defining the form schema using zod for validation
 const formSchema = z.object({
   name: z.string(),
@@ -81,10 +84,16 @@ export default function ItemDialog({
       if (!item) return;
 
       // Updating the item using the updateItem action
-      await updateItem({
+      let ok = await updateItem({
         item: { id: item.id, ...values },
         store_id: params.store_id as string,
       });
+      
+      if (ok) {
+        toast.success("Success: Item has been updated!");
+      } else {
+        toast.error("Error: Item could not be updated!");
+      }
 
       // Waiting for a short period of time and closing the dialog
       wait().then(() => setOpen(false));
@@ -92,7 +101,13 @@ export default function ItemDialog({
     }
 
     // Creating a new item using the createItem action
-    await createItem({ item: values, store_id: params.store_id as string });
+    let ok = await createItem({ item: values, store_id: params.store_id as string });
+
+    if (ok) {
+      toast.success("Success: Item has been created!");
+    } else {
+      toast.error("Error: Item could not be created!!");
+    }
     // Waiting for a short period of time and closing the dialog
     wait().then(() => setOpen(false));
   };
