@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	StripeHelper "github.com/hktrib/RetailGo/cmd/api/stripe-components"
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/item"
 	"github.com/hktrib/RetailGo/internal/ent/store"
@@ -107,17 +106,13 @@ func StripeWebhookRouter(w http.ResponseWriter, r *http.Request, endpointSecret 
 }
 
 func AuthorizeUser(w http.ResponseWriter, event stripe.Event, client *ent.Client) {
-	var CAccount stripe.Account
-	err := json.Unmarshal(event.Data.Raw, &CAccount)
+	// Get the store from the database
+	Store, err := client.Store.Query().Where(store.StripeAccountID(event.Account)).Only(context.Background())
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error parsing webhook JSON: %v\n", err)
+		log.Debug().Err(err).Msg("AuthorizeUser: unable to retrieve store")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
-	// Get the store from the database
-	Store, err := client.Store.Query().Where(store.StripeAccountID(CAccount.ID)).Only(context.Background())
-
 	// Update the user's status to authorized
 	_, err = client.Store.UpdateOne(Store).SetIsAuthorized(true).Save(context.Background())
 
@@ -216,7 +211,7 @@ func SendSuccessEmail(StoreObj *ent.Store) error {
 	split := strings.Split(em, "@")
 
 	to := mail.Address{Name: split[0], Address: StoreObj.OwnerEmail}
-	subject := "You must complete onboarding to continue!"
+	subject := "Your all set!"
 
 	// Message to be sent
 	headers := make(map[string]string)
@@ -230,17 +225,14 @@ func SendSuccessEmail(StoreObj *ent.Store) error {
 
 	tmpl := template.Must(template.ParseGlob("./cmd/templates/*"))
 
-	url, err := StripeHelper.StartOnboarding(StoreObj.StripeAccountID)
-	if err != nil {
-		return fmt.Errorf("failed to start onboarding: %w", err)
-	}
+	url := "https://retail-go.vercel.app/store/"
 
 	htmlBody := new(bytes.Buffer)
 	templateData := HtmlTemplate{
-		Action_url: url.URL,
+		Action_url: url,
 	}
 
-	err = tmpl.ExecuteTemplate(htmlBody, "onboarding_success.html", templateData)
+	err := tmpl.ExecuteTemplate(htmlBody, "onboarding_success.html", templateData)
 	if err != nil {
 		return fmt.Errorf("failed to read email template: %w", err)
 	}
