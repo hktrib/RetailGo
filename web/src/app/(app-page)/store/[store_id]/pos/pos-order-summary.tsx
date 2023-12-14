@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { createCheckout } from "./actions";
 
 import { CheckoutDialog } from "./checkout-dialog";
@@ -35,25 +35,14 @@ const POSOrderSummary = ({
       lineItems: lineItems,
       store_id: storeId,
     });
-
     if (!res) {
       console.error("error creating checkout", res);
       return;
     }
 
     const newClientSecret = JSON.parse(res).ClientSecret;
-
     setClientSecret(newClientSecret);
   };
-
-  useEffect(() => {
-    if (!clientSecret) {
-      setCheckoutOpen(false);
-      return;
-    }
-
-    setCheckoutOpen(true);
-  }, [clientSecret]);
 
   return (
     <div className="h-full">
