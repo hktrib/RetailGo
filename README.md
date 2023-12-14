@@ -13,7 +13,8 @@
   <span>Colby Frey</span> ·
   <span>David Nguyen</span> ·
   <span>Giridhar Vadhul</span> ·
-  <span>Jonathan Michel</span>
+  <span>Jonathan Michel</span> ·
+  <span>Leo Asatoorian</span>
 </p>
 
 <p align="center">
