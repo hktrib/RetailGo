@@ -91,12 +91,12 @@ func (s *Server) MountHandlers() {
 	s.Router.Route("/webhook/stripe", func(r chi.Router) {
 		r.Post("/", func(writer http.ResponseWriter, request *http.Request) {
 			sk := s.Config.STRIPE_WEBHOOK_SECRET
-			s.StripeWebhookRouter(writer, request, sk)
+			webhook.StripeWebhookRouter(writer, request, sk, s.DBClient)
 		})
 		r.Post("/connect", func(writer http.ResponseWriter, request *http.Request) {
 			sk := s.Config.STRIPE_WEBHOOK_SECRET_CONNECTED
 
-			s.StripeWebhookRouter(writer, request, sk)
+			webhook.StripeWebhookRouter(writer, request, sk, s.DBClient)
 		})
 
 	})
