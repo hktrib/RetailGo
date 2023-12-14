@@ -1,8 +1,8 @@
 import { RedirectToSignIn, SignIn, SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { GetStoreByUUID } from "./queries";
-import InviteButtons from "@/components/app-page/invite-dialog";
 import Header from "@/components/landing-page/Header";
 import Footer from "@/components/landing-page/footer";
+import InviteButtons from "@/components/app-page/InviteButtons";
 
 export default async function InvitePage({
   searchParams,

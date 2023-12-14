@@ -9,6 +9,7 @@ import (
 // Item with only the feilds the client should see
 type ClientItem ent.Item
 type ClientStore ent.Store
+type ClientUserStore ent.UserToStore
 
 // Overload for default json marshaller
 func (i ClientItem) MarshalJSON() ([]byte, error) {
@@ -17,6 +18,9 @@ func (i ClientItem) MarshalJSON() ([]byte, error) {
 
 func (i ClientStore) MarshalJSON() ([]byte, error) {
 	return MarshalStore(i)
+}
+func (i ClientUserStore) MarshalJSON() ([]byte, error) {
+	return MarshelUserStore(i)
 }
 
 // Overload for default json marshaller
@@ -73,5 +77,28 @@ func PruneStore(TargetItem *ent.Store) ClientStore {
 	var store ClientStore
 	store = ClientStore(*TargetItem)
 	return store
+
+}
+
+// Overload for default json marshaller
+func MarshelUserStore(TargetItem ClientUserStore) ([]byte, error) {
+
+	return json.Marshal(map[string]interface{}{
+		"user_id":          TargetItem.UserID,
+		"store_id":         TargetItem.StoreID,
+		"permission_level": TargetItem.PermissionLevel,
+		"store_name":       TargetItem.StoreName,
+	})
+}
+func PruneUserStore(TargetItems ...*ent.UserToStore) []ClientUserStore {
+	var clientItems []ClientUserStore
+
+	for _, item := range TargetItems {
+		clientItems = append(clientItems, ClientUserStore(*item))
+	}
+	if clientItems == nil {
+		clientItems = make([]ClientUserStore, 0)
+	}
+	return clientItems
 
 }
