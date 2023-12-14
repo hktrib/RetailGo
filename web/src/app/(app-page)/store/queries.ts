@@ -11,9 +11,7 @@ export const getItemRecommendations = async ({
   console.log(`Fetching item recommendations with url:${fetchUrl}`);
 
   try {
-    const res = await fetch(fetchUrl, {
-      headers: { "Access-Control-Allow-Origin": "no-cors" },
-    });
+    const res = await fetch(fetchUrl, {});
 
     if (!res.ok)
       return {
