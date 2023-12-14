@@ -9,9 +9,10 @@ import (
 	"net/http"
 
 	"github.com/clerkinc/clerk-sdk-go/clerk"
-	"github.com/hktrib/RetailGo/internal/util"
 	"github.com/rs/zerolog/log"
 	svix "github.com/svix/svix-webhooks/go"
+
+	"github.com/hktrib/RetailGo/internal/util"
 )
 
 var Config *util.Config
@@ -26,16 +27,16 @@ type EmailObject struct {
 
 type UserInterface struct {
 	EmailObjects          []EmailObject `json:"email_addresses"`
+	FirstName             string        `json:"first_name"`
+	LastName              string        `json:"last_name"`
 	PrimaryEmailAddressID string        `json:"primary_email_address_id"`
 	ID                    string        `json:"id"`
 }
 
 type Event struct {
-	Data      UserInterface `json:"data"`
-	Object    string        `json:"object"`
-	FirstName string        `json:"first_name"`
-	LastName  string        `json:"last_name"`
-	Type      EventType     `json:"type"`
+	Data   UserInterface `json:"data"`
+	Object string        `json:"object"`
+	Type   EventType     `json:"type"`
 }
 
 const (
@@ -98,7 +99,7 @@ func HandleClerkWebhook(w http.ResponseWriter, r *http.Request) {
 	// Process Event Data
 	var event Event
 	err = json.Unmarshal([]byte(payload), &event)
-	fmt.Println(event.Data)
+	fmt.Printf("Event.Data: %v\n", event.Data)
 	if err != nil {
 		log.Debug().Err(err).Msg("unable to martial json")
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -120,11 +121,11 @@ func HandleClerkWebhook(w http.ResponseWriter, r *http.Request) {
 			"email":         emailObject.EmailAddress,
 			"is_owner":      false,
 			"clerk_user_id": event.Data.ID,
-			"first_name":    event.FirstName,
-			"last_name":     event.LastName,
+			"first_name":    event.Data.FirstName,
+			"last_name":     event.Data.LastName,
 		}
 
-		url := "http://localhost:" + Config.SERVER_ADDRESS + "/create/user"
+		url := "http://localhost:" + Config.SERVER_ADDRESS + "/create/owner"
 		// Use ngrok to create tempUrl for local testing purposes (io.ReadAll error handling sucks! with ngrok testing)
 		// tempURl := "http://10a8-2600-1700-87f4-100-5125-57cc-354-6945.ngrok.io/create/user"
 		b, _ := json.Marshal(requestBody)
