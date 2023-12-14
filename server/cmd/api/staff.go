@@ -1,10 +1,12 @@
 package server
 
+// Package api provides the implementation of the staff API endpoints.
+// This file contains the necessary imports and declarations for the staff API.
+
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	StripeHelper "github.com/hktrib/RetailGo/cmd/api/stripe-components"
 	"html/template"
 	"log"
 	"net/http"
@@ -13,6 +15,8 @@ import (
 	"os"
 	"strconv"
 
+	StripeHelper "github.com/hktrib/RetailGo/cmd/api/stripe-components"
+
 	"github.com/go-chi/chi/v5"
 
 	"github.com/hktrib/RetailGo/internal/ent"
@@ -20,13 +24,14 @@ import (
 	"github.com/hktrib/RetailGo/internal/ent/user"
 )
 
+// GetAllEmployees retrieves all employees belonging to a specific store.
+// Input: w - http.ResponseWriter, r - *http.Request
+// Return: None
 func (srv *Server) GetAllEmployees(w http.ResponseWriter, r *http.Request) {
-
 	ctx := r.Context()
 
 	// Parse the store id
 	store_id, err := strconv.Atoi(chi.URLParam(r, "store_id"))
-
 	if err != nil {
 		fmt.Println("Error with Store Id")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
@@ -35,7 +40,6 @@ func (srv *Server) GetAllEmployees(w http.ResponseWriter, r *http.Request) {
 
 	// get all employees belonging to this store
 	user_data, err := srv.DBClient.User.Query().Where(user.StoreID(store_id)).All(ctx)
-
 	if err != nil {
 		fmt.Println("Issue with querying the DB.")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -58,6 +62,7 @@ type EmailRequest struct {
 	Name  string `json:"name"`
 }
 
+// HtmlTemplate represents the data for the HTML email template
 type HtmlTemplate struct {
 	Email       string `json:"email"`
 	Name        string `json:"name"`
@@ -66,8 +71,10 @@ type HtmlTemplate struct {
 	Action_url  string `json:"action_url"`
 }
 
+// DeleteEmployee deletes an employee from the database.
+// Input: w - http.ResponseWriter, r - *http.Request
+// Return: None
 func (srv *Server) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
-
 	// Verify user credentials using clerk
 	_, clerk_err := VerifyUserCredentials(r)
 	if clerk_err != nil {
@@ -85,7 +92,6 @@ func (srv *Server) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err := srv.DBClient.User.Query().Where(user.ID(user_id)).Only(ctx)
-
 	if ent.IsNotFound(err) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
@@ -93,12 +99,12 @@ func (srv *Server) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-
 }
 
-// TestEmailHandler handles the email testing request
+// SendInviteEmail sends an invitation email to a user.
+// Input: w - http.ResponseWriter, r - *http.Request
+// Return: None
 func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
-
 	entries, dummy_err := os.ReadDir("./")
 	if dummy_err != nil {
 		log.Fatal(dummy_err)
@@ -126,7 +132,6 @@ func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 
 	// Parse the store id
 	store_id, id_err := strconv.Atoi(chi.URLParam(r, "store_id"))
-
 	if id_err != nil {
 		fmt.Println("Error with Store Id")
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
@@ -191,9 +196,7 @@ func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 		Name:        req.Name,
 		Store_name:  storeObj.StoreName,
 		Sender_name: firstName + " " + lastName,
-		//Sender_name: "Billy Bob",
-		//    Action_url: "http://localhost:3000/invite?code=" + storeObj.UUID,
-		Action_url: "https://retail-go.vercel.app/invite?code=" + storeObj.UUID,
+		Action_url:  "https://retail-go.vercel.app/invite?code=" + storeObj.UUID,
 	}
 	err_io := tmpl.ExecuteTemplate(htmlBody, "email_invitation.html", templateData)
 
@@ -224,8 +227,11 @@ func (srv *Server) SendInviteEmail(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Email sent successfully"))
 }
-func SendOnboardingEmail(StoreObj *ent.Store, UserObj *ent.User) error {
 
+// SendOnboardingEmail sends an onboarding email to a user.
+// Input: StoreObj - *ent.Store, UserObj - *ent.User
+// Return: error
+func SendOnboardingEmail(StoreObj *ent.Store, UserObj *ent.User) error {
 	// Set up authentication information.
 	auth := smtp.PlainAuth(
 		"",

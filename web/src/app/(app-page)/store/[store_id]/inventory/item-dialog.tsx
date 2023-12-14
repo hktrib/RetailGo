@@ -1,5 +1,5 @@
-"use client";
-
+"use client"
+// Importing necessary dependencies and components
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,6 +36,7 @@ import { ChevronsUpDown, PencilIcon } from "lucide-react";
 import { UploadDropzone } from "@/lib/uploadthing";
 import UploadButton from "@/components/app-page/upload-button";
 
+// Defining the form schema using zod for validation
 const formSchema = z.object({
   name: z.string(),
   price: z.coerce.number(),
@@ -43,6 +44,7 @@ const formSchema = z.object({
   category_name: z.string(),
 });
 
+// Exporting the ItemDialog component
 export default function ItemDialog({
   item,
   mode = "add",
@@ -52,9 +54,12 @@ export default function ItemDialog({
   mode?: string;
   categories: Category[];
 }) {
+  // Getting the store_id from the URL parameters
   const params = useParams();
+  // Managing the open state of the dialog
   const [open, setOpen] = useState(false);
 
+  // Initializing the form using react-hook-form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -65,37 +70,52 @@ export default function ItemDialog({
     },
   });
 
+  // Function to handle form submission
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    // Checking if the store_id is available
     if (!params.store_id) return;
 
+    // Handling the "edit" mode
     if (mode === "edit") {
+      // Checking if the item is available
       if (!item) return;
 
+      // Updating the item using the updateItem action
       await updateItem({
         item: { id: item.id, ...values },
         store_id: params.store_id as string,
       });
 
+      // Waiting for a short period of time and closing the dialog
       wait().then(() => setOpen(false));
       return;
     }
 
+    // Creating a new item using the createItem action
     await createItem({ item: values, store_id: params.store_id as string });
+    // Waiting for a short period of time and closing the dialog
     wait().then(() => setOpen(false));
   };
 
+  // Function to display the category name
   const displayCategory = (value: string) => {
+    // If the value is empty, return "Select category"
     if (!value) return "Select category";
+    // If categories are not available or empty, return the value as is
     if (!categories || !categories.length) return value;
 
+    // Find the category with the matching name and return its name
     const categoryName = categories.find((category) => category.name === value)
       ?.name;
 
+    // If the categoryName is available, return it
     if (categoryName) return categoryName;
 
+    // If no matching category is found, return the value as is
     return value;
   };
 
+  // Rendering the ItemDialog component
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -117,6 +137,7 @@ export default function ItemDialog({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+            {/* Form fields */}
             <FormField
               control={form.control}
               name="name"
@@ -170,6 +191,7 @@ export default function ItemDialog({
               )}
             />
 
+            {/* Item image upload */}
             {/* <div className="pb-0.5 pt-2">
               <div className="text-sm font-medium">Item image</div>
 
@@ -205,6 +227,7 @@ export default function ItemDialog({
                         className="dark:border-zinc-800 dark:focus:ring-zinc-700"
                       />
 
+                      {/* Displaying category options */}
                       {categories.length ? (
                         <div className="mt-4 flex flex-col space-y-0.5">
                           {categories.map((category) => (
@@ -234,6 +257,7 @@ export default function ItemDialog({
               )}
             />
 
+            {/* Dialog footer */}
             <DialogFooter className="gap-x-4 pt-2">
               <Button type="submit">
                 {mode === "edit" ? "Update" : "Add"}
