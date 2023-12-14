@@ -379,6 +379,11 @@ func (srv *Server) UserJoinStore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("Store ID: ", store.ID)
+	fmt.Println("Firstname: ", firstName)
+	fmt.Println("Lastname ", lastName)
+	fmt.Println("Email: ", email)
+
 	// Create a new User entity
 	newUser, create_err := srv.DBClient.User.Create().
 		SetEmail(email).
@@ -387,7 +392,6 @@ func (srv *Server) UserJoinStore(w http.ResponseWriter, r *http.Request) {
 		SetClerkUserID(clerkUser.ID).
 		SetFirstName(firstName).
 		SetLastName(lastName).
-		AddStoreIDs(store.ID).
 		Save(ctx)
 	if create_err != nil {
 		fmt.Println("User Creation didn't work:", create_err)
@@ -395,14 +399,15 @@ func (srv *Server) UserJoinStore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, user_store_error := srv.DBClient.UserToStore.Create().
+	userToStoreObj, user_store_error := srv.DBClient.UserToStore.Create().
+		SetUserID(newUser.ID).
 		SetStoreID(store.ID).
 		SetStoreName(store.StoreName).
 		SetClerkUserID(clerkUser.ID).
 		SetPermissionLevel(1). // Employee permission level
 		Save(ctx)
 	if user_store_error != nil {
-		fmt.Println("User Creation didn't work:", create_err)
+		fmt.Println("User Creation didn't work:", user_store_error)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -416,17 +421,17 @@ func (srv *Server) UserJoinStore(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Querying user_to_store table for user_to_store relationship for new employee
-	newUTS, err := srv.DBClient.UserToStore.Query().
-		Where(usertostore.StoreID(store.ID), usertostore.UserID(newUser.ID)).
-		Only(ctx)
-	if err != nil {
-		log.Debug().Err(err).Msg("UserJoinStore: unable to query from usertostore table in database")
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
+	/*	newUTS, err := srv.DBClient.UserToStore.Query().
+			Where(usertostore.StoreID(store.ID), usertostore.UserID(newUser.ID)).
+			First(ctx)
+		if err != nil {
+			log.Debug().Err(err).Msg("UserJoinStore: unable to query from usertostore table in database")
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+	*/
 	// Adding the user_to_store relationship to Clerk's Data Store
-	err = clerkStore.AddMetadata(newUTS)
+	err = clerkStore.AddMetadata(userToStoreObj)
 	if err != nil {
 		log.Debug().Err(err).Msg("UserJoinStore: unable to user metadata to Clerk Store")
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
