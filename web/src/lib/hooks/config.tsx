@@ -11,7 +11,7 @@ let env: string = process.env.NODE_ENV;
 
 let config: ClassDictionary;
 
-// env = "production";
+env = "production";
 // console.log(env)
 
 if (env === "development") {
