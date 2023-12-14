@@ -184,7 +184,7 @@ class DB(object):
 
         try:
             candidates = self.find_item_near_vector(store_vector, result_limit=RESULT_LIMIT)
-            candidates = sorted(candidates, lambda candidate: candidate["_additional"]["distance"])
+            candidates = sorted(candidates, key = lambda candidate: candidate["_additional"]["distance"])
         except Exception as error:
             print("Failed to find nearby items:", error)
             return None
