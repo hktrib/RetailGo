@@ -88,7 +88,21 @@ func (s *Server) MountHandlers() {
 		})
 
 	})
+
+	s.Router.Route("/webhook/weaviate", func(r chi.Router) {
+		r.Post("/create", func(writer http.ResponseWriter, request *http.Request) {
+			webhook.HandleWeaviateCreate(writer, request, s.DBClient, s.WeaviateClient)
+		})
+		r.Post("/update", func(writer http.ResponseWriter, request *http.Request) {
+			webhook.HandleWeaviateUpdate(writer, request, s.DBClient, s.WeaviateClient)
+		})
+		r.Post("/delete", func(writer http.ResponseWriter, request *http.Request) {
+			webhook.HandleWeaviateDelete(writer, request, s.DBClient, s.WeaviateClient)
+		})
+	})
+
 	s.Router.Post("/clerkwebhook", webhook.HandleClerkWebhook)
+
 	s.Router.Get("/", func(w http.ResponseWriter, request *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write(([]byte)("OK"))

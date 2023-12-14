@@ -6,6 +6,7 @@ import (
 	weaviateClient "github.com/weaviate/weaviate-go-client/v4/weaviate"
 	weaviateAuth "github.com/weaviate/weaviate-go-client/v4/weaviate/auth"
 
+	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/util"
 )
 
@@ -14,7 +15,17 @@ type Weaviate struct {
 	ctx    context.Context
 }
 
-func ChangesVectorizedProperties(updatedFields UpdatedFields) bool {
+func ChangesVectorizedProperties(originalItem *ent.Item, updatedItem *ent.Item) bool {
+	updatedFields := UpdatedFields{
+		Name:                  originalItem.Name != updatedItem.Name,
+		Photo:                 originalItem.Photo != updatedItem.Photo,
+		Quantity:              originalItem.Quantity != updatedItem.Quantity,
+		Price:                 originalItem.Price != updatedItem.Price,
+		CategoryName:          originalItem.CategoryName != updatedItem.CategoryName,
+		NumberSoldSinceUpdate: false, // Assume that sales is taken care of elsewhere. If not, this is subject to change.
+		DateLastSold:          false, // Assume that sales is taken care of elsewhere. If not, this is subject to change.
+	}
+
 	return (updatedFields.Name || updatedFields.CategoryName || updatedFields.Price || updatedFields.Photo || updatedFields.DateLastSold || updatedFields.NumberSoldSinceUpdate)
 }
 

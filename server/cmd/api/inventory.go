@@ -153,36 +153,36 @@ func (srv *Server) InvCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	err = createOrUpdateCategory(reqItem.CategoryName, createdItem, ctx, srv)
 
-	weaviateID, weaviateErr := srv.WeaviateClient.CreateItem(createdItem)
+	// weaviateID, weaviateErr := srv.WeaviateClient.CreateItem(createdItem)
 
-	fmt.Println("Weaviate ID on create:", weaviateID)
+	// fmt.Println("Weaviate ID on create:", weaviateID)
 
-	// Currently raises 500 if creation of weaviate copy or storing the weaviate id fails.
-	// Attempts to roll back the database in response to this so that there are no ghost items for Weaviate.
+	// // Currently raises 500 if creation of weaviate copy or storing the weaviate id fails.
+	// // Attempts to roll back the database in response to this so that there are no ghost items for Weaviate.
 
-	if weaviateErr != nil {
-		fmt.Println("Weaviate Create didn't work")
-		_ = srv.DBClient.
-			Item.DeleteOneID(createdItem.ID).
-			Where(item.StoreID(store_id)).
-			Exec(r.Context())
+	// if weaviateErr != nil {
+	// 	fmt.Println("Weaviate Create didn't work")
+	// 	_ = srv.DBClient.
+	// 		Item.DeleteOneID(createdItem.ID).
+	// 		Where(item.StoreID(store_id)).
+	// 		Exec(r.Context())
 
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
+	// 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	// 	return
+	// }
 
-	_, setWeaviateIDErr := createdItem.Update().SetWeaviateID(weaviateID).Save(r.Context())
+	// _, setWeaviateIDErr := createdItem.Update().SetWeaviateID(weaviateID).Save(r.Context())
 
-	if setWeaviateIDErr != nil {
-		fmt.Println("Failed to set Weaviate ID")
-		_ = srv.DBClient.
-			Item.DeleteOneID(createdItem.ID).
-			Where(item.StoreID(store_id)).
-			Exec(r.Context())
+	// if setWeaviateIDErr != nil {
+	// 	fmt.Println("Failed to set Weaviate ID")
+	// 	_ = srv.DBClient.
+	// 		Item.DeleteOneID(createdItem.ID).
+	// 		Where(item.StoreID(store_id)).
+	// 		Exec(r.Context())
 
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
+	// 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	// 	return
+	// }
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("Created"))
@@ -347,16 +347,6 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 
 	log.Debug().Msg(fmt.Sprintf("originalItem: %v \n requested item: %v", originalItem, reqItem))
 
-	fieldsUpdated := weaviate.UpdatedFields{
-		Name:                  targetItem.Name != reqItem.Name,
-		Photo:                 targetItem.Photo != reqItem.Photo,
-		Quantity:              targetItem.Quantity != reqItem.Quantity,
-		Price:                 targetItem.Price != reqItem.Price,
-		CategoryName:          targetItem.CategoryName != reqItem.CategoryName,
-		NumberSoldSinceUpdate: false, // Assume that sales is taken care of elsewhere. If not, this is subject to change.
-		DateLastSold:          false, // Assume that sales is taken care of elsewhere. If not, this is subject to change.
-	}
-
 	// Update the item's paramaters in the database
 	_, err = targetItem.Update().
 		SetQuantity(reqItem.Quantity).
@@ -364,7 +354,7 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		SetPhoto(reqItem.Photo).
 		SetPrice(reqItem.Price).
 		SetCategoryName(reqItem.CategoryName).
-		SetVectorized(originalItem.Vectorized && !(weaviate.ChangesVectorizedProperties(fieldsUpdated))).
+		SetVectorized(originalItem.Vectorized && !(weaviate.ChangesVectorizedProperties(&originalItem, &reqItem))).
 		SetNumberSoldSinceUpdate(originalItem.NumberSoldSinceUpdate).
 		Save(r.Context())
 	if err != nil {
@@ -373,21 +363,21 @@ func (srv *Server) InvUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	weaviateUpdateErr := srv.WeaviateClient.EditItem(targetItem, fieldsUpdated)
-	if weaviateUpdateErr != nil {
-		// Rolls back Database update if Weaviate update fails, but no guarantee of rollback working..
-		log.Debug().Err(weaviateUpdateErr).Msg("InvUpdate: weaviate failed to update item")
-		_, _ = targetItem.Update().
-			SetQuantity(originalItem.Quantity).
-			SetPhoto(originalItem.Photo).
-			SetName(originalItem.Name).
-			SetPrice(originalItem.Price).
-			SetCategoryName(originalItem.CategoryName).
-			SetVectorized(originalItem.Vectorized).
-			Save(r.Context())
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
+	// weaviateUpdateErr := srv.WeaviateClient.EditItem(targetItem, fieldsUpdated)
+	// if weaviateUpdateErr != nil {
+	// 	// Rolls back Database update if Weaviate update fails, but no guarantee of rollback working..
+	// 	log.Debug().Err(weaviateUpdateErr).Msg("InvUpdate: weaviate failed to update item")
+	// 	_, _ = targetItem.Update().
+	// 		SetQuantity(originalItem.Quantity).
+	// 		SetPhoto(originalItem.Photo).
+	// 		SetName(originalItem.Name).
+	// 		SetPrice(originalItem.Price).
+	// 		SetCategoryName(originalItem.CategoryName).
+	// 		SetVectorized(originalItem.Vectorized).
+	// 		Save(r.Context())
+	// 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	// 	return
+	// }
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))

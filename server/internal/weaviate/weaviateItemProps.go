@@ -30,7 +30,7 @@ func (weaviate *Weaviate) CreateItem(item *ent.Item) (string, error) {
 	return w.Object.ID.String(), err
 }
 
-func (weaviate *Weaviate) EditItem(item *ent.Item, updatedFields UpdatedFields) error {
+func (weaviate *Weaviate) EditItem(item *ent.Item, updatedFields *UpdatedFields) error {
 	// Update properties on Weaviate.
 
 	itemUpdates := map[string]interface{}{}
