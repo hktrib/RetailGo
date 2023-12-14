@@ -114,6 +114,7 @@ var (
 		{Name: "store_phone", Type: field.TypeString, Nullable: true},
 		{Name: "stripe_account_id", Type: field.TypeString, Nullable: true},
 		{Name: "store_type", Type: field.TypeString, Nullable: true},
+		{Name: "is_authorized", Type: field.TypeBool, Nullable: true, Default: false},
 	}
 	// StoresTable holds the schema information for the "stores" table.
 	StoresTable = &schema.Table{

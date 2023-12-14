@@ -2,8 +2,19 @@
 
 package ent
 
+import (
+	"github.com/hktrib/RetailGo/internal/ent/schema"
+	"github.com/hktrib/RetailGo/internal/ent/store"
+)
+
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	storeFields := schema.Store{}.Fields()
+	_ = storeFields
+	// storeDescIsAuthorized is the schema descriptor for is_authorized field.
+	storeDescIsAuthorized := storeFields[9].Descriptor()
+	// store.DefaultIsAuthorized holds the default value on creation for the is_authorized field.
+	store.DefaultIsAuthorized = storeDescIsAuthorized.Default.(bool)
 }

@@ -110,6 +110,20 @@ func (sc *StoreCreate) SetNillableStoreType(s *string) *StoreCreate {
 	return sc
 }
 
+// SetIsAuthorized sets the "is_authorized" field.
+func (sc *StoreCreate) SetIsAuthorized(b bool) *StoreCreate {
+	sc.mutation.SetIsAuthorized(b)
+	return sc
+}
+
+// SetNillableIsAuthorized sets the "is_authorized" field if the given value is not nil.
+func (sc *StoreCreate) SetNillableIsAuthorized(b *bool) *StoreCreate {
+	if b != nil {
+		sc.SetIsAuthorized(*b)
+	}
+	return sc
+}
+
 // SetID sets the "id" field.
 func (sc *StoreCreate) SetID(i int) *StoreCreate {
 	sc.mutation.SetID(i)
@@ -168,6 +182,7 @@ func (sc *StoreCreate) Mutation() *StoreMutation {
 
 // Save creates the Store in the database.
 func (sc *StoreCreate) Save(ctx context.Context) (*Store, error) {
+	sc.defaults()
 	return withHooks(ctx, sc.sqlSave, sc.mutation, sc.hooks)
 }
 
@@ -190,6 +205,14 @@ func (sc *StoreCreate) Exec(ctx context.Context) error {
 func (sc *StoreCreate) ExecX(ctx context.Context) {
 	if err := sc.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (sc *StoreCreate) defaults() {
+	if _, ok := sc.mutation.IsAuthorized(); !ok {
+		v := store.DefaultIsAuthorized
+		sc.mutation.SetIsAuthorized(v)
 	}
 }
 
@@ -268,6 +291,10 @@ func (sc *StoreCreate) createSpec() (*Store, *sqlgraph.CreateSpec) {
 		_spec.SetField(store.FieldStoreType, field.TypeString, value)
 		_node.StoreType = value
 	}
+	if value, ok := sc.mutation.IsAuthorized(); ok {
+		_spec.SetField(store.FieldIsAuthorized, field.TypeBool, value)
+		_node.IsAuthorized = value
+	}
 	if nodes := sc.mutation.ItemsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -337,6 +364,7 @@ func (scb *StoreCreateBulk) Save(ctx context.Context) ([]*Store, error) {
 	for i := range scb.builders {
 		func(i int, root context.Context) {
 			builder := scb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*StoreMutation)
 				if !ok {

@@ -198,3 +198,21 @@ func (srv *Server) HandleOnboarding(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(302)
 	fmt.Fprintf(w, "%s", accLink.URL)
 }
+
+func (srv *Server) GetAuthorizationStatus(w http.ResponseWriter, r *http.Request) {
+	store_id, _ := strconv.Atoi(chi.URLParam(r, "store_id"))
+
+	// Get store
+	store, err := srv.DBClient.Store.Query().Where(store.ID(store_id)).Only(r.Context())
+	if err != nil {
+		log.Debug().Err(err).Msg("GetAuthorizationStatus: unable to fetch store from database")
+		return
+	}
+	if store.IsAuthorized {
+		w.WriteHeader(200)
+		w.Write([]byte("true"))
+		return
+	}
+	w.WriteHeader(200)
+	w.Write([]byte("false"))
+}
