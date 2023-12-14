@@ -153,6 +153,8 @@ func (s *Server) MountHandlers() {
 
 			})
 
+			r.Get("/authorized", s.HandleOnboarding)
+
 			// Inventory Route(s)
 			r.Route("/inventory", func(r chi.Router) {
 				r.Group(func(r chi.Router) {
