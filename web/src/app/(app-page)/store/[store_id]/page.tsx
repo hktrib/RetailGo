@@ -37,10 +37,13 @@ function DashboardPage({ params }: { params: { store_id: string } }) {
 }
 
 async function ItemRecommendations({ storeId }: { storeId: string }) {
+  console.log("Starting Recommendations")
+
   const recommendedItems = await getItemRecommendations({ store_id: storeId });
 
+  console.log("RecommendedItems was a success:", recommendedItems.success, "and the items were:", recommendedItems.items)
+
   if (!recommendedItems.success || !recommendedItems.items) {
-    console.log("RecommendedItems was a success:", recommendedItems.success, "and the items were:", recommendedItems.items)
     return (
       <p className="text-sm leading-6 text-gray-700 dark:text-zinc-300">
         Nothing to recommend for now!
