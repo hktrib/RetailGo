@@ -45,6 +45,8 @@
 - [Stripe](https://stripe.com/) – payments
 - [Vercel](https://vercel.com/) – web deployments
 - [Railway](https://railway.app/) – infrastructure/api deployments
+- [FastAPI](https://fastapi.tiangolo.com/) - recommender api
+- [Weaviate](https://weaviate.io/) - vector database
 
 ## Repo Activity
 
