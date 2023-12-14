@@ -48,18 +48,18 @@ Parameters:
 ```Sender_name : string```
 ```Action_url : URL```
 
-Template Name : email_invitation.html
+Template Name : ```email_invitation.html```
 
 ## Onboarding Template
 Parameters:
 ```Sender_name : string```
 ```Action_url : URL```
 
-Template Name : onboarding_success.html
+Template Name : ```onboarding_template.html```
 
 ## Onboarding Success
 Parameters:
 ```Sender_name : string```
 ```Action_url : URL```
 
-Template Name: onboarding_template.html
+Template Name: ```onboarding_success.html```
