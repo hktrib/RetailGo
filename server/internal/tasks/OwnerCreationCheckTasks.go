@@ -7,9 +7,10 @@ import (
 	"time"
 
 	"github.com/hibiken/asynq"
+	"github.com/rs/zerolog/log"
+
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/user"
-	"github.com/rs/zerolog/log"
 )
 
 // A list of applicable task types.
@@ -44,13 +45,9 @@ func (rc *RedisConsumer) ConsumeTaskOwnerCreationCheck(ctx context.Context, task
 	if err != nil {
 		if _, isMyErrorType := err.(*ent.NotFoundError); isMyErrorType {
 
-			// TODO: Create a Store!
-			// TODO: handle user deletion from clerk
-			// TODO: handle user email sending -> using email from task.Payload
+			log.Info().Msg("Sending reminder Email to user")
 
-			log.Info().Msg("Deleting User from Clerk!!!!")
-
-			return fmt.Errorf("error: User is Not Created!!! Deleting from CLerk%w", err)
+			return fmt.Errorf("error: User has no store Association yet!!!%w", err)
 		} else {
 
 			// Somehow we have 2 records of the user with the same email!!!
