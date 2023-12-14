@@ -21,6 +21,7 @@ export async function createCheckout({
         "Content-Type": "application/json",
       },
       body: JSON.stringify(lineItems),
+      cache: "no-store",
     });
 
     const data = await res.text();
