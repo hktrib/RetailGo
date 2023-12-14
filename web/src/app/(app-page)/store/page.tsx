@@ -22,9 +22,7 @@ export default function StoreViewPage() {
   // }
 
   // Stall til not Loaded
-  if (!user || !user.publicMetadata){
-    return redirect("/register-store");
-  }
+  if (!user || !user.publicMetadata) return redirect("/register-store");
 
   const publicMetadata = user.publicMetadata as {
     stores?: StoreMetadata[];

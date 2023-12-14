@@ -90,13 +90,10 @@ func (s *Server) MountHandlers() {
 	// Route for Stripe webhook to handle transaction outcomes.
 	s.Router.Route("/webhook/stripe", func(r chi.Router) {
 		r.Post("/", func(writer http.ResponseWriter, request *http.Request) {
-			sk := s.Config.STRIPE_WEBHOOK_SECRET
-			webhook.StripeWebhookRouter(writer, request, sk, s.DBClient)
+			webhook.StripeWebhookRouter(writer, request, s.Config.STRIPE_WEBHOOK_SECRET_CONNECTED, s.DBClient)
 		})
 		r.Post("/connect", func(writer http.ResponseWriter, request *http.Request) {
-			sk := s.Config.STRIPE_WEBHOOK_SECRET_CONNECTED
-
-			webhook.StripeWebhookRouter(writer, request, sk, s.DBClient)
+			webhook.StripeWebhookRouter(writer, request, s.Config.STRIPE_WEBHOOK_SECRET_CONNECTED, s.DBClient)
 		})
 
 	})
@@ -112,83 +109,167 @@ func (s *Server) MountHandlers() {
 
 		// Add necessary middleware for protecting owner and store create routes
 		r.Route("/create", func(r chi.Router) {
+
+			// MIDDLEWARE | Validates Clerk signature before Create Store/Owner
 			// r.Use(s.ProtectStoreAndOwnerCreation)
+
+			// Handles User Data for Potential Store Creation
 			r.Group(func(r chi.Router) {
+
+				// MIDDLEWARE | Stages USER data for store creation in Redis
 				r.Use(s.IsOwnerCreateHandle)
+
+				// POST | Creates a new user
 				r.Post("/user", s.UserCreate)
+
 			})
+
+			// Handles Store Creation Requests
 			r.Group(func(r chi.Router) {
+
+				// MIDDLEWARE | Fetches Staged User Data from Redis
 				r.Use(s.StoreCreateHandle)
+
+				// POST | Creates a new Store -> using Staged Owner Data
 				r.Post("/store", s.CreateStore)
+
 			})
 		})
 	})
 
 	s.Router.Route("/store", func(r chi.Router) {
 		r.Route("/{store_id}", func(r chi.Router) {
-			//	r.Use(s.ValidateStoreAccess) // add [Employee || Owner] validation
+
+			// store access validation middleware
+			//	r.Use(s.ValidateStoreAccess)
+
+			// Onboarding Route(s)
 			r.Group(func(r chi.Router) {
-				//	r.Use(s.ValidateOwner)                   // add owner validation validation
-				r.Get("/onboarding", s.HandleOnboarding) // Get a store by ID)
+				// owner validation middleware
+				//	r.Use(s.ValidateOwner)
+
+				// Get a store by ID
+				r.Get("/onboarding", s.HandleOnboarding)
+
 			})
+
+			// Inventory Route(s)
 			r.Route("/inventory", func(r chi.Router) {
 				r.Group(func(r chi.Router) {
-					//		r.Use(s.ValidateOwner)         // add owner validation validation
-					r.Post("/create", s.InvCreate) //
-					r.Delete("/", s.InvDelete)     //
+					// MIDDLEWARE | Owner validation
+					//		r.Use(s.ValidateOwner)
+
+					// POST | Create Item in Inventory
+					r.Post("/create", s.InvCreate)
+
+					// DELETE | Delete Item in Inventory
+					r.Delete("/", s.InvDelete)
 				})
-				r.Get("/", s.InvRead)                    //
-				r.Post("/update", s.InvUpdate)           //
-				r.Post("/updatephoto", s.InvUpdatePhoto) //
+
+				// GET | Gets all items in Inventory
+				r.Get("/", s.InvRead)
+
+				// POST | Updates Item in Inventory
+				r.Post("/update", s.InvUpdate)
+
+				// POST | Updates Item's Photo URL in Inventory
+				r.Post("/updatephoto", s.InvUpdatePhoto)
+
 			})
+
+			// Category Route(s)
 			r.Route("/category", func(r chi.Router) {
+
+				// GET | Get's all Items in the category
+				r.Get("/", s.CatItemList)
+
+				// Category CRUD Route(s)
 				r.Group(func(r chi.Router) {
-					r.Use(s.ValidateOwner)     // add owner validation validation
-					r.Post("/", s.CatCreate)   //
-					r.Delete("/", s.CatDelete) //
+
+					// MIDDLEWARE | Owner validation
+					r.Use(s.ValidateOwner)
+
+					// POST | creating new category
+					r.Post("/", s.CatCreate)
+
+					// DELETE | deleting existing category
+					r.Delete("/", s.CatDelete)
+
 				})
+
+				// Category Item(s) CRUD Route(s)
 				r.Route("/{category_id}", func(r chi.Router) {
 					r.Group(func(r chi.Router) {
-						//	r.Use(s.ValidateOwner)         // add owner validation validation
-						//	r.Delete("/", s.CatItemDelete) //
-						r.Get("/", s.CatItemRead) //
-						r.Post("/", s.CatItemAdd) //
+
+						// MIDDLEWARE | Owner validation
+						//	r.Use(s.ValidateOwner)
+
+						// GET | All items from category
+						r.Get("/", s.CatItemRead)
+
+						// POST | Add an item to a category
+						r.Post("/", s.CatItemAdd)
+
 					})
 				})
 
-				r.Get("/", s.CatItemList)      //
-				r.Post("/update", s.InvUpdate) //
-
+				// POST | Update Item in Category
+				r.Post("/update", s.InvUpdate)
 			})
 
+			// Staff Routes
 			r.Route("/staff", func(r chi.Router) {
-				r.Get("/", s.GetAllEmployees) //
+
+				// Get | All staff/employees from store
+				r.Get("/", s.GetAllEmployees)
+
+				// Post | Send invitation to prospective employee
 				r.Post("/invite", s.SendInviteEmail)
 			})
 
+			// POS Routes
 			r.Route("/pos", func(r chi.Router) {
 				r.Post("/checkout", s.StoreCheckout)
 				r.Get("/info", s.GetPosInfo)
 			})
+
+			// Users/
 			r.Route("/users", func(r chi.Router) {
 				r.Get("/", s.GetStoreUsers)
 			})
 		})
-		r.Get("/uuid/{uuid}", s.GetStoreByUUID) //
 
+		// Get | Store by UUID
+		r.Get("/uuid/{uuid}", s.GetStoreByUUID)
+
+		// Get | Store by User's Clerk ID
 		r.Get("/", s.GetStoresByClerkId)
 	})
 
 	s.Router.Route("/user", func(r chi.Router) {
-		r.Get("/store", s.UserHasStore) // Checks if a user has a store
+
+		// Checks if a user has a store
+		r.Get("/store", s.UserHasStore)
+
 		r.Route("/{user_id}", func(r chi.Router) {
-			r.Delete("/", s.UserDelete) // Delete a user by ID
-			r.Put("/", s.userUpdate)    // Update a user by ID
-			r.Get("/", s.UserQuery)     // Get a user by ID
+			// Delete a user by ID
+			r.Delete("/", s.UserDelete)
+
+			// Update a user by ID
+			r.Put("/", s.userUpdate)
+
+			// Get a user by ID
+			r.Get("/", s.UserQuery)
 		})
-		r.Post("/join", s.UserJoinStore) // Join a store for a user
-		r.Post("/", s.UserCreate)        // Create a new user
-		r.Post("/add", s.userAdd)        // Additional user creation endpoint
+
+		// Join a store for a user
+		r.Post("/join", s.UserJoinStore)
+
+		// Create a new user
+		r.Post("/", s.UserCreate)
+
+		// Additional user creation endpoint
+		r.Post("/add", s.userAdd)
 	})
 
 }

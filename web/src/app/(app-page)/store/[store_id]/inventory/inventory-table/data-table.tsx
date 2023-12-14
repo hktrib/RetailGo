@@ -101,10 +101,10 @@ export function DataTable<TData extends InventoryItem, TValue>({
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
-                  key={row.original.id}
+                  key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   className="dark:border-zinc-800 dark:hover:bg-zinc-800"
->
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
@@ -114,7 +114,7 @@ export function DataTable<TData extends InventoryItem, TValue>({
                     </TableCell>
                   ))}
                   <TableCell>
-                    <div className="flex h-10 w-8 flex-row space-x-2 p-0 text-right">
+                    <div className="flex h-8 w-8 flex-row space-x-2 p-0 text-right">
                       <ItemDialog
                         item={{
                           id: row.original.id,
