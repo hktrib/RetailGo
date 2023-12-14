@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { UserButton, auth } from "@clerk/nextjs";
+import Image from "next/image";
 
 export default function Header() {
   const { userId } = auth();
@@ -13,7 +14,12 @@ export default function Header() {
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5">
             <span className="sr-only">RetailGo</span>
-            <span className="text-lg font-bold tracking-wide">RetailGo</span>
+            <Image
+              src="/retailgo-black.svg"
+              width={100}
+              height={100}
+              alt="RetailGo"
+            />
           </Link>
         </div>
 

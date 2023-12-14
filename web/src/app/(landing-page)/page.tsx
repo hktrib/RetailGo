@@ -24,7 +24,7 @@ const features = [
 
 export default function Home() {
   return (
-    <main>
+    <main className="bg-white">
       <section className="relative isolate px-6 pt-14 lg:px-8" id="hero">
         <svg
           className="absolute inset-x-0 top-0 -z-10 h-[64rem] w-full stroke-gray-200 [mask-image:radial-gradient(32rem_32rem_at_center,white,transparent)]"
