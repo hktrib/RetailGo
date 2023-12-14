@@ -4,6 +4,9 @@ import { useAuth } from "@clerk/nextjs";
 import { revalidatePath } from "next/cache";
 import { config } from "@/lib/hooks/config";
 
+// Function to update a user
+// Input: user object with first_name, last_name, and email properties, and user_id string
+// Return: boolean indicating whether the user was successfully updated
 export const updateUser = async ({
   user,
   user_id,
@@ -49,6 +52,9 @@ export const updateUser = async ({
   return false;
 };
 
+// Function to delete a user
+// Input: user_id string
+// Return: boolean indicating whether the user was successfully deleted
 export const deleteUser = async ({ user_id }: { user_id: string }) => {
   const env: string = process.env.NODE_ENV;
 

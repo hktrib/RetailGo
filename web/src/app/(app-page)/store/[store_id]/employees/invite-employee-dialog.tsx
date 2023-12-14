@@ -1,5 +1,5 @@
-"use client";
-
+"use client"
+// Importing necessary dependencies
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,29 +25,43 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+// Function component to invite an employee
 export default function InviteEmployee() {
-  const [isDialogOpen, setDialogOpen] = useState(false); // State to control the dialog
+  // State to control the dialog
+  const [isDialogOpen, setDialogOpen] = useState(false);
+
+  // Get the parameters from the URL
   const params = useParams();
 
+  // Define the form validation schema using zod
   const formSchema = z.object({
     email: z.string().regex(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/),
     name: z.string(),
   });
 
+  // Initialize the form using react-hook-form and zodResolver
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
+  // Get the store ID from the URL parameters
   const id = params.store_id;
+
+  // Create a mutation function to send the invite
   const inviteMutation = SendInvite(id.toString());
 
+  // Function to handle form submission
   const onSubmit = form.handleSubmit((data: any) => {
     console.log(JSON.stringify(data));
 
+    // Call the inviteMutation function to send the invite
     inviteMutation.mutate(data);
+
+    // Close the dialog
     setDialogOpen(false);
   });
 
+  // Render the dialog component with the form
   return (
     <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
@@ -66,6 +80,7 @@ export default function InviteEmployee() {
 
         <Form {...form}>
           <form onSubmit={onSubmit} {...form} className="space-y-2">
+            {/* Form field for employee name */}
             <FormField
               control={form.control}
               name="name"
@@ -83,6 +98,7 @@ export default function InviteEmployee() {
               )}
             />
 
+            {/* Form field for employee email */}
             <FormField
               control={form.control}
               name="email"
@@ -100,6 +116,7 @@ export default function InviteEmployee() {
               )}
             />
 
+            {/* Form submission button */}
             <DialogFooter className="pt-2">
               <Button type="submit">Invite</Button>
             </DialogFooter>
