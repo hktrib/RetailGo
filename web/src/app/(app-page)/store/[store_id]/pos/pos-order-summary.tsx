@@ -40,10 +40,8 @@ const POSOrderSummary = ({
       return;
     }
 
-    console.log("received client secret", res);
-
     const newClientSecret = JSON.parse(res).ClientSecret;
-    console.log("here:", newClientSecret);
+
     setClientSecret(newClientSecret);
   };
 
