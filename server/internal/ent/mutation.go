@@ -2318,6 +2318,7 @@ type StoreMutation struct {
 	store_phone       *string
 	stripe_account_id *string
 	store_type        *string
+	is_authorized     *bool
 	clearedFields     map[string]struct{}
 	items             map[int]struct{}
 	removeditems      map[int]struct{}
@@ -2790,6 +2791,55 @@ func (m *StoreMutation) ResetStoreType() {
 	delete(m.clearedFields, store.FieldStoreType)
 }
 
+// SetIsAuthorized sets the "is_authorized" field.
+func (m *StoreMutation) SetIsAuthorized(b bool) {
+	m.is_authorized = &b
+}
+
+// IsAuthorized returns the value of the "is_authorized" field in the mutation.
+func (m *StoreMutation) IsAuthorized() (r bool, exists bool) {
+	v := m.is_authorized
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsAuthorized returns the old "is_authorized" field's value of the Store entity.
+// If the Store object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StoreMutation) OldIsAuthorized(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsAuthorized is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsAuthorized requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsAuthorized: %w", err)
+	}
+	return oldValue.IsAuthorized, nil
+}
+
+// ClearIsAuthorized clears the value of the "is_authorized" field.
+func (m *StoreMutation) ClearIsAuthorized() {
+	m.is_authorized = nil
+	m.clearedFields[store.FieldIsAuthorized] = struct{}{}
+}
+
+// IsAuthorizedCleared returns if the "is_authorized" field was cleared in this mutation.
+func (m *StoreMutation) IsAuthorizedCleared() bool {
+	_, ok := m.clearedFields[store.FieldIsAuthorized]
+	return ok
+}
+
+// ResetIsAuthorized resets all changes to the "is_authorized" field.
+func (m *StoreMutation) ResetIsAuthorized() {
+	m.is_authorized = nil
+	delete(m.clearedFields, store.FieldIsAuthorized)
+}
+
 // AddItemIDs adds the "items" edge to the Item entity by ids.
 func (m *StoreMutation) AddItemIDs(ids ...int) {
 	if m.items == nil {
@@ -2986,7 +3036,7 @@ func (m *StoreMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *StoreMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.uuid != nil {
 		fields = append(fields, store.FieldUUID)
 	}
@@ -3010,6 +3060,9 @@ func (m *StoreMutation) Fields() []string {
 	}
 	if m.store_type != nil {
 		fields = append(fields, store.FieldStoreType)
+	}
+	if m.is_authorized != nil {
+		fields = append(fields, store.FieldIsAuthorized)
 	}
 	return fields
 }
@@ -3035,6 +3088,8 @@ func (m *StoreMutation) Field(name string) (ent.Value, bool) {
 		return m.StripeAccountID()
 	case store.FieldStoreType:
 		return m.StoreType()
+	case store.FieldIsAuthorized:
+		return m.IsAuthorized()
 	}
 	return nil, false
 }
@@ -3060,6 +3115,8 @@ func (m *StoreMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldStripeAccountID(ctx)
 	case store.FieldStoreType:
 		return m.OldStoreType(ctx)
+	case store.FieldIsAuthorized:
+		return m.OldIsAuthorized(ctx)
 	}
 	return nil, fmt.Errorf("unknown Store field %s", name)
 }
@@ -3125,6 +3182,13 @@ func (m *StoreMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStoreType(v)
 		return nil
+	case store.FieldIsAuthorized:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsAuthorized(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Store field %s", name)
 }
@@ -3170,6 +3234,9 @@ func (m *StoreMutation) ClearedFields() []string {
 	if m.FieldCleared(store.FieldStoreType) {
 		fields = append(fields, store.FieldStoreType)
 	}
+	if m.FieldCleared(store.FieldIsAuthorized) {
+		fields = append(fields, store.FieldIsAuthorized)
+	}
 	return fields
 }
 
@@ -3198,6 +3265,9 @@ func (m *StoreMutation) ClearField(name string) error {
 		return nil
 	case store.FieldStoreType:
 		m.ClearStoreType()
+		return nil
+	case store.FieldIsAuthorized:
+		m.ClearIsAuthorized()
 		return nil
 	}
 	return fmt.Errorf("unknown Store nullable field %s", name)
@@ -3230,6 +3300,9 @@ func (m *StoreMutation) ResetField(name string) error {
 		return nil
 	case store.FieldStoreType:
 		m.ResetStoreType()
+		return nil
+	case store.FieldIsAuthorized:
+		m.ResetIsAuthorized()
 		return nil
 	}
 	return fmt.Errorf("unknown Store field %s", name)

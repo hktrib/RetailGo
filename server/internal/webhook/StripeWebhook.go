@@ -4,17 +4,34 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	StripeHelper "github.com/hktrib/RetailGo/cmd/api/stripe-components"
 	"github.com/hktrib/RetailGo/internal/ent"
 	"github.com/hktrib/RetailGo/internal/ent/item"
+	"github.com/hktrib/RetailGo/internal/ent/store"
 	"github.com/rs/zerolog/log"
 	"github.com/stripe/stripe-go/v76"
 	"github.com/stripe/stripe-go/v76/checkout/session"
 	"github.com/stripe/stripe-go/v76/webhook"
 	"io"
 	"net/http"
+	"net/mail"
+	"net/smtp"
+	"strings"
+
+	"bytes"
+
+	"html/template"
 	"os"
 	"time"
 )
+
+type HtmlTemplate struct {
+	Email       string `json:"email"`
+	Name        string `json:"name"`
+	Store_name  string `json:"store_name"`
+	Sender_name string `json:"sender_name"`
+	Action_url  string `json:"action_url"`
+}
 
 /*
 StripeWebhookRouter Brief:
@@ -57,8 +74,7 @@ func StripeWebhookRouter(w http.ResponseWriter, r *http.Request, endpointSecret 
 	case "account.updated":
 		// Then define and call a function to handle the event account.updated
 	case "account.application.authorized":
-		// Then define and call a function to handle the event account.application.authorized
-	case "account.application.deauthorized":
+		AuthorizeUser(w, event, DBClient)
 		// Then define and call a function to handle the event account.application.deauthorized
 	case "account.external_account.created":
 		// Then define and call a function to handle the event account.external_account.created
@@ -81,13 +97,39 @@ func StripeWebhookRouter(w http.ResponseWriter, r *http.Request, endpointSecret 
 		// Then define and call a function to handle the event product.deleted
 	case "product.updated":
 		// Then define and call a function to handle the event product.updated
-	// ... handle other event types
 	default:
 		fmt.Fprintf(os.Stderr, "Unhandled event type: %s\n", event.Type)
 		w.WriteHeader(http.StatusNotImplemented)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+
+}
+
+func AuthorizeUser(w http.ResponseWriter, event stripe.Event, client *ent.Client) {
+	var CAccount stripe.Account
+	err := json.Unmarshal(event.Data.Raw, &CAccount)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error parsing webhook JSON: %v\n", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// Get the store from the database
+	Store, err := client.Store.Query().Where(store.StripeAccountID(CAccount.ID)).Only(context.Background())
+
+	// Update the user's status to authorized
+	_, err = client.Store.UpdateOne(Store).SetIsAuthorized(true).Save(context.Background())
+
+	if err != nil {
+		log.Debug().Err(err).Msg("AuthorizeUser: unable to update store")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	err = SendSuccessEmail(Store)
+	if err != nil {
+		return
+	}
 
 }
 
@@ -115,7 +157,6 @@ func HandleTransSuccess(w http.ResponseWriter, event stripe.Event, DBClient *ent
 
 	params := &stripe.CheckoutSessionParams{}
 	params.AddExpand("line_items")
-
 	// Retrieve the session.
 	sessionWithLineItems, err := session.Get(CSession.ID, params)
 	if err != nil {
@@ -159,4 +200,65 @@ func FulfillOrder(LineItemList *stripe.LineItemList, DBClient *ent.Client) {
 			log.Debug().Err(err).Msg("FulfillOrder: Unable to update item")
 		}
 	}
+}
+func SendSuccessEmail(StoreObj *ent.Store) error {
+	// Set up authentication information.
+	auth := smtp.PlainAuth(
+		"",
+		"retailgoco@gmail.com",
+		"hhqm pqgw lxmi weqb",
+		"smtp.gmail.com",
+	)
+
+	// Define email headers and HTML content
+	from := mail.Address{Name: "RetailGo Team", Address: "retailgoco@gmail.com"}
+	em := StoreObj.OwnerEmail
+	split := strings.Split(em, "@")
+
+	to := mail.Address{Name: split[0], Address: StoreObj.OwnerEmail}
+	subject := "You must complete onboarding to continue!"
+
+	// Message to be sent
+	headers := make(map[string]string)
+	headers["From"] = from.String()
+	headers["To"] = to.String()
+	headers["Subject"] = subject
+	headers["MIME-Version"] = "1.0"
+	headers["Content-Type"] = `text/html; charset="UTF-8"`
+
+	// HTML message
+
+	tmpl := template.Must(template.ParseGlob("./cmd/templates/*"))
+
+	url, err := StripeHelper.StartOnboarding(StoreObj.StripeAccountID)
+	if err != nil {
+		return fmt.Errorf("failed to start onboarding: %w", err)
+	}
+
+	htmlBody := new(bytes.Buffer)
+	templateData := HtmlTemplate{
+		Action_url: url.URL,
+	}
+
+	err = tmpl.ExecuteTemplate(htmlBody, "onboarding_success.html", templateData)
+	if err != nil {
+		return fmt.Errorf("failed to read email template: %w", err)
+	}
+
+	// Combine headers and HTML content
+	message := ""
+	for k, v := range headers {
+		message += fmt.Sprintf("%s: %s\r\n", k, v)
+	}
+	message += "\r\n" + htmlBody.String()
+
+	// Convert to and from to slice of strings
+	toAddresses := []string{to.Address}
+
+	// Send the email
+	err = smtp.SendMail("smtp.gmail.com:587", auth, from.Address, toAddresses, []byte(message))
+	if err != nil {
+		return fmt.Errorf("failed to send email: %w", err)
+	}
+	return nil
 }
