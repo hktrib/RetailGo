@@ -20,20 +20,34 @@ export const createItem = async ({
   console.log(item);
   console.log(`attempting to create item for store ${store_id}`);
 
+  let status = false
+
   try {
-    await fetch(serverUrl, {
+    let response = await fetch(serverUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(item),
     });
+
+    if (
+      response.status === 200 ||
+      response.status === 201
+      ) {
+        status = true
+    }
+
   } catch (err) {
+    status = false
     console.error(`error creating item for store ${store_id}: ${err}`);
   }
 
+  
   revalidatePath("/store/[store]", "page");
   revalidateTag("storeCategories");
+
+  return status
 };
 
 export const updateItem = async ({
@@ -55,19 +69,28 @@ export const updateItem = async ({
   console.log(item);
   console.log(`attempting to update item for store ${store_id}`);
 
+  let status = false;
+
   try {
-    await fetch(serverUrl, {
+    let response = await fetch(serverUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(item),
     });
+
+    if (response.status === 200) {
+      status = true
+    }
   } catch (err) {
+    status = false
     console.error(`error updating item for store ${store_id}: ${err}`);
   }
 
   revalidatePath("/store/[store]", "page");
+
+  return status
 };
 
 export const deleteItem = async ({
@@ -82,16 +105,25 @@ export const deleteItem = async ({
 
   console.log(`attempting to delete item ${itemId} for store ${storeId}`);
 
+  let status = false
+
   try {
-    await fetch(serverUrl, {
+    let response = await fetch(serverUrl, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
     });
+
+    if (response.status === 200) {
+      status = true
+    }
+
   } catch (err) {
+    status = false
     console.error(`error deleting item ${itemId} for store ${storeId}: ${err}`);
   }
 
   revalidatePath("/store/[store]", "page");
+  return status
 };

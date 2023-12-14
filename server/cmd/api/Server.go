@@ -98,8 +98,9 @@ func (s *Server) MountHandlers() {
 
 	})
 
-	// Route for Clerk Webhook.
+	// POST | Stages Clerk User Data via loopback to /IsOwnerCreateHandle
 	s.Router.Post("/clerkwebhook", webhook.HandleClerkWebhook)
+
 	s.Router.Get("/", func(w http.ResponseWriter, request *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write(([]byte)("OK"))

@@ -30,6 +30,8 @@ import { Trash2 } from "lucide-react";
 
 import type { InventoryItem } from "./columns";
 
+import toast from "react-hot-toast";
+
 interface DataTableProps<TData extends InventoryItem, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -60,6 +62,16 @@ export function DataTable<TData extends InventoryItem, TValue>({
       columnFilters,
     },
   });
+
+
+  const deleteSubmit = async (itemId: number, storeId: string) => {
+    let ok = await deleteItem({itemId, storeId})
+    if (ok) {
+      toast.success("Success: Item has been deleted!");
+    } else {
+      toast.error("Error: Item could not be deleted!!");
+    }
+  }
 
   return (
     <div>
@@ -128,10 +140,8 @@ export function DataTable<TData extends InventoryItem, TValue>({
                       />
                       <button
                         onClick={() =>
-                          deleteItem({
-                            itemId: row.original.id,
-                            storeId: params.store_id as string,
-                          })
+                          deleteSubmit(row.original.id, 
+                            params.store_id as string)
                         }
                       >
                         <Trash2 className="h-5 w-5 p-0 text-red-500" />
