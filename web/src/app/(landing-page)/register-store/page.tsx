@@ -83,7 +83,7 @@ export default function RegistrationForm() {
   };
 
   return (
-    <main className="relative isolate flex flex-1 flex-col items-center justify-center overflow-hidden bg-white px-6 pt-14 lg:px-8">
+    <main className="relative isolate flex h-full min-h-screen flex-1 flex-col items-center justify-center overflow-hidden bg-white px-6 pt-14 lg:px-8">
       <div className="absolute left-1/2 top-4 -z-10 h-[1026px] w-[1026px] -translate-x-1/2 stroke-gray-300/70 [mask-image:linear-gradient(to_bottom,white_20%,transparent_75%)] sm:top-16 lg:-top-16 xl:top-8 xl:ml-0">
         <svg
           viewBox="0 0 1026 1026"
@@ -173,7 +173,11 @@ export default function RegistrationForm() {
                 <FormItem>
                   <FormLabel className="text-gray-600">Store name</FormLabel>
                   <FormControl>
-                    <Input className="text-gray-600" placeholder="Store name" {...field} />
+                    <Input
+                      className="text-gray-600"
+                      placeholder="Store name"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -186,7 +190,11 @@ export default function RegistrationForm() {
                 <FormItem>
                   <FormLabel className="text-gray-600">Phone number</FormLabel>
                   <FormControl>
-                    <Input className="text-gray-600" placeholder="Store phone number" {...field} />
+                    <Input
+                      className="text-gray-600"
+                      placeholder="Store phone number"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -201,7 +209,11 @@ export default function RegistrationForm() {
                     Address line 1
                   </FormLabel>
                   <FormControl>
-                    <Input className="text-gray-600" placeholder="Address line 1" {...field} />
+                    <Input
+                      className="text-gray-600"
+                      placeholder="Address line 1"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -216,7 +228,11 @@ export default function RegistrationForm() {
                     Address line 2
                   </FormLabel>
                   <FormControl>
-                    <Input className="text-gray-600" placeholder="Address line 2" {...field} />
+                    <Input
+                      className="text-gray-600"
+                      placeholder="Address line 2"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
