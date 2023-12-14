@@ -7,7 +7,7 @@ export const getItemRecommendations = async ({
 }: {
   store_id: string;
 }) => {
-  const fetchUrl = `${config.serverURL}/recommend/${store_id}`;
+  const fetchUrl = `${config.recServerURL}/recommend/${store_id}`;
   console.log(`Fetching item recommendations with url:${fetchUrl}`);
 
   try {
