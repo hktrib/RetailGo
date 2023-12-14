@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createCheckout } from "./actions";
 
 import { CheckoutDialog } from "./checkout-dialog";
@@ -40,7 +40,10 @@ const POSOrderSummary = ({
       return;
     }
 
+    console.log("received client secret", res);
+
     const newClientSecret = JSON.parse(res).ClientSecret;
+    console.log("here:", newClientSecret);
     setClientSecret(newClientSecret);
   };
 
