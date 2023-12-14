@@ -80,14 +80,14 @@ func PruneStore(TargetItem *ent.Store) ClientStore {
 
 }
 
-// Overload for default json marshaller
+// Overload for default json marshaller has store items
 func MarshelUserStore(TargetItem ClientUserStore) ([]byte, error) {
 
 	return json.Marshal(map[string]interface{}{
-		"user_id":          TargetItem.UserID,
-		"store_id":         TargetItem.StoreID,
-		"permission_level": TargetItem.PermissionLevel,
-		"store_name":       TargetItem.StoreName,
+		"user_id":           TargetItem.UserID,
+		"id":                TargetItem.StoreID,
+		"Permission_level ": TargetItem.PermissionLevel,
+		"storename":         TargetItem.StoreName,
 	})
 }
 func PruneUserStore(targetItems ...*ent.UserToStore) []ClientUserStore {
