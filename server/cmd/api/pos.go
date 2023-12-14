@@ -57,7 +57,7 @@ func (srv *Server) StoreCheckout(writer http.ResponseWriter, request *http.Reque
 
 	}
 	// get store id from url
-	storeId, err := strconv.Atoi(chi.URLParam(request, "storeId"))
+	storeId, err := strconv.Atoi(chi.URLParam(request, "store_id"))
 	if err != nil {
 		log.Debug().Err(err).Msg("StoreCheckout: unable to parse storeId")
 		http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
