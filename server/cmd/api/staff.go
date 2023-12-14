@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	StripeHelper "github.com/hktrib/RetailGo/cmd/api/stripe-components"
 	"html/template"
 	"log"
 	"net/http"
@@ -12,6 +11,8 @@ import (
 	"net/smtp"
 	"os"
 	"strconv"
+
+	StripeHelper "github.com/hktrib/RetailGo/cmd/api/stripe-components"
 
 	"github.com/go-chi/chi/v5"
 
@@ -258,14 +259,11 @@ func SendOnboardingEmail(StoreObj *ent.Store, UserObj *ent.User) error {
 
 	htmlBody := new(bytes.Buffer)
 	templateData := HtmlTemplate{
-		Email:       UserObj.Email,
-		Name:        UserObj.FirstName,
-		Store_name:  StoreObj.StoreName,
 		Sender_name: UserObj.FirstName + " " + UserObj.LastName,
 		Action_url:  url.URL,
 	}
 
-	err = tmpl.ExecuteTemplate(htmlBody, "email_invitation.html", templateData)
+	err = tmpl.ExecuteTemplate(htmlBody, "onboarding_template.html", templateData)
 	if err != nil {
 		return fmt.Errorf("failed to read email template: %w", err)
 	}
