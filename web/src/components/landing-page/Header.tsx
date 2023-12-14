@@ -16,8 +16,8 @@ export default function Header() {
             <span className="sr-only">RetailGo</span>
             <Image
               src="/retailgo-black.svg"
-              width={100}
-              height={100}
+              width={115}
+              height={115}
               alt="RetailGo"
             />
           </Link>

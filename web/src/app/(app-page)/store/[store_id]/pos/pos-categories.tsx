@@ -55,7 +55,7 @@ const CategoryCard = ({
   return (
     <article
       className={cx(
-        "cursor-pointer rounded-lg bg-gray-100 p-4 shadow-sm dark:bg-zinc-800",
+        "cursor-pointer rounded-lg bg-white p-4 shadow-sm dark:bg-zinc-800",
         selected && "ring-2 ring-sky-300 dark:ring-blue-500",
       )}
       onClick={() => setSelectedCategory(name)}

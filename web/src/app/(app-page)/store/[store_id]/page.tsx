@@ -37,11 +37,16 @@ function DashboardPage({ params }: { params: { store_id: string } }) {
 }
 
 async function ItemRecommendations({ storeId }: { storeId: string }) {
-  console.log("Starting Recommendations")
+  console.log("Starting Recommendations");
 
   const recommendedItems = await getItemRecommendations({ store_id: storeId });
 
-  console.log("RecommendedItems was a success:", recommendedItems.success, "and the items were:", recommendedItems.items)
+  console.log(
+    "RecommendedItems was a success:",
+    recommendedItems.success,
+    "and the items were:",
+    recommendedItems.items,
+  );
 
   if (!recommendedItems.success || !recommendedItems.items) {
     return (
@@ -58,7 +63,7 @@ async function ItemRecommendations({ storeId }: { storeId: string }) {
           className="rounded-md bg-gray-200 shadow-sm dark:bg-zinc-800"
           key={item.name}
         >
-          <div className="w-52 rounded-md bg-gray-50 shadow-sm dark:bg-zinc-800">
+          <div className="w-52 rounded-md bg-white shadow-sm dark:bg-zinc-800">
             <RemoteImage imageURL={item.imageURL} />
 
             <div className="flex flex-col p-4">

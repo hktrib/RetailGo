@@ -1,4 +1,4 @@
-"use client"
+"use client";
 // Importing necessary dependencies and components
 import { useState } from "react";
 import { useParams } from "next/navigation";
@@ -35,7 +35,6 @@ import { Input } from "@/components/ui/input";
 import { ChevronsUpDown, PencilIcon } from "lucide-react";
 import { UploadDropzone } from "@/lib/uploadthing";
 import UploadButton from "@/components/app-page/upload-button";
-
 
 import toast from "react-hot-toast";
 
@@ -88,7 +87,7 @@ export default function ItemDialog({
         item: { id: item.id, ...values },
         store_id: params.store_id as string,
       });
-      
+
       if (ok) {
         toast.success("Success: Item has been updated!");
       } else {
@@ -101,7 +100,10 @@ export default function ItemDialog({
     }
 
     // Creating a new item using the createItem action
-    let ok = await createItem({ item: values, store_id: params.store_id as string });
+    let ok = await createItem({
+      item: values,
+      store_id: params.store_id as string,
+    });
 
     if (ok) {
       toast.success("Success: Item has been created!");
@@ -136,7 +138,7 @@ export default function ItemDialog({
       <DialogTrigger asChild>
         {mode === "edit" ? (
           <button className="icon-button">
-            <PencilIcon className="h-5 w-5 p-0 text-amber-500" />
+            <PencilIcon className="h-5 w-5 p-0 text-sky-600 dark:text-sky-500" />
           </button>
         ) : (
           <button className="rounded-md bg-sky-500 px-4 py-1.5 text-sm font-medium text-white shadow-sm dark:bg-gradient-to-r dark:from-blue-600 dark:to-indigo-600">
