@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
@@ -44,12 +45,30 @@ export default function Sidebar({ stores }: { stores: StoreMetadata[] }) {
       <div className="flex grow flex-col px-6 dark:border-zinc-700">
         <div className="flex items-center justify-between pb-3.5 pt-7">
           <Link href="/store" className="text-lg font-semibold">
-            RetailGo
+            <Image
+              src="/retailgo-black.svg"
+              className="block dark:hidden"
+              alt="RetailGo"
+              width={100}
+              height={100}
+            />
+            <Image
+              src="/retailgo-white.svg"
+              className="hidden dark:block"
+              alt="RetailGo"
+              width={100}
+              height={100}
+            />
           </Link>
 
-          <div className="flex items-center">
-            <UserButton afterSignOutUrl="/" appearance={{}} />
-          </div>
+          <UserButton
+            afterSignOutUrl="/"
+            appearance={{
+              elements: {
+                userButtonAvatarBox: "w-[26px] h-[26px]",
+              },
+            }}
+          />
         </div>
 
         <div className="h-full pb-12">
