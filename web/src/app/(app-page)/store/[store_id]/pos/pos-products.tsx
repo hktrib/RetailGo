@@ -103,7 +103,7 @@ const ProductCard = ({
   const { id, name, price, category } = productData;
 
   return (
-    <article className="rounded-lg bg-gray-100 p-4 shadow-sm dark:bg-zinc-800">
+    <article className="rounded-lg bg-white p-4 shadow-sm dark:bg-zinc-800">
       <div className="text-xs text-gray-500 dark:text-zinc-400">{category}</div>
       <div className="mt-0.5 text-lg font-medium leading-6">{name}</div>
       <div className="text-sm leading-6 text-gray-600 dark:text-zinc-300">

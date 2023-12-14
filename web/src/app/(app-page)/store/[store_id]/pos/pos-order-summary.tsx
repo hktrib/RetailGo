@@ -52,7 +52,7 @@ const POSOrderSummary = ({
           {cart.map((cartItem, idx) => (
             <div
               key={`${cartItem.id}-x${cartItem.quantityAdded}`}
-              className="flex items-center justify-between rounded-lg bg-gray-100 p-3 dark:bg-zinc-800"
+              className="flex items-center justify-between rounded-lg bg-white p-3 dark:bg-zinc-800"
             >
               <div className="flex items-center gap-x-2 text-sm">
                 <div className="flex h-6 w-6 items-center justify-center rounded-full bg-black text-gray-50 dark:bg-zinc-700">
@@ -73,12 +73,12 @@ const POSOrderSummary = ({
           ))}
         </div>
       ) : (
-        <div className="rounded-lg bg-gray-100 p-3 text-sm dark:bg-zinc-800">
+        <div className="rounded-lg bg-white px-3 py-3.5 text-sm dark:bg-zinc-800">
           No items added to cart.
         </div>
       )}
 
-      <div className="mt-6 rounded-lg bg-gray-100 p-3 dark:bg-zinc-800">
+      <div className="mt-6 rounded-lg bg-white p-3 dark:bg-zinc-800">
         <div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-700 dark:text-zinc-300">

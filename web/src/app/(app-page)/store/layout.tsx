@@ -13,8 +13,12 @@ export type StoreMetadata = {
   storename: string;
 };
 
-export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const {userId, sessionClaims } = auth();
+export default async function AppLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { userId, sessionClaims } = auth();
 
   if (!sessionClaims || !sessionClaims.publicMetadata) return notFound();
 
@@ -27,15 +31,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     const db_stores = await GetStoresByClerkId();
     console.log("Stores are: ", db_stores.stores);
 
-    if(db_stores.success){
+    if (db_stores.success) {
       await clerkClient.users.updateUserMetadata(userId, {
         publicMetadata: {
-          stores: db_stores.stores
-        }
-      })
-      
-    }
-    else{
+          stores: db_stores.stores,
+        },
+      });
+    } else {
       console.log("No public metadata -> redirecting to register-store");
       redirect("/register-store");
     }
@@ -48,7 +50,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <Sidebar stores={publicMetadata.stores ?? []} />
         <div className="flex h-full flex-grow flex-col xl:pl-64">
           <div className="flex h-full flex-grow flex-col p-2">
-            <div className="flex h-full flex-grow flex-col rounded-3xl border border-gray-100 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="flex h-full flex-grow flex-col rounded-3xl border border-gray-100 bg-gray-50 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
               {children}
             </div>
           </div>

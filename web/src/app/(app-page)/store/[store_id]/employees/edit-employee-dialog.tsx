@@ -80,7 +80,7 @@ export default function EditEmployeeDialog({
     <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         <button className="icon-button">
-          <PencilIcon className="h-5 w-5 p-0 text-amber-500" />
+          <PencilIcon className="h-5 w-5 p-0 text-sky-600 dark:text-sky-500" />
         </button>
       </DialogTrigger>
 

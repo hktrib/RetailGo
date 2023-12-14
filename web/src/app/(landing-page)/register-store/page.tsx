@@ -83,7 +83,7 @@ export default function RegistrationForm() {
   };
 
   return (
-    <main className="relative isolate flex h-full min-h-screen flex-1 flex-col items-center justify-center overflow-hidden bg-white px-6 pt-14 lg:px-8">
+    <main className="relative isolate flex h-full min-h-screen flex-1 flex-col items-center justify-center overflow-hidden bg-white px-6 pt-20 lg:px-8">
       <div className="absolute left-1/2 top-4 -z-10 h-[1026px] w-[1026px] -translate-x-1/2 stroke-gray-300/70 [mask-image:linear-gradient(to_bottom,white_20%,transparent_75%)] sm:top-16 lg:-top-16 xl:top-8 xl:ml-0">
         <svg
           viewBox="0 0 1026 1026"
@@ -149,7 +149,7 @@ export default function RegistrationForm() {
 
       <div className="mx-auto w-full max-w-xl rounded-3xl bg-gray-50 px-6 py-16 shadow md:px-16">
         <div className="flex flex-col items-center">
-          <Store className="h-8 w-8 text-gray-600" />
+          <Store className="h-9 w-9 text-gray-600" />
 
           <div className="mt-4 text-center">
             <h1 className="text-2xl font-semibold text-gray-900">
