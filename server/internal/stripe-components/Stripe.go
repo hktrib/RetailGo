@@ -138,7 +138,7 @@ func StartOnboarding(accountId string, storeID int) (*stripe.AccountLink, error)
 	params := &stripe.AccountLinkParams{
 		Account:    stripe.String(accountId),
 		RefreshURL: stripe.String(fmt.Sprintf("https://retailgo-production.up.railway.app/store/%d/onboarding", storeID)),
-		ReturnURL:  stripe.String("https://retailgo-production.up.railway.app/store/"),
+		ReturnURL:  stripe.String("https://retail-go.vercel.app/store/"),
 		Type:       stripe.String("account_onboarding"),
 		Collect:    stripe.String("eventually_due"),
 	}
